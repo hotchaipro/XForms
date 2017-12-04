@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Core\BackgroundBlurEffect.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\NativeListView.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Renderers\CalendarControlRenderer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Renderers\CalendarDatePickerRenderer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Renderers\ContentControlRenderer.cs" />
@@ -26,18 +27,18 @@
     <Compile Include="$(MSBuildThisFileDirectory)Renderers\ViewRenderer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\UniversalWindowsApplication.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Renderers\ApplicationRenderer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\XamlConversions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\NativeConversions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Renderers\ElementRenderer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Renderers\FrameRenderer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\XamlPlatform.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\NativePlatform.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\DrawContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Renderers\BitmapRenderer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\OwnerDrawControl.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\GraphicsDeviceManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Renderers\DistributedStackLayoutRenderer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Layouts\XamlDistributedStackPanel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\NativeDistributedStackPanel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Renderers\DockLayoutRenderer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Layouts\XamlDockPanel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\NativeDockPanel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Renderers\PageRenderer.cs" />
   </ItemGroup>
 </Project>

@@ -1,18 +1,18 @@
 ﻿using System;
-using global::Windows.Foundation;
-using global::Windows.UI.Xaml;
-using global::Windows.UI.Xaml.Controls;
+using Windows.Foundation;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 using XamlSize = global::Windows.Foundation.Size;
 
-namespace XForms.Windows.Layouts
+namespace XForms.Windows
 {
     /// <summary>
     /// A layout panel that stacks items linearly and distributes the space between the 
     /// items evently.
     /// </summary>
-    internal class XamlDistributedStackPanel : Panel
+    internal class NativeDistributedStackPanel : Panel
     {
-        public XamlDistributedStackPanel()
+        public NativeDistributedStackPanel()
         {
         }
 

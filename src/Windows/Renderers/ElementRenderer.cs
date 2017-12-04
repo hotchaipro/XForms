@@ -1,5 +1,5 @@
 ﻿using System;
-using global::Windows.UI.Xaml;
+using Windows.UI.Xaml;
 
 namespace XForms.Windows.Renderers
 {

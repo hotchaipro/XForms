@@ -1,10 +1,10 @@
 ﻿using System;
 using Microsoft.Graphics.Canvas.Text;
-using global::Windows.UI.Xaml;
+using Windows.UI.Xaml;
 
 namespace XForms.Windows
 {
-    internal static class XamlConversions
+    internal static class NativeConversions
     {
         public static LayoutAlignment ToLayoutAlignment(
             this HorizontalAlignment horizontalAlignment)

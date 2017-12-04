@@ -3,10 +3,10 @@ using System.Numerics;
 using Microsoft.Graphics.Canvas.UI.Composition;
 using Windows.Graphics.DirectX;
 using Windows.Graphics.Display;
-using global::Windows.UI.Composition;
-using global::Windows.UI.Xaml;
-using global::Windows.UI.Xaml.Controls;
-using global::Windows.UI.Xaml.Hosting;
+using Windows.UI.Composition;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Hosting;
 using XForms.Controls;
 
 namespace XForms.Windows

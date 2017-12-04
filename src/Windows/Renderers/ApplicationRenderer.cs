@@ -1,11 +1,11 @@
 ﻿using System;
 using Windows.ApplicationModel.Core;
-using global::Windows.Foundation;
-using global::Windows.Foundation.Metadata;
-using global::Windows.UI.Core;
-using global::Windows.UI.ViewManagement;
-using global::Windows.UI.Xaml;
-using global::Windows.UI.Xaml.Media;
+using Windows.Foundation;
+using Windows.Foundation.Metadata;
+using Windows.UI.Core;
+using Windows.UI.ViewManagement;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Media;
 using XamlApplication = global::Windows.UI.Xaml.Application;
 using XamlColor = global::Windows.UI.Color;
 

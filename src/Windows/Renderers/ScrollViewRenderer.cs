@@ -1,5 +1,5 @@
 ﻿using System;
-using global::Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls;
 using XForms.Controls;
 
 namespace XForms.Windows.Renderers

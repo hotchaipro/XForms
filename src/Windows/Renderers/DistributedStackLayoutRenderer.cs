@@ -1,19 +1,18 @@
 ﻿using System;
-using global::Windows.UI.Xaml;
+using Windows.UI.Xaml;
 using XForms.Layouts;
-using XForms.Windows.Layouts;
 
 namespace XForms.Windows.Renderers
 {
     public class DistributedStackLayoutRenderer : ViewRenderer, IDistributedStackLayoutRenderer
     {
-        private XamlDistributedStackPanel _panel;
+        private NativeDistributedStackPanel _panel;
 
         public DistributedStackLayoutRenderer(
             XForms.Layouts.DistributedStackLayout layout)
             : base(layout)
         {
-            this._panel = new XamlDistributedStackPanel()
+            this._panel = new NativeDistributedStackPanel()
             {
                 //Background = new global::Windows.UI.Xaml.Media.SolidColorBrush(global::Windows.UI.Colors.Red),
             };

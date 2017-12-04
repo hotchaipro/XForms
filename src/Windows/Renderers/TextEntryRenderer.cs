@@ -1,6 +1,6 @@
 ﻿using System;
-using global::Windows.UI.Xaml.Controls;
-using global::Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Input;
 using XForms.Controls;
 
 namespace XForms.Windows.Renderers

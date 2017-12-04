@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.UI.Composition;
 using Windows.Graphics.Display;
-using global::Windows.UI.Composition;
+using Windows.UI.Composition;
 
 namespace XForms.Windows
 {

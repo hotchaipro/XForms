@@ -1,8 +1,8 @@
 ﻿using System;
 using Microsoft.Graphics.Canvas.Effects;
-using global::Windows.UI.Composition;
-using global::Windows.UI.Xaml;
-using global::Windows.UI.Xaml.Hosting;
+using Windows.UI.Composition;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Hosting;
 
 namespace XForms.Windows
 {

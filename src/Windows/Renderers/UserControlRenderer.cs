@@ -1,6 +1,5 @@
 ﻿using System;
 using XForms.Controls;
-using XForms.Windows.Layouts;
 
 namespace XForms.Windows.Renderers
 {
@@ -16,7 +15,7 @@ namespace XForms.Windows.Renderers
             {
                 IsTabStop = true,
             };
-            XamlDockPanel.SetDock(this._ownerDrawControl, XamlDockRegion.CenterOverlay);
+            NativeDockPanel.SetDock(this._ownerDrawControl, NativeDockRegion.CenterOverlay);
 
             this._ownerDrawControl.Tapped += Control_Tapped;
             this.SetNativeElement(this._ownerDrawControl);

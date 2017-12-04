@@ -1,5 +1,5 @@
 ﻿using System;
-using global::Windows.UI.Text;
+using Windows.UI.Text;
 using XForms.Controls;
 using XamlCalendarDatePicker = global::Windows.UI.Xaml.Controls.CalendarDatePicker;
 

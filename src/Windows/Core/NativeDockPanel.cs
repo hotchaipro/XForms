@@ -1,14 +1,14 @@
 ﻿using System;
-using global::Windows.Foundation;
-using global::Windows.UI.Xaml;
-using global::Windows.UI.Xaml.Controls;
-using global::Windows.UI.Xaml.Media;
+using Windows.Foundation;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media;
 using XamlSize = global::Windows.Foundation.Size;
 using System.Collections.Generic;
 
-namespace XForms.Windows.Layouts
+namespace XForms.Windows
 {
-    internal enum XamlDockRegion
+    internal enum NativeDockRegion
     {
         CenterOverlay = 0,
         Left,
@@ -21,22 +21,22 @@ namespace XForms.Windows.Layouts
         BottomOverlay,
     }
 
-    internal class XamlDockPanel : Panel
+    internal class NativeDockPanel : Panel
     {
         public static readonly DependencyProperty DockProperty = DependencyProperty.RegisterAttached(
             "Dock",
-            typeof(XamlDockRegion),
-            typeof(XamlDockPanel),
-            new PropertyMetadata(XamlDockRegion.Left, OnDockPropertyChanged));
+            typeof(NativeDockRegion),
+            typeof(NativeDockPanel),
+            new PropertyMetadata(NativeDockRegion.Left, OnDockPropertyChanged));
 
-        public XamlDockPanel()
+        public NativeDockPanel()
         {
             // NOTE: For whatever reason, the Background property must be set for input handling,
             // such as the PointerPressed event in the parent Page, to work properly.
             //this.Background = new SolidColorBrush(global::Windows.UI.Colors.Transparent);
         }
 
-        public static XamlDockRegion GetDock(
+        public static NativeDockRegion GetDock(
             UIElement element)
         {
             if (element == null)
@@ -44,12 +44,12 @@ namespace XForms.Windows.Layouts
                 throw new ArgumentNullException(nameof(element));
             }
 
-            return (XamlDockRegion)element.GetValue(DockProperty);
+            return (NativeDockRegion)element.GetValue(DockProperty);
         }
 
         public static void SetDock(
             UIElement element,
-            XamlDockRegion dock)
+            NativeDockRegion dock)
         {
             if (element == null)
             {
@@ -64,9 +64,9 @@ namespace XForms.Windows.Layouts
             DependencyPropertyChangedEventArgs e)
         {
             UIElement element = (UIElement)d;
-            XamlDockRegion value = (XamlDockRegion)e.NewValue;
+            NativeDockRegion value = (NativeDockRegion)e.NewValue;
 
-            XamlDockPanel panel = VisualTreeHelper.GetParent(element) as XamlDockPanel;
+            NativeDockPanel panel = VisualTreeHelper.GetParent(element) as NativeDockPanel;
             if (panel != null)
             {
                 panel.InvalidateMeasure();
@@ -103,7 +103,7 @@ namespace XForms.Windows.Layouts
             {
                 var dockRegion = GetDock(child);
 
-                if (dockRegion == XamlDockRegion.CenterOverlay)
+                if (dockRegion == NativeDockRegion.CenterOverlay)
                 {
                     // Arrange the center elements last
                     centerElements.Add(child);
@@ -114,46 +114,46 @@ namespace XForms.Windows.Layouts
 
                     XamlSize childSize = child.DesiredSize;
 
-                    if (dockRegion == XamlDockRegion.Left)
+                    if (dockRegion == NativeDockRegion.Left)
                     {
                         usedLeft = Math.Max(usedLeft, startLeft + childSize.Width);
                         startLeft += childSize.Width;
                         minHeight = Math.Max(minHeight, usedTop + usedBottom + childSize.Height);
                     }
-                    else if (dockRegion == XamlDockRegion.LeftOverlay)
+                    else if (dockRegion == NativeDockRegion.LeftOverlay)
                     {
                         usedLeft = Math.Max(usedLeft, startLeft + childSize.Width);
                         minHeight = Math.Max(minHeight, usedTop + usedBottom + childSize.Height);
                     }
-                    else if (dockRegion == XamlDockRegion.Top)
+                    else if (dockRegion == NativeDockRegion.Top)
                     {
                         usedTop = Math.Max(usedTop, startTop + childSize.Height);
                         startTop += childSize.Height;
                         minWidth = Math.Max(minWidth, usedLeft + usedRight + childSize.Width);
                     }
-                    else if (dockRegion == XamlDockRegion.TopOverlay)
+                    else if (dockRegion == NativeDockRegion.TopOverlay)
                     {
                         usedTop = Math.Max(usedTop, startTop + childSize.Height);
                         minWidth = Math.Max(minWidth, usedLeft + usedRight + childSize.Width);
                     }
-                    else if (dockRegion == XamlDockRegion.Right)
+                    else if (dockRegion == NativeDockRegion.Right)
                     {
                         usedRight = Math.Max(usedRight, startRight + childSize.Width);
                         startRight += childSize.Width;
                         minHeight = Math.Max(minHeight, usedTop + usedBottom + childSize.Height);
                     }
-                    else if (dockRegion == XamlDockRegion.RightOverlay)
+                    else if (dockRegion == NativeDockRegion.RightOverlay)
                     {
                         usedRight = Math.Max(usedRight, startRight + childSize.Width);
                         minHeight = Math.Max(minHeight, usedTop + usedBottom + childSize.Height);
                     }
-                    else if (dockRegion == XamlDockRegion.Bottom)
+                    else if (dockRegion == NativeDockRegion.Bottom)
                     {
                         usedBottom = Math.Max(usedBottom, startBottom + childSize.Height);
                         startBottom += childSize.Height;
                         minWidth = Math.Max(minWidth, usedLeft + usedRight + childSize.Width);
                     }
-                    else if (dockRegion == XamlDockRegion.BottomOverlay)
+                    else if (dockRegion == NativeDockRegion.BottomOverlay)
                     {
                         usedBottom = Math.Max(usedBottom, startBottom + childSize.Height);
                         minWidth = Math.Max(minWidth, usedLeft + usedRight + childSize.Width);
@@ -221,7 +221,7 @@ namespace XForms.Windows.Layouts
             {
                 var dockRegion = GetDock(child);
 
-                if (dockRegion == XamlDockRegion.CenterOverlay)
+                if (dockRegion == NativeDockRegion.CenterOverlay)
                 {
                     // Arrange the center elements last
                     centerElements.Add(child);
@@ -232,44 +232,44 @@ namespace XForms.Windows.Layouts
 
                     XamlSize childSize = child.DesiredSize;
 
-                    if (dockRegion == XamlDockRegion.Left)
+                    if (dockRegion == NativeDockRegion.Left)
                     {
                         arrangeRect.Width = childSize.Width;
                         remainingRect.X += childSize.Width;
                         remainingRect.Width = Math.Max(0, remainingRect.Width - childSize.Width);
                     }
-                    else if (dockRegion == XamlDockRegion.LeftOverlay)
+                    else if (dockRegion == NativeDockRegion.LeftOverlay)
                     {
                         arrangeRect.Width = childSize.Width;
                     }
-                    else if (dockRegion == XamlDockRegion.Top)
+                    else if (dockRegion == NativeDockRegion.Top)
                     {
                         arrangeRect.Height = childSize.Height;
                         remainingRect.Y += childSize.Height;
                         remainingRect.Height = Math.Max(0, remainingRect.Height - childSize.Height);
                     }
-                    else if (dockRegion == XamlDockRegion.TopOverlay)
+                    else if (dockRegion == NativeDockRegion.TopOverlay)
                     {
                         arrangeRect.Height = childSize.Height;
                     }
-                    else if (dockRegion == XamlDockRegion.Right)
+                    else if (dockRegion == NativeDockRegion.Right)
                     {
                         arrangeRect.X = remainingRect.Right - childSize.Width;
                         arrangeRect.Width = childSize.Width;
                         remainingRect.Width = Math.Max(0, remainingRect.Width - childSize.Width);
                     }
-                    else if (dockRegion == XamlDockRegion.RightOverlay)
+                    else if (dockRegion == NativeDockRegion.RightOverlay)
                     {
                         arrangeRect.X = remainingRect.Right - childSize.Width;
                         arrangeRect.Width = childSize.Width;
                     }
-                    else if (dockRegion == XamlDockRegion.Bottom)
+                    else if (dockRegion == NativeDockRegion.Bottom)
                     {
                         arrangeRect.Y = remainingRect.Bottom - childSize.Height;
                         arrangeRect.Height = childSize.Height;
                         remainingRect.Height = Math.Max(0, remainingRect.Height - childSize.Height);
                     }
-                    else if (dockRegion == XamlDockRegion.BottomOverlay)
+                    else if (dockRegion == NativeDockRegion.BottomOverlay)
                     {
                         arrangeRect.Y = remainingRect.Bottom - childSize.Height;
                         arrangeRect.Height = childSize.Height;

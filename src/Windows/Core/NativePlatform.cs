@@ -6,11 +6,11 @@ using XamlApplication = global::Windows.UI.Xaml.Application;
 
 namespace XForms.Windows
 {
-    public class XamlPlatform : IPlatform
+    public class NativePlatform : IPlatform
     {
         private XamlApplication _xamlApplication;
 
-        public XamlPlatform(
+        public NativePlatform(
             XamlApplication xamlApplication)
         {
             if (null == xamlApplication)

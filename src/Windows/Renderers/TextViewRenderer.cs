@@ -1,5 +1,5 @@
 ﻿using System;
-using global::Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media;
 using XForms.Controls;
 using XamlGrid = global::Windows.UI.Xaml.Controls.Grid;
 using XamlTextBlock = global::Windows.UI.Xaml.Controls.TextBlock;

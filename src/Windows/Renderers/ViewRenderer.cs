@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
-using global::Windows.UI.Xaml;
-using global::Windows.UI.Xaml.Input;
-using global::Windows.UI.Xaml.Media;
-using global::Windows.UI.Xaml.Media.Animation;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Animation;
 
 namespace XForms.Windows.Renderers
 {

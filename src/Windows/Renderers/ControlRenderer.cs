@@ -1,5 +1,5 @@
 ﻿using System;
-using global::Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media;
 using XForms.Controls;
 
 namespace XForms.Windows.Renderers

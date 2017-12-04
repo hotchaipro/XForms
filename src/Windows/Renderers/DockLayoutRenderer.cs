@@ -1,19 +1,18 @@
 ﻿using System;
-using global::Windows.UI.Xaml;
+using Windows.UI.Xaml;
 using XForms.Layouts;
-using XForms.Windows.Layouts;
 
 namespace XForms.Windows.Renderers
 {
     public class DockLayoutRenderer : ViewRenderer, IDockLayoutRenderer
     {
-        private XamlDockPanel _panel;
+        private NativeDockPanel _panel;
 
         public DockLayoutRenderer(
             XForms.Layouts.DockLayout layout)
             : base(layout)
         {
-            this._panel = new XamlDockPanel();
+            this._panel = new NativeDockPanel();
             this._panel.HorizontalAlignment = global::Windows.UI.Xaml.HorizontalAlignment.Stretch;
             this._panel.VerticalAlignment = global::Windows.UI.Xaml.VerticalAlignment.Stretch;
 
@@ -30,7 +29,7 @@ namespace XForms.Windows.Renderers
             DockRegion dockRegion)
         {
             var nativeChild = (FrameworkElement)childRenderer.NativeElement;
-            XamlDockPanel.SetDock(nativeChild, ToXamlDockRegion(dockRegion));
+            NativeDockPanel.SetDock(nativeChild, ToXamlDockRegion(dockRegion));
             this._panel.Children.Add(nativeChild);
         }
 
@@ -40,7 +39,7 @@ namespace XForms.Windows.Renderers
             DockRegion dockRegion)
         {
             var nativeChild = (FrameworkElement)childRenderer.NativeElement;
-            XamlDockPanel.SetDock(nativeChild, ToXamlDockRegion(dockRegion));
+            NativeDockPanel.SetDock(nativeChild, ToXamlDockRegion(dockRegion));
             this._panel.Children.Insert(index, nativeChild);
         }
 
@@ -56,7 +55,7 @@ namespace XForms.Windows.Renderers
             DockRegion dockRegion)
         {
             var nativeChild = (FrameworkElement)childRenderer.NativeElement;
-            XamlDockPanel.SetDock(nativeChild, ToXamlDockRegion(dockRegion));
+            NativeDockPanel.SetDock(nativeChild, ToXamlDockRegion(dockRegion));
             this._panel.Children[index] = nativeChild;
         }
 
@@ -94,46 +93,46 @@ namespace XForms.Windows.Renderers
             this.ReplaceChild(index, childRenderer, dockRegion);
         }
 
-        private static XamlDockRegion ToXamlDockRegion(
+        private static NativeDockRegion ToXamlDockRegion(
             DockRegion dockRegion)
         {
-            XamlDockRegion xamlDockRegion;
+            NativeDockRegion xamlDockRegion;
 
             if (dockRegion == DockRegion.CenterOverlay)
             {
-                xamlDockRegion = XamlDockRegion.CenterOverlay;
+                xamlDockRegion = NativeDockRegion.CenterOverlay;
             }
             else if (dockRegion == DockRegion.Left)
             {
-                xamlDockRegion = XamlDockRegion.Left;
+                xamlDockRegion = NativeDockRegion.Left;
             }
             else if (dockRegion == DockRegion.LeftOverlay)
             {
-                xamlDockRegion = XamlDockRegion.LeftOverlay;
+                xamlDockRegion = NativeDockRegion.LeftOverlay;
             }
             else if (dockRegion == DockRegion.Top)
             {
-                xamlDockRegion = XamlDockRegion.Top;
+                xamlDockRegion = NativeDockRegion.Top;
             }
             else if (dockRegion == DockRegion.TopOverlay)
             {
-                xamlDockRegion = XamlDockRegion.TopOverlay;
+                xamlDockRegion = NativeDockRegion.TopOverlay;
             }
             else if (dockRegion == DockRegion.Right)
             {
-                xamlDockRegion = XamlDockRegion.Right;
+                xamlDockRegion = NativeDockRegion.Right;
             }
             else if (dockRegion == DockRegion.RightOverlay)
             {
-                xamlDockRegion = XamlDockRegion.RightOverlay;
+                xamlDockRegion = NativeDockRegion.RightOverlay;
             }
             else if (dockRegion == DockRegion.Bottom)
             {
-                xamlDockRegion = XamlDockRegion.Bottom;
+                xamlDockRegion = NativeDockRegion.Bottom;
             }
             else if (dockRegion == DockRegion.BottomOverlay)
             {
-                xamlDockRegion = XamlDockRegion.BottomOverlay;
+                xamlDockRegion = NativeDockRegion.BottomOverlay;
             }
             else
             {

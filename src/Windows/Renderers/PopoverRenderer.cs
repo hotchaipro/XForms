@@ -1,5 +1,5 @@
 ﻿using System;
-using global::Windows.UI.Xaml;
+using Windows.UI.Xaml;
 using XForms.Controls;
 using XamlPopup = global::Windows.UI.Xaml.Controls.Primitives.Popup;
 

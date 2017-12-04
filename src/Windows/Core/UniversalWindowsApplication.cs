@@ -1,7 +1,7 @@
 ﻿using System;
 using Windows.ApplicationModel.Activation;
-using global::Windows.UI.ViewManagement;
-using global::Windows.UI.Xaml;
+using Windows.UI.ViewManagement;
+using Windows.UI.Xaml;
 using NativeApplication = global::Windows.UI.Xaml.Application;
 using NativeFrame = global::Windows.UI.Xaml.Controls.Frame;
 
