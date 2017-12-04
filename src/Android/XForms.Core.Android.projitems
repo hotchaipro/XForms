@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>237611cc-f05e-490e-857f-8ee0f6d4e51b</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>XForms.Android</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Core\AndroidApplication.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\BaseLayoutParams.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\NativeConversions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\NativeDistributedStackLayout.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\NativeDockLayout.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\DrawContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\NativeListViewItemContainer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\NativeListPickerAdapter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\NativeListViewAdapter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\OwnerDrawControl.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\NativePlatform.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\ApplicationRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\BitmapRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\CalendarControlRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\CalendarDatePickerRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\ContentControlRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\ControlRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\DistributedStackLayoutRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\DockLayoutRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\ElementRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\FrameRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\ImageRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\LayoutRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\ListPickerRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\ListViewRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\PageRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\PopoverRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\ProgressRingRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\ScrollViewRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\TextEntryRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\TextViewRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\UserControlRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\ViewRenderer.cs" />
+  </ItemGroup>
+</Project>

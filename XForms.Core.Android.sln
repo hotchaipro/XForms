@@ -1,0 +1,35 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2010
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XForms.Core.AndroidLibrary", "dll\Android\XForms.Core.AndroidLibrary.csproj", "{12E7289A-F17F-4D48-8201-22399D5FA0EB}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "XForms.Core", "src\Core\XForms.Core.shproj", "{2F04F6C1-D6BB-40A7-83F3-D387C23A1493}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "XForms.Core.Android", "src\Android\XForms.Core.Android.shproj", "{237611CC-F05E-490E-857F-8EE0F6D4E51B}"
+EndProject
+Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		src\Android\XForms.Core.Android.projitems*{12e7289a-f17f-4d48-8201-22399d5fa0eb}*SharedItemsImports = 4
+		src\Core\XForms.Core.projitems*{12e7289a-f17f-4d48-8201-22399d5fa0eb}*SharedItemsImports = 4
+		src\Android\XForms.Core.Android.projitems*{237611cc-f05e-490e-857f-8ee0f6d4e51b}*SharedItemsImports = 13
+		src\Core\XForms.Core.projitems*{2f04f6c1-d6bb-40a7-83f3-d387c23a1493}*SharedItemsImports = 13
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{12E7289A-F17F-4D48-8201-22399D5FA0EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12E7289A-F17F-4D48-8201-22399D5FA0EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12E7289A-F17F-4D48-8201-22399D5FA0EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12E7289A-F17F-4D48-8201-22399D5FA0EB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C2DE3B67-BA93-4195-88A2-1E197FF6D5D0}
+	EndGlobalSection
+EndGlobal
