@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>de4be9d5-8b91-4e03-8b5c-f5cdc3922d86</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>XForms.Windows</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Core\BackgroundBlurEffect.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\CalendarControlRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\CalendarDatePickerRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\ContentControlRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\ControlRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\ImageRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\ListPickerRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\ListViewRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\PopoverRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\ProgressRingRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\ScrollViewRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\TextEntryRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\TextViewRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\UserControlRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\ViewRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\UniversalWindowsApplication.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\ApplicationRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\XamlConversions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\ElementRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\FrameRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\XamlPlatform.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\DrawContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\BitmapRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\OwnerDrawControl.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\GraphicsDeviceManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\DistributedStackLayoutRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Layouts\XamlDistributedStackPanel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\DockLayoutRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Layouts\XamlDockPanel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\PageRenderer.cs" />
+  </ItemGroup>
+</Project>
