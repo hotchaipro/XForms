@@ -19,7 +19,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Core\NativeListPickerAdapter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\NativeListViewAdapter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\OwnerDrawControl.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\NativePlatform.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\AndroidPlatform.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Renderers\ApplicationRenderer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Renderers\BitmapRenderer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Renderers\CalendarControlRenderer.cs" />

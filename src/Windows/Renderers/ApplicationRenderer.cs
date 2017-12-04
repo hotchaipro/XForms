@@ -38,7 +38,7 @@ namespace XForms.Windows.Renderers
             this._xamlApplication = xamlApplication;
 
             // Handle lifetime events
-            if (ApiInformation.IsApiContractPresent("global::Windows.Foundation.UniversalApiContract", 3, 0))
+            if (ApiInformation.IsApiContractPresent("Windows.Foundation.UniversalApiContract", 3, 0))
             {
                 xamlApplication.EnteredBackground += Application_EnteredBackground;
                 xamlApplication.LeavingBackground += Application_LeavingBackground;
@@ -370,7 +370,7 @@ namespace XForms.Windows.Renderers
         private void UpdateTitleBar()
         {
 
-            if (global::Windows.Foundation.Metadata.ApiInformation.IsTypePresent("global::Windows.UI.ViewManagement.StatusBar"))
+            if (global::Windows.Foundation.Metadata.ApiInformation.IsTypePresent("Windows.UI.ViewManagement.StatusBar"))
             {
                 var statusBar = global::Windows.UI.ViewManagement.StatusBar.GetForCurrentView();
                 statusBar.ForegroundColor = this.TitleBarForegroundColor?.ToXamlColor();

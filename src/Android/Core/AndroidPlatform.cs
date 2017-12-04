@@ -5,11 +5,11 @@ using XForms.Layouts;
 
 namespace XForms.Android
 {
-    public class NativePlatform : IPlatform
+    public class AndroidPlatform : IPlatform
     {
         private AndroidApplicationActivity _androidApplication;
 
-        public NativePlatform(
+        public AndroidPlatform(
             AndroidApplicationActivity androidApplication)
         {
             if (null == androidApplication)

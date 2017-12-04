@@ -97,7 +97,7 @@ namespace XForms.Windows
 
         private void InitializeDrawingSurface()
         {
-            if (!global::Windows.Foundation.Metadata.ApiInformation.IsApiContractPresent("global::Windows.Foundation.UniversalApiContract", 2))
+            if (!global::Windows.Foundation.Metadata.ApiInformation.IsApiContractPresent("Windows.Foundation.UniversalApiContract", 2))
             {
                 throw new NotSupportedException("This version of Windows does not support the required Composition API.");
             }

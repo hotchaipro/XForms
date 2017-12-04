@@ -41,4 +41,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)Core\NativeDockPanel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Renderers\PageRenderer.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Page Include="$(MSBuildThisFileDirectory)Resources.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
 </Project>

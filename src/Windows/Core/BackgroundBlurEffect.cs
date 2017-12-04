@@ -29,7 +29,7 @@ namespace XForms.Windows
         public void Apply(
             float blurAmount)
         {
-            if (global::Windows.Foundation.Metadata.ApiInformation.IsMethodPresent("global::Windows.UI.Composition.Compositor", "CreateBackdropBrush"))
+            if (global::Windows.Foundation.Metadata.ApiInformation.IsMethodPresent("Windows.UI.Composition.Compositor", "CreateBackdropBrush"))
             {
                 this.ApplyInternal(blurAmount);
             }
