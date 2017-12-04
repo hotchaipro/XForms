@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>2f04f6c1-d6bb-40a7-83f3-d387c23a1493</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>XForms</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\Button.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\CalendarControl.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\CalendarDatePicker.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\Command.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\CommandBar.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\CommandBarButton.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\ContentControl.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\Control.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\DaysOfWeekPicker.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\FloatingButton.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\FlyoutButton.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\HyperlinkView.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\Image.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\ImageToggleButton.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\LightDismissControl.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\ListPicker.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\ListPickerItem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\ListView.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\ListViewItem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\ListViewItemContainer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\ListViewSource.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\ListViewSwipeItem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\MenuBar.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\MenuButton.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\MenuItem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\MessageBox.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\NavigationCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\Popover.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\ProgressRing.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\RadioButton.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\RadioButtonItem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\RadioButtonPicker.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\ScrollView.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\TabBar.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\TabButton.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\TextEntry.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\TextView.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\ToggleButton.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\UICommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\UserControl.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Input\SwipeGestureRecognizer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Input\TapGestureRecognizer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Layouts\DistributedStackLayout.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Layouts\DockLayout.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Angle.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Application.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\AppTheme.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Bitmap.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Color.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Colors.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Dimension.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Easing.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Element.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\FontStyle.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\FontWeight.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Frame.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\GestureRecognizer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\ICommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\IDrawContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\ImageSource.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\IPlatform.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Layout.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\LayoutAlignment.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\LayoutViewCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\NavigationEventArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Origin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Page.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Point.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\PointerInput.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Rectangle.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Size.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\TextAlignment.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\TextFormat.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Thickness.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Timer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\TitleBar.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\View.cs" />
+  </ItemGroup>
+</Project>
