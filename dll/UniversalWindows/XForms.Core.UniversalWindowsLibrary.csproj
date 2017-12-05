@@ -12,7 +12,7 @@
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.16299.0</TargetPlatformVersion>
-    <TargetPlatformMinVersion>10.0.10586.0</TargetPlatformMinVersion>
+    <TargetPlatformMinVersion>10.0.10240.0</TargetPlatformMinVersion>
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -106,6 +106,99 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\..\src\Windows\Core\BackgroundBlurEffect.cs">
+      <Link>Core\BackgroundBlurEffect.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Windows\Core\DrawContext.cs">
+      <Link>Core\DrawContext.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Windows\Core\GraphicsDeviceManager.cs">
+      <Link>Core\GraphicsDeviceManager.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Windows\Core\NativeConversions.cs">
+      <Link>Core\NativeConversions.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Windows\Core\NativeDistributedStackPanel.cs">
+      <Link>Core\NativeDistributedStackPanel.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Windows\Core\NativeDockPanel.cs">
+      <Link>Core\NativeDockPanel.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Windows\Core\NativeListView.cs">
+      <Link>Core\NativeListView.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Windows\Core\OwnerDrawControl.cs">
+      <Link>Core\OwnerDrawControl.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Windows\Core\UniversalWindowsApplication.cs">
+      <Link>Core\UniversalWindowsApplication.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Windows\Core\UniversalWindowsPlatform.cs">
+      <Link>Core\UniversalWindowsPlatform.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Windows\Renderers\ApplicationRenderer.cs">
+      <Link>Renderers\ApplicationRenderer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Windows\Renderers\BitmapRenderer.cs">
+      <Link>Renderers\BitmapRenderer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Windows\Renderers\CalendarControlRenderer.cs">
+      <Link>Renderers\CalendarControlRenderer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Windows\Renderers\CalendarDatePickerRenderer.cs">
+      <Link>Renderers\CalendarDatePickerRenderer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Windows\Renderers\ContentControlRenderer.cs">
+      <Link>Renderers\ContentControlRenderer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Windows\Renderers\ControlRenderer.cs">
+      <Link>Renderers\ControlRenderer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Windows\Renderers\DistributedStackLayoutRenderer.cs">
+      <Link>Renderers\DistributedStackLayoutRenderer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Windows\Renderers\DockLayoutRenderer.cs">
+      <Link>Renderers\DockLayoutRenderer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Windows\Renderers\ElementRenderer.cs">
+      <Link>Renderers\ElementRenderer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Windows\Renderers\FrameRenderer.cs">
+      <Link>Renderers\FrameRenderer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Windows\Renderers\ImageRenderer.cs">
+      <Link>Renderers\ImageRenderer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Windows\Renderers\ListPickerRenderer.cs">
+      <Link>Renderers\ListPickerRenderer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Windows\Renderers\ListViewRenderer.cs">
+      <Link>Renderers\ListViewRenderer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Windows\Renderers\PageRenderer.cs">
+      <Link>Renderers\PageRenderer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Windows\Renderers\PopoverRenderer.cs">
+      <Link>Renderers\PopoverRenderer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Windows\Renderers\ProgressRingRenderer.cs">
+      <Link>Renderers\ProgressRingRenderer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Windows\Renderers\ScrollViewRenderer.cs">
+      <Link>Renderers\ScrollViewRenderer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Windows\Renderers\TextEntryRenderer.cs">
+      <Link>Renderers\TextEntryRenderer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Windows\Renderers\TextViewRenderer.cs">
+      <Link>Renderers\TextViewRenderer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Windows\Renderers\UserControlRenderer.cs">
+      <Link>Renderers\UserControlRenderer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Windows\Renderers\ViewRenderer.cs">
+      <Link>Renderers\ViewRenderer.cs</Link>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\XForms.Core.UniversalWindowsLibrary.rd.xml" />
   </ItemGroup>
@@ -118,12 +211,23 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <SDKReference Include="WindowsMobile, Version=10.0.15063.0">
+    <SDKReference Include="WindowsMobile, Version=10.0.10586.0">
       <Name>Windows Mobile Extensions for the UWP</Name>
     </SDKReference>
   </ItemGroup>
-  <Import Project="..\..\src\Core\XForms.Core.projitems" Label="Shared" />
-  <Import Project="..\..\src\Windows\XForms.Core.Windows.projitems" Label="Shared" />
+  <ItemGroup>
+    <Page Include="..\..\src\Windows\Resources.xaml">
+      <Link>Resources.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Portable\XForms.Core.PortableLibrary.csproj">
+      <Project>{bd37daec-0b39-4f34-bdb5-0d2b2f8ff214}</Project>
+      <Name>XForms.Core.PortableLibrary</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

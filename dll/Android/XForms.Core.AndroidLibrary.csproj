@@ -47,7 +47,12 @@
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <Import Project="..\..\src\Core\XForms.Core.projitems" Label="Shared" />
+  <ItemGroup>
+    <ProjectReference Include="..\Portable\XForms.Core.PortableLibrary.csproj">
+      <Project>{bd37daec-0b39-4f34-bdb5-0d2b2f8ff214}</Project>
+      <Name>XForms.Core.PortableLibrary</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="..\..\src\Android\XForms.Core.Android.projitems" Label="Shared" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,0 +1,279 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <MinimumVisualStudioVersion>10.0</MinimumVisualStudioVersion>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{BD37DAEC-0B39-4F34-BDB5-0D2B2F8FF214}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>XForms</RootNamespace>
+    <AssemblyName>XForms.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Profile7</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\src\Core\Controls\Button.cs">
+      <Link>Controls\Button.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\CalendarControl.cs">
+      <Link>Controls\CalendarControl.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\CalendarDatePicker.cs">
+      <Link>Controls\CalendarDatePicker.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\Command.cs">
+      <Link>Controls\Command.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\CommandBar.cs">
+      <Link>Controls\CommandBar.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\CommandBarButton.cs">
+      <Link>Controls\CommandBarButton.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\ContentControl.cs">
+      <Link>Controls\ContentControl.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\Control.cs">
+      <Link>Controls\Control.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\DaysOfWeekPicker.cs">
+      <Link>Controls\DaysOfWeekPicker.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\FloatingButton.cs">
+      <Link>Controls\FloatingButton.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\FlyoutButton.cs">
+      <Link>Controls\FlyoutButton.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\HyperlinkView.cs">
+      <Link>Controls\HyperlinkView.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\Image.cs">
+      <Link>Controls\Image.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\ImageToggleButton.cs">
+      <Link>Controls\ImageToggleButton.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\LightDismissControl.cs">
+      <Link>Controls\LightDismissControl.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\ListPicker.cs">
+      <Link>Controls\ListPicker.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\ListPickerItem.cs">
+      <Link>Controls\ListPickerItem.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\ListView.cs">
+      <Link>Controls\ListView.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\ListViewItem.cs">
+      <Link>Controls\ListViewItem.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\ListViewItemContainer.cs">
+      <Link>Controls\ListViewItemContainer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\ListViewSource.cs">
+      <Link>Controls\ListViewSource.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\ListViewSwipeItem.cs">
+      <Link>Controls\ListViewSwipeItem.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\MenuBar.cs">
+      <Link>Controls\MenuBar.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\MenuButton.cs">
+      <Link>Controls\MenuButton.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\MenuItem.cs">
+      <Link>Controls\MenuItem.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\MessageBox.cs">
+      <Link>Controls\MessageBox.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\NavigationCommand.cs">
+      <Link>Controls\NavigationCommand.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\Popover.cs">
+      <Link>Controls\Popover.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\ProgressRing.cs">
+      <Link>Controls\ProgressRing.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\RadioButton.cs">
+      <Link>Controls\RadioButton.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\RadioButtonItem.cs">
+      <Link>Controls\RadioButtonItem.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\RadioButtonPicker.cs">
+      <Link>Controls\RadioButtonPicker.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\ScrollView.cs">
+      <Link>Controls\ScrollView.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\TabBar.cs">
+      <Link>Controls\TabBar.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\TabButton.cs">
+      <Link>Controls\TabButton.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\TextEntry.cs">
+      <Link>Controls\TextEntry.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\TextView.cs">
+      <Link>Controls\TextView.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\ToggleButton.cs">
+      <Link>Controls\ToggleButton.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\UICommand.cs">
+      <Link>Controls\UICommand.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Controls\UserControl.cs">
+      <Link>Controls\UserControl.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Core\Angle.cs">
+      <Link>Core\Angle.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Core\Application.cs">
+      <Link>Core\Application.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Core\AppTheme.cs">
+      <Link>Core\AppTheme.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Core\Bitmap.cs">
+      <Link>Core\Bitmap.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Core\Color.cs">
+      <Link>Core\Color.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Core\Colors.cs">
+      <Link>Core\Colors.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Core\Dimension.cs">
+      <Link>Core\Dimension.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Core\Easing.cs">
+      <Link>Core\Easing.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Core\Element.cs">
+      <Link>Core\Element.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Core\FontStyle.cs">
+      <Link>Core\FontStyle.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Core\FontWeight.cs">
+      <Link>Core\FontWeight.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Core\Frame.cs">
+      <Link>Core\Frame.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Core\GestureRecognizer.cs">
+      <Link>Core\GestureRecognizer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Core\ICommand.cs">
+      <Link>Core\ICommand.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Core\IDrawContext.cs">
+      <Link>Core\IDrawContext.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Core\ImageSource.cs">
+      <Link>Core\ImageSource.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Core\IPlatform.cs">
+      <Link>Core\IPlatform.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Core\Layout.cs">
+      <Link>Core\Layout.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Core\LayoutAlignment.cs">
+      <Link>Core\LayoutAlignment.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Core\LayoutViewCollection.cs">
+      <Link>Core\LayoutViewCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Core\NavigationEventArgs.cs">
+      <Link>Core\NavigationEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Core\Origin.cs">
+      <Link>Core\Origin.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Core\Page.cs">
+      <Link>Core\Page.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Core\Point.cs">
+      <Link>Core\Point.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Core\PointerInput.cs">
+      <Link>Core\PointerInput.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Core\Rectangle.cs">
+      <Link>Core\Rectangle.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Core\Size.cs">
+      <Link>Core\Size.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Core\TextAlignment.cs">
+      <Link>Core\TextAlignment.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Core\TextFormat.cs">
+      <Link>Core\TextFormat.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Core\Thickness.cs">
+      <Link>Core\Thickness.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Core\Timer.cs">
+      <Link>Core\Timer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Core\TitleBar.cs">
+      <Link>Core\TitleBar.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Core\View.cs">
+      <Link>Core\View.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Input\SwipeGestureRecognizer.cs">
+      <Link>Input\SwipeGestureRecognizer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Input\TapGestureRecognizer.cs">
+      <Link>Input\TapGestureRecognizer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Layouts\DistributedStackLayout.cs">
+      <Link>Layouts\DistributedStackLayout.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\Core\Layouts\DockLayout.cs">
+      <Link>Layouts\DockLayout.cs</Link>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

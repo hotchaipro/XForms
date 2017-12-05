@@ -5,17 +5,9 @@ VisualStudioVersion = 15.0.27004.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XForms.Core.UniversalWindowsLibrary", "dll\UniversalWindows\XForms.Core.UniversalWindowsLibrary.csproj", "{13326D54-DC11-49C9-8A7B-3F02BEA9CA6B}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "XForms.Core", "src\Core\XForms.Core.shproj", "{2F04F6C1-D6BB-40A7-83F3-D387C23A1493}"
-EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "XForms.Core.Windows", "src\Windows\XForms.Core.Windows.shproj", "{DE4BE9D5-8B91-4E03-8B5C-F5CDC3922D86}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XForms.Core.PortableLibrary", "dll\Portable\XForms.Core.PortableLibrary.csproj", "{BD37DAEC-0B39-4F34-BDB5-0D2B2F8FF214}"
 EndProject
 Global
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		src\Core\XForms.Core.projitems*{13326d54-dc11-49c9-8a7b-3f02bea9ca6b}*SharedItemsImports = 4
-		src\Windows\XForms.Core.Windows.projitems*{13326d54-dc11-49c9-8a7b-3f02bea9ca6b}*SharedItemsImports = 4
-		src\Core\XForms.Core.projitems*{2f04f6c1-d6bb-40a7-83f3-d387c23a1493}*SharedItemsImports = 13
-		src\Windows\XForms.Core.Windows.projitems*{de4be9d5-8b91-4e03-8b5c-f5cdc3922d86}*SharedItemsImports = 13
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|ARM = Debug|ARM
@@ -43,6 +35,22 @@ Global
 		{13326D54-DC11-49C9-8A7B-3F02BEA9CA6B}.Release|x64.Build.0 = Release|x64
 		{13326D54-DC11-49C9-8A7B-3F02BEA9CA6B}.Release|x86.ActiveCfg = Release|x86
 		{13326D54-DC11-49C9-8A7B-3F02BEA9CA6B}.Release|x86.Build.0 = Release|x86
+		{BD37DAEC-0B39-4F34-BDB5-0D2B2F8FF214}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD37DAEC-0B39-4F34-BDB5-0D2B2F8FF214}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD37DAEC-0B39-4F34-BDB5-0D2B2F8FF214}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{BD37DAEC-0B39-4F34-BDB5-0D2B2F8FF214}.Debug|ARM.Build.0 = Debug|Any CPU
+		{BD37DAEC-0B39-4F34-BDB5-0D2B2F8FF214}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{BD37DAEC-0B39-4F34-BDB5-0D2B2F8FF214}.Debug|x64.Build.0 = Debug|Any CPU
+		{BD37DAEC-0B39-4F34-BDB5-0D2B2F8FF214}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BD37DAEC-0B39-4F34-BDB5-0D2B2F8FF214}.Debug|x86.Build.0 = Debug|Any CPU
+		{BD37DAEC-0B39-4F34-BDB5-0D2B2F8FF214}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD37DAEC-0B39-4F34-BDB5-0D2B2F8FF214}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD37DAEC-0B39-4F34-BDB5-0D2B2F8FF214}.Release|ARM.ActiveCfg = Release|Any CPU
+		{BD37DAEC-0B39-4F34-BDB5-0D2B2F8FF214}.Release|ARM.Build.0 = Release|Any CPU
+		{BD37DAEC-0B39-4F34-BDB5-0D2B2F8FF214}.Release|x64.ActiveCfg = Release|Any CPU
+		{BD37DAEC-0B39-4F34-BDB5-0D2B2F8FF214}.Release|x64.Build.0 = Release|Any CPU
+		{BD37DAEC-0B39-4F34-BDB5-0D2B2F8FF214}.Release|x86.ActiveCfg = Release|Any CPU
+		{BD37DAEC-0B39-4F34-BDB5-0D2B2F8FF214}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
