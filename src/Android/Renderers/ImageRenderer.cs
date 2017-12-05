@@ -18,6 +18,7 @@ namespace XForms.Android.Renderers
             : base(context, imageControl)
         {
             this._nativeImageView = new AndroidImageView(context);
+            this._nativeImageView.SetScaleType(global::Android.Widget.ImageView.ScaleType.FitXy);
             this.SetNativeElement(this._nativeImageView);
         }
 
