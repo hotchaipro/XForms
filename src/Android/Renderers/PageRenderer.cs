@@ -32,7 +32,6 @@ namespace XForms.Android.Renderers
         {
             var layout = ((global::Android.Views.ViewGroup)layoutRenderer.NativeElement);
             this._nativePage.AddView(layout);
-            ((BaseLayoutParams)layout.LayoutParameters).Gravity = global::Android.Views.GravityFlags.Top | global::Android.Views.GravityFlags.Left;
 
             // NOTE: The layout already has AndroidBaseLayoutParameters defined, so 
             // do not overwrite them here.
