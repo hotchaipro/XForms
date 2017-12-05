@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using XForms.Controls;
 using XForms.Input;
 using XForms.Layouts;
-using XForms.Pages;
 
 namespace XForms.Test
 {
@@ -24,7 +21,7 @@ namespace XForms.Test
                 new TextView()
                 {
                     Text = "TOP1",
-                    ForegroundColor = Colors.White,
+                    ForegroundColor = Colors.Red,
                     HorizontalAlignment = LayoutAlignment.Fill,
                     VerticalAlignment = LayoutAlignment.Start,
                     HorizontalTextAlignment = TextAlignment.Start,
@@ -77,7 +74,7 @@ namespace XForms.Test
                 new TextView()
                 {
                     Text = "TOP2",
-                    ForegroundColor = Colors.White,
+                    ForegroundColor = Colors.Red,
                     HorizontalAlignment = LayoutAlignment.Fill,
                     VerticalAlignment = LayoutAlignment.Start,
                     HorizontalTextAlignment = TextAlignment.Start,
@@ -90,7 +87,7 @@ namespace XForms.Test
                     new TextView()
                     {
                         Text = "MORE",
-                        ForegroundColor = Colors.White,
+                        ForegroundColor = Colors.Red,
                         HorizontalAlignment = LayoutAlignment.Fill,
                         VerticalAlignment = LayoutAlignment.Start,
                         HorizontalTextAlignment = TextAlignment.Start,

@@ -10,47 +10,73 @@ namespace XForms.Test
         {
             var stackLayout = new DistributedStackLayout()
             {
-                HorizontalAlignment = LayoutAlignment.Fill,
-                //Size = new Size(Dimension.Auto, 60),
-                //Size = new Size(200, 60),
             };
 
             stackLayout.Children.Add(
                 new TextView()
                 {
-                    //Size = new Size(Dimension.FitToContent),
                     HorizontalAlignment = LayoutAlignment.Center,
-                    //HorizontalTextAlignment = TextAlignment.Center,
                     Text = "ITEM1",
                     ForegroundColor = Colors.White,
                     BackgroundColor = Colors.Red,
                 });
 
             stackLayout.Children.Add(
+                new Image()
+                {
+                    Source = ThemeResources.Default.AboutLogo,
+                    Size = new Size(50),
+                    HorizontalAlignment = LayoutAlignment.Center,
+                });
+
+            stackLayout.Children.Add(
                 new TextView()
                 {
-                    //Size = new Size(Dimension.FitToContent),
                     HorizontalAlignment = LayoutAlignment.Center,
-                    //HorizontalTextAlignment = TextAlignment.Center,
                     Text = "ITEM2",
                     ForegroundColor = Colors.White,
                     BackgroundColor = Colors.Red,
                 });
 
-            //stackLayout.Children.Add(
-            //new Image()
-            //{
-            //    Source = ThemeResources.Default.AboutLogo,
-            //    HorizontalAlignment = LayoutAlignment.Center,
-            //});
+            var distributedStackLayout = new DistributedStackLayout()
+            {
+                HorizontalAlignment = LayoutAlignment.Fill,
+            };
+
+            distributedStackLayout.Children.Add(
+                new TextView()
+                {
+                    HorizontalAlignment = LayoutAlignment.Center,
+                    Text = "ITEM1",
+                    ForegroundColor = Colors.White,
+                    BackgroundColor = Colors.Red,
+                });
+
+            distributedStackLayout.Children.Add(
+                new Image()
+                {
+                    Source = ThemeResources.Default.AboutLogo,
+                    Size = new Size(50),
+                    HorizontalAlignment = LayoutAlignment.Center,
+                });
+
+            distributedStackLayout.Children.Add(
+                new TextView()
+                {
+                    HorizontalAlignment = LayoutAlignment.Center,
+                    Text = "ITEM2",
+                    ForegroundColor = Colors.White,
+                    BackgroundColor = Colors.Red,
+                });
 
             var pageLayout = new DockLayout()
             {
-			};
+            };
 
-			pageLayout.Children.Add(stackLayout, DockRegion.Top);
+            pageLayout.Children.Add(stackLayout, DockRegion.Top);
+            pageLayout.Children.Add(distributedStackLayout, DockRegion.Top);
 
-			this.Layout = pageLayout;
+            this.Layout = pageLayout;
         }
     }
 }

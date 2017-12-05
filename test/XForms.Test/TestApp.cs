@@ -24,9 +24,9 @@ namespace XForms.Test
 
             this.NavigateTo(new DockLayoutPage());
             //this.NavigateTo(new DistributedStackLayoutPage());
-            //this.NavigateTo(new ControlPage());
             //this.NavigateTo(new TabbedPage());
             //this.NavigateTo(new MarginPage());
+            //this.NavigateTo(new ControlPage());
         }
     }
 }
