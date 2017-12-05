@@ -60,6 +60,8 @@ namespace XForms.Windows.Renderers
             var layoutPanel = ((global::Windows.UI.Xaml.Controls.Panel)layoutRenderer.NativeElement);
             layoutPanel.Background = this.NativePage.Background;
             this.NativePage.Content = layoutPanel;
+            layoutPanel.HorizontalAlignment = global::Windows.UI.Xaml.HorizontalAlignment.Left;
+            layoutPanel.VerticalAlignment = global::Windows.UI.Xaml.VerticalAlignment.Top;
         }
     }
 }
