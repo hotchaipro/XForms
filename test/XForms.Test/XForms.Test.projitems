@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>4c3d888a-b751-44d1-b778-a74d0ea3d840</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>XForms.Test</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)TestApp.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DockLayoutPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DistributedStackLayoutPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ThemeManager.cs" />
+  </ItemGroup>
+</Project>

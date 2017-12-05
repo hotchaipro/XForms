@@ -1,0 +1,8 @@
+﻿<xforms:UniversalWindowsApplication
+    x:Class="XForms.Test.UniversalWindows.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:XForms.Test.UniversalWindows"
+    xmlns:xforms="using:XForms.Windows"
+    RequestedTheme="Light">
+</xforms:UniversalWindowsApplication>

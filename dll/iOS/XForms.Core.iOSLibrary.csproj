@@ -42,6 +42,12 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Portable\XForms.Core.PortableLibrary.csproj">
+      <Project>{bd37daec-0b39-4f34-bdb5-0d2b2f8ff214}</Project>
+      <Name>XForms.Core.PortableLibrary</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="..\..\src\iOS\XForms.Core.iOS.projitems" Label="Shared" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>
