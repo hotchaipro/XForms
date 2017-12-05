@@ -11,10 +11,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XForms.Core.PortableLibrary
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "XForms.Test", "XForms.Test\XForms.Test.shproj", "{4C3D888A-B751-44D1-B778-A74D0EA3D840}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "XForms.Core.Android", "..\src\Android\XForms.Core.Android.shproj", "{237611CC-F05E-490E-857F-8EE0F6D4E51B}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\src\Android\XForms.Core.Android.projitems*{12e7289a-f17f-4d48-8201-22399d5fa0eb}*SharedItemsImports = 4
 		XForms.Test\XForms.Test.projitems*{1acad7cc-6905-41cd-b54d-d693ab545705}*SharedItemsImports = 4
+		..\src\Android\XForms.Core.Android.projitems*{237611cc-f05e-490e-857f-8ee0f6d4e51b}*SharedItemsImports = 13
 		XForms.Test\XForms.Test.projitems*{4c3d888a-b751-44d1-b778-a74d0ea3d840}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

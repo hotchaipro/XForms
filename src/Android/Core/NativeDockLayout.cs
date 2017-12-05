@@ -397,8 +397,18 @@ namespace XForms.Android
             }
             else if ((horizontalGravityFlags == GravityFlags.FillHorizontal) && (axis != LayoutAxis.Horizontal))
             {
-                // Use the entire available width (minus the margins) to layout the child
-                childLayoutWidth = arrangeRect.Width - layoutParams.LeftMargin - layoutParams.RightMargin;
+                // Check for auto-dimension
+                if ((child.MeasuredWidth == global::Android.Views.ViewGroup.LayoutParams.MatchParent)
+                    || (child.MeasuredWidth == global::Android.Views.ViewGroup.LayoutParams.WrapContent))
+                {
+                    // Use the entire available width (minus the margins) to layout the child
+                    childLayoutWidth = arrangeRect.Width - layoutParams.LeftMargin - layoutParams.RightMargin;
+                }
+                else
+                {
+                    // Center in the available width
+                    childLeft = arrangeRect.Left + layoutParams.LeftMargin + ((arrangeRect.Width - (layoutParams.LeftMargin + child.MeasuredWidth + layoutParams.RightMargin)) / 2);
+                }
             }
 
             float childTop = arrangeRect.Top + layoutParams.TopMargin;
@@ -414,8 +424,18 @@ namespace XForms.Android
             }
             else if ((verticalGravityFlags == GravityFlags.FillVertical) && (axis != LayoutAxis.Vertical))
             {
-                // Use the entire available height (minus the margins) to layout the child
-                childLayoutHeight = arrangeRect.Height - layoutParams.TopMargin - layoutParams.BottomMargin;
+                // Check for auto-dimension
+                if ((child.MeasuredHeight == global::Android.Views.ViewGroup.LayoutParams.MatchParent)
+                    || (child.MeasuredHeight == global::Android.Views.ViewGroup.LayoutParams.WrapContent))
+                {
+                    // Use the entire available height (minus the margins) to layout the child
+                    childLayoutHeight = arrangeRect.Height - layoutParams.TopMargin - layoutParams.BottomMargin;
+                }
+                else
+                {
+                    // Center in the available height
+                    childTop = arrangeRect.Top + layoutParams.TopMargin + ((arrangeRect.Height - (layoutParams.TopMargin + child.MeasuredHeight + layoutParams.BottomMargin)) / 2);
+                }
             }
 
             // Layout the child with gravity taken into account

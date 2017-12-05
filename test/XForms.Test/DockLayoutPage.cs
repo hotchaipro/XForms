@@ -36,7 +36,7 @@ namespace XForms.Test
             pageLayout.Children.Add(
                 new TextView()
                 {
-                    Text = "TOP-LX",
+                    Text = "TOP-LZ",
                     Size = wideSize,
                     ForegroundColor = Colors.Black,
                     BackgroundColor = backgroundColor,
@@ -63,7 +63,7 @@ namespace XForms.Test
             pageLayout.Children.Add(
                 new TextView()
                 {
-                    Text = "TOP-RX",
+                    Text = "TOP-RZ",
                     Size = wideSize,
                     ForegroundColor = Colors.Black,
                     BackgroundColor = backgroundColor,
@@ -90,7 +90,7 @@ namespace XForms.Test
             pageLayout.Children.Add(
                 new TextView()
                 {
-                    Text = "TOP-CX",
+                    Text = "TOP-CZ",
                     Size = wideSize,
                     ForegroundColor = Colors.Black,
                     BackgroundColor = backgroundColor,
@@ -117,7 +117,7 @@ namespace XForms.Test
             pageLayout.Children.Add(
                 new TextView()
                 {
-                    Text = "TOP-FX",
+                    Text = "TOP-FZ",
                     Size = wideSize,
                     ForegroundColor = Colors.Black,
                     BackgroundColor = backgroundColor,
@@ -144,7 +144,7 @@ namespace XForms.Test
             pageLayout.Children.Add(
                 new TextView()
                 {
-                    Text = "BOTTOM-LX",
+                    Text = "BOTTOM-LZ",
                     Size = wideSize,
                     ForegroundColor = Colors.Black,
                     BackgroundColor = backgroundColor,
@@ -171,7 +171,7 @@ namespace XForms.Test
             pageLayout.Children.Add(
                 new TextView()
                 {
-                    Text = "BOTTOM-RX",
+                    Text = "BOTTOM-RZ",
                     Size = wideSize,
                     ForegroundColor = Colors.Black,
                     BackgroundColor = backgroundColor,
@@ -198,7 +198,7 @@ namespace XForms.Test
             pageLayout.Children.Add(
                 new TextView()
                 {
-                    Text = "BOTTOM-CX",
+                    Text = "BOTTOM-CZ",
                     Size = wideSize,
                     ForegroundColor = Colors.Black,
                     BackgroundColor = backgroundColor,
@@ -209,256 +209,257 @@ namespace XForms.Test
                 },
                 DockRegion.Bottom);
 
-			pageLayout.Children.Add(
-				new TextView()
-				{
-					Text = "BOTTOM-F",
-					ForegroundColor = Colors.Black,
-					BackgroundColor = backgroundColor,
-					HorizontalAlignment = LayoutAlignment.Fill,
-					VerticalAlignment = LayoutAlignment.Start,
-					HorizontalTextAlignment = TextAlignment.Center,
-					VerticalTextAlignment = TextAlignment.End,
-				},
-				DockRegion.Bottom);
+            pageLayout.Children.Add(
+                new TextView()
+                {
+                    Text = "BOTTOM-F",
+                    ForegroundColor = Colors.Black,
+                    BackgroundColor = backgroundColor,
+                    HorizontalAlignment = LayoutAlignment.Fill,
+                    VerticalAlignment = LayoutAlignment.Start,
+                    HorizontalTextAlignment = TextAlignment.Center,
+                    VerticalTextAlignment = TextAlignment.End,
+                },
+                DockRegion.Bottom);
 
-			pageLayout.Children.Add(
-				new TextView()
-				{
-					Text = "BOTTOM-FX",
-					Size = wideSize,
-					ForegroundColor = Colors.Black,
-					BackgroundColor = backgroundColor,
-					HorizontalAlignment = LayoutAlignment.Fill,
-					VerticalAlignment = LayoutAlignment.Start,
-					HorizontalTextAlignment = TextAlignment.Center,
-					VerticalTextAlignment = TextAlignment.End,
-				},
-				DockRegion.Bottom);
+            pageLayout.Children.Add(
+                new TextView()
+                {
+                    Text = "BOTTOM-FZ",
+                    Size = wideSize,
+                    ForegroundColor = Colors.Black,
+                    BackgroundColor = backgroundColor,
+                    HorizontalAlignment = LayoutAlignment.Fill,
+                    VerticalAlignment = LayoutAlignment.Start,
+                    HorizontalTextAlignment = TextAlignment.Center,
+                    VerticalTextAlignment = TextAlignment.End,
+                },
+                DockRegion.Bottom);
 
-			/*
-						pageLayout.Children.Add(
-							new TextView()
-							{
-								Text = "L-T",
-								ForegroundColor = Colors.Black,
-								BackgroundColor = backgroundColor,
-								HorizontalAlignment = LayoutAlignment.Start,
-								VerticalAlignment = LayoutAlignment.Start,
-								HorizontalTextAlignment = TextAlignment.Start,
-								VerticalTextAlignment = TextAlignment.Start,
-							},
-							DockRegion.Left);
 
-						pageLayout.Children.Add(
-							new TextView()
-							{
-								Text = "L-TX",
-								Size = tallSize,
-								ForegroundColor = Colors.Black,
-								BackgroundColor = backgroundColor,
-								HorizontalAlignment = LayoutAlignment.Start,
-								VerticalAlignment = LayoutAlignment.Start,
-								HorizontalTextAlignment = TextAlignment.Start,
-								VerticalTextAlignment = TextAlignment.Start,
-							},
-							DockRegion.Left);
+            pageLayout.Children.Add(
+                new TextView()
+                {
+                    Text = "L-T",
+                    ForegroundColor = Colors.Black,
+                    BackgroundColor = backgroundColor,
+                    HorizontalAlignment = LayoutAlignment.Start,
+                    VerticalAlignment = LayoutAlignment.Start,
+                    HorizontalTextAlignment = TextAlignment.Start,
+                    VerticalTextAlignment = TextAlignment.Start,
+                },
+                DockRegion.Left);
 
-						pageLayout.Children.Add(
-							new TextView()
-							{
-								Text = "L-B",
-								ForegroundColor = Colors.Black,
-								BackgroundColor = backgroundColor,
-								HorizontalAlignment = LayoutAlignment.Start,
-								VerticalAlignment = LayoutAlignment.End,
-								HorizontalTextAlignment = TextAlignment.Start,
-								VerticalTextAlignment = TextAlignment.End,
-							},
-							DockRegion.Left);
+            pageLayout.Children.Add(
+                new TextView()
+                {
+                    Text = "L-TZ",
+                    Size = tallSize,
+                    ForegroundColor = Colors.Black,
+                    BackgroundColor = backgroundColor,
+                    HorizontalAlignment = LayoutAlignment.Start,
+                    VerticalAlignment = LayoutAlignment.Start,
+                    HorizontalTextAlignment = TextAlignment.Start,
+                    VerticalTextAlignment = TextAlignment.Start,
+                },
+                DockRegion.Left);
 
-						pageLayout.Children.Add(
-							new TextView()
-							{
-								Text = "L-BX",
-								Size = tallSize,
-								ForegroundColor = Colors.Black,
-								BackgroundColor = backgroundColor,
-								HorizontalAlignment = LayoutAlignment.Start,
-								VerticalAlignment = LayoutAlignment.End,
-								HorizontalTextAlignment = TextAlignment.Start,
-								VerticalTextAlignment = TextAlignment.End,
-							},
-							DockRegion.Left);
+            pageLayout.Children.Add(
+                new TextView()
+                {
+                    Text = "L-B",
+                    ForegroundColor = Colors.Black,
+                    BackgroundColor = backgroundColor,
+                    HorizontalAlignment = LayoutAlignment.Start,
+                    VerticalAlignment = LayoutAlignment.End,
+                    HorizontalTextAlignment = TextAlignment.Start,
+                    VerticalTextAlignment = TextAlignment.End,
+                },
+                DockRegion.Left);
 
-						pageLayout.Children.Add(
-							new TextView()
-							{
-								Text = "L-C",
-								ForegroundColor = Colors.Black,
-								BackgroundColor = backgroundColor,
-								HorizontalAlignment = LayoutAlignment.Start,
-								VerticalAlignment = LayoutAlignment.Center,
-								HorizontalTextAlignment = TextAlignment.Start,
-								VerticalTextAlignment = TextAlignment.Center,
-							},
-							DockRegion.Left);
+            pageLayout.Children.Add(
+                new TextView()
+                {
+                    Text = "L-BZ",
+                    Size = tallSize,
+                    ForegroundColor = Colors.Black,
+                    BackgroundColor = backgroundColor,
+                    HorizontalAlignment = LayoutAlignment.Start,
+                    VerticalAlignment = LayoutAlignment.End,
+                    HorizontalTextAlignment = TextAlignment.Start,
+                    VerticalTextAlignment = TextAlignment.End,
+                },
+                DockRegion.Left);
 
-						pageLayout.Children.Add(
-							new TextView()
-							{
-								Text = "L-CX",
-								Size = tallSize,
-								ForegroundColor = Colors.Black,
-								BackgroundColor = backgroundColor,
-								HorizontalAlignment = LayoutAlignment.Start,
-								VerticalAlignment = LayoutAlignment.Center,
-								HorizontalTextAlignment = TextAlignment.Start,
-								VerticalTextAlignment = TextAlignment.Center,
-							},
-							DockRegion.Left);
-			*/
-			pageLayout.Children.Add(
-			    new TextView()
-			    {
-			        Text = "L-F",
-			        ForegroundColor = Colors.Black,
-			        BackgroundColor = backgroundColor,
-			        HorizontalAlignment = LayoutAlignment.Start,
-			        VerticalAlignment = LayoutAlignment.Fill,
-			        HorizontalTextAlignment = TextAlignment.Start,
-			        VerticalTextAlignment = TextAlignment.Center,
-			    },
-			    DockRegion.Left);
+            pageLayout.Children.Add(
+                new TextView()
+                {
+                    Text = "L-C",
+                    ForegroundColor = Colors.Black,
+                    BackgroundColor = backgroundColor,
+                    HorizontalAlignment = LayoutAlignment.Start,
+                    VerticalAlignment = LayoutAlignment.Center,
+                    HorizontalTextAlignment = TextAlignment.Start,
+                    VerticalTextAlignment = TextAlignment.Center,
+                },
+                DockRegion.Left);
 
-			pageLayout.Children.Add(
-			    new TextView()
-			    {
-			        Text = "L-FX",
-					Size = tallSize,
-					ForegroundColor = Colors.Black,
-			        BackgroundColor = backgroundColor,
-			        HorizontalAlignment = LayoutAlignment.Start,
-			        VerticalAlignment = LayoutAlignment.Fill,
-			        HorizontalTextAlignment = TextAlignment.Start,
-			        VerticalTextAlignment = TextAlignment.Center,
-			    },
-			    DockRegion.Left);
-/*
-			pageLayout.Children.Add(
-				new TextView()
-				{
-					Text = "R-T",
-					ForegroundColor = Colors.Black,
-					BackgroundColor = backgroundColor,
-					HorizontalAlignment = LayoutAlignment.Start,
-					VerticalAlignment = LayoutAlignment.Start,
-					HorizontalTextAlignment = TextAlignment.Start,
-					VerticalTextAlignment = TextAlignment.Start,
-				},
-				DockRegion.Right);
+            pageLayout.Children.Add(
+                new TextView()
+                {
+                    Text = "L-CZ",
+                    Size = tallSize,
+                    ForegroundColor = Colors.Black,
+                    BackgroundColor = backgroundColor,
+                    HorizontalAlignment = LayoutAlignment.Start,
+                    VerticalAlignment = LayoutAlignment.Center,
+                    HorizontalTextAlignment = TextAlignment.Start,
+                    VerticalTextAlignment = TextAlignment.Center,
+                },
+                DockRegion.Left);
 
-			pageLayout.Children.Add(
-				new TextView()
-				{
-					Text = "R-TX",
-					Size = tallSize,
-					ForegroundColor = Colors.Black,
-					BackgroundColor = backgroundColor,
-					HorizontalAlignment = LayoutAlignment.Start,
-					VerticalAlignment = LayoutAlignment.Start,
-					HorizontalTextAlignment = TextAlignment.Start,
-					VerticalTextAlignment = TextAlignment.Start,
-				},
-				DockRegion.Right);
+            pageLayout.Children.Add(
+                new TextView()
+                {
+                    Text = "L-F",
+                    ForegroundColor = Colors.Black,
+                    BackgroundColor = backgroundColor,
+                    HorizontalAlignment = LayoutAlignment.Start,
+                    VerticalAlignment = LayoutAlignment.Fill,
+                    HorizontalTextAlignment = TextAlignment.Start,
+                    VerticalTextAlignment = TextAlignment.Center,
+                },
+                DockRegion.Left);
 
-			pageLayout.Children.Add(
-				new TextView()
-				{
-					Text = "R-B",
-					ForegroundColor = Colors.Black,
-					BackgroundColor = backgroundColor,
-					HorizontalAlignment = LayoutAlignment.Start,
-					VerticalAlignment = LayoutAlignment.End,
-					HorizontalTextAlignment = TextAlignment.Start,
-					VerticalTextAlignment = TextAlignment.End,
-				},
-				DockRegion.Right);
+            pageLayout.Children.Add(
+                new TextView()
+                {
+                    Text = "L-FZ",
+                    Size = tallSize,
+                    ForegroundColor = Colors.Black,
+                    BackgroundColor = backgroundColor,
+                    HorizontalAlignment = LayoutAlignment.Start,
+                    VerticalAlignment = LayoutAlignment.Fill,
+                    HorizontalTextAlignment = TextAlignment.Start,
+                    VerticalTextAlignment = TextAlignment.Center,
+                },
+                DockRegion.Left);
 
-			pageLayout.Children.Add(
-				new TextView()
-				{
-					Text = "R-BX",
-					Size = tallSize,
-					ForegroundColor = Colors.Black,
-					BackgroundColor = backgroundColor,
-					HorizontalAlignment = LayoutAlignment.Start,
-					VerticalAlignment = LayoutAlignment.End,
-					HorizontalTextAlignment = TextAlignment.Start,
-					VerticalTextAlignment = TextAlignment.End,
-				},
-				DockRegion.Right);
+            pageLayout.Children.Add(
+                new TextView()
+                {
+                    Text = "R-T",
+                    ForegroundColor = Colors.Black,
+                    BackgroundColor = backgroundColor,
+                    HorizontalAlignment = LayoutAlignment.Start,
+                    VerticalAlignment = LayoutAlignment.Start,
+                    HorizontalTextAlignment = TextAlignment.Start,
+                    VerticalTextAlignment = TextAlignment.Start,
+                },
+                DockRegion.Right);
 
-			pageLayout.Children.Add(
-				new TextView()
-				{
-					Text = "R-C",
-					ForegroundColor = Colors.Black,
-					BackgroundColor = backgroundColor,
-					HorizontalAlignment = LayoutAlignment.Start,
-					VerticalAlignment = LayoutAlignment.Center,
-					HorizontalTextAlignment = TextAlignment.Start,
-					VerticalTextAlignment = TextAlignment.Center,
-				},
-				DockRegion.Right);
+            pageLayout.Children.Add(
+                new TextView()
+                {
+                    Text = "R-TZ",
+                    Size = tallSize,
+                    ForegroundColor = Colors.Black,
+                    BackgroundColor = backgroundColor,
+                    HorizontalAlignment = LayoutAlignment.Start,
+                    VerticalAlignment = LayoutAlignment.Start,
+                    HorizontalTextAlignment = TextAlignment.Start,
+                    VerticalTextAlignment = TextAlignment.Start,
+                },
+                DockRegion.Right);
 
-			pageLayout.Children.Add(
-				new TextView()
-				{
-					Text = "R-CX",
-					Size = tallSize,
-					ForegroundColor = Colors.Black,
-					BackgroundColor = backgroundColor,
-					HorizontalAlignment = LayoutAlignment.Start,
-					VerticalAlignment = LayoutAlignment.Center,
-					HorizontalTextAlignment = TextAlignment.Start,
-					VerticalTextAlignment = TextAlignment.Center,
-				},
-				DockRegion.Right);
-*/            
-			pageLayout.Children.Add(
-			    new TextView()
-			    {
-			        Text = "R-F",
-			        ForegroundColor = Colors.Black,
-			        BackgroundColor = backgroundColor,
-			        HorizontalAlignment = LayoutAlignment.Start,
-			        VerticalAlignment = LayoutAlignment.Fill,
-			        HorizontalTextAlignment = TextAlignment.Start,
-			        VerticalTextAlignment = TextAlignment.Center,
-			    },
-			    DockRegion.Right);
+            pageLayout.Children.Add(
+                new TextView()
+                {
+                    Text = "R-B",
+                    ForegroundColor = Colors.Black,
+                    BackgroundColor = backgroundColor,
+                    HorizontalAlignment = LayoutAlignment.Start,
+                    VerticalAlignment = LayoutAlignment.End,
+                    HorizontalTextAlignment = TextAlignment.Start,
+                    VerticalTextAlignment = TextAlignment.End,
+                },
+                DockRegion.Right);
 
-			pageLayout.Children.Add(
-			    new TextView()
-			    {
-			        Text = "R-FX",
-			        ForegroundColor = Colors.Black,
-			        BackgroundColor = backgroundColor,
-			        HorizontalAlignment = LayoutAlignment.Start,
-			        VerticalAlignment = LayoutAlignment.Fill,
-			        HorizontalTextAlignment = TextAlignment.Start,
-			        VerticalTextAlignment = TextAlignment.Center,
-			    },
-			    DockRegion.Right);
+            pageLayout.Children.Add(
+                new TextView()
+                {
+                    Text = "R-BZ",
+                    Size = tallSize,
+                    ForegroundColor = Colors.Black,
+                    BackgroundColor = backgroundColor,
+                    HorizontalAlignment = LayoutAlignment.Start,
+                    VerticalAlignment = LayoutAlignment.End,
+                    HorizontalTextAlignment = TextAlignment.Start,
+                    VerticalTextAlignment = TextAlignment.End,
+                },
+                DockRegion.Right);
 
-			var image = new Image()
-			{
-			    Source = ThemeResources.Default.AboutLogo,
-			};
-			pageLayout.Children.Add(image, DockRegion.CenterOverlay);
+            pageLayout.Children.Add(
+                new TextView()
+                {
+                    Text = "R-C",
+                    ForegroundColor = Colors.Black,
+                    BackgroundColor = backgroundColor,
+                    HorizontalAlignment = LayoutAlignment.Start,
+                    VerticalAlignment = LayoutAlignment.Center,
+                    HorizontalTextAlignment = TextAlignment.Start,
+                    VerticalTextAlignment = TextAlignment.Center,
+                },
+                DockRegion.Right);
 
-			this.Layout = pageLayout;
+            pageLayout.Children.Add(
+                new TextView()
+                {
+                    Text = "R-CZ",
+                    Size = tallSize,
+                    ForegroundColor = Colors.Black,
+                    BackgroundColor = backgroundColor,
+                    HorizontalAlignment = LayoutAlignment.Start,
+                    VerticalAlignment = LayoutAlignment.Center,
+                    HorizontalTextAlignment = TextAlignment.Start,
+                    VerticalTextAlignment = TextAlignment.Center,
+                },
+                DockRegion.Right);
+
+            pageLayout.Children.Add(
+                new TextView()
+                {
+                    Text = "R-F",
+                    ForegroundColor = Colors.Black,
+                    BackgroundColor = backgroundColor,
+                    HorizontalAlignment = LayoutAlignment.Start,
+                    VerticalAlignment = LayoutAlignment.Fill,
+                    HorizontalTextAlignment = TextAlignment.Start,
+                    VerticalTextAlignment = TextAlignment.Center,
+                },
+                DockRegion.Right);
+
+            pageLayout.Children.Add(
+                new TextView()
+                {
+                    Text = "R-FZ",
+                    Size = tallSize,
+                    ForegroundColor = Colors.Black,
+                    BackgroundColor = backgroundColor,
+                    HorizontalAlignment = LayoutAlignment.Start,
+                    VerticalAlignment = LayoutAlignment.Fill,
+                    HorizontalTextAlignment = TextAlignment.Start,
+                    VerticalTextAlignment = TextAlignment.Center,
+                },
+                DockRegion.Right);
+
+            var image = new Image()
+            {
+                Source = ThemeResources.Default.AboutLogo,
+            };
+            pageLayout.Children.Add(image, DockRegion.CenterOverlay);
+
+            this.Layout = pageLayout;
         }
     }
 }
