@@ -45,13 +45,13 @@ namespace XForms.Controls
                 {
                     this._isChecked = value;
 
-                    this.Invalidate();
+                    this.UpdateState();
 
                     this.IsCheckedChanged?.Invoke(this, new ToggledEventArgs(value));
                 }
                 else
                 {
-                    this.Invalidate();
+                    this.UpdateState();
                 }
             }
         }
@@ -100,7 +100,7 @@ namespace XForms.Controls
             internal set;
         }
 
-        public override void Invalidate()
+        private void UpdateState()
         {
             // TODO: Move animations out of the DrawBackground method
 
@@ -137,7 +137,7 @@ namespace XForms.Controls
                 }
             }
 
-            base.Invalidate();
+            this.Invalidate();
         }
 
         protected override void DrawBackground(
@@ -193,14 +193,14 @@ namespace XForms.Controls
         {
             this._isTouchDown = true;
 
-            this.Invalidate();
+            this.UpdateState();
         }
 
         void ITapGestureDelegate.OnTapEnded()
         {
             this._isTouchDown = false;
 
-            this.Invalidate();
+            this.UpdateState();
         }
 
         void ITapGestureDelegate.OnTapped()
