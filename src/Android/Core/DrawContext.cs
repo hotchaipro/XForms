@@ -201,9 +201,10 @@ namespace XForms.Android
             {
                 AntiAlias = true,
             };
+
             LightingColorFilter colorFilter = null;
 
-            if (!tint.IsTransparent)
+            if ((!tint.IsTransparent) && (tint != Colors.White))
             {
                 colorFilter = new LightingColorFilter(tint.ToAndroidColor(), 1);
                 paint.SetColorFilter(colorFilter);
