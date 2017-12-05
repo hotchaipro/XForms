@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2010
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XForms.Core.iOSLibrary", "dll\iOS\XForms.Core.iOSLibrary.csproj", "{D1549149-38E2-46BB-A461-812EBB7F260E}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "XForms.Core.iOS", "src\iOS\XForms.Core.iOS.shproj", "{75A5099E-12C6-404C-91C5-4B90355E0370}"
+EndProject
+Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		src\iOS\XForms.Core.iOS.projitems*{75a5099e-12c6-404c-91c5-4b90355e0370}*SharedItemsImports = 13
+		src\iOS\XForms.Core.iOS.projitems*{d1549149-38e2-46bb-a461-812ebb7f260e}*SharedItemsImports = 4
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D1549149-38E2-46BB-A461-812EBB7F260E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1549149-38E2-46BB-A461-812EBB7F260E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1549149-38E2-46BB-A461-812EBB7F260E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1549149-38E2-46BB-A461-812EBB7F260E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D8CEBD91-7F50-4AAC-B88B-B0D0BCE6C6E2}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>75a5099e-12c6-404c-91c5-4b90355e0370</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>XForms.iOS</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\ApplicationRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\ElementRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\FrameRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\LayoutRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\NativeApplicationDelegate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\NativeConversions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\NativeLayout.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\NativePage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\NativePlatform.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\NativeViewExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\PageRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\ViewRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\BitmapRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\DrawContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\OwnerDrawControl.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\DistributedStackLayoutRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\DockLayoutRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\NativeDistributedStackLayout.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\NativeDockLayout.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\ImageRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Renderers\TextViewRenderer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Core\" />
+  </ItemGroup>
+</Project>
