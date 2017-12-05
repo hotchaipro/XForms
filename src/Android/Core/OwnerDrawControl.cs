@@ -32,7 +32,7 @@ namespace XForms.Android
             if ((drawingRect.Width() > 0) && drawingRect.Height() > 0)
             {
                 // NOTE: ClipRect must be explicitly set on every OnDraw call
-                canvas.ClipRect(drawingRect, Region.Op.Replace);
+                canvas.ClipRect(drawingRect);
 
                 Rectangle bounds = new Rectangle(
                     XForms.Android.NativeConversions.PixelsToDevicePixels(this.Context, drawingRect.Left),
