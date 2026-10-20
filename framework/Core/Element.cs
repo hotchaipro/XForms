@@ -78,8 +78,6 @@ namespace XForms
             }
         }
 
-        private object _bindingContext;
-
         private Dictionary<IAttachedProperty, object> _properties;
 
         private IElementRenderer _renderer;
@@ -172,34 +170,6 @@ namespace XForms
         {
         }
 
-        public object BindingContext
-        {
-            get
-            {
-                return _bindingContext;
-            }
-
-            set
-            {
-                if (value != this._bindingContext)
-                {
-                    _bindingContext = value;
-                    this.OnBindingContextChanged();
-                }
-            }
-        }
-
-        //private void ApplyBinding()
-        //{
-        //    // f(element, bindingContext)
-
-        //    // element.Property = bindingContext.Property
-
-        //    // + event
-
-        //    // bindingContext.PropertyChanged += (element, value) => { element.Property = value; }
-        //}
-
         /// <summary>
         /// Whether the element is this element or one of its descendants.
         /// </summary>
@@ -228,9 +198,7 @@ namespace XForms
             return this._properties.TryGetValue(property, out value);
         }
 
-        protected virtual void OnBindingContextChanged()
-        {
-        }
+
 
         protected abstract IElementRenderer CreateRenderer();
 

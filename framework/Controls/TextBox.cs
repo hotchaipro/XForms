@@ -11,6 +11,14 @@ namespace XForms.Controls
         All = SpellCheck | Suggestions,
     }
 
+    public interface ITextBoxDelegate
+    {
+        /// <summary>
+        /// Called by the platform after the user changes the text.
+        /// </summary>
+        void OnNativeTextChanged();
+    }
+
     public interface ITextBoxRenderer : IControlRenderer
     {
         string Text { get; set; }
@@ -20,8 +28,10 @@ namespace XForms.Controls
         new void Focus();
     }
 
-    public class TextBox : Control
+    public class TextBox : Control, ITextBoxDelegate
     {
+        public static readonly ViewProperty<TextBox, string> TextProperty = new(nameof(Text), v => v.Text, (v, x) => v.Text = x);
+        public static readonly ViewProperty<TextBox, string> PlaceholderTextProperty = new(nameof(PlaceholderText), v => v.PlaceholderText, (v, x) => v.PlaceholderText = x);
         protected override AccessibilityRole DefaultAccessibilityRole
         {
             get
@@ -58,19 +68,49 @@ namespace XForms.Controls
         private KeyboardOptions? _keyboardOptions;
         private bool _focusWhenAttached;
 
+        /// <summary>
+        /// Raised when the text changes, whether the user or code changed it.
+        /// </summary>
+        public event EventHandler TextChanged;
+
         public string Text
         {
             get
             {
-                // The user edits the native text, so read it once it exists
-                return this.Native?.Text ?? this._text;
+                return this._text;
             }
 
             set
             {
+                if (value == this._text)
+                {
+                    return;
+                }
+
                 this._text = value;
                 this.Native?.Text = value;
+                this.OnTextChanged();
             }
+        }
+
+        private void OnTextChanged()
+        {
+            this.OnPropertyChanged(nameof(this.Text));
+            this.TextChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        void ITextBoxDelegate.OnNativeTextChanged()
+        {
+            // NOTE: Setting the text from code also changes the native text;
+            // only a different value is a change
+            string text = this.Native?.Text ?? string.Empty;
+            if (text == (this._text ?? string.Empty))
+            {
+                return;
+            }
+
+            this._text = text;
+            this.OnTextChanged();
         }
 
         public string PlaceholderText
@@ -84,6 +124,8 @@ namespace XForms.Controls
             {
                 this._placeholderText = value;
                 this.Native?.PlaceholderText = value;
+
+                this.OnPropertyChanged();
             }
         }
 
@@ -99,6 +141,8 @@ namespace XForms.Controls
                 this._acceptsReturn = value;
                 this.Native?.Multiline = value;
                 this.InvalidateMeasure();
+
+                this.OnPropertyChanged();
             }
         }
 
@@ -113,6 +157,8 @@ namespace XForms.Controls
             {
                 this._keyboardOptions = value;
                 this.Native?.KeyboardOptions = value;
+
+                this.OnPropertyChanged();
             }
         }
 

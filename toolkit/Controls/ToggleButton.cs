@@ -6,6 +6,8 @@ namespace XForms.Toolkit
 {
     public sealed class ToggleButton : UserControl, ITapGestureDelegate
     {
+        public static readonly ViewProperty<ToggleButton, bool> IsCheckedProperty = new(nameof(IsChecked), v => v.IsChecked, (v, x) => v.IsChecked = x);
+
         // Animates the control itself (press feedback, spinning)
         private readonly Animator _ownAnimator;
 
@@ -71,6 +73,7 @@ namespace XForms.Toolkit
                     this.UpdateScale();
 
                     this.IsCheckedChanged?.Invoke(this, new ToggledEventArgs(value));
+                    this.OnPropertyChanged();
                 }
             }
         }

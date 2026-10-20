@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Generic;
+using System.Windows.Input;
 using XForms.Input;
 using XForms.Layouts;
 using XForms.Controls;
@@ -98,6 +99,30 @@ namespace XForms.Toolkit
             set;
         }
 
+        private object _commandParameter;
+
+        /// <summary>
+        /// The value passed to the command. The button shows only while the
+        /// command can run with it.
+        /// </summary>
+        public object CommandParameter
+        {
+            get
+            {
+                return this._commandParameter;
+            }
+
+            set
+            {
+                this._commandParameter = value;
+
+                if (null != this.Command)
+                {
+                    this.IsVisible = this.Command.CanExecute(value);
+                }
+            }
+        }
+
         public Bitmap Icon
         {
             get
@@ -144,15 +169,7 @@ namespace XForms.Toolkit
             }
         }
 
-        protected override void OnBindingContextChanged()
-        {
-            base.OnBindingContextChanged();
 
-            if (null != this.Command)
-            {
-                this.IsVisible = this.Command.CanExecute(this.BindingContext);
-            }
-        }
 
         protected override void DrawBackground(
             IDrawContext drawContext,
@@ -185,7 +202,7 @@ namespace XForms.Toolkit
 
         void ITapGestureDelegate.OnTapped()
         {
-            this.Command?.Execute(this.BindingContext);
+            this.Command?.Execute(this.CommandParameter);
         }
 
         void ITapGestureDelegate.OnTapEnded()

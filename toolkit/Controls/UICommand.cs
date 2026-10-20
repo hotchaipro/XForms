@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System;
+using System.Windows.Input;
 using XForms.Controls;
 
 namespace XForms.Toolkit
@@ -38,6 +39,28 @@ namespace XForms.Toolkit
         {
             get;
             set;
+        }
+
+        /// <summary>
+        /// Raised when the wrapped command's ability to run changes.
+        /// </summary>
+        public event EventHandler CanExecuteChanged
+        {
+            add
+            {
+                if (null != this.Command)
+                {
+                    this.Command.CanExecuteChanged += value;
+                }
+            }
+
+            remove
+            {
+                if (null != this.Command)
+                {
+                    this.Command.CanExecuteChanged -= value;
+                }
+            }
         }
 
         public bool CanExecute(

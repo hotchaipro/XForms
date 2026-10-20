@@ -29,6 +29,11 @@ namespace XForms.Controls
 
     public class TextBlock : View
     {
+        public static readonly ViewProperty<TextBlock, string> TextProperty = new(nameof(Text), v => v.Text, (v, x) => v.Text = x);
+        public static readonly ViewProperty<TextBlock, Color> ForegroundProperty = new(nameof(Foreground), v => v.Foreground, (v, x) => v.Foreground = x);
+        public static readonly ViewProperty<TextBlock, float> FontSizeProperty = new(nameof(FontSize), v => v.FontSize, (v, x) => v.FontSize = x);
+        public static readonly ViewProperty<TextBlock, FontWeight> FontWeightProperty = new(nameof(FontWeight), v => v.FontWeight, (v, x) => v.FontWeight = x);
+        public static readonly ViewProperty<TextBlock, bool> StrikethroughProperty = new(nameof(Strikethrough), v => v.Strikethrough, (v, x) => v.Strikethrough = x);
         // Values the app set; the rest keep the platform's defaults
         private string _text;
         private TextAlignment? _textAlignment;
@@ -76,6 +81,8 @@ namespace XForms.Controls
 
                 // New text can need a different size, on every platform
                 this.InvalidateMeasure();
+
+                this.OnPropertyChanged();
             }
         }
 
@@ -90,6 +97,8 @@ namespace XForms.Controls
             {
                 this._textAlignment = value;
                 this.Native?.HorizontalTextAlignment = value;
+
+                this.OnPropertyChanged();
             }
         }
 
@@ -104,6 +113,8 @@ namespace XForms.Controls
             {
                 this._verticalTextAlignment = value;
                 this.Native?.VerticalTextAlignment = value;
+
+                this.OnPropertyChanged();
             }
         }
 
@@ -119,6 +130,8 @@ namespace XForms.Controls
                 this._wordWrap = (value == TextWrapping.Wrap);
                 this.Native?.WordWrap = this._wordWrap.Value;
                 this.InvalidateMeasure();
+
+                this.OnPropertyChanged();
             }
         }
 
@@ -133,6 +146,8 @@ namespace XForms.Controls
             {
                 this._textTrimming = (value == TextTrimming.CharacterEllipsis);
                 this.Native?.TextTrimming = this._textTrimming.Value;
+
+                this.OnPropertyChanged();
             }
         }
 
@@ -147,6 +162,8 @@ namespace XForms.Controls
             {
                 this._foreground = value;
                 this.Native?.ForegroundColor = value;
+
+                this.OnPropertyChanged();
             }
         }
 
@@ -161,6 +178,8 @@ namespace XForms.Controls
             {
                 this._backgroundColor = value;
                 this.Native?.BackgroundColor = value;
+
+                this.OnPropertyChanged();
             }
         }
 
@@ -176,6 +195,8 @@ namespace XForms.Controls
                 this._fontSize = value;
                 this.Native?.FontSize = value;
                 this.InvalidateMeasure();
+
+                this.OnPropertyChanged();
             }
         }
 
@@ -191,6 +212,8 @@ namespace XForms.Controls
                 this._fontStyle = value;
                 this.Native?.FontStyle = value;
                 this.InvalidateMeasure();
+
+                this.OnPropertyChanged();
             }
         }
 
@@ -206,6 +229,8 @@ namespace XForms.Controls
                 this._fontWeight = value;
                 this.Native?.FontWeight = value;
                 this.InvalidateMeasure();
+
+                this.OnPropertyChanged();
             }
         }
 
@@ -220,6 +245,8 @@ namespace XForms.Controls
             {
                 this._strikethrough = value;
                 this.Native?.Strikethrough = value;
+
+                this.OnPropertyChanged();
             }
         }
 

@@ -141,9 +141,10 @@ namespace XForms.iOS
             Rect destinationRectangle,
             Color tint)
         {
+            // No image draws nothing, as on Win32
             if (null == bitmap)
             {
-                throw new ArgumentNullException(nameof(bitmap));
+                return;
             }
 
             var rect = destinationRectangle.ToCGRect();

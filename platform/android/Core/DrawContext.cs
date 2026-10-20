@@ -226,9 +226,10 @@ namespace XForms.Android
             Rect destinationRectangle,
             Color tint)
         {
+            // No image draws nothing, as on Win32
             if (null == bitmap)
             {
-                throw new ArgumentNullException(nameof(bitmap));
+                return;
             }
 
             var nativeBitmap = ((BitmapRenderer)bitmap.Renderer).NativeBitmap;

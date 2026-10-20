@@ -8,6 +8,8 @@ namespace XForms.Controls
     /// </summary>
     public class Border : UserControl
     {
+        public static readonly ViewProperty<Border, Color> BackgroundProperty = new(nameof(Background), v => v.Background, (v, x) => v.Background = x);
+        public static readonly ViewProperty<Border, Color> BorderBrushProperty = new(nameof(BorderBrush), v => v.BorderBrush, (v, x) => v.BorderBrush = x);
         private Color _background = Colors.Transparent;
         private Color _borderBrush = Colors.Transparent;
         private Thickness _borderThickness = Thickness.Zero;
@@ -31,6 +33,8 @@ namespace XForms.Controls
             set
             {
                 this.Content = value;
+
+                this.OnPropertyChanged();
             }
         }
 
@@ -56,6 +60,8 @@ namespace XForms.Controls
             {
                 this._background = value;
                 this.InvalidateVisual();
+
+                this.OnPropertyChanged();
             }
         }
 
@@ -73,6 +79,8 @@ namespace XForms.Controls
             {
                 this._borderBrush = value;
                 this.InvalidateVisual();
+
+                this.OnPropertyChanged();
             }
         }
 
@@ -92,6 +100,8 @@ namespace XForms.Controls
                 this._borderThickness = value;
                 this.UpdateContentPadding();
                 this.InvalidateVisual();
+
+                this.OnPropertyChanged();
             }
         }
 
@@ -109,6 +119,8 @@ namespace XForms.Controls
             {
                 this._cornerRadius = value;
                 this.InvalidateVisual();
+
+                this.OnPropertyChanged();
             }
         }
 
@@ -126,6 +138,8 @@ namespace XForms.Controls
             {
                 this._padding = value;
                 this.UpdateContentPadding();
+
+                this.OnPropertyChanged();
             }
         }
 

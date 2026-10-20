@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System;
+using System.Windows.Input;
 using XForms.Input;
 using XForms.Controls;
 

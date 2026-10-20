@@ -18,6 +18,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)XamlPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PickersPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PanelsPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BindingPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DockPanelPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UniformGridPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ThemeManager.cs" />

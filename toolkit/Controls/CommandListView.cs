@@ -196,7 +196,7 @@ namespace XForms.Toolkit
                 this._commandBar.SetCommands(commands);
                 this._commandBarCommands = commands;
             }
-            this._commandBar.BindingContext = this.Item;
+            this._commandBar.CommandParameter = this.Item;
 
             // Reset swipe defaults
             this._swipeItem.Animator.Stop();
@@ -209,7 +209,7 @@ namespace XForms.Toolkit
         {
             // Reset command bar
             this.IsCommandBarVisible = false;
-            this._commandBar.BindingContext = null;
+            this._commandBar.CommandParameter = null;
 
             // Reset swipe commands
             this._swipeItem.Animator.Stop();

@@ -103,14 +103,30 @@ namespace XForms.Toolkit
             }
         }
 
-        protected override void OnBindingContextChanged()
-        {
-            base.OnBindingContextChanged();
+        private object _commandParameter;
 
-            // Propagate binding context to child buttons
-            foreach (var child in this._buttonsLayout.Children)
+        /// <summary>
+        /// The value the bar's buttons pass to their commands, such as the list
+        /// item the bar acts on.
+        /// </summary>
+        public object CommandParameter
+        {
+            get
             {
-                child.BindingContext = this.BindingContext;
+                return this._commandParameter;
+            }
+
+            set
+            {
+                this._commandParameter = value;
+
+                foreach (var child in this._buttonsLayout.Children)
+                {
+                    if (child is CommandBarButton button)
+                    {
+                        button.CommandParameter = value;
+                    }
+                }
             }
         }
     }

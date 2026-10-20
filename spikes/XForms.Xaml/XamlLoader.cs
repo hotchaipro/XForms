@@ -507,18 +507,19 @@ namespace XForms.Xaml
         /// {Binding Path} or {Binding Path=Name, Mode=TwoWay}, by reflection on the data context.
         /// </summary>
         /// <remarks>
-        /// GAP: TextEntry raises no event when its text changes, so two-way
-        /// bindings can't update the view model. WORKAROUND: none; TwoWay
-        /// bindings behave as OneWay.
+        /// TwoWay bindings listen to the view's PropertyChanged (phase 3 made
+        /// views observable, and TextBox reports typing).
         /// </remarks>
         private void Bind(object target, string name, string text)
         {
             string inner = text.Substring("{Binding".Length).TrimEnd('}').Trim();
             string path = inner;
+            bool isTwoWay = false;
             foreach (var part in inner.Split(','))
             {
                 var pair = part.Split('=');
                 if (pair.Length == 2 && pair[0].Trim() == "Path") path = pair[1].Trim();
+                else if (pair.Length == 2 && pair[0].Trim() == "Mode") isTwoWay = (pair[1].Trim() == "TwoWay");
                 else if (pair.Length == 1) path = pair[0].Trim();
             }
 
@@ -531,6 +532,22 @@ namespace XForms.Xaml
 
             void Update() => Assign(target, name, property.GetValue(source));
             Update();
+
+            var targetProperty = target.GetType().GetProperty(name, BindingFlags.Public | BindingFlags.Instance);
+            if (isTwoWay && (target is INotifyPropertyChanged view) && (null != targetProperty) && property.CanWrite)
+            {
+                view.PropertyChanged += (sender, e) =>
+                {
+                    if (e.PropertyName == name)
+                    {
+                        var value = targetProperty.GetValue(target);
+                        if (!Equals(value, property.GetValue(source)))
+                        {
+                            property.SetValue(source, value);
+                        }
+                    }
+                };
+            }
 
             if (source is INotifyPropertyChanged observable)
             {

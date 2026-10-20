@@ -113,6 +113,21 @@ attach their children in turn. `View.Attached` and `View.Detached` report
 when a view is added to and removed from its parent. The `Renderer`
 properties are internal: no public API exposes a native object.
 
+## Properties and binding
+
+Views implement `INotifyPropertyChanged`. Properties that can be bound
+have a descriptor (`TextBlock.TextProperty`), and views bind to any source
+with a compiled lambda:
+
+```csharp
+title.Bind(TextBlock.TextProperty, viewModel, vm => vm.Title);
+name.Bind(TextBox.TextProperty, viewModel, vm => vm.Name, (vm, value) => vm.Name = value);
+```
+
+There's no inherited data context: a page or control gets its view model
+explicitly, and list rows get their item through `ListViewItem.Item`.
+Controls run `System.Windows.Input.ICommand`s.
+
 ## Layout
 
 All platforms share one layout engine, in `View`, with WPF-style semantics:

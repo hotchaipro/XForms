@@ -184,6 +184,8 @@ namespace XForms.iOS.Renderers
                 ReturnKeyType = UIReturnKeyType.Done,
             };
 
+            textField.EditingChanged += (sender, e) => ((ITextBoxDelegate)this.Element).OnNativeTextChanged();
+
             textField.ShouldReturn = (field) =>
             {
                 field.ResignFirstResponder();
@@ -278,6 +280,8 @@ namespace XForms.iOS.Renderers
 
             // The text view sizes to its content, so a new line may change its height
             this._container.RequestLayout();
+
+            ((ITextBoxDelegate)this.Element).OnNativeTextChanged();
         }
 
         private void UpdatePlaceholderVisibility()

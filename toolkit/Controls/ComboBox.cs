@@ -9,6 +9,9 @@ namespace XForms.Toolkit
     /// </summary>
     public class ComboBox : PickerField
     {
+        public static readonly ViewProperty<ComboBox, int> SelectedIndexProperty = new(nameof(SelectedIndex), v => v.SelectedIndex, (v, x) => v.SelectedIndex = x);
+        public static readonly ViewProperty<ComboBox, ComboBoxItem> SelectedItemProperty = new(nameof(SelectedItem), v => v.SelectedItem, (v, x) => v.SelectedItem = x);
+
         private int _selectedIndex = -1;
         private float _maximumTextWidth = -1;
         private Popup _popup;
@@ -119,6 +122,9 @@ namespace XForms.Toolkit
 
             this._selectedIndex = index;
             this.InvalidateVisual();
+
+            this.OnPropertyChanged(nameof(this.SelectedIndex));
+            this.OnPropertyChanged(nameof(this.SelectedItem));
 
             if (index >= 0)
             {

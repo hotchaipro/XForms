@@ -51,7 +51,7 @@ namespace XForms.Controls
                 item);
             reuseContainer.Content = itemView;
 
-            itemView.BindingContext = item;
+            itemView.Item = item;
 
             return reuseContainer;
         }

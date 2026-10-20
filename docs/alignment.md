@@ -836,7 +836,7 @@ All three success criteria hold:
 | No `Padding` | The `Border`'s padding becomes its child's margin | 2, **done** |
 | No rounded rectangles | `CornerRadius` is accepted but drawn square | 2, **done**: `FillRoundedRectangle` and `DrawRoundedRectangle` |
 | No visual states (pressed, pointer over) | The button dims its template root while pressed | 4 (pointer events), toolkit |
-| `TextEntry` raises no event when its text changes | None: two-way bindings behave as one-way | 8 |
+| `TextEntry` raises no event when its text changes | None: two-way bindings behave as one-way | 3, **done**: `TextBox.TextChanged`, and views raise `PropertyChanged`; the spike's `TwoWay` bindings work |
 | No opacity animation, and no frame callback | Opacity is stepped on the UI thread by a timer; translation uses `TranslateTo` | 6 |
 | No loaded or attached event | The storyboard starts in a UI-thread callback queued from the page's constructor | 1, **new**: `Attached` and `Detached` events, which come with creating renderers at attach |
 | `XForms.Timer` hides `System.Threading.Timer` in any file that uses `XForms` | Fully qualified name | 1, **new**: rename it to `DispatcherTimer` |
@@ -997,6 +997,44 @@ Neither changed the order of the phases. Both added items, which are below.
    - Add typed, compiled bindings with an explicit source.
    - Add command support on controls.
    - Remove `BindingContext`.
+
+   **Status: done.**
+   - **Observable views:**
+     - `View` implements `INotifyPropertyChanged`, with `OnPropertyChanged`
+       and `SetProperty` helpers for control authors.
+     - The framework's and toolkit's properties raise it, including values
+       the user changes: `TextBox.Text`, `ToggleButton.IsChecked`,
+       `ComboBox.SelectedItem`, `CalendarDatePicker.SelectedDate` and
+       `RadioButtons.SelectedItem`.
+   - **Typed bindings:**
+     - Bindable properties have a descriptor, such as `TextBlock.TextProperty`
+       (a `ViewProperty<TView, TValue>`: a name and compiled accessors, with
+       no property engine behind it).
+     - `view.Bind(TextBlock.TextProperty, vm, vm => vm.Title)` binds one
+       way, re-reading the lambda when the source raises `PropertyChanged`.
+       Adding a setter lambda binds both ways.
+     - The view keeps its bindings, and the source refers to them weakly,
+       so view models don't keep views alive. `Bind` returns a `Binding`
+       to dispose early.
+   - **Commands:**
+     - Controls take `System.Windows.Input.ICommand`; XForms' own
+       `ICommand` is gone.
+     - `Button` gained `Command` and `CommandParameter`, and is enabled
+       while the command can run.
+     - The toolkit's `Command` became `RelayCommand`, with `CanExecute` and
+       `NotifyCanExecuteChanged`.
+   - **No `BindingContext`:**
+     - Command bars and buttons pass a `CommandParameter`.
+     - List rows get their item through `ListViewItem.Item` and
+       `OnItemChanged`, until phase 9's typed `ListView<T>`.
+     - SoonerOrLater's task page takes its view model as a property.
+   - **Pulled forward from phase 8:** `TextBox.TextChanged`, reported by each
+     platform's native editor, which two-way binding needs.
+   - **Fixed on the way:** `DrawImage` with no bitmap now draws nothing on
+     every platform; Android and iOS threw.
+   - **Not done:** nested paths (`vm.Address.City`) update only when the
+     source itself raises a change. Bindings expect changes on the UI
+     thread.
 4. **Input.**
    - Add pointer, wheel, key and focus events and overrides, with multiple
      pointers and explicit pointer capture.

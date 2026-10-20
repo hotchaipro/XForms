@@ -112,7 +112,7 @@ namespace XForms.Controls
             var content = this.Content;
             if (null != content)
             {
-                content.BindingContext = null;
+                content.Item = null;
                 content.Container = null;
             }
 

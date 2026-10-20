@@ -20,6 +20,9 @@ namespace XForms.Android.Renderers
 
             //this._nativeTextView.RevealOnFocusHint = true;
 
+            var textBoxDelegate = (ITextBoxDelegate)textEntry;
+            this._nativeTextEntry.AfterTextChanged += (sender, e) => textBoxDelegate.OnNativeTextChanged();
+
             this.SetNativeElement(this._nativeTextEntry);
         }
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System;
+using System.Windows.Input;
 using XForms.Controls;
 
 namespace XForms.Toolkit
@@ -26,6 +27,13 @@ namespace XForms.Toolkit
         //    get;
         //    set;
         //}
+
+        // A URI can always be opened
+        public event EventHandler CanExecuteChanged
+        {
+            add { }
+            remove { }
+        }
 
         public bool CanExecute(
             object parameter)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Input;
 using XForms.Input;
 using XForms.Controls;
 
@@ -6,6 +7,10 @@ namespace XForms.Toolkit
 {
     public class Button : UserControl, ITapGestureDelegate
     {
+        public static readonly ViewProperty<Button, string> TextProperty = new(nameof(Text), v => v.Text, (v, x) => v.Text = x);
+        public static readonly ViewProperty<Button, bool> IsEnabledProperty = new(nameof(IsEnabled), v => v.IsEnabled, (v, x) => v.IsEnabled = x);
+        public static readonly ViewProperty<Button, ICommand> CommandProperty = new(nameof(Command), v => v.Command, (v, x) => v.Command = x);
+
         // Animates the control itself (press feedback, spinning)
         private readonly Animator _ownAnimator;
 
@@ -31,6 +36,8 @@ namespace XForms.Toolkit
         private string _text;
         private bool _isEnabled = true;
         private bool _isAlert;
+
+        private ICommand _command;
 
         public event EventHandler Clicked;
 
@@ -60,6 +67,73 @@ namespace XForms.Toolkit
                 this._isEnabled = value;
 
                 this.InvalidateVisual();
+
+                this.OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// The command the button runs when clicked. The button is enabled
+        /// while the command can run.
+        /// </summary>
+        public ICommand Command
+        {
+            get
+            {
+                return this._command;
+            }
+
+            set
+            {
+                if (null != this._command)
+                {
+                    this._command.CanExecuteChanged -= this.Command_CanExecuteChanged;
+                }
+
+                this._command = value;
+
+                if (null != value)
+                {
+                    value.CanExecuteChanged += this.Command_CanExecuteChanged;
+                }
+
+                this.UpdateCanExecute();
+                this.OnPropertyChanged();
+            }
+        }
+
+        private object _commandParameter;
+
+        /// <summary>
+        /// The value passed to the command.
+        /// </summary>
+        public object CommandParameter
+        {
+            get
+            {
+                return this._commandParameter;
+            }
+
+            set
+            {
+                this._commandParameter = value;
+                this.UpdateCanExecute();
+                this.OnPropertyChanged();
+            }
+        }
+
+        private void Command_CanExecuteChanged(
+            object sender,
+            EventArgs e)
+        {
+            this.UpdateCanExecute();
+        }
+
+        private void UpdateCanExecute()
+        {
+            if (null != this._command)
+            {
+                this.IsEnabled = this._command.CanExecute(this._commandParameter);
             }
         }
 
@@ -90,6 +164,8 @@ namespace XForms.Toolkit
                 this._text = value;
 
                 this.InvalidateVisual();
+
+                this.OnPropertyChanged();
             }
         }
 
@@ -169,6 +245,11 @@ namespace XForms.Toolkit
             if (this.IsEnabled)
             {
                 this.Clicked?.Invoke(this, EventArgs.Empty);
+
+                if ((null != this._command) && this._command.CanExecute(this._commandParameter))
+                {
+                    this._command.Execute(this._commandParameter);
+                }
             }
         }
 

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace XForms
@@ -71,8 +73,15 @@ namespace XForms
         bool Focus();
     }
 
-    public abstract class View : Element, IViewDelegate
+    public abstract class View : Element, IViewDelegate, INotifyPropertyChanged
     {
+        public static readonly ViewProperty<View, bool> IsVisibleProperty = new(nameof(IsVisible), v => v.IsVisible, (v, x) => v.IsVisible = x);
+        public static readonly ViewProperty<View, bool> IsHitTestVisibleProperty = new(nameof(IsHitTestVisible), v => v.IsHitTestVisible, (v, x) => v.IsHitTestVisible = x);
+        public static readonly ViewProperty<View, float> WidthProperty = new(nameof(Width), v => v.Width, (v, x) => v.Width = x);
+        public static readonly ViewProperty<View, float> HeightProperty = new(nameof(Height), v => v.Height, (v, x) => v.Height = x);
+        public static readonly ViewProperty<View, Thickness> MarginProperty = new(nameof(Margin), v => v.Margin, (v, x) => v.Margin = x);
+        public static readonly ViewProperty<View, string> AccessibilityLabelProperty = new(nameof(AccessibilityLabel), v => v.AccessibilityLabel, (v, x) => v.AccessibilityLabel = x);
+
         private bool _isVisible = true;
         private bool _isHitTestVisible = true;
         private Animator _animator;
@@ -115,6 +124,8 @@ namespace XForms
                     // A hidden view takes no space, so its parent must lay out again
                     this.InvalidateMeasure();
                 }
+
+                this.OnPropertyChanged();
             }
         }
 
@@ -129,6 +140,8 @@ namespace XForms
             {
                 this._isHitTestVisible = value;
                 this.Native?.IsHitTestVisible = value;
+
+                this.OnPropertyChanged();
             }
         }
 
@@ -162,6 +175,57 @@ namespace XForms
                 }
             }
         }
+
+        #region Property changes and bindings
+
+        private List<Binding> _bindings;
+
+        /// <summary>
+        /// Raised when a property of the view changes, whether code or the user
+        /// (typing, toggling, choosing) changed it.
+        /// </summary>
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged(
+            [CallerMemberName] string propertyName = null)
+        {
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        /// <summary>
+        /// Sets a property's field and raises <see cref="PropertyChanged"/> if
+        /// the value changed. Returns whether it changed.
+        /// </summary>
+        protected bool SetProperty<T>(
+            ref T field,
+            T value,
+            [CallerMemberName] string propertyName = null)
+        {
+            if (EqualityComparer<T>.Default.Equals(field, value))
+            {
+                return false;
+            }
+
+            field = value;
+            this.OnPropertyChanged(propertyName);
+            return true;
+        }
+
+        // The view keeps its bindings alive; sources refer to them weakly
+        internal void AddBinding(
+            Binding binding)
+        {
+            this._bindings ??= new List<Binding>();
+            this._bindings.Add(binding);
+        }
+
+        internal void RemoveBinding(
+            Binding binding)
+        {
+            this._bindings?.Remove(binding);
+        }
+
+        #endregion Property changes and bindings
 
         #region Attach
 
@@ -318,6 +382,8 @@ namespace XForms
             set
             {
                 this._accessibilityRole = value;
+
+                this.OnPropertyChanged();
             }
         }
 
@@ -335,6 +401,8 @@ namespace XForms
             set
             {
                 this._accessibilityLabel = value;
+
+                this.OnPropertyChanged();
             }
         }
 
@@ -386,6 +454,8 @@ namespace XForms
             {
                 this._requestedSize = new Size(value, this._requestedSize.Height);
                 this.InvalidateMeasure();
+
+                this.OnPropertyChanged();
             }
         }
 
@@ -403,6 +473,8 @@ namespace XForms
             {
                 this._requestedSize = new Size(this._requestedSize.Width, value);
                 this.InvalidateMeasure();
+
+                this.OnPropertyChanged();
             }
         }
 
@@ -420,6 +492,8 @@ namespace XForms
             {
                 this._minimumSize = new Size(value, this._minimumSize.Height);
                 this.InvalidateMeasure();
+
+                this.OnPropertyChanged();
             }
         }
 
@@ -437,6 +511,8 @@ namespace XForms
             {
                 this._minimumSize = new Size(this._minimumSize.Width, value);
                 this.InvalidateMeasure();
+
+                this.OnPropertyChanged();
             }
         }
 
@@ -454,6 +530,8 @@ namespace XForms
             {
                 this._maximumSize = new Size(value, this._maximumSize.Height);
                 this.InvalidateMeasure();
+
+                this.OnPropertyChanged();
             }
         }
 
@@ -471,6 +549,8 @@ namespace XForms
             {
                 this._maximumSize = new Size(this._maximumSize.Width, value);
                 this.InvalidateMeasure();
+
+                this.OnPropertyChanged();
             }
         }
 
@@ -485,6 +565,8 @@ namespace XForms
             {
                 this._margin = value;
                 this.InvalidateMeasure();
+
+                this.OnPropertyChanged();
             }
         }
 
@@ -517,6 +599,8 @@ namespace XForms
             {
                 this._horizontalAlignment = value;
                 this.InvalidateMeasure();
+
+                this.OnPropertyChanged();
             }
         }
 
@@ -531,6 +615,8 @@ namespace XForms
             {
                 this._verticalAlignment = value;
                 this.InvalidateMeasure();
+
+                this.OnPropertyChanged();
             }
         }
 
@@ -553,6 +639,8 @@ namespace XForms
             {
                 this._flowDirection = value;
                 this.InvalidateMeasure();
+
+                this.OnPropertyChanged();
             }
         }
 
@@ -575,6 +663,8 @@ namespace XForms
                     this._zIndex = value;
                     (this.Parent as Panel)?.OnChildZIndexChanged(this);
                 }
+
+                this.OnPropertyChanged();
             }
         }
 
@@ -593,6 +683,8 @@ namespace XForms
             {
                 this._clipToBounds = value;
                 this.Native?.ClipToBounds = value;
+
+                this.OnPropertyChanged();
             }
         }
 

@@ -11,6 +11,8 @@ namespace XForms.Controls
 
     public class Image : View
     {
+        public static readonly ViewProperty<Image, ImageSource> SourceProperty = new(nameof(Source), v => v.Source, (v, x) => v.Source = x);
+        public static readonly ViewProperty<Image, Color> TintProperty = new(nameof(Tint), v => v.Tint, (v, x) => v.Tint = x);
         protected override AccessibilityRole DefaultAccessibilityRole
         {
             get
@@ -37,6 +39,8 @@ namespace XForms.Controls
             {
                 this._tint = value;
                 this.Native?.SetTint(value);
+
+                this.OnPropertyChanged();
             }
         }
 
@@ -52,6 +56,8 @@ namespace XForms.Controls
                 this._source = value;
                 this.Native?.SetSource(value);
                 this.InvalidateMeasure();
+
+                this.OnPropertyChanged();
             }
         }
 

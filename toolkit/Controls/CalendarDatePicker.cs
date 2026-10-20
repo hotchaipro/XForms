@@ -9,6 +9,8 @@ namespace XForms.Toolkit
     /// </summary>
     public class CalendarDatePicker : PickerField
     {
+        public static readonly ViewProperty<CalendarDatePicker, DateTime?> SelectedDateProperty = new(nameof(SelectedDate), v => v.SelectedDate, (v, x) => v.SelectedDate = x);
+
         private DateTime? _selectedDate;
         private Popup _popup;
         private CalendarView _calendar;
@@ -28,8 +30,15 @@ namespace XForms.Toolkit
 
             set
             {
-                this._selectedDate = value?.Date;
+                var date = value?.Date;
+                if (date == this._selectedDate)
+                {
+                    return;
+                }
+
+                this._selectedDate = date;
                 this.InvalidateVisual();
+                this.OnPropertyChanged();
             }
         }
 

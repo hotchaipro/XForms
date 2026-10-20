@@ -6,6 +6,8 @@ namespace XForms.Toolkit
 {
     public class RadioButtons : ContentControl
     {
+        public static readonly ViewProperty<RadioButtons, object> SelectedItemProperty = new(nameof(SelectedItem), v => v.SelectedItem, (v, x) => v.SelectedItem = x);
+
         private DockPanel _buttonsLayout;
         private object _selectedValue;
 
@@ -71,6 +73,8 @@ namespace XForms.Toolkit
                 {
                     throw new ArgumentOutOfRangeException(nameof(SelectedItem));
                 }
+
+                this.OnPropertyChanged();
             }
         }
 
@@ -88,7 +92,7 @@ namespace XForms.Toolkit
             }
 
             var radioButton = new RadioButton(this, radioButtonItem);
-            radioButton.Command = new Command((o) => OnButtonClicked(o as RadioButton));
+            radioButton.Command = new RelayCommand((o) => OnButtonClicked(o as RadioButton));
             this._buttonsLayout.Children.Add(radioButton, Dock.Left);
         }
 

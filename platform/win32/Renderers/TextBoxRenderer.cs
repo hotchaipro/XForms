@@ -410,6 +410,7 @@ namespace XForms.Win32.Renderers
             {
                 case EN_CHANGE:
                     this.Host.Post(this.RequestContentHeight);
+                    this.Host.Post(((ITextBoxDelegate)this.Element).OnNativeTextChanged);
                     this.RequestPlaceholderRefresh();
                     break;
 

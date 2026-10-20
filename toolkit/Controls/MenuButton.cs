@@ -115,6 +115,16 @@ namespace XForms.Toolkit
 
         #region ITapGestureDelegate implementation
 
+        /// <summary>
+        /// The value passed to the command when it runs (and when asked whether
+        /// it can).
+        /// </summary>
+        public object CommandParameter
+        {
+            get;
+            set;
+        }
+
         void ITapGestureDelegate.OnTapBegan()
         {
             this._ownAnimator.ScaleTo(TouchDownScale, TimeSpan.FromMilliseconds(25), new CubicEase(EasingMode.EaseIn));
@@ -127,7 +137,7 @@ namespace XForms.Toolkit
 
         void ITapGestureDelegate.OnTapped()
         {
-            this.MenuItem.Command?.Execute(this.BindingContext);
+            this.MenuItem.Command?.Execute(this.CommandParameter);
         }
 
         void IGestureRecognizerDelegate.OnTouchBegan()

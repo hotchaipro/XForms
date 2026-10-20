@@ -55,6 +55,9 @@ namespace XForms
             Color color,
             float blurAmount = 8.0f);
 
+        /// <summary>
+        /// Draws a bitmap, optionally tinted; a null bitmap draws nothing.
+        /// </summary>
         void DrawImage(
             Bitmap bitmap,
             Rect destinationRectangle,
