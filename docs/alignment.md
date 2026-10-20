@@ -80,7 +80,7 @@ run into the gap.
 | 3 | **Navigation and windows** | A frame stack with `NavigateTo` and `NavigateBack` | Navigation parameters and results, modal pages, transitions, tabs or shell, deep links; on desktop, multiple windows, window title and state |
 | 3 | **Platform services** | `OpenUri` | Clipboard, file pickers, sharing, preferences and secure storage, haptics, connectivity, safe-area insets, system theme and text-scale changes |
 | 3 | **Assets** | Images loaded by name, with different naming rules per platform | One asset model, density variants, vector images (SVG) |
-| 3 | **Theming** | `AppTheme` (light and dark) with five colors | Resources, styles, and reporting the system theme, accent color and high contrast |
+| 3 | **Theming** | `AppTheme` (light and dark) with five colors | A theme mode reported by the system (light, dark, high contrast); typed design tokens (colors, type, shapes, motion) that any view can scope; per-control styles |
 | Ongoing | **Accessibility** | A role and a label, on Win32 only | States (checked, expanded, selected), values, custom actions, live regions, on every platform |
 | Ongoing | **Keyboard focus** | Win32 only | Every platform with a keyboard, including Android and iOS hardware keyboards |
 | Later | **Platforms and tooling** | Windows, Android, iOS | macOS, Linux and web; hot reload, previewer, headless testing |
@@ -178,7 +178,8 @@ Two areas need concrete shapes:
   secure storage, sharing and haptics. Expose them as interfaces available
   from the application rather than as static classes, so apps can substitute
   them in tests.
-- **Theme.** Keep `AppTheme` (MAUI's name), and report system theme changes.
+- **Theme.** Report the system's theme mode, accent color and high contrast,
+  and their changes (see [Theming](#7-theming-a-mode-design-tokens-and-styles)).
 
 ### 3. Properties and binding
 
@@ -535,7 +536,57 @@ The results size the gain on each platform, and set the order of the work.
 
 So lightweight views are worth doing, and Android is the strongest reason.
 
-### 7. Be clear about what ports
+### 7. Theming: a mode, design tokens and styles
+
+"Theme" means three different things in other frameworks, and XForms keeps
+them apart:
+
+| Concept | What it is | Precedent |
+|---|---|---|
+| **Mode** | Light, dark or high contrast | MAUI's `AppTheme` enum, Avalonia's `ThemeVariant`, WinUI's `ElementTheme`, SwiftUI's `ColorScheme` |
+| **Design tokens** | Semantic colors, a type scale, shapes and motion, resolved for a mode | Flutter's `ThemeData`, Compose's `MaterialTheme`, WinUI's theme resources |
+| **Skin** | How each control looks | Templates in WPF, WinUI and Avalonia; the control's own drawing, with component themes, in Flutter and Compose |
+
+XForms' controls draw themselves and its properties are typed, so it follows
+Flutter and Compose:
+- **`ThemeMode`.** An enum: `Light`, `Dark` and `HighContrast`. The platform
+  reports the system's mode and raises a change event. An app can follow it
+  or override it.
+- **`Theme`: typed design tokens.**
+  - A `ColorScheme` with semantic roles in pairs (a color, and the color of
+    content on it): accent, background, surface and subtle surface, error,
+    plus outline and disabled. The names follow Material 3's roles and map
+    to WinUI's theme resources.
+  - `Typography`: a type scale (display, title, body, label, caption) as
+    text formats, using the generic font families.
+  - `Shapes`: corner radii (small, medium, large).
+  - `Motion`: durations and easings (short, medium, emphasized).
+  - XForms provides a theme for each mode, built from the system's accent
+    color. An app can build its own (a brand's colors, its type scale).
+- **Scoped.** Any view can set a `Theme` for itself and its descendants (a
+  dark section in a light app, or a brand-colored banner). A view's
+  effective theme is inherited down the tree, as `FlowDirection` is.
+- **Styles, not templates.** A control can take an optional typed style
+  object (`ButtonStyle { Background, CornerRadius, Padding }`) whose unset
+  values come from the theme. A theme can carry default styles per control
+  type, as Flutter's component themes do.
+- **Delivered after attach.** A control's `OnThemeChanged(Theme)` runs once
+  it's attached and whenever its effective theme changes. It never runs
+  from a constructor, so a control can use views its constructor built. It
+  replaces `OnApplyTheme`, which ran from `Element`'s constructor.
+
+**Alternatives considered:**
+- **Keep `AppTheme` as a palette class.** MAUI's `AppTheme` is the mode
+  enum, so keeping the name with another meaning would mislead MAUI
+  developers, and five colors leave controls to hard-code the rest.
+- **String-keyed resource dictionaries** (WPF, WinUI, MAUI). They lose type
+  checking and refactoring, and need the dependency property engine XForms
+  doesn't adopt (see [Properties and binding](#3-properties-and-binding)).
+- **Control templates.** XForms' controls draw themselves (see
+  [Drawing](#4-drawing-xforms-own-api-on-native-2d-libraries)), so there's
+  no visual tree to template.
+
+### 8. Be clear about what ports
 
 | Ports with little change | Needs rework | Doesn't port |
 |---|---|---|
@@ -619,7 +670,8 @@ from. Where XForms keeps its own name, the reason is in
 | `KeyInputEvent` | `KeyEventArgs` | WPF, Avalonia | `Key` stays |
 | `GestureRecognizer`, `TapGestureRecognizer`, `SwipeGestureRecognizer` | Keep | MAUI | Plus `Tapped`, `DoubleTapped` and `Holding` events on views |
 | `AccessibilityRole` | Keep | SwiftUI, Flutter, React Native | Plain view property |
-| `AppTheme`, `LightTheme`, `DarkTheme` | `AppTheme` (Light, Dark), with resources for colors | MAUI | Theme colors move toward resources |
+| `AppTheme`, `LightTheme`, `DarkTheme` | `Theme` (design tokens: `ColorScheme`, `Typography`, `Shapes`, `Motion`), and `ThemeMode` (`Light`, `Dark`, `HighContrast`) | Flutter (`ThemeData`), Compose (`MaterialTheme`); MAUI's `AppTheme` is the mode | Typed tokens, scoped to any view, not resource dictionaries |
+| `OnApplyTheme(AppTheme)` | `OnThemeChanged(Theme)` | | Runs after attach and on changes, never from a constructor |
 | `ICommand` | `System.Windows.Input.ICommand` | All | Use the standard interface |
 
 ### Framework: members
@@ -866,7 +918,7 @@ All three success criteria hold:
   - Phase 3's typed bindings don't block it: a XAML layer can keep
     reflection bindings, or generate typed ones.
 - Element counts weren't tested: the page is small. The benchmark (see
-  [benchmarks.md](benchmarks.md)) covers that risk, and phase 7 answers it.
+  [benchmarks.md](benchmarks.md)) covers that risk, and phase 8 answers it.
 
 ## Plan
 
@@ -932,16 +984,16 @@ Neither changed the order of the phases. Both added items, which are below.
      - `DrawingContext` and `Render` (phase 5).
      - `TextLayout` (phase 5).
      - `OnGotFocus` and `OnLostFocus` (phase 4).
-     - `ListView<T>`, `ListViewItem` and `ItemClick` (phase 9).
-     - Async navigation and `Dispatcher` (phase 10).
+     - `ListView<T>`, `ListViewItem` and `ItemClick` (phase 10).
+     - Async navigation and `Dispatcher` (phase 11).
      - `RelayCommand` (phase 3).
    - **Still to do:**
      - Make the renderer interfaces and `Application.Renderer` internal.
      - Theme overrides still run from `Element`'s constructor, before
        derived constructors. A control whose `OnApplyTheme` uses views that
        its constructor builds has to skip that first call (SoonerOrLater's
-       `TaskListViewItem` does). Phase 3's property system should replace
-       this with theme resources.
+       `TaskListViewItem` does). Phase 7 (theming) replaces it with
+       `OnThemeChanged`, after attach.
 2. **Panels and view basics.**
    - Add `Grid`, `StackPanel`, `Border`, `WrapPanel` and `Canvas`, each with
      typed layout parameters for its children.
@@ -1027,9 +1079,9 @@ Neither changed the order of the phases. Both added items, which are below.
    - **No `BindingContext`:**
      - Command bars and buttons pass a `CommandParameter`.
      - List rows get their item through `ListViewItem.Item` and
-       `OnItemChanged`, until phase 9's typed `ListView<T>`.
+       `OnItemChanged`, until phase 10's typed `ListView<T>`.
      - SoonerOrLater's task page takes its view model as a property.
-   - **Pulled forward from phase 8:** `TextBox.TextChanged`, reported by each
+   - **Pulled forward from phase 9:** `TextBox.TextChanged`, reported by each
      platform's native editor, which two-way binding needs.
    - **Fixed on the way:** `DrawImage` with no bitmap now draws nothing on
      every platform; Android and iOS threw.
@@ -1198,12 +1250,24 @@ Neither changed the order of the phases. Both added items, which are below.
      Android, including swipes and its undo button. iOS is only built.
    - **Not done:**
      - The framework's popups, scrolled content and list rows don't get
-       animators yet; list rows come with phase 9.
+       animators yet; list rows come with phase 10.
      - Win32's frame callback waits for each frame on a pool thread, which
        sometimes misses one (about 48 frames per second on a 60 Hz
        display).
      - Hit testing on Win32 follows translation, but not scale or rotation.
-7. **Lightweight controls.** After the Animator, since it decides which views
+7. **Theming.** (See [Theming](#7-theming-a-mode-design-tokens-and-styles).)
+   - Add `ThemeMode`, reported by each platform with its changes: the
+     system's dark mode, accent color and high contrast.
+   - Replace `AppTheme` with `Theme`: a `ColorScheme` with semantic roles,
+     `Typography`, `Shapes` and `Motion`, with a theme for each mode.
+   - Let any view set a `Theme` for itself and its descendants, and give
+     each view its effective theme.
+   - Replace `OnApplyTheme` with `OnThemeChanged`, after attach.
+   - Move the toolkit's colors, corner radii, text sizes and durations onto
+     the theme's tokens, and add typed styles to the controls that need
+     them (buttons first).
+   - Update SoonerOrLater, and test both modes and high contrast.
+8. **Lightweight controls.** After the Animator, since it decides which views
    have layers.
    - Draw owner-drawn controls, `Border`, panels and `TextBlock` into their
      nearest layer's surface, with framework layout, hit-testing, input,
@@ -1214,16 +1278,16 @@ Neither changed the order of the phases. Both added items, which are below.
    - Expose lightweight controls through virtual accessibility nodes on every
      platform.
    - Rerun the benchmark to confirm the gain.
-8. **Text entry.** Add `TextChanged`, a submitted event, password mode,
+9. **Text entry.** Add `TextChanged`, a submitted event, password mode,
    maximum length, read-only and a selection API.
-9. **Lists.** Add `ListView<T>` with typed item sources and item views that
+10. **Lists.** Add `ListView<T>` with typed item sources and item views that
    are created once and bound to many items, plus grouping, horizontal and
    grid layouts, and selection modes.
-10. **App layer.**
+11. **App layer.**
    - Asynchronous, instance-based navigation, with parameters, results,
      modal pages and transitions.
    - Platform services, as interfaces from the application.
    - Windows on desktop.
-   - System theme and text-scale changes.
-11. **Ongoing.** Accessibility (states, values, actions; Android and iOS) and
+   - System text-scale changes.
+12. **Ongoing.** Accessibility (states, values, actions; Android and iOS) and
     keyboard focus on every platform, alongside the phases above.
