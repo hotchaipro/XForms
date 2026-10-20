@@ -257,6 +257,10 @@ other threads.
 
 ## Current state
 
+[alignment.md](alignment.md) proposes aligning the framework's API with WPF,
+WinUI and Avalonia (and with MAUI for app services), and lists the gaps to
+fill.
+
 The split is in place: the toolkit, including its pickers, calendar and
 progress ring, builds against public API only, and no platform has
 picker-specific code. Still to do:

@@ -104,6 +104,11 @@ namespace XForms.Android.Renderers
             int right = (int)Math.Round(this.DevicePixelsToPixels(frame.X + frame.Width));
             int bottom = (int)Math.Round(this.DevicePixelsToPixels(frame.Y + frame.Height));
 
+            // Never lose a pixel to edge rounding: a view arranged at exactly its
+            // measured size (text in particular) would otherwise wrap or clip
+            right = Math.Max(right, left + (int)Math.Ceiling(this.DevicePixelsToPixels(frame.Width) - 0.01f));
+            bottom = Math.Max(bottom, top + (int)Math.Ceiling(this.DevicePixelsToPixels(frame.Height) - 0.01f));
+
             // NOTE: Always finish with an exact measure at the final size: views
             // such as ListView lay out their content using the mode of the last
             // measure, not just its size. Android caches measurements per spec,

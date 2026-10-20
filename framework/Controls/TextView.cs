@@ -59,6 +59,9 @@ namespace XForms.Controls
             set
             {
                 this.Renderer.Text = value;
+
+                // New text can need a different size, on every platform
+                this.InvalidateLayout();
             }
         }
 

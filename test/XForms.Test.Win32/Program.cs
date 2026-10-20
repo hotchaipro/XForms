@@ -16,6 +16,9 @@ namespace XForms.Test.Win32
                     System.IO.File.AppendAllText(path, $"{DateTime.Now:O} {e.Exception.GetType().Name}: {e.Exception.Message}{Environment.NewLine}{Environment.StackTrace}{Environment.NewLine}");
             }
 
+            // XFORMS_TEST_PAGE picks another page, such as "pickers"
+            TestApp.StartPage = Environment.GetEnvironmentVariable("XFORMS_TEST_PAGE");
+
             Win32Application.Run("XForms Test (Win32)", (platform) => new TestApp(platform));
         }
     }
