@@ -57,14 +57,14 @@ namespace XForms.Input
                     this.State = GestureState.Began;
 
                     this._swipeDirection = 0;
-                    this._gestureStart = touch.Point;
+                    this._gestureStart = touch.Position;
 
                     this._delegate.OnTapBegan();
                 }
             }
             else if (this.State != GestureState.Possible)
             {
-                float dx = (float)(touch.Point.X - this._gestureStart.X);
+                float dx = (float)(touch.Position.X - this._gestureStart.X);
 
                 if (this._swipeDirection == 0)
                 {
@@ -80,7 +80,7 @@ namespace XForms.Input
                     dx = Math.Abs(dx);
                 }
 
-                double dy = Math.Abs(touch.Point.Y - this._gestureStart.Y);
+                double dy = Math.Abs(touch.Position.Y - this._gestureStart.Y);
 
                 if (touch.State == PointerInputState.Moved)
                 {

@@ -156,7 +156,8 @@ namespace XForms.Win32
             while (PInvoke.GetMessage(&msg, HWND.Null, 0, 0))
             {
                 // Focus, activation and back keys work wherever keyboard focus is
-                if (((msg.message == PInvoke.WM_KEYDOWN) || (msg.message == PInvoke.WM_SYSKEYDOWN))
+                if (((msg.message == PInvoke.WM_KEYDOWN) || (msg.message == PInvoke.WM_SYSKEYDOWN)
+                        || (msg.message == PInvoke.WM_KEYUP) || (msg.message == PInvoke.WM_SYSKEYUP))
                     && host._focus.PreviewKey(msg.message, (Windows.Win32.UI.Input.KeyboardAndMouse.VIRTUAL_KEY)msg.wParam.Value))
                 {
                     continue;
@@ -508,6 +509,22 @@ namespace XForms.Win32
             float delta)
         {
             this.HitTest(point, out var hit);
+
+            // Views under the pointer get the wheel first
+            for (var renderer = hit; null != renderer; renderer = renderer.ParentRenderer)
+            {
+                if ((renderer.Element is View view) && renderer.IsHitTestVisible)
+                {
+                    var origin = renderer.AbsoluteOrigin();
+                    var local = new Point(point.X - origin.X, point.Y - origin.Y);
+                    var e = new PointerEventArgs(0, PointerDeviceType.Mouse, local, PointerInputState.Moved, false, FocusManager.CurrentModifiers(), delta);
+                    if (view.DispatchPointerWheel(e))
+                    {
+                        return;
+                    }
+                }
+            }
+
             for (var renderer = hit; null != renderer; renderer = renderer.ParentRenderer)
             {
                 if (renderer is IScrollableRenderer scrollable)
@@ -552,11 +569,14 @@ namespace XForms.Win32
 
             PInvoke.GetPointerType(pointerId, out var pointerType);
             bool isDirect = (pointerType == POINTER_INPUT_TYPE.PT_TOUCH) || (pointerType == POINTER_INPUT_TYPE.PT_PEN);
+            var deviceType = (pointerType == POINTER_INPUT_TYPE.PT_TOUCH) ? PointerDeviceType.Touch
+                : (pointerType == POINTER_INPUT_TYPE.PT_PEN) ? PointerDeviceType.Pen
+                : PointerDeviceType.Mouse;
 
             switch (msg)
             {
                 case PInvoke.WM_POINTERDOWN:
-                    this._pointers.Down(pointerId, point, isDirect);
+                    this._pointers.Down(pointerId, point, isDirect, deviceType);
                     if (!isDirect)
                     {
                         // Keep receiving mouse moves outside the window

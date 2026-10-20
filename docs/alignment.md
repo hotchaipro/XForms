@@ -1042,6 +1042,44 @@ Neither changed the order of the phases. Both added items, which are below.
    - Add `Tapped`, `DoubleTapped` and `Holding`, plus pinch and pan
      recognizers.
    - Add key routing on Android and iOS.
+
+   **Status: done.**
+   - **Pointers:**
+     - `PointerEventArgs` has a pointer ID, device type (touch, mouse,
+       pen), position relative to the receiving view, key modifiers, wheel
+       delta, `OriginalSource` and `Handled`.
+     - Views have `OnPointerPressed`, `OnPointerMoved`, `OnPointerReleased`,
+       `OnPointerCanceled` and `OnPointerWheelChanged`, with matching
+       events. These replace the public `HandlePointerEvent`.
+     - `CapturePointer` keeps a pointer's moves from scrolling parents.
+     - Win32, Android and iOS deliver every finger, not just the first.
+       Win32 sends the wheel to the views under the pointer before
+       scrolling, and Android sends it as well.
+   - **Gestures:**
+     - `Tapped`, `DoubleTapped` and `Holding` events.
+     - `PanGestureRecognizer` (with allowed directions) and
+       `PinchGestureRecognizer`.
+     - Single-pointer recognizers follow only their first pointer.
+   - **Focus and keys:**
+     - `GotFocus`/`LostFocus` and `KeyDown`/`KeyUp`, with the overrides
+       `OnGotFocus`, `OnLostFocus`, `OnKeyDown` and `OnKeyUp`.
+       `KeyEventArgs` has `Handled`, modifiers and more keys (letters,
+       digits, function keys).
+     - Keys go to the focused view, then its ancestors.
+     - Android and iOS now route keys and keyboard focus too.
+   - **Application filters:** `Application.PreviewPointerInput` and
+     `PreviewKeyDown` see every event before the views do.
+   - **Fixed on the way:** `DispatcherTimer` ran its action off the UI
+     thread, and one shared counter meant starting any timer cancelled the
+     others. It now works as in WPF (`Interval`, `Tick`, `Start`, `Stop`),
+     ticking on the UI thread.
+   - **Verified:**
+     - On Win32 and Android: taps, double taps, holds, pans, focus and keys
+       (input test page).
+     - On Win32: the wheel, and a pinch with injected two-finger touch.
+     - Not verified: pinch and wheel on Android, and all of iOS, which is
+       only built.
+   - **Not done:** pointer enter and exit (hover tracking).
 5. **Drawing and text.**
    - Expand `DrawingContext` on Direct2D, Core Graphics and Android `Canvas`:
      paths, rounded rectangles, immutable brushes, push/pop of clip,

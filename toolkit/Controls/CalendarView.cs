@@ -225,100 +225,99 @@ namespace XForms.Toolkit
             return (point.X >= rectangle.X) && (point.Y >= rectangle.Y) && (point.X < rectangle.Right) && (point.Y < rectangle.Bottom);
         }
 
-        public override bool HandlePointerEvent(
-            PointerEventArgs pointerInputEvent)
+        protected override void OnPointerPressed(
+            PointerEventArgs e)
         {
-            if (base.HandlePointerEvent(pointerInputEvent))
-            {
-                return true;
-            }
-
-            switch (pointerInputEvent.State)
-            {
-                case PointerInputState.Began:
-                    this._pressedPart = this.PartAt(pointerInputEvent.Point, out this._pressedDate);
-                    this.InvalidateVisual();
-                    return this._pressedPart != Part.None;
-
-                case PointerInputState.Ended:
-                    {
-                        var part = this.PartAt(pointerInputEvent.Point, out var date);
-                        var pressedPart = this._pressedPart;
-                        var pressedDate = this._pressedDate;
-                        this._pressedPart = Part.None;
-                        this.InvalidateVisual();
-
-                        if (part != pressedPart)
-                        {
-                            return true;
-                        }
-
-                        switch (part)
-                        {
-                            case Part.PreviousMonth:
-                                this.ShowMonth(-1);
-                                break;
-
-                            case Part.NextMonth:
-                                this.ShowMonth(1);
-                                break;
-
-                            case Part.Day:
-                                if (date == pressedDate)
-                                {
-                                    this.Choose(date);
-                                }
-                                break;
-                        }
-
-                        return true;
-                    }
-
-                case PointerInputState.Canceled:
-                    this._pressedPart = Part.None;
-                    this.InvalidateVisual();
-                    return true;
-            }
-
-            return false;
+            this._pressedPart = this.PartAt(e.Position, out this._pressedDate);
+            this.InvalidateVisual();
+            e.Handled = (this._pressedPart != Part.None);
         }
 
-        protected override bool OnKeyDown(
+        protected override void OnPointerReleased(
+            PointerEventArgs e)
+        {
+            var part = this.PartAt(e.Position, out var date);
+            var pressedPart = this._pressedPart;
+            var pressedDate = this._pressedDate;
+            this._pressedPart = Part.None;
+            this.InvalidateVisual();
+            e.Handled = true;
+
+            if (part != pressedPart)
+            {
+                return;
+            }
+
+            switch (part)
+            {
+                case Part.PreviousMonth:
+                    this.ShowMonth(-1);
+                    break;
+
+                case Part.NextMonth:
+                    this.ShowMonth(1);
+                    break;
+
+                case Part.Day:
+                    if (date == pressedDate)
+                    {
+                        this.Choose(date);
+                    }
+                    break;
+            }
+        }
+
+        protected override void OnPointerCanceled(
+            PointerEventArgs e)
+        {
+            this._pressedPart = Part.None;
+            this.InvalidateVisual();
+            e.Handled = true;
+        }
+
+        protected override void OnKeyDown(
             KeyEventArgs keyInputEvent)
         {
             switch (keyInputEvent.Key)
             {
                 case Key.Left:
                     this.MoveKeyboardDate(this._keyboardDate.AddDays(-1));
-                    return true;
+                    keyInputEvent.Handled = true;
+                    return;
 
                 case Key.Right:
                     this.MoveKeyboardDate(this._keyboardDate.AddDays(1));
-                    return true;
+                    keyInputEvent.Handled = true;
+                    return;
 
                 case Key.Up:
                     this.MoveKeyboardDate(this._keyboardDate.AddDays(-7));
-                    return true;
+                    keyInputEvent.Handled = true;
+                    return;
 
                 case Key.Down:
                     this.MoveKeyboardDate(this._keyboardDate.AddDays(7));
-                    return true;
+                    keyInputEvent.Handled = true;
+                    return;
 
                 case Key.PageUp:
                     this.MoveKeyboardDate(this._keyboardDate.AddMonths(-1));
-                    return true;
+                    keyInputEvent.Handled = true;
+                    return;
 
                 case Key.PageDown:
                     this.MoveKeyboardDate(this._keyboardDate.AddMonths(1));
-                    return true;
+                    keyInputEvent.Handled = true;
+                    return;
 
                 case Key.Enter:
                 case Key.Space:
                     this.OnActivate();
-                    return true;
+                    keyInputEvent.Handled = true;
+                    return;
             }
 
-            return false;
+            return;
         }
 
         protected override void OnActivate()
@@ -329,7 +328,17 @@ namespace XForms.Toolkit
             }
         }
 
-        protected override void OnFocusChanged()
+        protected override void OnGotFocus()
+        {
+            this.OnFocusChanged();
+        }
+
+        protected override void OnLostFocus()
+        {
+            this.OnFocusChanged();
+        }
+
+        private void OnFocusChanged()
         {
             this.InvalidateVisual();
         }

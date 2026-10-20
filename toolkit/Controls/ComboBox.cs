@@ -140,26 +140,29 @@ namespace XForms.Toolkit
             DrawChevronDown(drawContext, bounds, color);
         }
 
-        protected override bool OnKeyDown(
+        protected override void OnKeyDown(
             KeyEventArgs keyInputEvent)
         {
-            if (base.OnKeyDown(keyInputEvent))
+            base.OnKeyDown(keyInputEvent);
+            if (keyInputEvent.Handled)
             {
-                return true;
+                return;
             }
 
             switch (keyInputEvent.Key)
             {
                 case Key.Up:
                     this.Select(Math.Max(0, this._selectedIndex - 1));
-                    return true;
+                    keyInputEvent.Handled = true;
+                    return;
 
                 case Key.Down:
                     this.Select(Math.Min(this.Items.Count - 1, this._selectedIndex + 1));
-                    return true;
+                    keyInputEvent.Handled = true;
+                    return;
             }
 
-            return false;
+            return;
         }
 
         protected override void OpenPicker()
@@ -328,42 +331,40 @@ namespace XForms.Toolkit
                 return ((point.X >= 0) && (point.X < this.Bounds.Width) && (index >= 0) && (index < this._picker.Items.Count)) ? index : -1;
             }
 
-            public override bool HandlePointerEvent(
-                PointerEventArgs pointerInputEvent)
+            // NOTE: Moves aren't claimed, so a touch drag scrolls the list
+
+            protected override void OnPointerPressed(
+                PointerEventArgs e)
             {
-                switch (pointerInputEvent.State)
-                {
-                    case PointerInputState.Began:
-                        this._pressedIndex = this.RowAt(pointerInputEvent.Point);
-                        this.InvalidateVisual();
-                        return this._pressedIndex >= 0;
-
-                    case PointerInputState.Ended:
-                        {
-                            int index = this.RowAt(pointerInputEvent.Point);
-                            bool isChosen = (index >= 0) && (index == this._pressedIndex);
-                            this._pressedIndex = -1;
-                            this.InvalidateVisual();
-
-                            if (isChosen)
-                            {
-                                this._picker.Choose(index);
-                            }
-
-                            return true;
-                        }
-
-                    case PointerInputState.Canceled:
-                        this._pressedIndex = -1;
-                        this.InvalidateVisual();
-                        return true;
-                }
-
-                // NOTE: Moves aren't claimed, so a touch drag scrolls the list
-                return false;
+                this._pressedIndex = this.RowAt(e.Position);
+                this.InvalidateVisual();
+                e.Handled = (this._pressedIndex >= 0);
             }
 
-            protected override bool OnKeyDown(
+            protected override void OnPointerReleased(
+                PointerEventArgs e)
+            {
+                int index = this.RowAt(e.Position);
+                bool isChosen = (index >= 0) && (index == this._pressedIndex);
+                this._pressedIndex = -1;
+                this.InvalidateVisual();
+                e.Handled = true;
+
+                if (isChosen)
+                {
+                    this._picker.Choose(index);
+                }
+            }
+
+            protected override void OnPointerCanceled(
+                PointerEventArgs e)
+            {
+                this._pressedIndex = -1;
+                this.InvalidateVisual();
+                e.Handled = true;
+            }
+
+            protected override void OnKeyDown(
                 KeyEventArgs keyInputEvent)
             {
                 int count = this._picker.Items.Count;
@@ -372,32 +373,37 @@ namespace XForms.Toolkit
                 {
                     case Key.Up:
                         this.Highlight(Math.Max(0, this._highlightIndex - 1));
-                        return true;
+                        keyInputEvent.Handled = true;
+                        return;
 
                     case Key.Down:
                         this.Highlight(Math.Min(count - 1, this._highlightIndex + 1));
-                        return true;
+                        keyInputEvent.Handled = true;
+                        return;
 
                     case Key.Home:
                         this.Highlight(0);
-                        return true;
+                        keyInputEvent.Handled = true;
+                        return;
 
                     case Key.End:
                         this.Highlight(count - 1);
-                        return true;
+                        keyInputEvent.Handled = true;
+                        return;
 
                     case Key.Enter:
                     case Key.Space:
                         this._picker.Choose(this._highlightIndex);
-                        return true;
+                        keyInputEvent.Handled = true;
+                        return;
 
                     case Key.Tab:
                         // Close, and let focus move on
                         this._picker.ClosePopup();
-                        return false;
+                        return;
                 }
 
-                return false;
+                return;
             }
 
             protected override void OnActivate()
@@ -481,7 +487,17 @@ namespace XForms.Toolkit
                 }
             }
 
-            protected override void OnFocusChanged()
+            protected override void OnGotFocus()
+            {
+                this.OnFocusChanged();
+            }
+
+            protected override void OnLostFocus()
+            {
+                this.OnFocusChanged();
+            }
+
+            private void OnFocusChanged()
             {
                 this.InvalidateVisual();
             }

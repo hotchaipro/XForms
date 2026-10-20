@@ -61,10 +61,47 @@ namespace XForms
             this.State = GestureState.Possible;
         }
 
+        private int? _pointerId;
+
+        /// <summary>
+        /// Whether the recognizer gets every pointer pressed on its view (as a
+        /// pinch does). Otherwise it follows only the first one, until released.
+        /// </summary>
+        protected virtual bool TracksMultiplePointers
+        {
+            get
+            {
+                return false;
+            }
+        }
+
         public void HandlePointerInput(
             PointerEventArgs inputEvent,
             ref GestureEventResult result)
         {
+            if (!this.TracksMultiplePointers)
+            {
+                if (inputEvent.State == PointerInputState.Began)
+                {
+                    if (null != this._pointerId)
+                    {
+                        // Another finger while one is already down: ignore it
+                        return;
+                    }
+
+                    this._pointerId = inputEvent.PointerId;
+                }
+                else if (inputEvent.PointerId != this._pointerId)
+                {
+                    return;
+                }
+
+                if ((inputEvent.State == PointerInputState.Ended) || (inputEvent.State == PointerInputState.Canceled))
+                {
+                    this._pointerId = null;
+                }
+            }
+
             if (inputEvent.State == PointerInputState.Began)
             {
                 this._delegate.OnTouchBegan();

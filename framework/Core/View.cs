@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 
 namespace XForms
 {
-    public interface IViewDelegate
+    internal interface IViewDelegate
     {
-        bool HandlePointerEvent(PointerEventArgs pointerInputEvent);
+        bool DispatchPointerEvent(PointerEventArgs e);
+
+        bool DispatchPointerWheel(PointerEventArgs e);
     }
 
     public interface IViewRenderer : IElementRenderer
@@ -975,10 +977,362 @@ namespace XForms
             set;
         }
 
+        #region Pointer input
+
+        private HashSet<int> _capturedPointers;
+        private TapTracker _tapTracker;
+        private EventHandler<TappedEventArgs> _tapped;
+        private EventHandler<TappedEventArgs> _doubleTapped;
+        private EventHandler<HoldingEventArgs> _holding;
+
+        public event EventHandler<PointerEventArgs> PointerPressed;
+
+        public event EventHandler<PointerEventArgs> PointerMoved;
+
+        public event EventHandler<PointerEventArgs> PointerReleased;
+
+        public event EventHandler<PointerEventArgs> PointerCanceled;
+
+        public event EventHandler<PointerEventArgs> PointerWheelChanged;
+
+        /// <summary>
+        /// Raised when a pointer is pressed and released over the view without
+        /// moving. Subscribing makes the view take the pointers pressed on it.
+        /// </summary>
+        public event EventHandler<TappedEventArgs> Tapped
+        {
+            add { this._tapped += value; this.EnsureTapTracker(); }
+            remove { this._tapped -= value; }
+        }
+
+        /// <summary>
+        /// Raised for a second tap soon after a first, close to it.
+        /// </summary>
+        public event EventHandler<TappedEventArgs> DoubleTapped
+        {
+            add { this._doubleTapped += value; this.EnsureTapTracker(); }
+            remove { this._doubleTapped -= value; }
+        }
+
+        /// <summary>
+        /// Raised when a pointer is held down on the view without moving
+        /// (<see cref="HoldingState.Started"/>), and again when it's released
+        /// or moves away. A held pointer doesn't also tap.
+        /// </summary>
+        public event EventHandler<HoldingEventArgs> Holding
+        {
+            add { this._holding += value; this.EnsureTapTracker(); }
+            remove { this._holding -= value; }
+        }
+
+        protected virtual void OnPointerPressed(
+            PointerEventArgs e)
+        {
+        }
+
+        protected virtual void OnPointerMoved(
+            PointerEventArgs e)
+        {
+        }
+
+        protected virtual void OnPointerReleased(
+            PointerEventArgs e)
+        {
+        }
+
+        protected virtual void OnPointerCanceled(
+            PointerEventArgs e)
+        {
+        }
+
+        protected virtual void OnPointerWheelChanged(
+            PointerEventArgs e)
+        {
+        }
+
+        /// <summary>
+        /// Keeps the pointer's moves for this view, so a scrolling parent can't
+        /// take them over (as it would for an unhandled drag). The capture ends
+        /// when the pointer is released or canceled.
+        /// </summary>
+        public bool CapturePointer(
+            PointerEventArgs e)
+        {
+            if (null == e)
+            {
+                throw new ArgumentNullException(nameof(e));
+            }
+
+            this._capturedPointers ??= new HashSet<int>();
+            this._capturedPointers.Add(e.PointerId);
+            return true;
+        }
+
+        public void ReleasePointerCapture(
+            PointerEventArgs e)
+        {
+            if (null == e)
+            {
+                throw new ArgumentNullException(nameof(e));
+            }
+
+            this._capturedPointers?.Remove(e.PointerId);
+        }
+
+        /// <summary>
+        /// Whether the view has captured the pointer.
+        /// </summary>
+        public bool HasPointerCapture(
+            int pointerId)
+        {
+            return this._capturedPointers?.Contains(pointerId) ?? false;
+        }
+
+        private void EnsureTapTracker()
+        {
+            this._tapTracker ??= new TapTracker(this);
+        }
+
+        /// <summary>
+        /// Delivers a pointer event from the platform: the application's preview,
+        /// then the overrides and events, then gestures. Returns whether the view
+        /// takes the pointer (for a press) or claims its moves (for a move).
+        /// </summary>
+        internal virtual bool DispatchPointerEvent(
+            PointerEventArgs e)
+        {
+            e.OriginalSource ??= this;
+
+            if (this.Application.FilterPointerInput(this, e))
+            {
+                return true;
+            }
+
+            switch (e.State)
+            {
+                case PointerInputState.Began:
+                    this.OnPointerPressed(e);
+                    this.PointerPressed?.Invoke(this, e);
+                    break;
+
+                case PointerInputState.Moved:
+                    this.OnPointerMoved(e);
+                    this.PointerMoved?.Invoke(this, e);
+                    break;
+
+                case PointerInputState.Ended:
+                    this.OnPointerReleased(e);
+                    this.PointerReleased?.Invoke(this, e);
+                    break;
+
+                case PointerInputState.Canceled:
+                    this.OnPointerCanceled(e);
+                    this.PointerCanceled?.Invoke(this, e);
+                    break;
+            }
+
+            bool takesPress = false;
+            if (null != this._tapTracker)
+            {
+                takesPress = this._tapTracker.OnPointer(e);
+            }
+
+            var result = new GestureEventResult();
+            this.GestureRecognizer?.HandlePointerInput(e, ref result);
+
+            bool isCaptured = this.HasPointerCapture(e.PointerId);
+            if ((e.State == PointerInputState.Ended) || (e.State == PointerInputState.Canceled))
+            {
+                this._capturedPointers?.Remove(e.PointerId);
+            }
+
+            return e.Handled
+                || result.DidHandleEvent
+                || isCaptured
+                || ((e.State == PointerInputState.Began) && takesPress);
+        }
+
+        /// <summary>
+        /// Delivers a wheel event from the platform. Returns whether the view
+        /// handled it; otherwise the platform offers it to the view's ancestors,
+        /// then scrolls.
+        /// </summary>
+        internal bool DispatchPointerWheel(
+            PointerEventArgs e)
+        {
+            e.OriginalSource ??= this;
+
+            if (this.Application.FilterPointerInput(this, e))
+            {
+                return true;
+            }
+
+            this.OnPointerWheelChanged(e);
+            this.PointerWheelChanged?.Invoke(this, e);
+            return e.Handled;
+        }
+
+        // Recognizes taps, double taps and holds of the view's first pointer
+        private sealed class TapTracker
+        {
+            private static readonly TimeSpan HoldTime = TimeSpan.FromMilliseconds(500);
+            private static readonly TimeSpan DoubleTapTime = TimeSpan.FromMilliseconds(500);
+
+            private readonly View _view;
+            private DispatcherTimer _holdTimer;
+            private int? _pointerId;
+            private PointerDeviceType _deviceType;
+            private Point _start;
+            private bool _isHolding;
+            private DateTime _lastTapTime;
+            private Point _lastTapPosition;
+
+            public TapTracker(
+                View view)
+            {
+                this._view = view;
+            }
+
+            // Returns whether the view takes a press
+            public bool OnPointer(
+                PointerEventArgs e)
+            {
+                switch (e.State)
+                {
+                    case PointerInputState.Began:
+                        if (null != this._pointerId)
+                        {
+                            // A second finger isn't a tap
+                            this.Cancel();
+                            return true;
+                        }
+
+                        this._pointerId = e.PointerId;
+                        this._deviceType = e.DeviceType;
+                        this._start = e.Position;
+                        this._isHolding = false;
+
+                        if (null != this._view._holding)
+                        {
+                            this._holdTimer ??= new DispatcherTimer(HoldTime, this.OnHoldTime);
+                            this._holdTimer.Start();
+                        }
+
+                        return true;
+
+                    case PointerInputState.Moved:
+                        if ((e.PointerId == this._pointerId) && (e.Position.DistanceTo(this._start) > Application.TouchSlop))
+                        {
+                            this.Cancel();
+                        }
+
+                        break;
+
+                    case PointerInputState.Ended:
+                        if (e.PointerId == this._pointerId)
+                        {
+                            this._holdTimer?.Stop();
+                            this._pointerId = null;
+
+                            if (this._isHolding)
+                            {
+                                this._isHolding = false;
+                                this._view._holding?.Invoke(this._view, new HoldingEventArgs(e.Position, HoldingState.Completed));
+                            }
+                            else if (e.Position.DistanceTo(this._start) <= Application.TouchSlop)
+                            {
+                                this.OnTap(e.Position);
+                            }
+                        }
+
+                        break;
+
+                    case PointerInputState.Canceled:
+                        if (e.PointerId == this._pointerId)
+                        {
+                            this.Cancel();
+                        }
+
+                        break;
+                }
+
+                return false;
+            }
+
+            private void OnTap(
+                Point position)
+            {
+                var now = DateTime.UtcNow;
+                bool isDouble = ((now - this._lastTapTime) <= DoubleTapTime)
+                    && (position.DistanceTo(this._lastTapPosition) <= 2 * Application.TouchSlop);
+
+                var args = new TappedEventArgs(position, this._deviceType);
+                this._view._tapped?.Invoke(this._view, args);
+
+                if (isDouble)
+                {
+                    // A third tap starts over
+                    this._lastTapTime = DateTime.MinValue;
+                    this._view._doubleTapped?.Invoke(this._view, args);
+                }
+                else
+                {
+                    this._lastTapTime = now;
+                    this._lastTapPosition = position;
+                }
+            }
+
+            private void OnHoldTime()
+            {
+                if (null == this._pointerId)
+                {
+                    return;
+                }
+
+                this._holdTimer.Stop();
+                this._isHolding = true;
+                this._view._holding?.Invoke(this._view, new HoldingEventArgs(this._start, HoldingState.Started));
+            }
+
+            private void Cancel()
+            {
+                this._holdTimer?.Stop();
+                this._pointerId = null;
+
+                if (this._isHolding)
+                {
+                    this._isHolding = false;
+                    this._view._holding?.Invoke(this._view, new HoldingEventArgs(this._start, HoldingState.Canceled));
+                }
+            }
+        }
+
+        bool IViewDelegate.DispatchPointerEvent(
+            PointerEventArgs e)
+        {
+            return this.DispatchPointerEvent(e);
+        }
+
+        bool IViewDelegate.DispatchPointerWheel(
+            PointerEventArgs e)
+        {
+            return this.DispatchPointerWheel(e);
+        }
+
+        #endregion Pointer input
+
         #region Keyboard
 
         private bool? _isKeyboardFocusable;
         private bool _isFocused;
+
+        public event EventHandler GotFocus;
+
+        public event EventHandler LostFocus;
+
+        public event EventHandler<KeyEventArgs> KeyDown;
+
+        public event EventHandler<KeyEventArgs> KeyUp;
 
         /// <summary>
         /// Whether keyboard focus can move to the view (with Tab). By default,
@@ -988,12 +1342,14 @@ namespace XForms
         {
             get
             {
-                return this._isKeyboardFocusable ?? (this.GestureRecognizer is Input.TapGestureRecognizer);
+                return this._isKeyboardFocusable
+                    ?? ((this.GestureRecognizer is Input.TapGestureRecognizer) || (null != this._tapped));
             }
 
             set
             {
                 this._isKeyboardFocusable = value;
+                this.OnPropertyChanged();
             }
         }
 
@@ -1012,7 +1368,19 @@ namespace XForms
                 if (value != this._isFocused)
                 {
                     this._isFocused = value;
-                    this.OnFocusChanged();
+
+                    if (value)
+                    {
+                        this.OnGotFocus();
+                        this.GotFocus?.Invoke(this, EventArgs.Empty);
+                    }
+                    else
+                    {
+                        this.OnLostFocus();
+                        this.LostFocus?.Invoke(this, EventArgs.Empty);
+                    }
+
+                    this.OnPropertyChanged();
                 }
             }
         }
@@ -1026,50 +1394,114 @@ namespace XForms
             return this.Native?.Focus() ?? false;
         }
 
-        /// <summary>
-        /// Called when the view gains or loses keyboard focus.
-        /// </summary>
-        protected virtual void OnFocusChanged()
+        protected virtual void OnGotFocus()
+        {
+        }
+
+        protected virtual void OnLostFocus()
         {
         }
 
         /// <summary>
-        /// Called when a key is pressed while the view (or one of its
-        /// descendants, which didn't handle it) has keyboard focus. Returns
-        /// whether the key was handled.
+        /// Called when a key is pressed while the view (or a descendant, which
+        /// didn't handle it) has keyboard focus. Set <c>e.Handled</c> to stop it
+        /// going to the view's ancestors.
         /// </summary>
-        protected internal virtual bool OnKeyDown(
-            KeyEventArgs keyInputEvent)
+        protected virtual void OnKeyDown(
+            KeyEventArgs e)
         {
+        }
+
+        /// <summary>
+        /// Called when a key is released while the view (or a descendant) has
+        /// keyboard focus.
+        /// </summary>
+        protected virtual void OnKeyUp(
+            KeyEventArgs e)
+        {
+        }
+
+        /// <summary>
+        /// Delivers a key press to the view; platforms call it for the focused
+        /// view, then its ancestors until one handles it.
+        /// </summary>
+        internal bool DispatchKeyDown(
+            KeyEventArgs e)
+        {
+            e.OriginalSource ??= this;
+
+            if ((e.OriginalSource == this) && this.Application.FilterKeyInput(this, e))
+            {
+                return true;
+            }
+
+            this.OnKeyDown(e);
+            this.KeyDown?.Invoke(this, e);
+            return e.Handled;
+        }
+
+        internal bool DispatchKeyUp(
+            KeyEventArgs e)
+        {
+            e.OriginalSource ??= this;
+
+            this.OnKeyUp(e);
+            this.KeyUp?.Invoke(this, e);
+            return e.Handled;
+        }
+
+        /// <summary>
+        /// Delivers a key press to the focused view and then its ancestors, until
+        /// one handles it. Enter and Space that nothing handles activate the
+        /// focused view. Returns whether the key was used.
+        /// </summary>
+        internal bool RouteKeyDown(
+            KeyEventArgs e)
+        {
+            for (var view = this; null != view; view = view.Parent as View)
+            {
+                if (view.DispatchKeyDown(e))
+                {
+                    return true;
+                }
+            }
+
+            if ((e.Key == Key.Enter) || (e.Key == Key.Space))
+            {
+                this.OnActivate();
+                return true;
+            }
+
+            return false;
+        }
+
+        internal bool RouteKeyUp(
+            KeyEventArgs e)
+        {
+            for (var view = this; null != view; view = view.Parent as View)
+            {
+                if (view.DispatchKeyUp(e))
+                {
+                    return true;
+                }
+            }
+
             return false;
         }
 
         /// <summary>
         /// Does what a tap would: called for Enter or Space on a focused view,
         /// and for a screen reader's activate command. By default this sends a
-        /// tap to the center of the view.
+        /// press and release to the center of the view.
         /// </summary>
         protected internal virtual void OnActivate()
         {
             var center = new Point(this.Bounds.Width / 2, this.Bounds.Height / 2);
-            this.HandlePointerEvent(new PointerEventArgs(center, PointerInputState.Began, true));
-            this.HandlePointerEvent(new PointerEventArgs(center, PointerInputState.Ended, true));
+            this.DispatchPointerEvent(new PointerEventArgs(-1, PointerDeviceType.Mouse, center, PointerInputState.Began, true, KeyModifiers.None));
+            this.DispatchPointerEvent(new PointerEventArgs(-1, PointerDeviceType.Mouse, center, PointerInputState.Ended, true, KeyModifiers.None));
         }
 
         #endregion Keyboard
-
-        public virtual bool HandlePointerEvent(
-            PointerEventArgs pointerInputEvent)
-        {
-            if (this.Application.HandlePreviewInput(this, pointerInputEvent))
-            {
-                return true;
-            }
-
-            GestureEventResult result = new GestureEventResult();
-            this.GestureRecognizer?.HandlePointerInput(pointerInputEvent, ref result);
-            return result.DidHandleEvent;
-        }
 
         internal override IEnumerable<Element> GetChildElements()
         {

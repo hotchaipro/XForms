@@ -394,8 +394,15 @@ namespace XForms.Android.Renderers
 
         public bool Focus()
         {
-            // NOTE: Keyboard focus for owner-drawn views isn't implemented on Android yet
-            return false;
+            var nativeView = this._nativeView;
+            if (null == nativeView)
+            {
+                return false;
+            }
+
+            nativeView.Focusable = true;
+            nativeView.FocusableInTouchMode = true;
+            return nativeView.RequestFocus();
         }
 
         private ITimeInterpolator GetAndroidInterpolator(
@@ -528,92 +535,274 @@ namespace XForms.Android.Renderers
             if (null != oldElement)
             {
                 oldElement.Touch -= Element_Touch;
+                oldElement.GenericMotion -= Element_GenericMotion;
+                oldElement.FocusChange -= Element_FocusChange;
+                oldElement.KeyPress -= Element_KeyPress;
             }
 
             if (null != newElement)
             {
                 newElement.Touch += Element_Touch;
+                newElement.GenericMotion += Element_GenericMotion;
+                newElement.FocusChange += Element_FocusChange;
+
+                // Text boxes handle their own keys
+                if (!(this.Element is XForms.Controls.TextBox))
+                {
+                    newElement.KeyPress += Element_KeyPress;
+
+                    // Keyboard focus can move to focusable views (with Tab)
+                    if ((this.Element is View view) && view.Focusable)
+                    {
+                        newElement.Focusable = true;
+                    }
+                }
             }
         }
+
+        // The pointers pressed on this view (Android sends each finger to the
+        // view it went down on)
+        private readonly System.Collections.Generic.HashSet<int> _pointers = new System.Collections.Generic.HashSet<int>();
 
         private void Element_Touch(
             object sender,
             AndroidView.TouchEventArgs e)
         {
             bool result = false;
+            var control = this.ViewDelegate;
 
-            if (this.IsHitTestVisible)
+            if (this.IsHitTestVisible && (null != control))
             {
-                var control = this.ViewDelegate;
-                if (null != control)
+                var motionEvent = e.Event;
+                var modifiers = ToKeyModifiers(motionEvent.MetaState);
+
+                switch (motionEvent.ActionMasked)
                 {
-                    var motionEvent = e.Event;
-                    bool isInContact;
-                    bool isKnownAction;
-                    PointerInputState pointerState;
-                    if (motionEvent.Action == MotionEventActions.Down)
-                    {
-                        pointerState = PointerInputState.Began;
-                        isKnownAction = true;
-                        isInContact = true;
-                    }
-                    else if (motionEvent.Action == MotionEventActions.Up)
-                    {
-                        pointerState = PointerInputState.Ended;
-                        isKnownAction = true;
-                        isInContact = true;
-                    }
-                    else if (motionEvent.Action == MotionEventActions.Move)
-                    {
-                        pointerState = PointerInputState.Moved;
-                        isKnownAction = true;
-                        isInContact = true;
-                    }
-                    else if (motionEvent.Action == MotionEventActions.Cancel)
-                    {
-                        pointerState = PointerInputState.Canceled;
-                        isKnownAction = true;
-                        isInContact = true;
-                    }
-                    else if (motionEvent.Action == MotionEventActions.HoverMove)
-                    {
-                        pointerState = PointerInputState.Moved;
-                        isKnownAction = true;
-                        isInContact = false;
-                    }
-                    else
-                    {
-                        pointerState = PointerInputState.Canceled;
-                        isKnownAction = false;
-                        isInContact = false;
-                    }
+                    case MotionEventActions.Down:
+                    case MotionEventActions.PointerDown:
+                        {
+                            int index = motionEvent.ActionIndex;
+                            int pointerId = motionEvent.GetPointerId(index);
+                            this._pointers.Add(pointerId);
+                            result = control.DispatchPointerEvent(this.ToPointerEvent(motionEvent, index, PointerInputState.Began, true, modifiers));
+                            if (!result)
+                            {
+                                this._pointers.Remove(pointerId);
+                            }
+                        }
 
-                    if (isKnownAction)
-                    {
-                        var contactPoint = new Point(
-                            this.PixelsToDevicePixels(motionEvent.GetX()),
-                            this.PixelsToDevicePixels(motionEvent.GetY()));
+                        break;
 
-                        var pointerEvent = new PointerEventArgs(contactPoint, pointerState, isInContact);
-
-                        result = control.HandlePointerEvent(pointerEvent);
+                    case MotionEventActions.Move:
+                        // A move carries every pointer's position
+                        for (int index = 0; index < motionEvent.PointerCount; index += 1)
+                        {
+                            if (this._pointers.Contains(motionEvent.GetPointerId(index)))
+                            {
+                                result |= control.DispatchPointerEvent(this.ToPointerEvent(motionEvent, index, PointerInputState.Moved, true, modifiers));
+                            }
+                        }
 
                         // A handled move means a gesture (such as a swipe) is under
                         // way; stop scrolling parents from taking the pointer over
-                        if ((result) && (pointerState == PointerInputState.Moved))
+                        if (result)
                         {
                             this.CapturePointer();
                         }
-                        else if ((pointerState == PointerInputState.Ended)
-                            || (pointerState == PointerInputState.Canceled))
+
+                        break;
+
+                    case MotionEventActions.Up:
+                    case MotionEventActions.PointerUp:
                         {
-                            this.ReleasePointer();
+                            int index = motionEvent.ActionIndex;
+                            int pointerId = motionEvent.GetPointerId(index);
+                            if (this._pointers.Remove(pointerId))
+                            {
+                                result = control.DispatchPointerEvent(this.ToPointerEvent(motionEvent, index, PointerInputState.Ended, true, modifiers));
+                            }
+
+                            if (0 == this._pointers.Count)
+                            {
+                                this.ReleasePointer();
+                            }
                         }
-                    }
+
+                        break;
+
+                    case MotionEventActions.Cancel:
+                        for (int index = 0; index < motionEvent.PointerCount; index += 1)
+                        {
+                            if (this._pointers.Remove(motionEvent.GetPointerId(index)))
+                            {
+                                control.DispatchPointerEvent(this.ToPointerEvent(motionEvent, index, PointerInputState.Canceled, true, modifiers));
+                            }
+                        }
+
+                        this._pointers.Clear();
+                        this.ReleasePointer();
+                        break;
+
+                    case MotionEventActions.HoverMove:
+                        result = control.DispatchPointerEvent(this.ToPointerEvent(motionEvent, 0, PointerInputState.Moved, false, modifiers));
+                        break;
                 }
             }
 
             e.Handled = result;
+        }
+
+        private PointerEventArgs ToPointerEvent(
+            MotionEvent motionEvent,
+            int index,
+            PointerInputState state,
+            bool isInContact,
+            KeyModifiers modifiers)
+        {
+            var position = new Point(
+                this.PixelsToDevicePixels(motionEvent.GetX(index)),
+                this.PixelsToDevicePixels(motionEvent.GetY(index)));
+
+            return new PointerEventArgs(
+                motionEvent.GetPointerId(index),
+                ToDeviceType(motionEvent.GetToolType(index)),
+                position,
+                state,
+                isInContact,
+                modifiers);
+        }
+
+        private static PointerDeviceType ToDeviceType(
+            MotionEventToolType toolType)
+        {
+            switch (toolType)
+            {
+                case MotionEventToolType.Mouse:
+                    return PointerDeviceType.Mouse;
+
+                case MotionEventToolType.Stylus:
+                case MotionEventToolType.Eraser:
+                    return PointerDeviceType.Pen;
+
+                default:
+                    return PointerDeviceType.Touch;
+            }
+        }
+
+        internal static KeyModifiers ToKeyModifiers(
+            MetaKeyStates metaState)
+        {
+            var modifiers = KeyModifiers.None;
+            if (metaState.HasFlag(MetaKeyStates.ShiftOn)) modifiers |= KeyModifiers.Shift;
+            if (metaState.HasFlag(MetaKeyStates.CtrlOn)) modifiers |= KeyModifiers.Control;
+            if (metaState.HasFlag(MetaKeyStates.AltOn)) modifiers |= KeyModifiers.Alt;
+            if (metaState.HasFlag(MetaKeyStates.MetaOn)) modifiers |= KeyModifiers.Meta;
+            return modifiers;
+        }
+
+        private void Element_GenericMotion(
+            object sender,
+            AndroidView.GenericMotionEventArgs e)
+        {
+            var motionEvent = e.Event;
+            if ((motionEvent.Action != MotionEventActions.Scroll) || (null == this.ViewDelegate))
+            {
+                e.Handled = false;
+                return;
+            }
+
+            // One notch is 1.0; scroll the same distance per notch as on Win32
+            float delta = motionEvent.GetAxisValue(Axis.Vscroll) * 48.0f;
+            var position = new Point(this.PixelsToDevicePixels(motionEvent.GetX()), this.PixelsToDevicePixels(motionEvent.GetY()));
+            var pointerEvent = new PointerEventArgs(0, PointerDeviceType.Mouse, position, PointerInputState.Moved, false, ToKeyModifiers(motionEvent.MetaState), delta);
+            e.Handled = this.ViewDelegate.DispatchPointerWheel(pointerEvent);
+        }
+
+        private void Element_FocusChange(
+            object sender,
+            AndroidView.FocusChangeEventArgs e)
+        {
+            if (this.Element is View view)
+            {
+                view.IsFocused = e.HasFocus;
+            }
+        }
+
+        private void Element_KeyPress(
+            object sender,
+            AndroidView.KeyEventArgs e)
+        {
+            e.Handled = false;
+
+            if (!(this.Element is View view))
+            {
+                return;
+            }
+
+            var key = ToKey(e.KeyCode);
+            if (key == Key.None)
+            {
+                return;
+            }
+
+            var keyEvent = new KeyEventArgs(key, ToKeyModifiers(e.Event.MetaState));
+            if (e.Event.Action == KeyEventActions.Down)
+            {
+                e.Handled = view.RouteKeyDown(keyEvent);
+            }
+            else if (e.Event.Action == KeyEventActions.Up)
+            {
+                e.Handled = view.RouteKeyUp(keyEvent);
+            }
+        }
+
+        internal static Key ToKey(
+            Keycode keyCode)
+        {
+            switch (keyCode)
+            {
+                case Keycode.Tab: return Key.Tab;
+                case Keycode.Enter:
+                case Keycode.NumpadEnter:
+                case Keycode.DpadCenter: return Key.Enter;
+                case Keycode.Space: return Key.Space;
+                case Keycode.Escape: return Key.Escape;
+                case Keycode.DpadLeft: return Key.Left;
+                case Keycode.DpadUp: return Key.Up;
+                case Keycode.DpadRight: return Key.Right;
+                case Keycode.DpadDown: return Key.Down;
+                case Keycode.MoveHome: return Key.Home;
+                case Keycode.MoveEnd: return Key.End;
+                case Keycode.PageUp: return Key.PageUp;
+                case Keycode.PageDown: return Key.PageDown;
+                case Keycode.Del: return Key.Back;
+                case Keycode.ForwardDel: return Key.Delete;
+                case Keycode.Insert: return Key.Insert;
+                case Keycode.F1: return Key.F1;
+                case Keycode.F2: return Key.F2;
+                case Keycode.F3: return Key.F3;
+                case Keycode.F4: return Key.F4;
+                case Keycode.F5: return Key.F5;
+                case Keycode.F6: return Key.F6;
+                case Keycode.F7: return Key.F7;
+                case Keycode.F8: return Key.F8;
+                case Keycode.F9: return Key.F9;
+                case Keycode.F10: return Key.F10;
+                case Keycode.F11: return Key.F11;
+                case Keycode.F12: return Key.F12;
+                default:
+                    if ((keyCode >= Keycode.A) && (keyCode <= Keycode.Z))
+                    {
+                        return Key.A + (keyCode - Keycode.A);
+                    }
+
+                    if ((keyCode >= Keycode.Num0) && (keyCode <= Keycode.Num9))
+                    {
+                        return Key.D0 + (keyCode - Keycode.Num0);
+                    }
+
+                    return Key.None;
+            }
         }
 
         private void CapturePointer()

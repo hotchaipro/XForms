@@ -105,7 +105,33 @@ namespace XForms.Win32
                 case VIRTUAL_KEY.VK_PRIOR: return Key.PageUp;
                 case VIRTUAL_KEY.VK_NEXT: return Key.PageDown;
                 case VIRTUAL_KEY.VK_F4: return Key.F4;
-                default: return Key.None;
+                case VIRTUAL_KEY.VK_BACK: return Key.Back;
+                case VIRTUAL_KEY.VK_DELETE: return Key.Delete;
+                case VIRTUAL_KEY.VK_INSERT: return Key.Insert;
+                case VIRTUAL_KEY.VK_F1: return Key.F1;
+                case VIRTUAL_KEY.VK_F2: return Key.F2;
+                case VIRTUAL_KEY.VK_F3: return Key.F3;
+                case VIRTUAL_KEY.VK_F5: return Key.F5;
+                case VIRTUAL_KEY.VK_F6: return Key.F6;
+                case VIRTUAL_KEY.VK_F7: return Key.F7;
+                case VIRTUAL_KEY.VK_F8: return Key.F8;
+                case VIRTUAL_KEY.VK_F9: return Key.F9;
+                case VIRTUAL_KEY.VK_F10: return Key.F10;
+                case VIRTUAL_KEY.VK_F11: return Key.F11;
+                case VIRTUAL_KEY.VK_F12: return Key.F12;
+                default:
+                    // Letters and digits share their ASCII codes
+                    if ((key >= (VIRTUAL_KEY)'A') && (key <= (VIRTUAL_KEY)'Z'))
+                    {
+                        return Key.A + (key - (VIRTUAL_KEY)'A');
+                    }
+
+                    if ((key >= (VIRTUAL_KEY)'0') && (key <= (VIRTUAL_KEY)'9'))
+                    {
+                        return Key.D0 + (key - (VIRTUAL_KEY)'0');
+                    }
+
+                    return Key.None;
             }
         }
 
@@ -113,17 +139,35 @@ namespace XForms.Win32
         /// Offers the key to the focused view, then to its ancestors.
         /// </summary>
         private bool DispatchKey(
-            KeyEventArgs keyInputEvent)
+            KeyEventArgs keyInputEvent,
+            bool isDown)
         {
             for (var renderer = this._focused; null != renderer; renderer = renderer.ParentRenderer)
             {
-                if ((renderer.Element is View view) && view.OnKeyDown(keyInputEvent))
+                if (renderer.Element is View view)
                 {
-                    return true;
+                    bool handled = isDown ? view.DispatchKeyDown(keyInputEvent) : view.DispatchKeyUp(keyInputEvent);
+                    if (handled)
+                    {
+                        return true;
+                    }
                 }
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// The modifier keys held down now.
+        /// </summary>
+        public static KeyModifiers CurrentModifiers()
+        {
+            var modifiers = KeyModifiers.None;
+            if ((PInvoke.GetKeyState((int)VIRTUAL_KEY.VK_SHIFT) & 0x8000) != 0) modifiers |= KeyModifiers.Shift;
+            if ((PInvoke.GetKeyState((int)VIRTUAL_KEY.VK_CONTROL) & 0x8000) != 0) modifiers |= KeyModifiers.Control;
+            if ((PInvoke.GetKeyState((int)VIRTUAL_KEY.VK_MENU) & 0x8000) != 0) modifiers |= KeyModifiers.Alt;
+            if (((PInvoke.GetKeyState((int)VIRTUAL_KEY.VK_LWIN) | PInvoke.GetKeyState((int)VIRTUAL_KEY.VK_RWIN)) & 0x8000) != 0) modifiers |= KeyModifiers.Meta;
+            return modifiers;
         }
 
         /// <summary>
@@ -135,11 +179,13 @@ namespace XForms.Win32
             VIRTUAL_KEY virtualKey)
         {
             bool isShiftDown = (PInvoke.GetKeyState((int)VIRTUAL_KEY.VK_SHIFT) & 0x8000) != 0;
-            bool isAltDown = (message == PInvoke.WM_SYSKEYDOWN);
+            bool isAltDown = (message == PInvoke.WM_SYSKEYDOWN) || (message == PInvoke.WM_SYSKEYUP);
+            var modifiers = CurrentModifiers() | (isAltDown ? KeyModifiers.Alt : KeyModifiers.None);
 
-            if ((message != PInvoke.WM_KEYDOWN) && (message != PInvoke.WM_SYSKEYDOWN))
+            if ((message == PInvoke.WM_KEYUP) || (message == PInvoke.WM_SYSKEYUP))
             {
-                return false;
+                var upKey = ToKey(virtualKey);
+                return (upKey != Key.None) && !(this._focused is TextBoxRenderer) && this.DispatchKey(new KeyEventArgs(upKey, modifiers), isDown: false);
             }
 
             // Alt+Left goes back
@@ -157,7 +203,7 @@ namespace XForms.Win32
             // A native text entry handles its own keys (except Tab and Escape)
             bool isTextBox = this._focused is TextBoxRenderer;
 
-            if (!isTextBox && this.DispatchKey(new KeyEventArgs(key, isShiftDown, isAltDown)))
+            if (!isTextBox && this.DispatchKey(new KeyEventArgs(key, modifiers), isDown: true))
             {
                 return true;
             }

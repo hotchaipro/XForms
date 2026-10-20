@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using XForms.Win32.Renderers;
 
@@ -34,6 +35,11 @@ namespace XForms.Win32
         private bool _isActive;
         private uint _pointerId;
         private bool _isDirect;
+        private PointerDeviceType _deviceType;
+
+        // Pointers pressed while the first is down: each goes to the view that
+        // took it, and none of them scrolls
+        private readonly Dictionary<uint, (ViewRenderer Renderer, Point Origin, PointerDeviceType DeviceType)> _others = new();
         private ViewRenderer _capture;
         private Point _captureOrigin;
         private IScrollableRenderer _scrollable;
@@ -78,17 +84,19 @@ namespace XForms.Win32
         public void Down(
             uint pointerId,
             Point point,
-            bool isDirect)
+            bool isDirect,
+            PointerDeviceType deviceType)
         {
             if (this._isActive)
             {
-                // NOTE: Only the first pointer is tracked; extra fingers are ignored
+                this.OtherDown(pointerId, point, deviceType);
                 return;
             }
 
             this._isActive = true;
             this._pointerId = pointerId;
             this._isDirect = isDirect;
+            this._deviceType = deviceType;
             this._capture = null;
             this._isDragScrolling = false;
             this._sampleCount = 0;
@@ -138,7 +146,7 @@ namespace XForms.Win32
                     var origin = renderer.AbsoluteOrigin();
                     var local = new Point(point.X - origin.X, point.Y - origin.Y);
 
-                    if (Deliver(renderer, local, PointerInputState.Began))
+                    if (Deliver(renderer, local, PointerInputState.Began, pointerId, deviceType))
                     {
                         this._capture = renderer;
                         this._captureOrigin = origin;
@@ -154,6 +162,12 @@ namespace XForms.Win32
             uint pointerId,
             Point point)
         {
+            if (this._others.TryGetValue(pointerId, out var other))
+            {
+                Deliver(other.Renderer, Local(point, other.Origin), PointerInputState.Moved, pointerId, other.DeviceType);
+                return;
+            }
+
             if ((!this._isActive) || (pointerId != this._pointerId))
             {
                 return;
@@ -173,7 +187,7 @@ namespace XForms.Win32
             if (null != capture)
             {
                 var local = new Point(point.X - this._captureOrigin.X, point.Y - this._captureOrigin.Y);
-                isClaimed = Deliver(capture, local, PointerInputState.Moved);
+                isClaimed = Deliver(capture, local, PointerInputState.Moved, this._pointerId, this._deviceType);
             }
 
             // An unclaimed, mostly vertical drag past the slop scrolls the content
@@ -194,6 +208,12 @@ namespace XForms.Win32
             uint pointerId,
             Point point)
         {
+            if (this._others.Remove(pointerId, out var other))
+            {
+                Deliver(other.Renderer, Local(point, other.Origin), PointerInputState.Ended, pointerId, other.DeviceType);
+                return;
+            }
+
             if ((!this._isActive) || (pointerId != this._pointerId))
             {
                 return;
@@ -209,7 +229,7 @@ namespace XForms.Win32
                 if (null != capture)
                 {
                     var local = new Point(point.X - this._captureOrigin.X, point.Y - this._captureOrigin.Y);
-                    Deliver(capture, local, PointerInputState.Ended);
+                    Deliver(capture, local, PointerInputState.Ended, this._pointerId, this._deviceType);
                 }
             }
 
@@ -225,6 +245,13 @@ namespace XForms.Win32
 
             this.CancelCapture();
 
+            foreach (var pair in this._others)
+            {
+                Deliver(pair.Value.Renderer, Point.Zero, PointerInputState.Canceled, pair.Key, pair.Value.DeviceType);
+            }
+
+            this._others.Clear();
+
             if (this._isDragScrolling)
             {
                 this._scrollable.Scroller.Fling(0);
@@ -239,18 +266,52 @@ namespace XForms.Win32
             if (null != capture)
             {
                 this._capture = null;
-                Deliver(capture, Point.Zero, PointerInputState.Canceled);
+                Deliver(capture, Point.Zero, PointerInputState.Canceled, this._pointerId, this._deviceType);
             }
+        }
+
+        // Another pointer pressed while the first is down (a second finger):
+        // offered to the deepest view under it, then its ancestors
+        private void OtherDown(
+            uint pointerId,
+            Point point,
+            PointerDeviceType deviceType)
+        {
+            if (!this._host.HitTest(point, out var hit))
+            {
+                return;
+            }
+
+            for (var renderer = hit; null != renderer; renderer = renderer.ParentRenderer)
+            {
+                if ((renderer.Element is View) && renderer.IsHitTestVisible)
+                {
+                    var origin = renderer.AbsoluteOrigin();
+                    if (Deliver(renderer, Local(point, origin), PointerInputState.Began, pointerId, deviceType))
+                    {
+                        this._others[pointerId] = (renderer, origin, deviceType);
+                        return;
+                    }
+                }
+            }
+        }
+
+        private static Point Local(
+            Point point,
+            Point origin)
+        {
+            return new Point(point.X - origin.X, point.Y - origin.Y);
         }
 
         private static bool Deliver(
             ViewRenderer renderer,
             Point local,
-            PointerInputState state)
+            PointerInputState state,
+            uint pointerId,
+            PointerDeviceType deviceType)
         {
-
-
-            return ((View)renderer.Element).HandlePointerEvent(new PointerEventArgs(local, state, true));
+            var e = new PointerEventArgs((int)pointerId, deviceType, local, state, true, FocusManager.CurrentModifiers());
+            return ((View)renderer.Element).DispatchPointerEvent(e);
         }
 
         private void BeginDragScrolling(

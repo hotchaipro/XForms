@@ -3,10 +3,7 @@ using System.Collections.Generic;
 
 namespace XForms
 {
-    public interface IPageDelegate
-    {
-        bool HandlePointerEvent(PointerEventArgs pointerInputEvent);
-    }
+
 
     public interface IPageRenderer : IViewRenderer
     {
@@ -15,7 +12,7 @@ namespace XForms
         Color BackgroundColor { get; set; }
     }
 
-    public class Page : View, IPageDelegate
+    public class Page : View
     {
         private Panel _layout;
         private Color _backgroundColor;
@@ -126,10 +123,13 @@ namespace XForms
         {
         }
 
-        public override bool HandlePointerEvent(
-            PointerEventArgs pointerInputEvent)
+        // A press on the page itself (not on any of its views) light-dismisses
+        // and does nothing else
+        internal override bool DispatchPointerEvent(
+            PointerEventArgs e)
         {
-            return this.Application.HandlePreviewInput(this, pointerInputEvent);
+            e.OriginalSource ??= this;
+            return this.Application.FilterPointerInput(this, e) || base.DispatchPointerEvent(e);
         }
 
         protected override Size MeasureOverride(

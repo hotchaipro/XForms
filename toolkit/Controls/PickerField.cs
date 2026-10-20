@@ -113,39 +113,33 @@ namespace XForms.Toolkit
             this.InvalidateVisual();
         }
 
-        public override bool HandlePointerEvent(
-            PointerEventArgs pointerInputEvent)
+        // NOTE: Moves aren't claimed, so a drag that starts here can still scroll
+
+        protected override void OnPointerPressed(
+            PointerEventArgs e)
         {
-            if (base.HandlePointerEvent(pointerInputEvent))
+            this.SetPressed(true);
+            e.Handled = true;
+        }
+
+        protected override void OnPointerReleased(
+            PointerEventArgs e)
+        {
+            this.SetPressed(false);
+            var point = e.Position;
+            if ((point.X >= 0) && (point.Y >= 0) && (point.X < this.Bounds.Width) && (point.Y < this.Bounds.Height))
             {
-                return true;
+                this.OpenPicker();
             }
 
-            switch (pointerInputEvent.State)
-            {
-                case PointerInputState.Began:
-                    this.SetPressed(true);
-                    return true;
+            e.Handled = true;
+        }
 
-                case PointerInputState.Ended:
-                    {
-                        this.SetPressed(false);
-                        var point = pointerInputEvent.Point;
-                        if ((point.X >= 0) && (point.Y >= 0) && (point.X < this.Bounds.Width) && (point.Y < this.Bounds.Height))
-                        {
-                            this.OpenPicker();
-                        }
-
-                        return true;
-                    }
-
-                case PointerInputState.Canceled:
-                    this.SetPressed(false);
-                    return true;
-            }
-
-            // NOTE: Moves aren't claimed, so a drag that starts here can still scroll
-            return false;
+        protected override void OnPointerCanceled(
+            PointerEventArgs e)
+        {
+            this.SetPressed(false);
+            e.Handled = true;
         }
 
         private void SetPressed(
@@ -163,19 +157,30 @@ namespace XForms.Toolkit
             this.OpenPicker();
         }
 
-        protected override bool OnKeyDown(
+        protected override void OnKeyDown(
             KeyEventArgs keyInputEvent)
         {
             if ((keyInputEvent.Key == Key.F4) || (keyInputEvent.IsAltDown && (keyInputEvent.Key == Key.Down)))
             {
                 this.OpenPicker();
-                return true;
+                keyInputEvent.Handled = true;
+                return;
             }
 
-            return false;
+            return;
         }
 
-        protected override void OnFocusChanged()
+        protected override void OnGotFocus()
+        {
+            this.OnFocusChanged();
+        }
+
+        protected override void OnLostFocus()
+        {
+            this.OnFocusChanged();
+        }
+
+        private void OnFocusChanged()
         {
             this.InvalidateVisual();
         }

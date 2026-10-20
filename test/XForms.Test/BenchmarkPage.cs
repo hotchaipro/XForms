@@ -94,8 +94,13 @@ namespace XForms.Test
             this._builtTicks = Clock.ElapsedTicks;
 
             // Report once the first frames have drawn
-            var timer = new DispatcherTimer(this.Report);
-            timer.Start(TimeSpan.FromSeconds(2));
+            var timer = new DispatcherTimer() { Interval = TimeSpan.FromSeconds(2) };
+            timer.Tick += (sender, e) =>
+            {
+                timer.Stop();
+                this.Report();
+            };
+            timer.Start();
         }
 
         private void Report()

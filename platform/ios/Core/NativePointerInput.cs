@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Foundation;
 using UIKit;
 
@@ -8,34 +9,40 @@ namespace XForms.iOS
     /// Translates UIKit touches into XForms pointer events for a single native view.
     /// </summary>
     /// <remarks>
-    /// Mirrors the Android model: a view that handles the first touch receives the
-    /// rest of that touch sequence, and a view that declines it lets the touch travel
-    /// up the responder chain to its superview.
+    /// Mirrors the Android model: a view that handles a touch receives the rest
+    /// of that touch, and a view that declines it lets the touch travel up the
+    /// responder chain to its superview. Each finger is its own pointer.
     /// </remarks>
-    internal struct NativePointerInput
+    internal sealed class NativePointerInput
     {
-        private UITouch _trackedTouch;
+        private static int NextPointerId = 1;
+
+        private readonly Dictionary<UITouch, int> _trackedTouches = new Dictionary<UITouch, int>();
 
         public bool TouchesBegan(
             UIView view,
             IViewDelegate viewDelegate,
             NSSet touches)
         {
-            if ((null != this._trackedTouch) || (null == viewDelegate) || (!view.UserInteractionEnabled))
-            {
-                return (null != this._trackedTouch);
-            }
-
-            var touch = touches.AnyObject as UITouch;
-            if (null == touch)
+            if ((null == viewDelegate) || (!view.UserInteractionEnabled))
             {
                 return false;
             }
 
-            bool handled = Dispatch(view, viewDelegate, touch, PointerInputState.Began);
-            if (handled)
+            bool handled = false;
+            foreach (var item in touches)
             {
-                this._trackedTouch = touch;
+                if (!(item is UITouch touch) || this._trackedTouches.ContainsKey(touch))
+                {
+                    continue;
+                }
+
+                int pointerId = NextPointerId++;
+                if (Dispatch(view, viewDelegate, touch, pointerId, PointerInputState.Began))
+                {
+                    this._trackedTouches[touch] = pointerId;
+                    handled = true;
+                }
             }
 
             return handled;
@@ -46,15 +53,17 @@ namespace XForms.iOS
             IViewDelegate viewDelegate,
             NSSet touches)
         {
-            var touch = this.FindTrackedTouch(touches);
-            if (null == touch)
+            bool tracked = false;
+            foreach (var item in touches)
             {
-                return false;
+                if ((item is UITouch touch) && this._trackedTouches.TryGetValue(touch, out int pointerId))
+                {
+                    Dispatch(view, viewDelegate, touch, pointerId, PointerInputState.Moved);
+                    tracked = true;
+                }
             }
 
-            Dispatch(view, viewDelegate, touch, PointerInputState.Moved);
-
-            return true;
+            return tracked;
         }
 
         public bool TouchesEnded(
@@ -79,35 +88,24 @@ namespace XForms.iOS
             NSSet touches,
             PointerInputState state)
         {
-            var touch = this.FindTrackedTouch(touches);
-            if (null == touch)
+            bool tracked = false;
+            foreach (var item in touches)
             {
-                return false;
+                if ((item is UITouch touch) && this._trackedTouches.Remove(touch, out int pointerId))
+                {
+                    Dispatch(view, viewDelegate, touch, pointerId, state);
+                    tracked = true;
+                }
             }
 
-            this._trackedTouch = null;
-
-            Dispatch(view, viewDelegate, touch, state);
-
-            return true;
-        }
-
-        private UITouch FindTrackedTouch(
-            NSSet touches)
-        {
-            var trackedTouch = this._trackedTouch;
-            if ((null != trackedTouch) && (touches.Contains(trackedTouch)))
-            {
-                return trackedTouch;
-            }
-
-            return null;
+            return tracked;
         }
 
         private static bool Dispatch(
             UIView view,
             IViewDelegate viewDelegate,
             UITouch touch,
+            int pointerId,
             PointerInputState state)
         {
             if (null == viewDelegate)
@@ -118,7 +116,11 @@ namespace XForms.iOS
             var location = touch.LocationInView(view);
             var point = new Point((float)location.X, (float)location.Y);
 
-            return viewDelegate.HandlePointerEvent(new PointerEventArgs(point, state, true));
+            var deviceType = (touch.Type == UITouchType.Stylus) ? PointerDeviceType.Pen
+                : (touch.Type == UITouchType.IndirectPointer) ? PointerDeviceType.Mouse
+                : PointerDeviceType.Touch;
+
+            return viewDelegate.DispatchPointerEvent(new PointerEventArgs(pointerId, deviceType, point, state, true, KeyModifiers.None));
         }
     }
 }

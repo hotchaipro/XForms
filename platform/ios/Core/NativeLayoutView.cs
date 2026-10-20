@@ -14,7 +14,7 @@ namespace XForms.iOS
     internal class NativeLayoutView : UIView
     {
         private readonly View _owner;
-        private NativePointerInput _pointerInput;
+        private readonly NativePointerInput _pointerInput = new NativePointerInput();
         private bool _isMeasureValid;
         private Size _measuredAvailableSize;
         private Size _measuredContentSize;
@@ -30,6 +30,9 @@ namespace XForms.iOS
             }
 
             this._owner = owner;
+
+            // Each finger is its own pointer
+            this.MultipleTouchEnabled = true;
         }
 
         /// <summary>
@@ -122,6 +125,147 @@ namespace XForms.iOS
             this._laidOutSize = contentSize;
             this._isLayoutValid = true;
         }
+
+        #region Keyboard
+
+        public override bool CanBecomeFirstResponder
+        {
+            get
+            {
+                return this._owner.Focusable;
+            }
+        }
+
+        public override bool BecomeFirstResponder()
+        {
+            bool result = base.BecomeFirstResponder();
+            if (result)
+            {
+                this._owner.IsFocused = true;
+            }
+
+            return result;
+        }
+
+        public override bool ResignFirstResponder()
+        {
+            bool result = base.ResignFirstResponder();
+            if (result)
+            {
+                this._owner.IsFocused = false;
+            }
+
+            return result;
+        }
+
+        public override void PressesBegan(
+            NSSet<UIPress> presses,
+            UIPressesEvent evt)
+        {
+            if (!this.RoutePresses(presses, isDown: true))
+            {
+                base.PressesBegan(presses, evt);
+            }
+        }
+
+        public override void PressesEnded(
+            NSSet<UIPress> presses,
+            UIPressesEvent evt)
+        {
+            if (!this.RoutePresses(presses, isDown: false))
+            {
+                base.PressesEnded(presses, evt);
+            }
+        }
+
+        // Hardware keys go to the focused view, then its ancestors
+        private bool RoutePresses(
+            NSSet<UIPress> presses,
+            bool isDown)
+        {
+            bool handled = false;
+            foreach (var press in presses)
+            {
+                var uiKey = press.Key;
+                if (null == uiKey)
+                {
+                    continue;
+                }
+
+                var key = ToKey(uiKey.KeyCode);
+                if (key == Key.None)
+                {
+                    continue;
+                }
+
+                var keyEvent = new KeyEventArgs(key, ToKeyModifiers(uiKey.ModifierFlags));
+                handled |= isDown ? this._owner.RouteKeyDown(keyEvent) : this._owner.RouteKeyUp(keyEvent);
+            }
+
+            return handled;
+        }
+
+        private static KeyModifiers ToKeyModifiers(
+            UIKeyModifierFlags flags)
+        {
+            var modifiers = KeyModifiers.None;
+            if (flags.HasFlag(UIKeyModifierFlags.Shift)) modifiers |= KeyModifiers.Shift;
+            if (flags.HasFlag(UIKeyModifierFlags.Control)) modifiers |= KeyModifiers.Control;
+            if (flags.HasFlag(UIKeyModifierFlags.Alternate)) modifiers |= KeyModifiers.Alt;
+            if (flags.HasFlag(UIKeyModifierFlags.Command)) modifiers |= KeyModifiers.Meta;
+            return modifiers;
+        }
+
+        private static Key ToKey(
+            UIKeyboardHidUsage usage)
+        {
+            switch (usage)
+            {
+                case UIKeyboardHidUsage.KeyboardTab: return Key.Tab;
+                case UIKeyboardHidUsage.KeyboardReturnOrEnter:
+                case UIKeyboardHidUsage.KeypadEnter: return Key.Enter;
+                case UIKeyboardHidUsage.KeyboardSpacebar: return Key.Space;
+                case UIKeyboardHidUsage.KeyboardEscape: return Key.Escape;
+                case UIKeyboardHidUsage.KeyboardLeftArrow: return Key.Left;
+                case UIKeyboardHidUsage.KeyboardUpArrow: return Key.Up;
+                case UIKeyboardHidUsage.KeyboardRightArrow: return Key.Right;
+                case UIKeyboardHidUsage.KeyboardDownArrow: return Key.Down;
+                case UIKeyboardHidUsage.KeyboardHome: return Key.Home;
+                case UIKeyboardHidUsage.KeyboardEnd: return Key.End;
+                case UIKeyboardHidUsage.KeyboardPageUp: return Key.PageUp;
+                case UIKeyboardHidUsage.KeyboardPageDown: return Key.PageDown;
+                case UIKeyboardHidUsage.KeyboardDeleteOrBackspace: return Key.Back;
+                case UIKeyboardHidUsage.KeyboardDeleteForward: return Key.Delete;
+                case UIKeyboardHidUsage.KeyboardInsert: return Key.Insert;
+                case UIKeyboardHidUsage.KeyboardF1: return Key.F1;
+                case UIKeyboardHidUsage.KeyboardF2: return Key.F2;
+                case UIKeyboardHidUsage.KeyboardF3: return Key.F3;
+                case UIKeyboardHidUsage.KeyboardF4: return Key.F4;
+                case UIKeyboardHidUsage.KeyboardF5: return Key.F5;
+                case UIKeyboardHidUsage.KeyboardF6: return Key.F6;
+                case UIKeyboardHidUsage.KeyboardF7: return Key.F7;
+                case UIKeyboardHidUsage.KeyboardF8: return Key.F8;
+                case UIKeyboardHidUsage.KeyboardF9: return Key.F9;
+                case UIKeyboardHidUsage.KeyboardF10: return Key.F10;
+                case UIKeyboardHidUsage.KeyboardF11: return Key.F11;
+                case UIKeyboardHidUsage.KeyboardF12: return Key.F12;
+                case UIKeyboardHidUsage.Keyboard0: return Key.D0;
+                default:
+                    if ((usage >= UIKeyboardHidUsage.KeyboardA) && (usage <= UIKeyboardHidUsage.KeyboardZ))
+                    {
+                        return Key.A + (int)(usage - UIKeyboardHidUsage.KeyboardA);
+                    }
+
+                    if ((usage >= UIKeyboardHidUsage.Keyboard1) && (usage <= UIKeyboardHidUsage.Keyboard9))
+                    {
+                        return Key.D1 + (int)(usage - UIKeyboardHidUsage.Keyboard1);
+                    }
+
+                    return Key.None;
+            }
+        }
+
+        #endregion Keyboard
 
         public override void TouchesBegan(
             NSSet touches,

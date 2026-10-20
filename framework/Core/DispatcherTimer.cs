@@ -4,14 +4,23 @@ using System.Threading.Tasks;
 
 namespace XForms
 {
+    /// <summary>
+    /// Raises <see cref="Tick"/> on the UI thread after each
+    /// <see cref="Interval"/>, until stopped.
+    /// </summary>
     public sealed class DispatcherTimer
     {
-        private static volatile int CurrentInstance;
+        private int _generation;
 
-        private Action _action;
-        private CancellationTokenSource _cancelTokenSource;
+        public DispatcherTimer()
+        {
+        }
 
+        /// <summary>
+        /// Creates a timer that runs the action at each tick.
+        /// </summary>
         public DispatcherTimer(
+            TimeSpan interval,
             Action action)
         {
             if (null == action)
@@ -19,33 +28,62 @@ namespace XForms
                 throw new ArgumentNullException(nameof(action));
             }
 
-            this._action = action;
-
-            this._cancelTokenSource = new CancellationTokenSource();
+            this.Interval = interval;
+            this.Tick += (sender, e) => action();
         }
 
-        public void Start(
-            TimeSpan delay)
-        {
-            int instance = Interlocked.Increment(ref CurrentInstance);
+        public event EventHandler Tick;
 
-            Task.Delay(delay, this._cancelTokenSource.Token).ContinueWith((t, s) =>
+        public TimeSpan Interval
+        {
+            get;
+            set;
+        }
+
+        public bool IsEnabled
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Starts the timer, or restarts it from now if it's running.
+        /// </summary>
+        public void Start()
+        {
+            this.IsEnabled = true;
+            int generation = Interlocked.Increment(ref this._generation);
+            this.ScheduleTick(generation);
+        }
+
+        public void Stop()
+        {
+            this.IsEnabled = false;
+            Interlocked.Increment(ref this._generation);
+        }
+
+        private void ScheduleTick(
+            int generation)
+        {
+            var application = Application.Current;
+            Task.Delay(this.Interval).ContinueWith((task) =>
             {
-                // Only execute the action for the latest delay task instance
-                int currentInstance = Interlocked.CompareExchange(ref CurrentInstance, 0, 0);
-                if ((int)s == currentInstance)
+                application.InvokeOnUIThreadAsync(() =>
                 {
-                    // TODO: Execute on UI thread
-                    this._action();
-                }
-            },
-            instance,
-            TaskContinuationOptions.OnlyOnRanToCompletion);
-        }
+                    // Ignore ticks from before the latest Start or Stop
+                    if (!this.IsEnabled || (generation != this._generation))
+                    {
+                        return;
+                    }
 
-        public void Cancel()
-        {
-            this._cancelTokenSource.Cancel();
+                    this.Tick?.Invoke(this, EventArgs.Empty);
+
+                    if (this.IsEnabled && (generation == this._generation))
+                    {
+                        this.ScheduleTick(generation);
+                    }
+                });
+            }, TaskScheduler.Default);
         }
     }
 }

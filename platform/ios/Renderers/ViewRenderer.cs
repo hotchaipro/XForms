@@ -378,8 +378,9 @@ namespace XForms.iOS.Renderers
 
         public bool Focus()
         {
-            // NOTE: Keyboard focus for owner-drawn views isn't implemented on iOS yet
-            return false;
+            // NOTE: Only native views that can become first responder take focus
+            // (owner-drawn and layout views do when their view is focusable)
+            return this._nativeView?.BecomeFirstResponder() ?? false;
         }
 
         public virtual void StopAnimation()

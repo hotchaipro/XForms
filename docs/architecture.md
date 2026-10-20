@@ -204,31 +204,39 @@ object. Nested layers per animator are planned (see
 
 ## Input
 
-Platforms deliver pointer input as `PointerEventArgs` (Began, Moved, Ended
-and Canceled) to the deepest view under the pointer, then to its ancestors,
-until one handles it. Views usually handle input through gesture recognizers
-(`TapGestureRecognizer`, `SwipeGestureRecognizer`). Two rules keep scrolling
-native:
+Platforms deliver pointer input as `PointerEventArgs` (with a pointer ID,
+device type, position and modifiers) to the deepest view under the pointer,
+then to its ancestors, until one handles the press. That view gets the rest
+of that pointer. Every finger is its own pointer.
+
+Views handle input through overrides and events (`OnPointerPressed`,
+`PointerMoved`, `OnPointerWheelChanged` and so on), the `Tapped`,
+`DoubleTapped` and `Holding` events, or gesture recognizers
+(`TapGestureRecognizer`, `SwipeGestureRecognizer`, `PanGestureRecognizer`,
+`PinchGestureRecognizer`). `Application.PreviewPointerInput` sees every event
+first. Two rules keep scrolling native:
 
 - **A gesture claims Moved events only once it is sure.** A swipe claims them
   once it is in its Changed state. A tap never claims them.
-- **Platforms capture the pointer only after a claimed move.** Until then, a
-  drag can still become a scroll of the enclosing list or scroll view.
-
-Owner-drawn controls can also handle input directly by overriding
-`View.HandlePointerEvent`, as the toolkit's pickers and calendar do.
+- **Platforms capture the pointer only after a claimed move.** A move is
+  claimed when it's handled, or when the view called `CapturePointer`.
+  Until then, a drag can still become a scroll of the enclosing list or
+  scroll view.
 
 Keyboard input goes to the focused view through public `View` API:
 - `Focusable`. Views with a tap gesture are focusable by default.
-- `Focus()`, `IsFocused` and `OnFocusChanged`.
-- `OnKeyDown(KeyEventArgs)`. A key the focused view doesn't handle bubbles
-  up to its ancestors.
+- `Focus()`, `IsFocused`, and `GotFocus`/`LostFocus` (with the overrides
+  `OnGotFocus` and `OnLostFocus`).
+- `KeyDown` and `KeyUp`, with the overrides `OnKeyDown` and `OnKeyUp`. A key
+  the focused view doesn't handle (`e.Handled`) bubbles up to its ancestors.
+  `Application.PreviewKeyDown` sees each key first.
 - `OnActivate`, for Enter, Space or a screen reader's "invoke". By default it
   sends the view a tap.
 
 The platform handles Tab and Shift+Tab (focus order), Escape (closes the top
-popup, then goes back) and Alt+Left (back). This is implemented on Win32;
-Android and iOS don't route keys yet.
+popup, then goes back) and Alt+Left (back) on Win32. Android and iOS route
+hardware keys to the focused view the same way, and use their native focus
+navigation.
 
 ## Accessibility
 

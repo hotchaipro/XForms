@@ -235,31 +235,44 @@ namespace XForms
             set;
         }
 
-        internal bool HandlePreviewInput(
-            Page page,
-            PointerEventArgs pointerInputEvent)
-        {
-            bool handled = false;
+        /// <summary>
+        /// Raised for every pointer event before the view under the pointer
+        /// gets it (the event's <see cref="PointerEventArgs.OriginalSource"/>).
+        /// Set <see cref="PointerEventArgs.Handled"/> to keep it from the view.
+        /// </summary>
+        public event EventHandler<PointerEventArgs> PreviewPointerInput;
 
-            if (pointerInputEvent.State == PointerInputState.Began)
+        /// <summary>
+        /// Raised for every key press before the focused view gets it. Set
+        /// <see cref="KeyEventArgs.Handled"/> to keep it from the view.
+        /// </summary>
+        public event EventHandler<KeyEventArgs> PreviewKeyDown;
+
+        internal bool FilterPointerInput(
+            View view,
+            PointerEventArgs e)
+        {
+            // An open light-dismiss surface takes a press outside it
+            if (this.HandleLightDismissEvent(view, e))
             {
-                var target = this.LightDismissTarget;
-                if (null != target)
-                {
-                    this.LightDismissTarget = null;
-                    target.OnLightDismiss();
-                    handled = true;
-                }
+                return true;
             }
 
-            return handled;
+            // The application sees each event once, at the view it was sent to
+            if (e.OriginalSource == view)
+            {
+                this.PreviewPointerInput?.Invoke(this, e);
+            }
+
+            return e.Handled;
         }
 
-        internal bool HandlePreviewInput(
+        internal bool FilterKeyInput(
             View view,
-            PointerEventArgs pointerInputEvent)
+            KeyEventArgs e)
         {
-            return this.HandleLightDismissEvent(view, pointerInputEvent);
+            this.PreviewKeyDown?.Invoke(this, e);
+            return e.Handled;
         }
 
         private bool HandleLightDismissEvent(
@@ -271,7 +284,7 @@ namespace XForms
             if (pointerInputEvent.State == PointerInputState.Began)
             {
                 var target = this.LightDismissTarget;
-                if ((null != target) && !target.Contains(view))
+                if ((null != target) && ((view is Page) || !target.Contains(view)))
                 {
                     this.LightDismissTarget = null;
                     target.OnLightDismiss();

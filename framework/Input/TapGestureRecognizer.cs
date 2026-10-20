@@ -47,7 +47,7 @@ namespace XForms.Input
                 {
                     this.State = GestureState.Began;
 
-                    this._gestureStart = touch.Point;
+                    this._gestureStart = touch.Position;
 
                     this._delegate.OnTapBegan();
                 }
@@ -56,7 +56,7 @@ namespace XForms.Input
             {
                 if (this.State == GestureState.Began)
                 {
-                    double distance = touch.Point.DistanceTo(this._gestureStart);
+                    double distance = touch.Position.DistanceTo(this._gestureStart);
 
                     if (distance > Application.TouchSlop)
                     {
@@ -74,7 +74,7 @@ namespace XForms.Input
             {
                 if (this.State == GestureState.Began)
                 {
-                    double distance = touch.Point.DistanceTo(this._gestureStart);
+                    double distance = touch.Position.DistanceTo(this._gestureStart);
 
                     if (distance <= Application.TouchSlop)
                     {
