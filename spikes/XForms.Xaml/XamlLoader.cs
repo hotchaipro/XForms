@@ -7,6 +7,7 @@ using System.Threading;
 using System.Windows.Input;
 using System.Xml.Linq;
 using XForms.Controls;
+using XForms.Layouts;
 
 namespace XForms.Xaml
 {
@@ -258,8 +259,8 @@ namespace XForms.Xaml
                         var grid = new Grid() { Animator = animator };
                         string rows = (string)element.Attribute("RowDefinitions");
                         string columns = (string)element.Attribute("ColumnDefinitions");
-                        if (null != rows) foreach (var part in rows.Split(',')) grid.Rows.Add(GridLength.Parse(part));
-                        if (null != columns) foreach (var part in columns.Split(',')) grid.Columns.Add(GridLength.Parse(part));
+                        if (null != rows) grid.RowDefinitions.AddRange(rows);
+                        if (null != columns) grid.ColumnDefinitions.AddRange(columns);
                         target = grid;
                         break;
                     }
@@ -335,7 +336,13 @@ namespace XForms.Xaml
                 switch (target)
                 {
                     case Grid grid:
-                        grid.Children.Add(childView);
+                        // Grid.Row and Grid.Column become the child's typed cell
+                        grid.Children.Add(
+                            childView,
+                            (int)ToFloat((string)child.Attribute("Grid.Row") ?? "0"),
+                            (int)ToFloat((string)child.Attribute("Grid.Column") ?? "0"),
+                            (int)ToFloat((string)child.Attribute("Grid.RowSpan") ?? "1"),
+                            (int)ToFloat((string)child.Attribute("Grid.ColumnSpan") ?? "1"));
                         break;
 
                     case StackPanel panel:
@@ -434,14 +441,18 @@ namespace XForms.Xaml
                 case "HorizontalAlignment": view.HorizontalAlignment = Enum.Parse<HorizontalAlignment>(value.ToString()); return;
                 case "VerticalAlignment": view.VerticalAlignment = Enum.Parse<VerticalAlignment>(value.ToString()); return;
                 case "Opacity": view.Animator.Opacity = ToFloat(value); return;
-                case "Grid.Row": Grid.RowProperty.SetValue(view, (int)ToFloat(value)); return;
-                case "Grid.Column": Grid.ColumnProperty.SetValue(view, (int)ToFloat(value)); return;
+                case "Grid.Row":
+                case "Grid.Column":
+                case "Grid.RowSpan":
+                case "Grid.ColumnSpan":
+                    // Applied when the child is added to its grid
+                    return;
             }
 
             switch (target)
             {
                 case StackPanel panel when name == "Orientation":
-                    panel.IsHorizontal = string.Equals(value as string, "Horizontal", StringComparison.OrdinalIgnoreCase);
+                    panel.Orientation = Enum.Parse<Orientation>(value.ToString());
                     return;
 
                 case StackPanel panel when name == "Spacing":
@@ -453,7 +464,7 @@ namespace XForms.Xaml
                     {
                         case "Background": border.Background = ToColor(value); return;
                         case "BorderBrush": border.BorderBrush = ToColor(value); return;
-                        case "BorderThickness": border.BorderThickness = ToFloat(value); return;
+                        case "BorderThickness": border.BorderThickness = ToThickness(value); return;
                         case "CornerRadius": border.CornerRadius = ToFloat(value); return;
                         case "Padding": border.Padding = ToThickness(value); return;
                     }

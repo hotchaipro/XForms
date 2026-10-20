@@ -34,6 +34,11 @@ namespace XForms
         /// </summary>
         void InvalidateMeasure();
 
+        /// <summary>
+        /// Whether the native view clips its children and drawing to its bounds.
+        /// </summary>
+        bool ClipToBounds { set; }
+
         float Opacity { get; set; }
 
         float Scale { get; set; }
@@ -140,6 +145,11 @@ namespace XForms
             if (!this._isHitTestVisible)
             {
                 native.IsHitTestVisible = false;
+            }
+
+            if (this._clipToBounds)
+            {
+                native.ClipToBounds = true;
             }
 
             this._animator?.OnRendererCreated();
@@ -349,12 +359,18 @@ namespace XForms
         #region Layout
 
         private Size _requestedSize = new Size(Dimension.Auto, Dimension.Auto);
+        private Size _minimumSize = Size.Empty;
         private Size _maximumSize = new Size(Dimension.Auto, Dimension.Auto);
         private Thickness _margin = Thickness.Zero;
+        private Thickness _padding = Thickness.Zero;
         private HorizontalAlignment _horizontalAlignment = HorizontalAlignment.Stretch;
         private VerticalAlignment _verticalAlignment = VerticalAlignment.Stretch;
+        private FlowDirection? _flowDirection;
+        private int _zIndex;
+        private bool _clipToBounds;
         private Rect _frame;
         private Size _contentMeasureSize = new Size(float.NaN, float.NaN);
+        private Size _contentArrangeSize;
 
         /// <summary>
         /// The width the view asks for, or <see cref="Dimension.Auto"/> (the default) to size to its content.
@@ -386,6 +402,40 @@ namespace XForms
             set
             {
                 this._requestedSize = new Size(this._requestedSize.Width, value);
+                this.InvalidateMeasure();
+            }
+        }
+
+        /// <summary>
+        /// The least width the view takes (0 by default).
+        /// </summary>
+        public float MinWidth
+        {
+            get
+            {
+                return this._minimumSize.Width;
+            }
+
+            set
+            {
+                this._minimumSize = new Size(value, this._minimumSize.Height);
+                this.InvalidateMeasure();
+            }
+        }
+
+        /// <summary>
+        /// The least height the view takes (0 by default).
+        /// </summary>
+        public float MinHeight
+        {
+            get
+            {
+                return this._minimumSize.Height;
+            }
+
+            set
+            {
+                this._minimumSize = new Size(this._minimumSize.Width, value);
                 this.InvalidateMeasure();
             }
         }
@@ -438,6 +488,24 @@ namespace XForms
             }
         }
 
+        /// <summary>
+        /// Space between the view's edges and its children. Containers expose
+        /// it as <c>Padding</c>.
+        /// </summary>
+        private protected Thickness ContentPadding
+        {
+            get
+            {
+                return this._padding;
+            }
+
+            set
+            {
+                this._padding = value;
+                this.InvalidateMeasure();
+            }
+        }
+
         public HorizontalAlignment HorizontalAlignment
         {
             get
@@ -463,6 +531,68 @@ namespace XForms
             {
                 this._verticalAlignment = value;
                 this.InvalidateMeasure();
+            }
+        }
+
+        /// <summary>
+        /// Whether the view's children are laid out left to right or right to
+        /// left. Inherited from the parent unless set.
+        /// </summary>
+        /// <remarks>
+        /// Right to left mirrors the positions of the children; text and
+        /// drawing aren't mirrored.
+        /// </remarks>
+        public FlowDirection FlowDirection
+        {
+            get
+            {
+                return this._flowDirection ?? (this.Parent as View)?.FlowDirection ?? FlowDirection.LeftToRight;
+            }
+
+            set
+            {
+                this._flowDirection = value;
+                this.InvalidateMeasure();
+            }
+        }
+
+        /// <summary>
+        /// The view's order among its siblings in a panel: views with a higher
+        /// index draw above (and are hit before) views with a lower one. Views
+        /// with the same index keep the order they were added in.
+        /// </summary>
+        public int ZIndex
+        {
+            get
+            {
+                return this._zIndex;
+            }
+
+            set
+            {
+                if (value != this._zIndex)
+                {
+                    this._zIndex = value;
+                    (this.Parent as Panel)?.OnChildZIndexChanged(this);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Whether the view clips its children (and drawing) to its bounds.
+        /// False by default: children can draw outside their parent.
+        /// </summary>
+        public bool ClipToBounds
+        {
+            get
+            {
+                return this._clipToBounds;
+            }
+
+            set
+            {
+                this._clipToBounds = value;
+                this.Native?.ClipToBounds = value;
             }
         }
 
@@ -493,7 +623,7 @@ namespace XForms
         public void InvalidateMeasure()
         {
             this._contentMeasureSize = new Size(float.NaN, float.NaN);
-            this.Renderer?.InvalidateMeasure();
+            this.Native?.InvalidateMeasure();
         }
 
         /// <summary>
@@ -501,7 +631,7 @@ namespace XForms
         /// </summary>
         public void InvalidateArrange()
         {
-            this.Renderer?.InvalidateMeasure();
+            this.Native?.InvalidateMeasure();
         }
 
         /// <summary>
@@ -522,17 +652,19 @@ namespace XForms
             float availableWidth = ConstrainLength(
                 Math.Max(0, availableSize.Width - margin.Left - margin.Right),
                 this._requestedSize.Width,
+                this._minimumSize.Width,
                 this._maximumSize.Width);
 
             float availableHeight = ConstrainLength(
                 Math.Max(0, availableSize.Height - margin.Top - margin.Bottom),
                 this._requestedSize.Height,
+                this._minimumSize.Height,
                 this._maximumSize.Height);
 
             Size measuredSize = this.Renderer.MeasureNative(new Size(availableWidth, availableHeight));
 
-            float width = ConstrainLength(measuredSize.Width, this._requestedSize.Width, this._maximumSize.Width);
-            float height = ConstrainLength(measuredSize.Height, this._requestedSize.Height, this._maximumSize.Height);
+            float width = ConstrainLength(measuredSize.Width, this._requestedSize.Width, this._minimumSize.Width, this._maximumSize.Width);
+            float height = ConstrainLength(measuredSize.Height, this._requestedSize.Height, this._minimumSize.Height, this._maximumSize.Height);
 
             this.DesiredSize = new Size(
                 width + margin.Left + margin.Right,
@@ -561,6 +693,7 @@ namespace XForms
                 desiredSize.Width - margin.Left - margin.Right,
                 (int)this._horizontalAlignment,
                 this._requestedSize.Width,
+                this._minimumSize.Width,
                 this._maximumSize.Width);
 
             float height = ArrangeLength(
@@ -568,10 +701,25 @@ namespace XForms
                 desiredSize.Height - margin.Top - margin.Bottom,
                 (int)this._verticalAlignment,
                 this._requestedSize.Height,
+                this._minimumSize.Height,
                 this._maximumSize.Height);
 
             float x = slotX + AlignmentOffset((int)this._horizontalAlignment, slotWidth, width);
             float y = slotY + AlignmentOffset((int)this._verticalAlignment, slotHeight, height);
+
+            // The parent's padding offsets its children, and a right-to-left
+            // parent mirrors them
+            if (this.Parent is View parent)
+            {
+                var padding = parent._padding;
+                x += padding.Left;
+                y += padding.Top;
+
+                if (parent.FlowDirection == FlowDirection.RightToLeft)
+                {
+                    x = parent._contentArrangeSize.Width - x - width;
+                }
+            }
 
             this._frame = new Rect(x, y, width, height);
 
@@ -580,15 +728,23 @@ namespace XForms
 
         /// <summary>
         /// Measures the view's own children within the available size and returns
-        /// the size they need. Called by native containers from their measure pass;
-        /// views without layout children return an empty size.
+        /// the size they need, plus the view's padding. Called by native
+        /// containers from their measure pass; views without layout children
+        /// return their padding.
         /// </summary>
         public Size MeasureContent(
             Size availableSize)
         {
             this._contentMeasureSize = availableSize;
 
-            return this.MeasureOverride(availableSize);
+            var padding = this._padding;
+            var size = this.MeasureOverride(new Size(
+                Math.Max(0, availableSize.Width - padding.Left - padding.Right),
+                Math.Max(0, availableSize.Height - padding.Top - padding.Bottom)));
+
+            return new Size(
+                size.Width + padding.Left + padding.Right,
+                size.Height + padding.Top + padding.Bottom);
         }
 
         /// <summary>
@@ -604,7 +760,7 @@ namespace XForms
                 this.MeasureContent(size);
             }
 
-            this.ArrangeOverride(size);
+            this.ArrangeContent(size);
         }
 
         /// <summary>
@@ -616,12 +772,17 @@ namespace XForms
         public void ArrangeContent(
             Size size)
         {
-            this.ArrangeOverride(size);
+            this._contentArrangeSize = size;
+
+            var padding = this._padding;
+            this.ArrangeOverride(new Size(
+                Math.Max(0, size.Width - padding.Left - padding.Right),
+                Math.Max(0, size.Height - padding.Top - padding.Bottom)));
         }
 
         /// <summary>
         /// Measures the children (by calling their <see cref="Measure"/>) and
-        /// returns the size the view needs for them.
+        /// returns the size the view needs for them, within its padding.
         /// </summary>
         protected virtual Size MeasureOverride(
             Size availableSize)
@@ -631,7 +792,8 @@ namespace XForms
 
         /// <summary>
         /// Arranges the children (by calling their <see cref="Arrange"/>) within
-        /// the final size.
+        /// the final size, inside the view's padding: a child arranged at (0, 0)
+        /// sits at the padding's top left corner.
         /// </summary>
         protected virtual void ArrangeOverride(
             Size finalSize)
@@ -647,6 +809,7 @@ namespace XForms
         private static float ConstrainLength(
             float length,
             float requestedLength,
+            float minimumLength,
             float maximumLength)
         {
             if (!float.IsNaN(requestedLength))
@@ -659,7 +822,7 @@ namespace XForms
                 length = Math.Min(length, maximumLength);
             }
 
-            return length;
+            return Math.Max(length, minimumLength);
         }
 
         private static float ArrangeLength(
@@ -667,6 +830,7 @@ namespace XForms
             float desiredLength,
             int alignment,
             float requestedLength,
+            float minimumLength,
             float maximumLength)
         {
             float length;
@@ -689,7 +853,7 @@ namespace XForms
                 length = Math.Min(length, maximumLength);
             }
 
-            return Math.Max(0, length);
+            return Math.Max(Math.Max(0, length), minimumLength);
         }
 
         private static float AlignmentOffset(

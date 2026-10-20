@@ -17,7 +17,7 @@ namespace XForms.Controls
         string PlaceholderText { get; set; }
         bool Multiline { get; set; }
         KeyboardOptions KeyboardOptions { get; set; }
-        void Focus();
+        new void Focus();
     }
 
     public class TextBox : Control
@@ -35,6 +35,14 @@ namespace XForms.Controls
             get
             {
                 return this.PlaceholderText;
+            }
+        }
+
+        public override Color BackgroundColor
+        {
+            get
+            {
+                return this.Theme.SubtleBackgroundColor;
             }
         }
 

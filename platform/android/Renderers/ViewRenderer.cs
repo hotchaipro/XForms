@@ -125,6 +125,22 @@ namespace XForms.Android.Renderers
             this._nativeView?.RequestLayout();
         }
 
+        public bool ClipToBounds
+        {
+            set
+            {
+                // NOTE: ClipChildren clips each child to the child's own bounds, not
+                // to this view's. Clipping to the view's outline (its bounds) clips
+                // its drawing and all its descendants.
+                var nativeView = this._nativeView;
+                if (null != nativeView)
+                {
+                    nativeView.OutlineProvider = global::Android.Views.ViewOutlineProvider.Bounds;
+                    nativeView.ClipToOutline = value;
+                }
+            }
+        }
+
         private int ToMeasureSpec(
             float availableLength)
         {

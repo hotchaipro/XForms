@@ -832,15 +832,15 @@ All three success criteria hold:
 
 | Gap the spike hit | Workaround in the spike | Plan phase |
 |---|---|---|
-| A custom layout can't manage its own children: `LayoutViewCollection`'s constructor and `Layout`'s child methods are internal | The panels derive from `DistributedStackLayout`, whose child collection is public, and replace its layout logic | 2, **new**: a public base for custom panels |
-| No `Padding` | The `Border`'s padding becomes its child's margin | 2 |
-| No rounded rectangles | `CornerRadius` is accepted but drawn square | 5 |
+| A custom layout can't manage its own children: `LayoutViewCollection`'s constructor and `Layout`'s child methods are internal | The panels derive from `DistributedStackLayout`, whose child collection is public, and replace its layout logic | 2, **done**: `Panel` with a public `ViewCollection` |
+| No `Padding` | The `Border`'s padding becomes its child's margin | 2, **done** |
+| No rounded rectangles | `CornerRadius` is accepted but drawn square | 2, **done**: `FillRoundedRectangle` and `DrawRoundedRectangle` |
 | No visual states (pressed, pointer over) | The button dims its template root while pressed | 4 (pointer events), toolkit |
 | `TextEntry` raises no event when its text changes | None: two-way bindings behave as one-way | 8 |
 | No opacity animation, and no frame callback | Opacity is stepped on the UI thread by a timer; translation uses `TranslateTo` | 6 |
 | No loaded or attached event | The storyboard starts in a UI-thread callback queued from the page's constructor | 1, **new**: `Attached` and `Detached` events, which come with creating renderers at attach |
 | `XForms.Timer` hides `System.Threading.Timer` in any file that uses `XForms` | Fully qualified name | 1, **new**: rename it to `DispatcherTimer` |
-| The primitives look different on each platform: `Control.BackgroundColor` is painted behind owner-drawn controls on Android but not on Win32, the default text color is black on Win32 and Android's gray, and `TextEntry`'s background is white on Win32 and gray on Android | Owner-drawn spike elements report a transparent background | 2, **new**: one default look for the primitives on every platform |
+| The primitives look different on each platform: `Control.BackgroundColor` is painted behind owner-drawn controls on Android but not on Win32, the default text color is black on Win32 and Android's gray, and `TextEntry`'s background is white on Win32 and gray on Android | Owner-drawn spike elements report a transparent background | 2, **done**: the spike's workarounds are gone |
 
 **What worked as is:**
 - `Element.AttachedProperty` carried `Grid.Row` and `Grid.Column`. Phase 2
@@ -951,6 +951,47 @@ Neither changed the order of the phases. Both added items, which are below.
    - Give the primitives one default look on every platform: transparent
      backgrounds unless set, with the same text color and the same
      text-entry background everywhere.
+
+   **Status: done.**
+   - **Panels:**
+     - `StackPanel` (`Orientation`, `Spacing`).
+     - `Grid` (`GridLength` Auto, fixed and star rows and columns,
+       `RowSpacing` and `ColumnSpacing`,
+       `Children.Add(view, row, column, rowSpan, columnSpan)`).
+     - `WrapPanel` (`ItemSpacing`, `LineSpacing`).
+     - `Canvas` (`Children.Add(view, left, top)`).
+     - `Border` (`Background`, `BorderBrush`, `BorderThickness`,
+       `CornerRadius`, `Padding`, `Child`).
+   - **Custom panels:** a library derives from `Panel`, creates a
+     `ViewCollection` or `ViewCollection<TLayout>` for its children's typed
+     layout parameters, and overrides `MeasureChildren` and
+     `ArrangeChildren`. `DockPanel` now works this way, without an attached
+     property.
+   - **View basics:**
+     - `Padding` on panels, content controls and `Border`, applied by the
+       shared layout engine.
+     - `MinWidth` and `MinHeight`.
+     - `ZIndex`: the native children are kept in z-order.
+     - `ClipToBounds`: a visual clip on Win32, an outline clip on Android,
+       `ClipsToBounds` on iOS.
+     - `FlowDirection`: inherited, and right to left mirrors the children's
+       positions (text and drawing aren't mirrored yet).
+     - The drawing API gained rounded rectangles.
+   - **One default look:**
+     - Controls are transparent unless they give themselves a background;
+       list rows use the theme's background.
+     - Owner-drawn controls get their background from their drawing only,
+       on every platform.
+     - Android's `Clear` no longer blends over a native background.
+     - Text defaults to the theme's foreground color, and text boxes to its
+       subtle background.
+   - **The XAML spike** now uses the framework's `Grid`, `StackPanel` and
+     `Border`, maps `Grid.Row` and `Grid.Column` to the typed cell, and
+     needs none of its workarounds for layout or backgrounds.
+   - **Fixed on the way:**
+     - Phase 1 still created renderers early: `InvalidateMeasure` went
+       through the creating `Renderer` property. It now uses the
+       created-only one, so renderers are created at attach.
 3. **Properties and binding.**
    - Add observable properties on views.
    - Add typed, compiled bindings with an explicit source.

@@ -22,69 +22,18 @@ namespace XForms.Layouts
     /// </summary>
     public class DockPanel : Panel
     {
-        internal static readonly AttachedProperty<Dock> DockProperty = new AttachedProperty<Dock>();
-
-        public class DockPanelViewCollection : LayoutViewCollection
-        {
-            public DockPanelViewCollection(
-                DockPanel layout)
-                : base(layout)
-            {
-            }
-
-            public void Add(
-                View child,
-                Dock position)
-            {
-                if (null == child)
-                {
-                    throw new ArgumentNullException(nameof(child));
-                }
-
-                DockProperty.SetValue(child, position);
-
-                this.Add(child);
-            }
-
-            public void Insert(
-                int index,
-                View child,
-                Dock position)
-            {
-                if (null == child)
-                {
-                    throw new ArgumentNullException(nameof(child));
-                }
-
-                DockProperty.SetValue(child, position);
-
-                this.Insert(index, child);
-            }
-
-            public void Replace(
-                int index,
-                View child,
-                Dock position)
-            {
-                if (null == child)
-                {
-                    throw new ArgumentNullException(nameof(child));
-                }
-
-                DockProperty.SetValue(child, position);
-
-                this.Replace(index, child);
-            }
-        }
-
-        private DockPanelViewCollection _children;
+        private readonly ViewCollection<Dock> _children;
 
         public DockPanel()
         {
-            this._children = new DockPanelViewCollection(this);
+            this._children = new ViewCollection<Dock>(this, Dock.CenterOverlay);
         }
 
-        public DockPanelViewCollection Children
+        /// <summary>
+        /// The children, each docked to an edge or overlaid:
+        /// <c>Children.Add(view, Dock.Top)</c>.
+        /// </summary>
+        public ViewCollection<Dock> Children
         {
             get
             {
@@ -92,10 +41,10 @@ namespace XForms.Layouts
             }
         }
 
-        private static Dock GetDock(
+        private Dock GetDock(
             View child)
         {
-            return DockProperty.GetValue(child, Dock.CenterOverlay);
+            return this._children.GetLayout(child);
         }
 
         protected override Size MeasureChildren(

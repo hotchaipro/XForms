@@ -16,6 +16,23 @@ namespace XForms
             Rect rectangle,
             Color color);
 
+        /// <summary>
+        /// Strokes a rectangle with corners rounded to the radius.
+        /// </summary>
+        void DrawRoundedRectangle(
+            Rect rectangle,
+            float cornerRadius,
+            Color color,
+            float strokeWidth = 1.0f);
+
+        /// <summary>
+        /// Fills a rectangle with corners rounded to the radius.
+        /// </summary>
+        void FillRoundedRectangle(
+            Rect rectangle,
+            float cornerRadius,
+            Color color);
+
         void DrawEllipse(
             Point point,
             float radiusX,

@@ -16,6 +16,22 @@ namespace XForms.Controls
         {
         }
 
+        /// <summary>
+        /// Space between the control's edges and its content.
+        /// </summary>
+        public Thickness Padding
+        {
+            get
+            {
+                return this.ContentPadding;
+            }
+
+            set
+            {
+                this.ContentPadding = value;
+            }
+        }
+
         protected View Content
         {
             get

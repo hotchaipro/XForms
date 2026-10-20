@@ -20,13 +20,24 @@ namespace XForms
         void ReplaceChild(int index, IViewRenderer childRenderer);
     }
 
+    /// <summary>
+    /// Base for layout containers. A panel creates a <see cref="ViewCollection"/>
+    /// (or a <see cref="ViewCollection{TLayout}"/>, for children with layout
+    /// parameters) as its <c>Children</c>, and positions them in
+    /// <see cref="MeasureChildren"/> and <see cref="ArrangeChildren"/>.
+    /// </summary>
     public abstract class Panel : View
     {
-        private List<View> _children;
+        // The children in the order they were added (layout order), and in
+        // drawing order (by ZIndex, then layout order), which the native
+        // children follow
+        private readonly List<View> _children;
+        private readonly List<View> _nativeOrder;
 
         protected Panel()
         {
             this._children = new List<View>();
+            this._nativeOrder = new List<View>();
         }
 
         internal new IPanelRenderer Renderer
@@ -42,6 +53,22 @@ namespace XForms
             get
             {
                 return (IPanelRenderer)this.CreatedRenderer;
+            }
+        }
+
+        /// <summary>
+        /// Space between the panel's edges and its children.
+        /// </summary>
+        public Thickness Padding
+        {
+            get
+            {
+                return this.ContentPadding;
+            }
+
+            set
+            {
+                this.ContentPadding = value;
             }
         }
 
@@ -69,7 +96,7 @@ namespace XForms
             base.OnRendererCreated();
 
             var native = this.Native;
-            foreach (var child in this._children)
+            foreach (var child in this._nativeOrder)
             {
                 native.AddChild(child.AttachTo(this));
             }
@@ -80,10 +107,77 @@ namespace XForms
             }
         }
 
+        // Where the child goes in drawing order: after every sibling with a lower
+        // ZIndex, or the same ZIndex and an earlier place in layout order
+        private int NativeInsertIndex(
+            View child)
+        {
+            int zIndex = child.ZIndex;
+            int layoutIndex = this._children.IndexOf(child);
+
+            int index = 0;
+            foreach (var sibling in this._nativeOrder)
+            {
+                if ((sibling.ZIndex < zIndex)
+                    || ((sibling.ZIndex == zIndex) && (this._children.IndexOf(sibling) < layoutIndex)))
+                {
+                    index += 1;
+                }
+            }
+
+            return index;
+        }
+
+        private void AddNative(
+            View child)
+        {
+            int index = this.NativeInsertIndex(child);
+            this._nativeOrder.Insert(index, child);
+
+            var native = this.Native;
+            if (null != native)
+            {
+                native.InsertChild(index, child.AttachTo(this));
+                child.NotifyAttached();
+            }
+        }
+
+        private void RemoveNative(
+            View child)
+        {
+            int index = this._nativeOrder.IndexOf(child);
+            this._nativeOrder.RemoveAt(index);
+
+            var native = this.Native;
+            if (null != native)
+            {
+                native.RemoveChildAt(index);
+                child.NotifyDetached();
+            }
+        }
+
+        internal void OnChildZIndexChanged(
+            View child)
+        {
+            int oldIndex = this._nativeOrder.IndexOf(child);
+            this._nativeOrder.RemoveAt(oldIndex);
+            int newIndex = this.NativeInsertIndex(child);
+            this._nativeOrder.Insert(newIndex, child);
+
+            var native = this.Native;
+            if ((null != native) && (newIndex != oldIndex))
+            {
+                // Move the native child without detaching the view
+                native.RemoveChildAt(oldIndex);
+                native.InsertChild(newIndex, child.Renderer);
+            }
+        }
+
         internal void InternalClearChildren()
         {
             var oldChildren = this._children.ToArray();
             this._children.Clear();
+            this._nativeOrder.Clear();
 
             var native = this.Native;
             if (null != native)
@@ -101,21 +195,7 @@ namespace XForms
         internal void InternalAddChild(
             View child)
         {
-            if (null == child)
-            {
-                throw new ArgumentNullException(nameof(child));
-            }
-
-            this._children.Add(child);
-
-            var native = this.Native;
-            if (null != native)
-            {
-                native.AddChild(child.AttachTo(this));
-                child.NotifyAttached();
-            }
-
-            this.InvalidateMeasure();
+            this.InternalInsertChild(this._children.Count, child);
         }
 
         internal void InternalInsertChild(
@@ -127,14 +207,13 @@ namespace XForms
                 throw new ArgumentNullException(nameof(child));
             }
 
-            this._children.Insert(index, child);
-
-            var native = this.Native;
-            if (null != native)
+            if (this._children.Contains(child))
             {
-                native.InsertChild(index, child.AttachTo(this));
-                child.NotifyAttached();
+                throw new InvalidOperationException("The view is already a child of this panel.");
             }
+
+            this._children.Insert(index, child);
+            this.AddNative(child);
 
             this.InvalidateMeasure();
         }
@@ -143,14 +222,8 @@ namespace XForms
             int index)
         {
             var child = this._children[index];
+            this.RemoveNative(child);
             this._children.RemoveAt(index);
-
-            var native = this.Native;
-            if (null != native)
-            {
-                native.RemoveChildAt(index);
-                child.NotifyDetached();
-            }
 
             this.InvalidateMeasure();
         }
@@ -165,15 +238,9 @@ namespace XForms
             }
 
             var oldChild = this._children[index];
+            this.RemoveNative(oldChild);
             this._children[index] = child;
-
-            var native = this.Native;
-            if (null != native)
-            {
-                native.ReplaceChild(index, child.AttachTo(this));
-                oldChild.NotifyDetached();
-                child.NotifyAttached();
-            }
+            this.AddNative(child);
 
             this.InvalidateMeasure();
         }

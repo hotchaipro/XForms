@@ -8,26 +8,17 @@ namespace XForms.Layouts
     /// </summary>
     public class UniformGrid : Panel
     {
-        public class UniformGridViewCollection : LayoutViewCollection
-        {
-            public UniformGridViewCollection(
-                UniformGrid layout)
-                : base(layout)
-            {
-            }
-        }
-
-        private UniformGridViewCollection _children;
+        private readonly ViewCollection _children;
 
         public UniformGrid()
         {
             this.HorizontalAlignment = HorizontalAlignment.Left;
             this.VerticalAlignment = VerticalAlignment.Top;
 
-            this._children = new UniformGridViewCollection(this);
+            this._children = new ViewCollection(this);
         }
 
-        public UniformGridViewCollection Children
+        public ViewCollection Children
         {
             get
             {

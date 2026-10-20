@@ -17,6 +17,20 @@ namespace XForms.Android.Renderers
             this.SetNativeElement(this._nativeOwnerDrawControl);
         }
 
+        public override Color BackgroundColor
+        {
+            get
+            {
+                return base.BackgroundColor;
+            }
+
+            set
+            {
+                // NOTE: The control paints its own background in DrawBackground,
+                // so the native view stays transparent (as on Win32 and iOS)
+            }
+        }
+
         public void Invalidate()
         {
             this._nativeOwnerDrawControl.Invalidate();

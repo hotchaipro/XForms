@@ -23,4 +23,13 @@ namespace XForms
         Bottom = 2,
         Stretch = 3,
     }
+
+    /// <summary>
+    /// The direction a view lays out its children in.
+    /// </summary>
+    public enum FlowDirection
+    {
+        LeftToRight = 0,
+        RightToLeft = 1,
+    }
 }

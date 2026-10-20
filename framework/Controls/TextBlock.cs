@@ -253,10 +253,21 @@ namespace XForms.Controls
             if (this._verticalTextAlignment.HasValue) native.VerticalTextAlignment = this._verticalTextAlignment.Value;
             if (this._wordWrap.HasValue) native.WordWrap = this._wordWrap.Value;
             if (this._textTrimming.HasValue) native.TextTrimming = this._textTrimming.Value;
-            if (this._foreground.HasValue) native.ForegroundColor = this._foreground.Value;
+            native.ForegroundColor = this._foreground ?? this.Theme.ForegroundColor;
             if (this._backgroundColor.HasValue) native.BackgroundColor = this._backgroundColor.Value;
             if (this._strikethrough.HasValue) native.Strikethrough = this._strikethrough.Value;
             if (null != this._text) native.Text = this._text;
+        }
+
+        protected override void OnApplyTheme(
+            AppTheme theme)
+        {
+            base.OnApplyTheme(theme);
+
+            if (!this._foreground.HasValue)
+            {
+                this.Native?.ForegroundColor = theme.ForegroundColor;
+            }
         }
 
         protected override IElementRenderer CreateRenderer()

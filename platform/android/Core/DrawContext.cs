@@ -60,6 +60,15 @@ namespace XForms.Android
         public void Clear(
             Color color)
         {
+            // NOTE: A view's drawing starts empty, so clearing to transparent
+            // leaves it empty, as Direct2D's Clear does. (Replacing pixels with
+            // a transparent mode would punch through to the window, since views
+            // draw into their parent's display list.)
+            if (color.IsTransparent)
+            {
+                return;
+            }
+
             this._canvas.DrawColor(color.ToAndroidColor());
         }
 
@@ -97,6 +106,48 @@ namespace XForms.Android
             paint.SetStyle(Paint.Style.Fill);
 
             this._canvas.DrawRect(rect, paint);
+
+            paint.Dispose();
+        }
+
+        public void DrawRoundedRectangle(
+            Rect rectangle,
+            float cornerRadius,
+            Color color,
+            float strokeWidth = 1.0f)
+        {
+            var rect = ToNativeRectFPixels(rectangle);
+            float radius = NativeConversions.DevicePixelsToPixels(this.NativeContext, cornerRadius);
+
+            var paint = new Paint()
+            {
+                Color = color.ToAndroidColor(),
+                StrokeWidth = NativeConversions.DevicePixelsToPixels(this.NativeContext, strokeWidth),
+                AntiAlias = true,
+            };
+            paint.SetStyle(Paint.Style.Stroke);
+
+            this._canvas.DrawRoundRect(rect, radius, radius, paint);
+
+            paint.Dispose();
+        }
+
+        public void FillRoundedRectangle(
+            Rect rectangle,
+            float cornerRadius,
+            Color color)
+        {
+            var rect = ToNativeRectFPixels(rectangle);
+            float radius = NativeConversions.DevicePixelsToPixels(this.NativeContext, cornerRadius);
+
+            var paint = new Paint()
+            {
+                Color = color.ToAndroidColor(),
+                AntiAlias = true,
+            };
+            paint.SetStyle(Paint.Style.Fill);
+
+            this._canvas.DrawRoundRect(rect, radius, radius, paint);
 
             paint.Dispose();
         }

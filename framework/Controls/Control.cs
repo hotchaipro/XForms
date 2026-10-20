@@ -29,11 +29,15 @@ namespace XForms.Controls
             }
         }
 
+        /// <summary>
+        /// The control's background: transparent unless the control gives it
+        /// one. Owner-drawn controls paint it in their drawing.
+        /// </summary>
         public virtual Color BackgroundColor
         {
             get
             {
-                return this.Theme.BackgroundColor;
+                return Colors.Transparent;
             }
         }
 

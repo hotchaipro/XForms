@@ -13,7 +13,7 @@ namespace XForms.Toolkit
     /// </summary>
     public class CalendarView : UserControl
     {
-        private const float Padding = 8.0f;
+        private const float Inset = 8.0f;
         private const float HeaderHeight = 40.0f;
         private const float WeekdayHeight = 28.0f;
         private const float CellSize = 40.0f;
@@ -108,8 +108,8 @@ namespace XForms.Toolkit
             get
             {
                 return new Size(
-                    (7 * CellSize) + (2 * Padding),
-                    HeaderHeight + WeekdayHeight + (6 * CellSize) + (2 * Padding));
+                    (7 * CellSize) + (2 * Inset),
+                    HeaderHeight + WeekdayHeight + (6 * CellSize) + (2 * Inset));
             }
         }
 
@@ -159,7 +159,7 @@ namespace XForms.Toolkit
         {
             get
             {
-                return Math.Max(Padding, (this.Bounds.Width - (7 * CellSize)) / 2);
+                return Math.Max(Inset, (this.Bounds.Width - (7 * CellSize)) / 2);
             }
         }
 
@@ -167,7 +167,7 @@ namespace XForms.Toolkit
         {
             get
             {
-                return Padding + HeaderHeight + WeekdayHeight;
+                return Inset + HeaderHeight + WeekdayHeight;
             }
         }
 
@@ -176,7 +176,7 @@ namespace XForms.Toolkit
             get
             {
                 float right = this.GridLeft + (7 * CellSize);
-                return new Rect(right - (2 * CellSize), Padding, CellSize, HeaderHeight);
+                return new Rect(right - (2 * CellSize), Inset, CellSize, HeaderHeight);
             }
         }
 
@@ -185,7 +185,7 @@ namespace XForms.Toolkit
             get
             {
                 float right = this.GridLeft + (7 * CellSize);
-                return new Rect(right - CellSize, Padding, CellSize, HeaderHeight);
+                return new Rect(right - CellSize, Inset, CellSize, HeaderHeight);
             }
         }
 
@@ -402,7 +402,7 @@ namespace XForms.Toolkit
             // Header: the month, and the arrows to change it
             drawContext.DrawText(
                 this._month.ToString("MMMM yyyy", culture),
-                new Rect(gridLeft + 8, Padding, (5 * CellSize) - 8, HeaderHeight),
+                new Rect(gridLeft + 8, Inset, (5 * CellSize) - 8, HeaderHeight),
                 theme.ForegroundColor,
                 new TextFormat()
                 {
@@ -428,7 +428,7 @@ namespace XForms.Toolkit
                 var dayOfWeek = (DayOfWeek)((column + 1) % 7);
                 drawContext.DrawText(
                     culture.DateTimeFormat.GetShortestDayName(dayOfWeek),
-                    new Rect(gridLeft + (column * CellSize), Padding + HeaderHeight, CellSize, WeekdayHeight),
+                    new Rect(gridLeft + (column * CellSize), Inset + HeaderHeight, CellSize, WeekdayHeight),
                     theme.SubtleForegroundColor,
                     weekdayFormat);
             }

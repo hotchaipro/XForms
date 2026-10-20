@@ -58,6 +58,34 @@ namespace XForms.iOS
             this._graphicsContext.FillRect(rect);
         }
 
+        public void DrawRoundedRectangle(
+            Rect rectangle,
+            float cornerRadius,
+            Color color,
+            float strokeWidth = 1.0f)
+        {
+            using (var path = UIBezierPath.FromRoundedRect(rectangle.ToCGRect(), cornerRadius))
+            {
+                this._graphicsContext.SetStrokeColor(color.ToCGColor());
+                this._graphicsContext.SetLineWidth(strokeWidth);
+                this._graphicsContext.AddPath(path.CGPath);
+                this._graphicsContext.StrokePath();
+            }
+        }
+
+        public void FillRoundedRectangle(
+            Rect rectangle,
+            float cornerRadius,
+            Color color)
+        {
+            using (var path = UIBezierPath.FromRoundedRect(rectangle.ToCGRect(), cornerRadius))
+            {
+                this._graphicsContext.SetFillColor(color.ToCGColor());
+                this._graphicsContext.AddPath(path.CGPath);
+                this._graphicsContext.FillPath();
+            }
+        }
+
         public void DrawEllipse(
             Point centerPoint,
             float radiusX,

@@ -73,6 +73,25 @@ namespace XForms.Win32
             this._context->FillRectangle(rectangle.ToD2DRect(), this.Brush(color));
         }
 
+        public void DrawRoundedRectangle(
+            Rect rectangle,
+            float cornerRadius,
+            Color color,
+            float strokeWidth = 1.0f)
+        {
+            var rounded = new D2D1_ROUNDED_RECT() { rect = rectangle.ToD2DRect(), radiusX = cornerRadius, radiusY = cornerRadius };
+            this._context->DrawRoundedRectangle(&rounded, this.Brush(color), strokeWidth, null);
+        }
+
+        public void FillRoundedRectangle(
+            Rect rectangle,
+            float cornerRadius,
+            Color color)
+        {
+            var rounded = new D2D1_ROUNDED_RECT() { rect = rectangle.ToD2DRect(), radiusX = cornerRadius, radiusY = cornerRadius };
+            this._context->FillRoundedRectangle(&rounded, this.Brush(color));
+        }
+
         public void DrawEllipse(
             Point point,
             float radiusX,

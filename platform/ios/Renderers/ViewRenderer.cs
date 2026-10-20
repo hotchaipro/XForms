@@ -105,6 +105,17 @@ namespace XForms.iOS.Renderers
             this._nativeView?.RequestLayout();
         }
 
+        public bool ClipToBounds
+        {
+            set
+            {
+                if (null != this._nativeView)
+                {
+                    this._nativeView.ClipsToBounds = value;
+                }
+            }
+        }
+
         public virtual Color BackgroundColor
         {
             get

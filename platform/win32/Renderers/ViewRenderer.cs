@@ -68,6 +68,7 @@ namespace XForms.Win32.Renderers
         private Angle _rotation = Angle.Zero;
         private float _opacity = 1.0f;
         private bool _isVisible = true;
+        private bool _clipToBounds;
         private Color _backgroundColor = Colors.Transparent;
 
         protected ViewRenderer(
@@ -229,6 +230,7 @@ namespace XForms.Win32.Renderers
             if (isResized)
             {
                 this.UpdateTransform();
+                this.UpdateClip();
                 this.OnResized();
             }
 
@@ -241,6 +243,27 @@ namespace XForms.Win32.Renderers
         public virtual void InvalidateMeasure()
         {
             this.Host.RequestLayout();
+        }
+
+        public bool ClipToBounds
+        {
+            set
+            {
+                this._clipToBounds = value;
+                this.UpdateClip();
+            }
+        }
+
+        private void UpdateClip()
+        {
+            if (!this._clipToBounds)
+            {
+                // Scrolling views set their own clip
+                return;
+            }
+
+            float scale = this.Host.Scale;
+            this._visual->SetClip(new D2D_RECT_F() { left = 0, top = 0, right = this._frame.Width * scale, bottom = this._frame.Height * scale });
         }
 
         protected virtual void OnResized()

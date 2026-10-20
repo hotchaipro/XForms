@@ -127,9 +127,17 @@ All platforms share one layout engine, in `View`, with WPF-style semantics:
 - **Containers.** Native containers call back into the shared engine for
   their children (`MeasureContent`, and `LayoutContent` or `ArrangeContent`).
   So the platform's own layout system drives and caches the passes, but every
-  platform computes the same positions. `Panel` subclasses (`DockPanel`,
-  `UniformGrid`) and owner-drawn controls implement `MeasureOverride` and
-  `ArrangeOverride`.
+  platform computes the same positions. `Panel` subclasses (`StackPanel`,
+  `Grid`, `DockPanel`, `WrapPanel`, `Canvas`, `UniformGrid`) and owner-drawn
+  controls implement `MeasureOverride` and `ArrangeOverride`.
+- **Panels.** A panel keeps its children in a `ViewCollection`, or a
+  `ViewCollection<TLayout>` when each child has typed layout parameters
+  (`grid.Children.Add(view, row: 1, column: 2)`,
+  `dock.Children.Add(view, Dock.Top)`). Libraries write their own panels
+  the same way.
+- **Padding, sizes and direction.** The engine applies `Padding` (inside
+  the content), `MinWidth`/`MaxWidth`, `MinHeight`/`MaxHeight`, and
+  right-to-left `FlowDirection`, which mirrors the children's positions.
 
 Because the platform drives the passes, layout runs exactly when the platform
 lays out:

@@ -9,6 +9,14 @@ namespace XForms.Controls
         {
         }
 
+        public override Color BackgroundColor
+        {
+            get
+            {
+                return this.Theme.BackgroundColor;
+            }
+        }
+
         /// <summary>
         /// The container showing this view, while it shows an item.
         /// </summary>
