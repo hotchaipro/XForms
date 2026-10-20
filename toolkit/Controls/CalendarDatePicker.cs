@@ -89,8 +89,8 @@ namespace XForms.Toolkit
                 var longDate = new DateTime(2025, 9, 24).ToString("D", CultureInfo.CurrentCulture);
                 var format = this.CreateTextFormat();
                 return Math.Max(
-                    this.Application.MeasureText(longDate, format).Width,
-                    this.Application.MeasureText(this.PlaceholderText, format).Width);
+                    TextLayout.Measure(longDate, format).Width,
+                    TextLayout.Measure(this.PlaceholderText, format).Width);
             }
         }
 
@@ -98,7 +98,7 @@ namespace XForms.Toolkit
         /// A calendar page: a box with a band across the top and two rings.
         /// </summary>
         protected override void DrawGlyph(
-            IDrawContext drawContext,
+            DrawingContext drawContext,
             Rect bounds,
             Color color)
         {
@@ -164,10 +164,10 @@ namespace XForms.Toolkit
                 this.Content = calendar;
             }
 
-            protected override void DrawBackground(
-                IDrawContext drawContext,
-                Rect bounds)
+            protected override void Render(
+                DrawingContext drawContext)
             {
+                var bounds = new Rect(0, 0, this.Bounds.Width, this.Bounds.Height);
                 drawContext.Clear(Colors.Transparent);
                 DrawPopupFrame(drawContext, bounds, this.Theme);
             }

@@ -10,7 +10,7 @@ namespace XForms.Win32
     /// Draws XForms owner-drawn content with Direct2D, and text with DirectWrite
     /// (the system's own text renderer).
     /// </summary>
-    internal sealed unsafe class DrawContext : IDrawContext
+    internal sealed unsafe class DrawContext : DrawingContext
     {
         private readonly ID2D1DeviceContext* _context;
         private readonly Rect _bounds;
@@ -52,13 +52,282 @@ namespace XForms.Win32
             }
         }
 
-        public void Clear(
+        #region Brushes, paths and pushes
+
+        private enum PushKind
+        {
+            Clip,
+            Transform,
+            Opacity,
+        }
+
+        private readonly System.Collections.Generic.Stack<(PushKind Kind, D2D_MATRIX_3X2_F Saved)> _pushes = new();
+
+        // A native brush for the brush, filling the bounds; gradient brushes are
+        // created for the call, and must be released with ReleaseBrush
+        private ID2D1Brush* CreateBrush(
+            Brush brush,
+            Rect bounds,
+            out bool mustRelease)
+        {
+            mustRelease = false;
+
+            if (brush is LinearGradientBrush gradient)
+            {
+                var stops = new D2D1_GRADIENT_STOP[gradient.Stops.Count];
+                for (int i = 0; i < stops.Length; i += 1)
+                {
+                    stops[i] = new D2D1_GRADIENT_STOP() { position = gradient.Stops[i].Offset, color = gradient.Stops[i].Color.ToD2DColor() };
+                }
+
+                ID2D1GradientStopCollection* collection;
+                fixed (D2D1_GRADIENT_STOP* stopsPointer = stops)
+                {
+                    this._context->CreateGradientStopCollection(stopsPointer, (uint)stops.Length, D2D1_GAMMA.D2D1_GAMMA_2_2, D2D1_EXTEND_MODE.D2D1_EXTEND_MODE_CLAMP, &collection);
+                }
+
+                gradient.GetAbsolutePoints(bounds, out var start, out var end);
+                var properties = new D2D1_LINEAR_GRADIENT_BRUSH_PROPERTIES()
+                {
+                    startPoint = new D2D_POINT_2F() { x = start.X, y = start.Y },
+                    endPoint = new D2D_POINT_2F() { x = end.X, y = end.Y },
+                };
+
+                ID2D1LinearGradientBrush* linear;
+                this._context->CreateLinearGradientBrush(&properties, null, collection, &linear);
+                collection->Release();
+
+                mustRelease = true;
+                return (ID2D1Brush*)linear;
+            }
+
+            var solid = (SolidColorBrush)brush;
+            return this.Brush(solid.Color);
+        }
+
+        private static void ReleaseBrush(
+            ID2D1Brush* brush,
+            bool mustRelease)
+        {
+            if (mustRelease)
+            {
+                brush->Release();
+            }
+        }
+
+        public override void FillRectangle(
+            Rect rectangle,
+            Brush brush)
+        {
+            var native = this.CreateBrush(brush, rectangle, out bool mustRelease);
+            this._context->FillRectangle(rectangle.ToD2DRect(), native);
+            ReleaseBrush(native, mustRelease);
+        }
+
+        public override void FillRoundedRectangle(
+            Rect rectangle,
+            float cornerRadius,
+            Brush brush)
+        {
+            var native = this.CreateBrush(brush, rectangle, out bool mustRelease);
+            var rounded = new D2D1_ROUNDED_RECT() { rect = rectangle.ToD2DRect(), radiusX = cornerRadius, radiusY = cornerRadius };
+            this._context->FillRoundedRectangle(&rounded, native);
+            ReleaseBrush(native, mustRelease);
+        }
+
+        public override void FillEllipse(
+            Rect rectangle,
+            Brush brush)
+        {
+            var native = this.CreateBrush(brush, rectangle, out bool mustRelease);
+            this._context->FillEllipse(Ellipse(rectangle.Center, rectangle.Width / 2, rectangle.Height / 2), native);
+            ReleaseBrush(native, mustRelease);
+        }
+
+        private ID2D1PathGeometry* CreateGeometry(
+            PathGeometry path)
+        {
+            ID2D1Factory* factory;
+            this._context->GetFactory(&factory);
+
+            ID2D1PathGeometry* geometry;
+            factory->CreatePathGeometry(&geometry);
+            factory->Release();
+
+            ID2D1GeometrySink* sink;
+            geometry->Open(&sink);
+
+            bool isInFigure = false;
+            foreach (var segment in path.Segments)
+            {
+                var point = new D2D_POINT_2F() { x = segment.Point.X, y = segment.Point.Y };
+                switch (segment.Kind)
+                {
+                    case PathSegmentKind.MoveTo:
+                        if (isInFigure)
+                        {
+                            sink->EndFigure(D2D1_FIGURE_END.D2D1_FIGURE_END_OPEN);
+                        }
+
+                        sink->BeginFigure(point, D2D1_FIGURE_BEGIN.D2D1_FIGURE_BEGIN_FILLED);
+                        isInFigure = true;
+                        break;
+
+                    case PathSegmentKind.LineTo:
+                        sink->AddLine(point);
+                        break;
+
+                    case PathSegmentKind.QuadraticTo:
+                        {
+                            var quadratic = new D2D1_QUADRATIC_BEZIER_SEGMENT()
+                            {
+                                point1 = new D2D_POINT_2F() { x = segment.Control1.X, y = segment.Control1.Y },
+                                point2 = point,
+                            };
+                            sink->AddQuadraticBezier(&quadratic);
+                        }
+
+                        break;
+
+                    case PathSegmentKind.CubicTo:
+                        {
+                            var cubic = new D2D1_BEZIER_SEGMENT()
+                            {
+                                point1 = new D2D_POINT_2F() { x = segment.Control1.X, y = segment.Control1.Y },
+                                point2 = new D2D_POINT_2F() { x = segment.Control2.X, y = segment.Control2.Y },
+                                point3 = point,
+                            };
+                            sink->AddBezier(&cubic);
+                        }
+
+                        break;
+
+                    case PathSegmentKind.Close:
+                        if (isInFigure)
+                        {
+                            sink->EndFigure(D2D1_FIGURE_END.D2D1_FIGURE_END_CLOSED);
+                            isInFigure = false;
+                        }
+
+                        break;
+                }
+            }
+
+            if (isInFigure)
+            {
+                sink->EndFigure(D2D1_FIGURE_END.D2D1_FIGURE_END_OPEN);
+            }
+
+            sink->Close();
+            sink->Release();
+            return geometry;
+        }
+
+        public override void FillGeometry(
+            PathGeometry geometry,
+            Brush brush)
+        {
+            var native = this.CreateGeometry(geometry);
+            var nativeBrush = this.CreateBrush(brush, geometry.Bounds, out bool mustRelease);
+            this._context->FillGeometry((ID2D1Geometry*)native, nativeBrush, null);
+            ReleaseBrush(nativeBrush, mustRelease);
+            native->Release();
+        }
+
+        public override void DrawGeometry(
+            PathGeometry geometry,
+            Color color,
+            float strokeWidth = 1.0f)
+        {
+            var native = this.CreateGeometry(geometry);
+            this._context->DrawGeometry((ID2D1Geometry*)native, this.Brush(color), strokeWidth, TextResources.RoundStrokeStyle);
+            native->Release();
+        }
+
+        protected override void PushClipCore(
+            Rect clip)
+        {
+            this._context->PushAxisAlignedClip(clip.ToD2DRect(), D2D1_ANTIALIAS_MODE.D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
+            this._pushes.Push((PushKind.Clip, default));
+        }
+
+        protected override void PushTransformCore(
+            System.Numerics.Matrix3x2 transform)
+        {
+            D2D_MATRIX_3X2_F current;
+            this._context->GetTransform(&current);
+            this._pushes.Push((PushKind.Transform, current));
+
+            // The new transform applies first, then the current one
+            var c = new System.Numerics.Matrix3x2(
+                current.Anonymous.Anonymous1.m11, current.Anonymous.Anonymous1.m12,
+                current.Anonymous.Anonymous1.m21, current.Anonymous.Anonymous1.m22,
+                current.Anonymous.Anonymous1.dx, current.Anonymous.Anonymous1.dy);
+            var m = transform * c;
+
+            var combined = new D2D_MATRIX_3X2_F();
+            combined.Anonymous.Anonymous1.m11 = m.M11;
+            combined.Anonymous.Anonymous1.m12 = m.M12;
+            combined.Anonymous.Anonymous1.m21 = m.M21;
+            combined.Anonymous.Anonymous1.m22 = m.M22;
+            combined.Anonymous.Anonymous1.dx = m.M31;
+            combined.Anonymous.Anonymous1.dy = m.M32;
+            this._context->SetTransform(&combined);
+        }
+
+        protected override void PushOpacityCore(
+            float opacity)
+        {
+            var identity = new D2D_MATRIX_3X2_F();
+            identity.Anonymous.Anonymous1.m11 = 1;
+            identity.Anonymous.Anonymous1.m22 = 1;
+
+            var parameters = new D2D1_LAYER_PARAMETERS1()
+            {
+                contentBounds = new D2D_RECT_F() { left = float.NegativeInfinity, top = float.NegativeInfinity, right = float.PositiveInfinity, bottom = float.PositiveInfinity },
+                maskAntialiasMode = D2D1_ANTIALIAS_MODE.D2D1_ANTIALIAS_MODE_PER_PRIMITIVE,
+                maskTransform = identity,
+                opacity = opacity,
+                layerOptions = D2D1_LAYER_OPTIONS1.D2D1_LAYER_OPTIONS1_NONE,
+            };
+
+            this._context->PushLayer(&parameters, null);
+            this._pushes.Push((PushKind.Opacity, default));
+        }
+
+        public override void Pop()
+        {
+            if (0 == this._pushes.Count)
+            {
+                throw new InvalidOperationException("Pop without a matching Push.");
+            }
+
+            var (kind, saved) = this._pushes.Pop();
+            switch (kind)
+            {
+                case PushKind.Clip:
+                    this._context->PopAxisAlignedClip();
+                    break;
+
+                case PushKind.Transform:
+                    this._context->SetTransform(&saved);
+                    break;
+
+                case PushKind.Opacity:
+                    this._context->PopLayer();
+                    break;
+            }
+        }
+
+        #endregion Brushes, paths and pushes
+
+        public override void Clear(
             Color color)
         {
             this._context->Clear(color.ToD2DColor());
         }
 
-        public void DrawRectangle(
+        public override void DrawRectangle(
             Rect rectangle,
             Color color,
             float strokeWidth = 1.0f)
@@ -66,14 +335,14 @@ namespace XForms.Win32
             this._context->DrawRectangle(rectangle.ToD2DRect(), this.Brush(color), strokeWidth, null);
         }
 
-        public void FillRectangle(
+        public override void FillRectangle(
             Rect rectangle,
             Color color)
         {
             this._context->FillRectangle(rectangle.ToD2DRect(), this.Brush(color));
         }
 
-        public void DrawRoundedRectangle(
+        public override void DrawRoundedRectangle(
             Rect rectangle,
             float cornerRadius,
             Color color,
@@ -83,7 +352,7 @@ namespace XForms.Win32
             this._context->DrawRoundedRectangle(&rounded, this.Brush(color), strokeWidth, null);
         }
 
-        public void FillRoundedRectangle(
+        public override void FillRoundedRectangle(
             Rect rectangle,
             float cornerRadius,
             Color color)
@@ -92,7 +361,7 @@ namespace XForms.Win32
             this._context->FillRoundedRectangle(&rounded, this.Brush(color));
         }
 
-        public void DrawEllipse(
+        public override void DrawEllipse(
             Point point,
             float radiusX,
             float radiusY,
@@ -102,7 +371,7 @@ namespace XForms.Win32
             this._context->DrawEllipse(Ellipse(point, radiusX, radiusY), this.Brush(color), strokeWidth, null);
         }
 
-        public void FillEllipse(
+        public override void FillEllipse(
             Point point,
             float radiusX,
             float radiusY,
@@ -111,14 +380,14 @@ namespace XForms.Win32
             this._context->FillEllipse(Ellipse(point, radiusX, radiusY), this.Brush(color));
         }
 
-        public void FillEllipse(
+        public override void FillEllipse(
             Rect rectangle,
             Color color)
         {
             this.FillEllipse(rectangle.Center, rectangle.Width / 2, rectangle.Height / 2, color);
         }
 
-        public void FillEllipseShadow(
+        public override void FillEllipseShadow(
             Rect rectangle,
             Color color,
             float blurAmount = 8.0f)
@@ -129,7 +398,7 @@ namespace XForms.Win32
             this.FillEllipse(shadowBounds, shadowColor);
         }
 
-        public void DrawImage(
+        public override void DrawImage(
             Bitmap bitmap,
             Rect destinationRectangle,
             Color tint)
@@ -166,7 +435,7 @@ namespace XForms.Win32
             }
         }
 
-        public void DrawLine(
+        public override void DrawLine(
             Point start,
             Point end,
             Color color,
@@ -184,7 +453,7 @@ namespace XForms.Win32
         /// Draws a circular arc with round ends, clockwise from the start angle
         /// (in degrees, 0 at the top).
         /// </summary>
-        public void DrawArc(
+        public override void DrawArc(
             Point center,
             float radius,
             float startDegrees,
@@ -243,15 +512,18 @@ namespace XForms.Win32
             this.DrawText(glyph.ToString(), bounds, color, textFormat, TextResources.IconFontFamily);
         }
 
-        public void DrawText(
-            string text,
-            Rect bounds,
-            Color color,
-            TextFormat textFormat)
+        public override void DrawText(
+            TextLayout layout,
+            Point origin,
+            Color color)
         {
-            this.DrawText(text, bounds, color, textFormat, TextResources.FontFamily);
+            var native = (TextLayoutRenderer)layout.Native;
+            TextLayouts.Draw(this._context, native.Layout, origin, this.Brush(color), layout.Spans);
         }
 
+        /// <summary>
+        /// Draws text in a font family the platform names (such as the icon font).
+        /// </summary>
         public void DrawText(
             string text,
             Rect bounds,
@@ -259,50 +531,27 @@ namespace XForms.Win32
             TextFormat textFormat,
             string fontFamily)
         {
-            if (string.IsNullOrEmpty(text))
+            var format = new TextFormat()
             {
-                return;
-            }
-
-            var host = Win32Host.Current;
-
-            IDWriteTextFormat* format = TextResources.CreateTextFormat(textFormat.FontSize, textFormat.FontWeight, FontStyle.Normal, fontFamily);
-            try
-            {
-                format->SetTextAlignment(textFormat.HorizontalAlignment.ToDWriteTextAlignment());
-                format->SetParagraphAlignment(textFormat.VerticalAlignment.ToDWriteParagraphAlignment());
-                format->SetWordWrapping(DWRITE_WORD_WRAPPING.DWRITE_WORD_WRAPPING_NO_WRAP);
-
-                IDWriteTextLayout* layout;
-                host.DWriteFactory->CreateTextLayout(text, (uint)text.Length, format, bounds.Width, bounds.Height, &layout);
-                try
-                {
-                    this._context->DrawTextLayout(
-                        new D2D_POINT_2F() { x = bounds.X, y = bounds.Y },
-                        layout,
-                        this.Brush(color),
-                        D2D1_DRAW_TEXT_OPTIONS.D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT);
-                }
-                finally
-                {
-                    layout->Release();
-                }
-            }
-            finally
-            {
-                format->Release();
-            }
+                FontFamily = fontFamily,
+                FontSize = textFormat.FontSize,
+                FontWeight = textFormat.FontWeight,
+                FontStyle = textFormat.FontStyle,
+                HorizontalAlignment = textFormat.HorizontalAlignment,
+                VerticalAlignment = textFormat.VerticalAlignment,
+                TextWrapping = textFormat.TextWrapping,
+                TextTrimming = textFormat.TextTrimming,
+                MaxLines = textFormat.MaxLines,
+            };
+            this.DrawText(text, bounds, color, format);
         }
 
         public void DrawTextLayout(
             IDWriteTextLayout* layout,
-            Color color)
+            Color color,
+            System.Collections.Generic.IReadOnlyList<TextSpan> spans = null)
         {
-            this._context->DrawTextLayout(
-                new D2D_POINT_2F() { x = 0, y = 0 },
-                layout,
-                this.Brush(color),
-                D2D1_DRAW_TEXT_OPTIONS.D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT);
+            TextLayouts.Draw(this._context, layout, Point.Zero, this.Brush(color), spans);
         }
 
         private static D2D1_ELLIPSE Ellipse(

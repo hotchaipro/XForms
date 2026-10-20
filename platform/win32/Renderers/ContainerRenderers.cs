@@ -140,7 +140,7 @@ namespace XForms.Win32.Renderers
         protected override void DrawContent(
             DrawContext drawContext)
         {
-            this._drawDelegate.InvokeDrawBackground(drawContext, new Rect(0, 0, this.Frame.Width, this.Frame.Height));
+            this._drawDelegate.InvokeRender(drawContext, new Rect(0, 0, this.Frame.Width, this.Frame.Height));
         }
     }
 

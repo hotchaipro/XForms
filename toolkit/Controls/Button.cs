@@ -200,15 +200,15 @@ namespace XForms.Toolkit
             }
         }
 
-        protected override void DrawBackground(
-            IDrawContext drawContext,
-            Rect bounds)
+        protected override void Render(
+            DrawingContext drawContext)
         {
+            var bounds = new Rect(0, 0, this.Bounds.Width, this.Bounds.Height);
             Rect textBounds = new Rect(bounds.X, bounds.Y, bounds.Width, bounds.Height);
 
             if (this.IsEnabled)
             {
-                base.DrawBackground(drawContext, bounds);
+                base.Render(drawContext);
 
                 var foregroundColor = this.ForegroundColor;
                 if (foregroundColor.HasValue)

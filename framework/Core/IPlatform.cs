@@ -21,6 +21,8 @@ namespace XForms
         IPopupRenderer CreatePopupRenderer(Popup popup);
         void NavigateToUri(Uri uri);
 
-        Size MeasureText(string text, TextFormat textFormat);
+        ITextLayoutRenderer CreateTextLayout(TextLayout layout);
+
+        void RegisterFont(string familyName, string fileName);
     }
 }

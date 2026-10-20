@@ -1085,6 +1085,49 @@ Neither changed the order of the phases. Both added items, which are below.
      paths, rounded rectangles, immutable brushes, push/pop of clip,
      transform and opacity, and `TextLayout`.
    - Add font families and bundled fonts, text spans, and maximum lines.
+
+   **Status: done.**
+   - **`DrawingContext`:**
+     - It's an abstract class (it was the `IDrawContext` interface).
+       Owner-drawn controls override `Render(DrawingContext)`, which was
+       `DrawBackground(context, bounds)`.
+     - It gained immutable brushes (`SolidColorBrush`,
+       `LinearGradientBrush`) and `PathGeometry` (lines, quadratic and cubic
+       curves, and SVG-style arcs, which become curves).
+     - It gained `PushClip`, `PushTransform` (a `Matrix3x2`) and
+       `PushOpacity` (group opacity), each undone by `Pop` or by disposing
+       what the push returns.
+     - Implemented on Direct2D, Android's Canvas and Core Graphics.
+   - **`TextLayout`:**
+     - Text laid out once with a `TextFormat`, within a maximum size, and
+       drawn with `DrawText(layout, origin, color)`. It replaces
+       `Application.MeasureText` (`TextLayout.Measure` measures in one
+       call).
+     - `TextFormat` gained a font family, style, wrapping, trimming and
+       `MaxLines`.
+     - Every text drawing call goes through it, on DirectWrite,
+       StaticLayout and TextKit.
+   - **`TextBlock`:**
+     - `FontFamily` and `MaxLines`.
+     - `Inlines`: `Run`s with their own weight, style, color, underline and
+       strikethrough.
+   - **Fonts:**
+     - Generic families as in CSS (`FontFamilies.Serif`, `SansSerif`,
+       `Monospace`) map to a matching system font on each platform: Cambria,
+       Segoe UI and Consolas on Windows; serif, sans-serif and monospace on
+       Android; New York, San Francisco and SF Mono on iOS. They're the
+       portable choice, with nothing to bundle.
+     - `Application.RegisterFont` loads a font file (from the app's folder,
+       Android assets or the iOS bundle) under a family name, for brand and
+       icon fonts. Windows uses a DirectWrite custom collection.
+   - **Fixed on the way:**
+     - Win32 text blocks ignored `TextTrimming`.
+     - Android's text block `FontWeight` threw when read, and did nothing
+       when set.
+     - iOS's `VerticalTextAlignment` threw when read.
+   - **Verified** on Win32 and Android (drawing test page), including a
+     registered font on Win32. On Android, a font registered from assets
+     isn't verified, and iOS is only built.
 6. **Animation.**
    - Fill in the `Animator` (added in phase 1): translation, scale,
      rotation, opacity, clip and transform origin. Setting a value stops that

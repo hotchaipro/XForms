@@ -21,6 +21,9 @@ namespace XForms.Win32.Renderers
         private FontStyle _fontStyle = FontStyle.Normal;
         private FontWeight _fontWeight = FontWeight.Normal;
         private bool _strikethrough;
+        private string _fontFamily;
+        private int _maxLines;
+        private System.Collections.Generic.IReadOnlyList<TextSpan> _spans;
 
         public TextBlockRenderer(
             TextBlock textView)
@@ -96,6 +99,21 @@ namespace XForms.Win32.Renderers
             set { this._strikethrough = value; this.InvalidateRender(); }
         }
 
+        public string FontFamily
+        {
+            set { this._fontFamily = value; this.OnTextChanged(); }
+        }
+
+        public int MaxLines
+        {
+            set { this._maxLines = value; this.OnTextChanged(); }
+        }
+
+        public System.Collections.Generic.IReadOnlyList<TextSpan> Spans
+        {
+            set { this._spans = value; this.OnTextChanged(); }
+        }
+
         private void OnTextChanged()
         {
             this.InvalidateMeasure();
@@ -104,59 +122,50 @@ namespace XForms.Win32.Renderers
 
         private IDWriteTextLayout* CreateLayout(
             float maxWidth,
-            float maxHeight)
+            float maxHeight,
+            out Size size)
         {
-            var format = TextResources.CreateTextFormat(this._fontSize, this._fontWeight, this._fontStyle);
-            try
+            var format = new TextFormat()
             {
-                format->SetWordWrapping(this._wordWrap ? DWRITE_WORD_WRAPPING.DWRITE_WORD_WRAPPING_WRAP : DWRITE_WORD_WRAPPING.DWRITE_WORD_WRAPPING_NO_WRAP);
-                format->SetTextAlignment(this._horizontalTextAlignment.ToDWriteTextAlignment());
+                FontFamily = this._fontFamily,
+                FontSize = this._fontSize,
+                FontWeight = this._fontWeight,
+                FontStyle = this._fontStyle,
+                HorizontalAlignment = (this._horizontalTextAlignment == TextAlignment.Center) ? HorizontalAlignment.Center
+                    : (this._horizontalTextAlignment == TextAlignment.End) ? HorizontalAlignment.Right
+                    : HorizontalAlignment.Left,
+                TextWrapping = this._wordWrap ? TextWrapping.Wrap : TextWrapping.NoWrap,
+                TextTrimming = this._textTrimming ? XForms.TextTrimming.CharacterEllipsis : XForms.TextTrimming.None,
+                MaxLines = this._maxLines,
+            };
 
-                IDWriteTextLayout* layout;
-                Win32Host.Current.DWriteFactory->CreateTextLayout(this._text, (uint)this._text.Length, format, maxWidth, maxHeight, &layout);
-
-                if (this._strikethrough && (this._text.Length > 0))
-                {
-                    layout->SetStrikethrough(true, new DWRITE_TEXT_RANGE() { startPosition = 0, length = (uint)this._text.Length });
-                }
-
-                return layout;
-            }
-            finally
+            var spans = this._spans;
+            if (this._strikethrough && (this._text.Length > 0))
             {
-                format->Release();
+                var all = new System.Collections.Generic.List<TextSpan>(spans ?? Array.Empty<TextSpan>());
+                all.Add(new TextSpan(0, this._text.Length, strikethrough: true));
+                spans = all;
             }
+
+            return TextLayouts.CreateLayout(this._text, format, maxWidth, maxHeight, spans, out size, out _);
         }
 
         public override Size MeasureNative(
             Size availableSize)
         {
-            float maxWidth = float.IsInfinity(availableSize.Width) ? 100000 : availableSize.Width;
-            float maxHeight = float.IsInfinity(availableSize.Height) ? 100000 : availableSize.Height;
-
-            var layout = this.CreateLayout(maxWidth, maxHeight);
-            try
-            {
-                layout->GetMetrics(out var metrics);
-
-                return new Size(
-                    Math.Min((float)Math.Ceiling(metrics.widthIncludingTrailingWhitespace), availableSize.Width),
-                    Math.Min((float)Math.Ceiling(metrics.height), availableSize.Height));
-            }
-            finally
-            {
-                layout->Release();
-            }
+            var layout = this.CreateLayout(availableSize.Width, availableSize.Height, out var size);
+            layout->Release();
+            return size;
         }
 
         protected override void DrawContent(
             DrawContext drawContext)
         {
             var frame = this.Frame;
-            var layout = this.CreateLayout(frame.Width, frame.Height);
+            var layout = this.CreateLayout(frame.Width, frame.Height, out _);
             try
             {
-                drawContext.DrawTextLayout(layout, this._foregroundColor);
+                drawContext.DrawTextLayout(layout, this._foregroundColor, this._spans);
             }
             finally
             {

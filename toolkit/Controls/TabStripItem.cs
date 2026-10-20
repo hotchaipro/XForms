@@ -162,11 +162,11 @@ namespace XForms.Toolkit
             this.InvalidateVisual();
         }
 
-        protected override void DrawBackground(
-            IDrawContext drawContext,
-            Rect bounds)
+        protected override void Render(
+            DrawingContext drawContext)
         {
-            base.DrawBackground(drawContext, bounds);
+            var bounds = new Rect(0, 0, this.Bounds.Width, this.Bounds.Height);
+            base.Render(drawContext);
 
             //drawContext.DrawRectangle(bounds, Color.FromArgb(0x40, 255, 0, 0));
 

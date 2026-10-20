@@ -34,7 +34,7 @@ namespace XForms.iOS
 
                 var drawContext = new DrawContext(graphicsContext, bounds);
 
-                this._drawDelegate.InvokeDrawBackground(drawContext, bounds.ToRectangle());
+                this._drawDelegate.InvokeRender(drawContext, bounds.ToRectangle());
             }
         }
     }

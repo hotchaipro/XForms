@@ -3,10 +3,10 @@ using System.Collections.Generic;
 
 namespace XForms.Controls
 {
-    public interface IDrawDelegate
+    internal interface IDrawDelegate
     {
-        void InvokeDrawBackground(
-            IDrawContext drawContext,
+        void InvokeRender(
+            DrawingContext drawContext,
             Rect bounds);
     }
 
@@ -113,18 +113,22 @@ namespace XForms.Controls
             return this.Application.Platform.CreateUserControlRenderer(this);
         }
 
-        protected virtual void DrawBackground(
-            IDrawContext drawContext,
-            Rect bounds)
+        /// <summary>
+        /// Draws the control, within its bounds (from 0, 0). By default it fills
+        /// the control with its background color. Call
+        /// <see cref="InvalidateVisual"/> to draw again.
+        /// </summary>
+        protected virtual void Render(
+            DrawingContext drawingContext)
         {
-            drawContext.Clear(this.BackgroundColor);
+            drawingContext.Clear(this.BackgroundColor);
         }
 
-        void IDrawDelegate.InvokeDrawBackground(
-            IDrawContext drawContext,
+        void IDrawDelegate.InvokeRender(
+            DrawingContext drawContext,
             Rect bounds)
         {
-            this.DrawBackground(drawContext, bounds);
+            this.Render(drawContext);
         }
 
         protected override Size MeasureOverride(

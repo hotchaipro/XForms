@@ -59,10 +59,10 @@ namespace XForms.Toolkit
             return new Size(size, size);
         }
 
-        protected override void DrawBackground(
-            IDrawContext drawContext,
-            Rect bounds)
+        protected override void Render(
+            DrawingContext drawContext)
         {
+            var bounds = new Rect(0, 0, this.Bounds.Width, this.Bounds.Height);
             drawContext.Clear(Colors.Transparent);
 
             float size = Math.Min(bounds.Width, bounds.Height);

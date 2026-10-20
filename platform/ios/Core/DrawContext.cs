@@ -8,7 +8,7 @@ using XForms.iOS.Renderers;
 
 namespace XForms.iOS
 {
-    public sealed class DrawContext : IDrawContext
+    public sealed class DrawContext : DrawingContext
     {
         private CGContext _graphicsContext;
         private CGRect _bounds;
@@ -26,7 +26,183 @@ namespace XForms.iOS
             this._bounds = bounds;
         }
 
-        public void Clear(
+        #region Brushes, paths and pushes
+
+        private readonly System.Collections.Generic.Stack<bool> _pushes = new System.Collections.Generic.Stack<bool>();
+
+        // Fills the shape with the brush; gradients are drawn clipped to it
+        private void FillShape(
+            Action addShape,
+            Brush brush,
+            Rect bounds)
+        {
+            var context = this._graphicsContext;
+
+            if (brush is LinearGradientBrush gradient)
+            {
+                context.SaveState();
+                addShape();
+                context.Clip();
+
+                var colors = new CGColor[gradient.Stops.Count];
+                var locations = new nfloat[gradient.Stops.Count];
+                for (int i = 0; i < colors.Length; i += 1)
+                {
+                    colors[i] = gradient.Stops[i].Color.ToCGColor();
+                    locations[i] = gradient.Stops[i].Offset;
+                }
+
+                using (var colorSpace = CGColorSpace.CreateDeviceRGB())
+                using (var cgGradient = new CGGradient(colorSpace, colors, locations))
+                {
+                    gradient.GetAbsolutePoints(bounds, out var start, out var end);
+                    context.DrawLinearGradient(
+                        cgGradient,
+                        new CGPoint(start.X, start.Y),
+                        new CGPoint(end.X, end.Y),
+                        CGGradientDrawingOptions.DrawsBeforeStartLocation | CGGradientDrawingOptions.DrawsAfterEndLocation);
+                }
+
+                context.RestoreState();
+                return;
+            }
+
+            context.SetFillColor(((SolidColorBrush)brush).Color.ToCGColor());
+            addShape();
+            context.FillPath();
+        }
+
+        public override void FillRectangle(
+            Rect rectangle,
+            Brush brush)
+        {
+            this.FillShape(() => this._graphicsContext.AddRect(rectangle.ToCGRect()), brush, rectangle);
+        }
+
+        public override void FillRoundedRectangle(
+            Rect rectangle,
+            float cornerRadius,
+            Brush brush)
+        {
+            this.FillShape(() =>
+            {
+                using (var path = UIBezierPath.FromRoundedRect(rectangle.ToCGRect(), cornerRadius))
+                {
+                    this._graphicsContext.AddPath(path.CGPath);
+                }
+            }, brush, rectangle);
+        }
+
+        public override void FillEllipse(
+            Rect rectangle,
+            Brush brush)
+        {
+            this.FillShape(() => this._graphicsContext.AddEllipseInRect(rectangle.ToCGRect()), brush, rectangle);
+        }
+
+        private static CGPath CreatePath(
+            PathGeometry geometry)
+        {
+            var path = new CGPath();
+            foreach (var segment in geometry.Segments)
+            {
+                switch (segment.Kind)
+                {
+                    case PathSegmentKind.MoveTo:
+                        path.MoveToPoint(segment.Point.X, segment.Point.Y);
+                        break;
+
+                    case PathSegmentKind.LineTo:
+                        path.AddLineToPoint(segment.Point.X, segment.Point.Y);
+                        break;
+
+                    case PathSegmentKind.QuadraticTo:
+                        path.AddQuadCurveToPoint(segment.Control1.X, segment.Control1.Y, segment.Point.X, segment.Point.Y);
+                        break;
+
+                    case PathSegmentKind.CubicTo:
+                        path.AddCurveToPoint(segment.Control1.X, segment.Control1.Y, segment.Control2.X, segment.Control2.Y, segment.Point.X, segment.Point.Y);
+                        break;
+
+                    case PathSegmentKind.Close:
+                        path.CloseSubpath();
+                        break;
+                }
+            }
+
+            return path;
+        }
+
+        public override void FillGeometry(
+            PathGeometry geometry,
+            Brush brush)
+        {
+            using (var path = CreatePath(geometry))
+            {
+                this.FillShape(() => this._graphicsContext.AddPath(path), brush, geometry.Bounds);
+            }
+        }
+
+        public override void DrawGeometry(
+            PathGeometry geometry,
+            Color color,
+            float strokeWidth = 1.0f)
+        {
+            using (var path = CreatePath(geometry))
+            {
+                var context = this._graphicsContext;
+                context.SetStrokeColor(color.ToCGColor());
+                context.SetLineWidth(strokeWidth);
+                context.SetLineCap(CGLineCap.Round);
+                context.SetLineJoin(CGLineJoin.Round);
+                context.AddPath(path);
+                context.StrokePath();
+            }
+        }
+
+        protected override void PushClipCore(
+            Rect clip)
+        {
+            this._graphicsContext.SaveState();
+            this._graphicsContext.ClipToRect(clip.ToCGRect());
+            this._pushes.Push(false);
+        }
+
+        protected override void PushTransformCore(
+            System.Numerics.Matrix3x2 transform)
+        {
+            this._graphicsContext.SaveState();
+            this._graphicsContext.ConcatCTM(new CGAffineTransform(transform.M11, transform.M12, transform.M21, transform.M22, transform.M31, transform.M32));
+            this._pushes.Push(false);
+        }
+
+        protected override void PushOpacityCore(
+            float opacity)
+        {
+            this._graphicsContext.SaveState();
+            this._graphicsContext.SetAlpha(opacity);
+            this._graphicsContext.BeginTransparencyLayer();
+            this._pushes.Push(true);
+        }
+
+        public override void Pop()
+        {
+            if (0 == this._pushes.Count)
+            {
+                throw new InvalidOperationException("Pop without a matching Push.");
+            }
+
+            if (this._pushes.Pop())
+            {
+                this._graphicsContext.EndTransparencyLayer();
+            }
+
+            this._graphicsContext.RestoreState();
+        }
+
+        #endregion Brushes, paths and pushes
+
+        public override void Clear(
             Color color)
         {
             this._graphicsContext.ClearRect(this._bounds);
@@ -38,7 +214,7 @@ namespace XForms.iOS
             }
         }
 
-        public void DrawRectangle(
+        public override void DrawRectangle(
             Rect rectangle,
             Color color,
             float strokeWidth = 1.0f)
@@ -49,7 +225,7 @@ namespace XForms.iOS
             this._graphicsContext.StrokeRectWithWidth(rect, strokeWidth);
         }
 
-        public void FillRectangle(
+        public override void FillRectangle(
             Rect rectangle,
             Color color)
         {
@@ -58,7 +234,7 @@ namespace XForms.iOS
             this._graphicsContext.FillRect(rect);
         }
 
-        public void DrawRoundedRectangle(
+        public override void DrawRoundedRectangle(
             Rect rectangle,
             float cornerRadius,
             Color color,
@@ -73,7 +249,7 @@ namespace XForms.iOS
             }
         }
 
-        public void FillRoundedRectangle(
+        public override void FillRoundedRectangle(
             Rect rectangle,
             float cornerRadius,
             Color color)
@@ -86,7 +262,7 @@ namespace XForms.iOS
             }
         }
 
-        public void DrawEllipse(
+        public override void DrawEllipse(
             Point centerPoint,
             float radiusX,
             float radiusY,
@@ -112,7 +288,7 @@ namespace XForms.iOS
             this._graphicsContext.StrokeEllipseInRect(rect);
         }
 
-        public void FillEllipse(
+        public override void FillEllipse(
             Point centerPoint,
             float radiusX,
             float radiusY,
@@ -127,7 +303,7 @@ namespace XForms.iOS
             this.FillEllipse(rect, color);
         }
 
-        public void FillEllipse(
+        public override void FillEllipse(
             Rect rectangle,
             Color color)
         {
@@ -136,7 +312,7 @@ namespace XForms.iOS
             this._graphicsContext.FillEllipseInRect(rect);
         }
 
-        public void DrawImage(
+        public override void DrawImage(
             Bitmap bitmap,
             Rect destinationRectangle,
             Color tint)
@@ -170,7 +346,7 @@ namespace XForms.iOS
         }
 
         // TODO: Replace with a Shadow property on View
-        public void FillEllipseShadow(
+        public override void FillEllipseShadow(
             Rect rectangle,
             Color color,
             float shadowBlur = 8.0f)
@@ -187,7 +363,7 @@ namespace XForms.iOS
             //this._graphicsContext.RestoreState();
         }
 
-        public void DrawLine(
+        public override void DrawLine(
             Point start,
             Point end,
             Color color,
@@ -203,7 +379,7 @@ namespace XForms.iOS
             this._graphicsContext.RestoreState();
         }
 
-        public void DrawArc(
+        public override void DrawArc(
             Point center,
             float radius,
             float startDegrees,
@@ -228,83 +404,13 @@ namespace XForms.iOS
         /// <summary>
         /// The size of a single line of text, as <see cref="DrawText"/> draws it.
         /// </summary>
-        internal static Size MeasureText(
-            string text,
-            TextFormat textFormat)
+
+        public override void DrawText(
+            TextLayout layout,
+            Point origin,
+            Color color)
         {
-            var font = UIFont.SystemFontOfSize(textFormat.FontSize, textFormat.FontWeight.ToUIFontWeight());
-            if (string.IsNullOrEmpty(text))
-            {
-                return new Size(0, (float)Math.Ceiling(font.LineHeight));
-            }
-
-            var attributedText = new NSAttributedString(text, new UIStringAttributes() { Font = font });
-            var size = attributedText.Size;
-            return new Size((float)Math.Ceiling(size.Width), (float)Math.Ceiling(size.Height));
-        }
-
-        public void DrawText(
-            string text,
-            Rect bounds,
-            Color color,
-            TextFormat textFormat)
-        {
-            if (null == textFormat)
-            {
-                throw new ArgumentNullException(nameof(textFormat));
-            }
-
-            if (String.IsNullOrEmpty(text))
-            {
-                return;
-            }
-
-            var rect = bounds.ToCGRect();
-
-            var paragraphStyle = new NSMutableParagraphStyle()
-            {
-                Alignment = textFormat.HorizontalAlignment.ToUITextAlignment(),
-                LineBreakMode = UILineBreakMode.WordWrap,
-            };
-
-            var attributes = new UIStringAttributes()
-            {
-                Font = UIFont.SystemFontOfSize(textFormat.FontSize, textFormat.FontWeight.ToUIFontWeight()),
-                ForegroundColor = color.ToUIColor(),
-                ParagraphStyle = paragraphStyle,
-            };
-
-            var attributedText = new NSAttributedString(text, attributes);
-
-            // Position the text block vertically; horizontal alignment is handled
-            // by the paragraph style
-            var textSize = attributedText.GetBoundingRect(
-                new CGSize(rect.Width, nfloat.MaxValue),
-                NSStringDrawingOptions.UsesLineFragmentOrigin | NSStringDrawingOptions.UsesFontLeading,
-                null).Size;
-
-            nfloat textHeight = (nfloat)Math.Min(Math.Ceiling(textSize.Height), rect.Height);
-            nfloat y;
-            switch (textFormat.VerticalAlignment)
-            {
-                case VerticalAlignment.Center:
-                case VerticalAlignment.Stretch:
-                    y = rect.Y + ((rect.Height - textHeight) / 2);
-                    break;
-
-                case VerticalAlignment.Bottom:
-                    y = rect.Bottom - textHeight;
-                    break;
-
-                default:
-                    y = rect.Y;
-                    break;
-            }
-
-            attributedText.DrawString(
-                new CGRect(rect.X, y, rect.Width, textHeight),
-                NSStringDrawingOptions.UsesLineFragmentOrigin | NSStringDrawingOptions.TruncatesLastVisibleLine,
-                null);
+            ((TextLayoutRenderer)layout.Native).Draw(origin, color);
         }
     }
 }

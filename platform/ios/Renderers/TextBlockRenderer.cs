@@ -37,7 +37,7 @@ namespace XForms.iOS.Renderers
             {
                 this._nativeTextView.Text = value ?? String.Empty;
 
-                if (this._strikeThrough)
+                if (this._strikeThrough || (0 < (this._spans?.Count ?? 0)))
                 {
                     this.UpdateAttributedText();
                 }
@@ -63,12 +63,13 @@ namespace XForms.iOS.Renderers
         {
             get
             {
-                throw new NotImplementedException();
+                // NOTE: Labels center text vertically in their bounds, and are
+                // sized to their text
+                return TextAlignment.Start;
             }
 
             set
             {
-                // TODO: throw new NotImplementedException();
             }
         }
 
@@ -174,32 +175,62 @@ namespace XForms.iOS.Renderers
             }
         }
 
-        private void UpdateFont()
+        private string _fontFamily;
+        private System.Collections.Generic.IReadOnlyList<TextSpan> _spans;
+
+        public string FontFamily
         {
-            UIFont font = UIFont.SystemFontOfSize(this.FontSize, this.FontWeight.ToUIFontWeight());
-            if (this.FontStyle == FontStyle.Italic)
+            set
             {
-                var descriptor = font.FontDescriptor.CreateWithTraits(UIFontDescriptorSymbolicTraits.Italic);
-                if (null != descriptor)
+                this._fontFamily = value;
+                this.UpdateFont();
+            }
+        }
+
+        public int MaxLines
+        {
+            set
+            {
+                if (0 < value)
                 {
-                    font = UIFont.FromDescriptor(descriptor, this.FontSize);
+                    this._nativeTextView.Lines = value;
+                    this._nativeTextView.LineBreakMode = UILineBreakMode.TailTruncation;
+                    this._nativeTextView.RequestLayout();
                 }
             }
+        }
+
+        public System.Collections.Generic.IReadOnlyList<TextSpan> Spans
+        {
+            set
+            {
+                this._spans = value;
+                this.UpdateAttributedText();
+            }
+        }
+
+        private void UpdateFont()
+        {
+            UIFont font = Fonts.GetFont(this._fontFamily, this.FontSize, this.FontWeight, this.FontStyle);
 
             this._nativeTextView.Font = font;
+            if (0 < (this._spans?.Count ?? 0))
+            {
+                this.UpdateAttributedText();
+            }
             this._nativeTextView.RequestLayout();
         }
 
         private void UpdateAttributedText()
         {
-            var attributes = new UIStringAttributes()
+            string text = this._nativeTextView.Text ?? String.Empty;
+            var styled = Fonts.Styled(text, this._spans, this._fontFamily, this.FontSize, this.FontWeight, this.FontStyle, this._nativeTextView.TextColor);
+            if (this._strikeThrough && (0 < text.Length))
             {
-                Font = this._nativeTextView.Font,
-                ForegroundColor = this._nativeTextView.TextColor,
-                StrikethroughStyle = this._strikeThrough ? NSUnderlineStyle.Single : NSUnderlineStyle.None,
-            };
+                styled.AddAttributes(new UIStringAttributes() { StrikethroughStyle = NSUnderlineStyle.Single }, new NSRange(0, text.Length));
+            }
 
-            this._nativeTextView.AttributedText = new NSAttributedString(this._nativeTextView.Text ?? String.Empty, attributes);
+            this._nativeTextView.AttributedText = styled;
         }
     }
 }

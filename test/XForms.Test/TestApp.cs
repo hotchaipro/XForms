@@ -12,7 +12,7 @@ namespace XForms.Test
         }
 
         /// <summary>
-        /// The page to start on: "pickers", "panels", "binding", "input", "xaml", "benchmark-views" or
+        /// The page to start on: "pickers", "panels", "binding", "input", "drawing", "xaml", "benchmark-views" or
         /// "benchmark-drawn" (otherwise the text and list page). Set by each
         /// platform's entry point, for example from an environment variable or
         /// an intent extra.
@@ -42,6 +42,10 @@ namespace XForms.Test
 
                 case "benchmark-views":
                     this.NavigateTo(new BenchmarkPage(drawAsOneView: false));
+                    return;
+
+                case "drawing":
+                    this.NavigateTo(new DrawingPage());
                     return;
 
                 case "input":

@@ -103,11 +103,17 @@ namespace XForms.iOS
 
 
 
-        public Size MeasureText(
-            string text,
-            TextFormat textFormat)
+        public ITextLayoutRenderer CreateTextLayout(
+            TextLayout layout)
         {
-            return DrawContext.MeasureText(text, textFormat);
+            return new TextLayoutRenderer(layout);
+        }
+
+        public void RegisterFont(
+            string familyName,
+            string fileName)
+        {
+            Fonts.Register(familyName, fileName);
         }
 
         public void NavigateToUri(

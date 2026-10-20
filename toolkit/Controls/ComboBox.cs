@@ -81,7 +81,7 @@ namespace XForms.Toolkit
                     float width = 0;
                     foreach (var item in this.Items)
                     {
-                        width = Math.Max(width, this.Application.MeasureText(item.Text, format).Width);
+                        width = Math.Max(width, TextLayout.Measure(item.Text, format).Width);
                     }
 
                     this._maximumTextWidth = width;
@@ -133,7 +133,7 @@ namespace XForms.Toolkit
         }
 
         protected override void DrawGlyph(
-            IDrawContext drawContext,
+            DrawingContext drawContext,
             Rect bounds,
             Color color)
         {
@@ -274,10 +274,10 @@ namespace XForms.Toolkit
                     Math.Max(0, finalSize.Height - (2 * Inset))));
             }
 
-            protected override void DrawBackground(
-                IDrawContext drawContext,
-                Rect bounds)
+            protected override void Render(
+                DrawingContext drawContext)
             {
+                var bounds = new Rect(0, 0, this.Bounds.Width, this.Bounds.Height);
                 drawContext.Clear(Colors.Transparent);
                 DrawPopupFrame(drawContext, bounds, this.Theme);
             }
@@ -447,10 +447,10 @@ namespace XForms.Toolkit
                 }
             }
 
-            protected override void DrawBackground(
-                IDrawContext drawContext,
-                Rect bounds)
+            protected override void Render(
+                DrawingContext drawContext)
             {
+                var bounds = new Rect(0, 0, this.Bounds.Width, this.Bounds.Height);
                 var theme = this.Theme;
                 var items = this._picker.Items;
                 int selectedIndex = this._picker.SelectedIndex;

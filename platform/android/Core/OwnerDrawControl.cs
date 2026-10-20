@@ -39,7 +39,7 @@ namespace XForms.Android
                     XForms.Android.NativeConversions.PixelsToDevicePixels(this.Context, drawingRect.Height()));
 
                 var drawContext = new DrawContext(this.Context, canvas);
-                this._drawDelegate.InvokeDrawBackground(drawContext, bounds);
+                this._drawDelegate.InvokeRender(drawContext, bounds);
             }
         }
     }

@@ -165,8 +165,8 @@ That keeps native performance and native animation behavior.
 ## Owner-drawn controls
 
 `UserControl` is the framework's owner-drawn surface. A control overrides
-`DrawBackground(IDrawContext, bounds)`. Each platform implements
-`IDrawContext`:
+`Render(DrawingContext)` and draws within its bounds. Each platform
+implements `DrawingContext`:
 - Android: `Canvas`.
 - iOS: Core Graphics.
 - Win32: Direct2D, with DirectWrite for text.
@@ -175,11 +175,23 @@ The control calls `InvalidateVisual()` to redraw. A `UserControl` can also host 
 child view through its `Content`, which is how controls combine drawing with
 native text.
 
-`IDrawContext` draws rectangles, ellipses, lines and arcs (with round ends),
-images (optionally tinted), and text. `Application.MeasureText` measures a
-line of text the way `DrawText` draws it, so controls can size themselves to
-their text. Controls draw their own glyphs (chevrons, calendar icons) with
-lines and shapes rather than icon fonts, which differ between platforms.
+`DrawingContext` draws:
+- rectangles (also rounded), ellipses, lines and arcs, with round ends;
+- paths (`PathGeometry`), filled with a solid or gradient brush, or
+  stroked;
+- images (optionally tinted);
+- text.
+
+It can push a clip, a transform or group opacity. Text is laid out with a
+`TextLayout`: a `TextFormat` (family, size, weight, style, alignment,
+wrapping, trimming, maximum lines) and optional styled spans. A layout is
+measured once and drawn, so controls can size themselves to their text.
+
+Font families can be generic (`FontFamilies.Serif`, `SansSerif`,
+`Monospace`), which map to matching system fonts on each platform, or
+registered from a font file with `Application.RegisterFont`. Controls draw
+their own glyphs (chevrons, calendar icons) with lines and shapes rather
+than icon fonts, which differ between platforms.
 
 Animation goes through an `Animator`, which holds a view's translation,
 scale, rotation and opacity. These don't affect layout. A view has no

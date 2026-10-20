@@ -307,19 +307,26 @@ namespace XForms
         }
 
         /// <summary>
-        /// Measures a single line of text as the platform draws it with
-        /// <see cref="IDrawContext.DrawText"/>, for sizing owner-drawn controls.
+        /// Registers a font file bundled with the app (TrueType or OpenType)
+        /// under a family name, for <see cref="TextFormat.FontFamily"/> and
+        /// <see cref="Controls.TextBlock.FontFamily"/>. The file is next to the
+        /// app on Windows, in its assets on Android, and in its bundle on iOS.
         /// </summary>
-        public Size MeasureText(
-            string text,
-            TextFormat textFormat)
+        public void RegisterFont(
+            string familyName,
+            string fileName)
         {
-            if (null == textFormat)
+            if (string.IsNullOrEmpty(familyName))
             {
-                throw new ArgumentNullException(nameof(textFormat));
+                throw new ArgumentException("A family name is required.", nameof(familyName));
             }
 
-            return this.Platform.MeasureText(text ?? string.Empty, textFormat);
+            if (string.IsNullOrEmpty(fileName))
+            {
+                throw new ArgumentException("A file name is required.", nameof(fileName));
+            }
+
+            this.Platform.RegisterFont(familyName, fileName);
         }
 
         /// <summary>

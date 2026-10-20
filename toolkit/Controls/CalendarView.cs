@@ -398,10 +398,10 @@ namespace XForms.Toolkit
             this.SelectedDateChanged?.Invoke(this, date);
         }
 
-        protected override void DrawBackground(
-            IDrawContext drawContext,
-            Rect bounds)
+        protected override void Render(
+            DrawingContext drawContext)
         {
+            var bounds = new Rect(0, 0, this.Bounds.Width, this.Bounds.Height);
             var theme = this.Theme;
             var culture = CultureInfo.CurrentCulture;
             float gridLeft = this.GridLeft;
@@ -501,7 +501,7 @@ namespace XForms.Toolkit
         /// Windows' calendar.
         /// </summary>
         private void DrawArrowButton(
-            IDrawContext drawContext,
+            DrawingContext drawContext,
             Rect bounds,
             int direction,
             bool isEnabled,

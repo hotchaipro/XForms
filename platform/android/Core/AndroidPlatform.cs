@@ -108,11 +108,17 @@ namespace XForms.Android
 
 
 
-        public Size MeasureText(
-            string text,
-            TextFormat textFormat)
+        public ITextLayoutRenderer CreateTextLayout(
+            TextLayout layout)
         {
-            return DrawContext.MeasureText(this._androidApplication.ApplicationContext, text, textFormat);
+            return new TextLayoutRenderer(this._androidApplication.ApplicationContext, layout);
+        }
+
+        public void RegisterFont(
+            string familyName,
+            string fileName)
+        {
+            Fonts.Register(this._androidApplication.ApplicationContext, familyName, fileName);
         }
 
         public void NavigateToUri(

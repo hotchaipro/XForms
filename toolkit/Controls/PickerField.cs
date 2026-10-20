@@ -59,7 +59,7 @@ namespace XForms.Toolkit
         /// <summary>
         /// Draws the glyph at the end of the field, centered in the bounds.
         /// </summary>
-        protected abstract void DrawGlyph(IDrawContext drawContext, Rect bounds, Color color);
+        protected abstract void DrawGlyph(DrawingContext drawContext, Rect bounds, Color color);
 
         protected TextFormat CreateTextFormat()
         {
@@ -74,7 +74,7 @@ namespace XForms.Toolkit
         protected override Size MeasureOverride(
             Size availableSize)
         {
-            float lineHeight = this.Application.MeasureText("Ag", this.CreateTextFormat()).Height;
+            float lineHeight = TextLayout.Measure("Ag", this.CreateTextFormat()).Height;
             float width = TextInset + this.MaximumTextWidth + GlyphWidth;
 
             return new Size(
@@ -82,10 +82,10 @@ namespace XForms.Toolkit
                 Math.Min(lineHeight + (2 * VerticalPadding), availableSize.Height));
         }
 
-        protected override void DrawBackground(
-            IDrawContext drawContext,
-            Rect bounds)
+        protected override void Render(
+            DrawingContext drawContext)
         {
+            var bounds = new Rect(0, 0, this.Bounds.Width, this.Bounds.Height);
             var theme = this.Theme;
 
             drawContext.Clear(Colors.Transparent);
@@ -189,7 +189,7 @@ namespace XForms.Toolkit
         /// Draws a downward chevron centered in the bounds.
         /// </summary>
         protected static void DrawChevronDown(
-            IDrawContext drawContext,
+            DrawingContext drawContext,
             Rect bounds,
             Color color)
         {
@@ -202,7 +202,7 @@ namespace XForms.Toolkit
         /// A frame for a picker's popup: the app's background inside a thin border.
         /// </summary>
         protected internal static void DrawPopupFrame(
-            IDrawContext drawContext,
+            DrawingContext drawContext,
             Rect bounds,
             AppTheme theme)
         {

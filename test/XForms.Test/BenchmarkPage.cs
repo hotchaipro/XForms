@@ -116,7 +116,7 @@ namespace XForms.Test
         }
 
         private static void DrawTile(
-            IDrawContext drawContext,
+            DrawingContext drawContext,
             Rect bounds,
             int number,
             AppTheme theme)
@@ -151,10 +151,10 @@ namespace XForms.Test
                 this.Height = TileSize;
             }
 
-            protected override void DrawBackground(
-                IDrawContext drawContext,
-                Rect bounds)
+            protected override void Render(
+                DrawingContext drawContext)
             {
+                var bounds = new Rect(0, 0, this.Bounds.Width, this.Bounds.Height);
                 drawContext.Clear(Colors.Transparent);
                 DrawTile(drawContext, bounds, this._number, this.Theme);
 
@@ -184,10 +184,10 @@ namespace XForms.Test
                 this.Height = (count / Columns) * (TileSize + TileSpacing);
             }
 
-            protected override void DrawBackground(
-                IDrawContext drawContext,
-                Rect bounds)
+            protected override void Render(
+                DrawingContext drawContext)
             {
+                var bounds = new Rect(0, 0, this.Bounds.Width, this.Bounds.Height);
                 drawContext.Clear(Colors.Transparent);
 
                 // NOTE: Spaced like the per-view layout (tiles centered in their slots)

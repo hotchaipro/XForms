@@ -31,10 +31,10 @@ namespace XForms.Xaml
             }
         }
 
-        protected override void DrawBackground(
-            IDrawContext drawContext,
-            Rect bounds)
+        protected override void Render(
+            DrawingContext drawContext)
         {
+            var bounds = new Rect(0, 0, this.Bounds.Width, this.Bounds.Height);
             drawContext.Clear(Colors.Transparent);
         }
     }
@@ -92,10 +92,10 @@ namespace XForms.Xaml
             this.Content = this._templateRoot;
         }
 
-        protected override void DrawBackground(
-            IDrawContext drawContext,
-            Rect bounds)
+        protected override void Render(
+            DrawingContext drawContext)
         {
+            var bounds = new Rect(0, 0, this.Bounds.Width, this.Bounds.Height);
             drawContext.Clear(Colors.Transparent);
         }
 

@@ -32,12 +32,13 @@ namespace XForms.Android.Renderers
         {
             get
             {
-                return this._nativeTextView.Text;
+                return this._text;
             }
 
             set
             {
-                this._nativeTextView.Text = value ?? String.Empty;
+                this._text = value ?? String.Empty;
+                this.ApplyText();
             }
         }
 
@@ -141,29 +142,75 @@ namespace XForms.Android.Renderers
         {
             get
             {
-                return this._nativeTextView.Typeface.Style.FromAndroidTypefaceStyle();
+                return this._fontStyle;
             }
 
             set
             {
-                // NOTE: Android combines bold and italics into the style
-                var typefaceStyle = this._nativeTextView.Typeface.Style;
-                typefaceStyle &= (~global::Android.Graphics.TypefaceStyle.Italic) | value.ToAndroidTypefaceStyle();
-                this._nativeTextView.SetTypeface(null, typefaceStyle);
+                this._fontStyle = value;
+                this.ApplyTypeface();
             }
         }
+
+        private string _fontFamily;
+        private FontWeight _fontWeight = FontWeight.Normal;
+        private FontStyle _fontStyle = FontStyle.Normal;
+        private string _text = string.Empty;
+        private System.Collections.Generic.IReadOnlyList<TextSpan> _spans;
 
         public FontWeight FontWeight
         {
             get
             {
-                throw new NotImplementedException();
+                return this._fontWeight;
             }
 
             set
             {
-                //throw new NotImplementedException();
+                this._fontWeight = value;
+                this.ApplyTypeface();
             }
+        }
+
+        public string FontFamily
+        {
+            set
+            {
+                this._fontFamily = value;
+                this.ApplyTypeface();
+            }
+        }
+
+        public int MaxLines
+        {
+            set
+            {
+                if (0 < value)
+                {
+                    this._nativeTextView.SetMaxLines(value);
+                    this._nativeTextView.Ellipsize = global::Android.Text.TextUtils.TruncateAt.End;
+                }
+            }
+        }
+
+        public System.Collections.Generic.IReadOnlyList<TextSpan> Spans
+        {
+            set
+            {
+                this._spans = value;
+                this.ApplyText();
+            }
+        }
+
+        private void ApplyTypeface()
+        {
+            this._nativeTextView.Typeface = Fonts.GetTypeface(this._fontFamily, this._fontWeight, this._fontStyle);
+            this.ApplyText();
+        }
+
+        private void ApplyText()
+        {
+            this._nativeTextView.TextFormatted = Fonts.Styled(this._text, this._spans, this._fontFamily, this._fontWeight, this._fontStyle);
         }
 
         public bool Strikethrough

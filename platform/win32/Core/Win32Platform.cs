@@ -52,11 +52,17 @@ namespace XForms.Win32
             Process.Start(new ProcessStartInfo(uri.AbsoluteUri) { UseShellExecute = true });
         }
 
-        public Size MeasureText(
-            string text,
-            TextFormat textFormat)
+        public ITextLayoutRenderer CreateTextLayout(
+            TextLayout layout)
         {
-            return TextResources.MeasureText(text, textFormat.FontSize, textFormat.FontWeight);
+            return new TextLayoutRenderer(layout);
+        }
+
+        public void RegisterFont(
+            string familyName,
+            string fileName)
+        {
+            TextLayouts.RegisterFont(familyName, fileName);
         }
     }
 

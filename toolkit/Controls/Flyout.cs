@@ -66,10 +66,10 @@ namespace XForms.Toolkit
                 }
             }
 
-            protected override void DrawBackground(
-                IDrawContext drawContext,
-                Rect bounds)
+            protected override void Render(
+                DrawingContext drawContext)
             {
+                var bounds = new Rect(0, 0, this.Bounds.Width, this.Bounds.Height);
                 var theme = this.Theme;
                 drawContext.FillRectangle(bounds, theme.BackgroundColor);
                 drawContext.DrawRectangle(

@@ -112,13 +112,13 @@ namespace XForms.Toolkit
             this.Command = null;
         }
 
-        protected override void DrawBackground(
-            IDrawContext drawContext,
-            Rect bounds)
+        protected override void Render(
+            DrawingContext drawContext)
         {
+            var bounds = new Rect(0, 0, this.Bounds.Width, this.Bounds.Height);
             const float Padding = 10.0f;
 
-            base.DrawBackground(drawContext, bounds);
+            base.Render(drawContext);
 
             bounds = bounds.Deflate(Padding, 0);
 
