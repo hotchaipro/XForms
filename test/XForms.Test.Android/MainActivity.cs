@@ -6,9 +6,9 @@ using XForms.Android;
 namespace XForms.Test
 {
     [Activity(
-        Label = "XForms.Test.Android",
+        Label = "XForms Test",
         MainLauncher = true,
-        Icon = "@drawable/Icon")]
+        Icon = "@drawable/icon")]
     public class MainActivity : AndroidApplicationActivity
     {
         private TestApp _app;

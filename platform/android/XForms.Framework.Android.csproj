@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- The XForms framework on Android: native views and ViewGroups -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-android</TargetFramework>
+    <RootNamespace>XForms.Android</RootNamespace>
+    <AssemblyName>XForms.Framework.Android</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\framework\XForms.Framework.csproj" />
+  </ItemGroup>
+
+</Project>

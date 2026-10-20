@@ -22,7 +22,15 @@ namespace XForms.Test
         {
             await ThemeResources.Default.LoadResourcesAsync();
 
-            this.NavigateTo(new DockLayoutPage());
+            // XFORMS_TEST_PAGE picks another page, such as "pickers"
+            if (string.Equals(Environment.GetEnvironmentVariable("XFORMS_TEST_PAGE"), "pickers", StringComparison.OrdinalIgnoreCase))
+            {
+                this.NavigateTo(new PickersPage());
+                return;
+            }
+
+            this.NavigateTo(new TextAndListPage());
+            //this.NavigateTo(new DockLayoutPage());
             //this.NavigateTo(new DistributedStackLayoutPage());
             //this.NavigateTo(new TabbedPage());
             //this.NavigateTo(new MarginPage());

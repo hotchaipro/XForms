@@ -37,8 +37,19 @@ If you're writing an enterprise application where familiarity is the top priorit
 
 If your objective is to create a modern, exciting and unique user interface without having to re-write it for each platform, XForms may be for you.
 
+## Architecture
+
+XForms is a framework that contains all the platform-specific code, plus a
+toolkit of controls built on the framework's public API. Other control
+libraries can be built the same way and run on every platform. See
+[docs/architecture.md](docs/architecture.md).
+
+For how XForms compares with Uno Platform, Avalonia, .NET MAUI, Electron, React
+Native, Flutter and Compose Multiplatform, see
+[docs/comparisons.md](docs/comparisons.md).
+
 ## The current state of affairs:
 
-* Universal Windows: Release quality
-* Android: Alpha quality
-* iOS: Incomplete
+* Windows (Win32, DirectComposition and DirectWrite, no XAML): in development
+* Android: in development
+* iOS: in development (builds; not yet tested on a device)

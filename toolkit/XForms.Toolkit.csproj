@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    The XForms toolkit: cross-platform controls built only on the public
+    framework API, so they look and lay out the same on every platform.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>XForms.Toolkit</RootNamespace>
+    <AssemblyName>XForms.Toolkit</AssemblyName>
+    <IsTrimmable>true</IsTrimmable>
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\framework\XForms.Framework.csproj" />
+  </ItemGroup>
+
+</Project>

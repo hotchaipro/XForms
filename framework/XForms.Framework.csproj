@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    The XForms framework: application hosting, the shared layout engine, input,
+    accessibility, popups, and the native primitives (text, text entry,
+    scrolling, lists, images and the owner-drawn surface). Everything
+    platform-specific is behind this API, implemented by the platform projects.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>XForms</RootNamespace>
+    <AssemblyName>XForms.Framework</AssemblyName>
+    <IsTrimmable>true</IsTrimmable>
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>
+
+  <!-- The platform implementations reach into framework internals; control
+       libraries (such as the toolkit) use only the public API -->
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>XForms.Framework.Android</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>XForms.Framework.iOS</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>XForms.Framework.Win32</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+</Project>

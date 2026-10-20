@@ -1,0 +1,7 @@
+<Project>
+  <!-- Evaluated after each project sets its TargetFramework -->
+  <PropertyGroup>
+    <SupportedOSPlatformVersion Condition="'$(TargetPlatformIdentifier)' == 'ios'">15.0</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion Condition="'$(TargetPlatformIdentifier)' == 'android'">24.0</SupportedOSPlatformVersion>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,630 @@
+using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
+using System.Text;
+using System.Threading;
+using XForms.Win32.Renderers;
+
+namespace XForms.Win32.Automation
+{
+    /// <summary>
+    /// Exposes the XForms view tree to UI Automation (screen readers such as
+    /// Narrator). Views with an accessibility role become automation elements;
+    /// views without one are skipped and their accessible descendants are
+    /// promoted. Native RichEdit text entries expose themselves.
+    /// </summary>
+    internal static class AutomationTree
+    {
+        private static readonly StrategyBasedComWrappers ComWrappers = new StrategyBasedComWrappers();
+        private static readonly ConditionalWeakTable<ViewRenderer, ElementProvider> Elements = new ConditionalWeakTable<ViewRenderer, ElementProvider>();
+        private static int _nextRuntimeId;
+        private static RootProvider _root;
+
+        public static RootProvider Root
+        {
+            get
+            {
+                return _root ??= new RootProvider(Win32Host.Current);
+            }
+        }
+
+        public static ElementProvider GetElement(
+            ViewRenderer renderer)
+        {
+            return Elements.GetValue(renderer, (r) => new ElementProvider(r, Interlocked.Increment(ref _nextRuntimeId)));
+        }
+
+        /// <summary>
+        /// Returns an owned COM pointer to the object's interface.
+        /// </summary>
+        public static nint GetInterface<T>(
+            object provider)
+        {
+            if (null == provider)
+            {
+                return 0;
+            }
+
+            nint unknown = ComWrappers.GetOrCreateComInterfaceForObject(provider, CreateComInterfaceFlags.None);
+            Marshal.QueryInterface(unknown, typeof(T).GUID, out nint result);
+            Marshal.Release(unknown);
+            return result;
+        }
+
+        public static bool IsAccessible(
+            ViewRenderer renderer)
+        {
+            if (!(renderer.Element is View view) || (view.AccessibilityRole == AccessibilityRole.None) || !renderer.IsShownOnScreen)
+            {
+                return false;
+            }
+
+            // A visible RichEdit window describes itself
+            return !((renderer is TextEntryRenderer textEntry) && textEntry.IsEditWindowShown);
+        }
+
+        /// <summary>
+        /// The accessible children of an element (or of the window, for null).
+        /// </summary>
+        public static List<ViewRenderer> GetChildren(
+            ViewRenderer parent)
+        {
+            var children = new List<ViewRenderer>();
+
+            if (null == parent)
+            {
+                // The window holds the page, then any popups above it
+                var host = Win32Host.Current;
+                if (null != host.Root)
+                {
+                    CollectAccessible(host.Root, children);
+                }
+
+                foreach (var overlay in host.Overlays.Overlays)
+                {
+                    CollectAccessible(overlay.Renderer, children);
+                }
+
+                return children;
+            }
+
+            foreach (var child in parent.Children)
+            {
+                CollectAccessible(child, children);
+            }
+
+            return children;
+        }
+
+        private static void CollectAccessible(
+            ViewRenderer renderer,
+            List<ViewRenderer> result)
+        {
+            if (!renderer.IsShownOnScreen)
+            {
+                return;
+            }
+
+            if (IsAccessible(renderer))
+            {
+                result.Add(renderer);
+                return;
+            }
+
+            foreach (var child in renderer.Children)
+            {
+                CollectAccessible(child, result);
+            }
+        }
+
+        /// <summary>
+        /// The nearest accessible ancestor, or null for the window.
+        /// </summary>
+        public static ViewRenderer GetParent(
+            ViewRenderer renderer)
+        {
+            for (var parent = renderer.ParentRenderer; null != parent; parent = parent.ParentRenderer)
+            {
+                if (IsAccessible(parent))
+                {
+                    return parent;
+                }
+            }
+
+            return null;
+        }
+
+        public static ViewRenderer AccessibleAt(
+            Point point)
+        {
+            Win32Host.Current.HitTest(point, out var hit);
+            for (var renderer = hit; null != renderer; renderer = renderer.ParentRenderer)
+            {
+                if (IsAccessible(renderer))
+                {
+                    return renderer;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Tells screen readers that keyboard focus moved to the view.
+        /// </summary>
+        public static void RaiseFocusChanged(
+            ViewRenderer renderer)
+        {
+            if ((null == renderer) || !IsAccessible(renderer) || !UiaNative.UiaClientsAreListening())
+            {
+                return;
+            }
+
+            nint provider = GetInterface<IRawElementProviderSimple>(GetElement(renderer));
+            UiaNative.UiaRaiseAutomationEvent(provider, UiaConstants.AutomationFocusChangedEventId);
+            Marshal.Release(provider);
+        }
+
+        public static nint Navigate(
+            ViewRenderer element,
+            int direction)
+        {
+            switch (direction)
+            {
+                case UiaConstants.Parent:
+                    {
+                        var parent = GetParent(element);
+                        return (null != parent)
+                            ? GetInterface<IRawElementProviderFragment>(GetElement(parent))
+                            : GetInterface<IRawElementProviderFragment>(Root);
+                    }
+
+                case UiaConstants.NextSibling:
+                case UiaConstants.PreviousSibling:
+                    {
+                        var siblings = GetChildren(GetParent(element));
+                        int index = siblings.IndexOf(element) + ((direction == UiaConstants.NextSibling) ? 1 : -1);
+                        return ((index >= 0) && (index < siblings.Count))
+                            ? GetInterface<IRawElementProviderFragment>(GetElement(siblings[index]))
+                            : 0;
+                    }
+
+                case UiaConstants.FirstChild:
+                case UiaConstants.LastChild:
+                    {
+                        var children = GetChildren(element);
+                        if (children.Count == 0)
+                        {
+                            return 0;
+                        }
+
+                        var child = (direction == UiaConstants.FirstChild) ? children[0] : children[children.Count - 1];
+                        return GetInterface<IRawElementProviderFragment>(GetElement(child));
+                    }
+            }
+
+            return 0;
+        }
+
+        /// <summary>
+        /// Whether any of the view shows within its ancestors' bounds, such as a
+        /// list row that is realized just outside the scrolled viewport.
+        /// </summary>
+        public static bool IsOnScreen(
+            ViewRenderer renderer)
+        {
+            var origin = renderer.AbsoluteOrigin();
+            var visible = new Rectangle(origin.X, origin.Y, renderer.Frame.Width, renderer.Frame.Height);
+
+            for (var ancestor = renderer.ParentRenderer; null != ancestor; ancestor = ancestor.ParentRenderer)
+            {
+                var ancestorOrigin = ancestor.AbsoluteOrigin();
+                float left = Math.Max(visible.X, ancestorOrigin.X);
+                float top = Math.Max(visible.Y, ancestorOrigin.Y);
+                float right = Math.Min(visible.X + visible.Width, ancestorOrigin.X + ancestor.Frame.Width);
+                float bottom = Math.Min(visible.Y + visible.Height, ancestorOrigin.Y + ancestor.Frame.Height);
+
+                if ((right <= left) || (bottom <= top))
+                {
+                    return false;
+                }
+
+                visible = new Rectangle(left, top, right - left, bottom - top);
+            }
+
+            return true;
+        }
+
+        public static UiaRect ScreenBounds(
+            Point origin,
+            Size size)
+        {
+            var host = Win32Host.Current;
+            var screen = host.ClientToScreen(origin);
+
+            return new UiaRect()
+            {
+                Left = screen.X,
+                Top = screen.Y,
+                Width = size.Width * host.Scale,
+                Height = size.Height * host.Scale,
+            };
+        }
+    }
+
+    /// <summary>
+    /// An automation element for one accessible view.
+    /// </summary>
+    [GeneratedComClass]
+    internal sealed unsafe partial class ElementProvider : IRawElementProviderSimple, IRawElementProviderFragment, IInvokeProvider
+    {
+        private readonly WeakReference<ViewRenderer> _renderer;
+        private readonly int _runtimeId;
+
+        public ElementProvider(
+            ViewRenderer renderer,
+            int runtimeId)
+        {
+            this._renderer = new WeakReference<ViewRenderer>(renderer);
+            this._runtimeId = runtimeId;
+        }
+
+        private const int E_ELEMENTNOTAVAILABLE = unchecked((int)0x80040201);
+
+        private int OnUIThread(
+            Func<ViewRenderer, int> action)
+        {
+            return Win32Host.Current.InvokeSync(() =>
+            {
+                if (!this._renderer.TryGetTarget(out var renderer))
+                {
+                    return E_ELEMENTNOTAVAILABLE;
+                }
+
+                return action(renderer);
+            });
+        }
+
+        private static int ControlTypeFor(
+            AccessibilityRole role)
+        {
+            switch (role)
+            {
+                case AccessibilityRole.Button: return UiaConstants.ButtonControlTypeId;
+                case AccessibilityRole.ToggleButton: return UiaConstants.CheckBoxControlTypeId;
+                case AccessibilityRole.TabItem: return UiaConstants.TabItemControlTypeId;
+                case AccessibilityRole.List: return UiaConstants.ListControlTypeId;
+                case AccessibilityRole.ListItem: return UiaConstants.ListItemControlTypeId;
+                case AccessibilityRole.Image: return UiaConstants.ImageControlTypeId;
+                case AccessibilityRole.TextEntry: return UiaConstants.EditControlTypeId;
+                case AccessibilityRole.Group: return UiaConstants.GroupControlTypeId;
+                default: return UiaConstants.TextControlTypeId;
+            }
+        }
+
+        private static string NameFor(
+            ViewRenderer renderer)
+        {
+            var view = (View)renderer.Element;
+            string label = view.AccessibilityLabel;
+            if (!string.IsNullOrEmpty(label))
+            {
+                return label;
+            }
+
+            if (view.AccessibilityRole != AccessibilityRole.ListItem)
+            {
+                return string.Empty;
+            }
+
+            // Name a list item by the text inside it
+            var text = new StringBuilder();
+            AppendText(renderer, text);
+            return text.ToString();
+        }
+
+        private static void AppendText(
+            ViewRenderer renderer,
+            StringBuilder text)
+        {
+            foreach (var child in renderer.Children)
+            {
+                if (!child.IsShownOnScreen)
+                {
+                    continue;
+                }
+
+                if ((child.Element is View view) && (view.AccessibilityRole == AccessibilityRole.Text) && !string.IsNullOrEmpty(view.AccessibilityLabel))
+                {
+                    if (text.Length > 0)
+                    {
+                        text.Append(", ");
+                    }
+
+                    text.Append(view.AccessibilityLabel);
+                }
+                else
+                {
+                    AppendText(child, text);
+                }
+            }
+        }
+
+        private static bool IsInvokable(
+            ViewRenderer renderer)
+        {
+            var view = (View)renderer.Element;
+            return view.IsKeyboardFocusable || (view.AccessibilityRole == AccessibilityRole.ListItem);
+        }
+
+        public int GetProviderOptions(out int options)
+        {
+            options = UiaConstants.ServerSideProvider | UiaConstants.UseComThreading;
+            return 0;
+        }
+
+        public int GetPatternProvider(int patternId, out nint provider)
+        {
+            nint result = 0;
+            int hr = this.OnUIThread((renderer) =>
+            {
+                if ((patternId == UiaConstants.InvokePatternId) && IsInvokable(renderer))
+                {
+                    result = AutomationTree.GetInterface<IInvokeProvider>(this);
+                }
+
+                return 0;
+            });
+
+            provider = result;
+            return hr;
+        }
+
+        public int GetPropertyValue(int propertyId, Variant* value)
+        {
+            var result = new Variant();
+            int hr = this.OnUIThread((renderer) =>
+            {
+                var view = (View)renderer.Element;
+
+                switch (propertyId)
+                {
+                    case UiaConstants.ControlTypePropertyId:
+                        result = Variant.FromInt(ControlTypeFor(view.AccessibilityRole));
+                        break;
+
+                    case UiaConstants.NamePropertyId:
+                        result = Variant.FromString(NameFor(renderer));
+                        break;
+
+                    case UiaConstants.IsKeyboardFocusablePropertyId:
+                        result = Variant.FromBool(FocusManager.IsFocusable(renderer));
+                        break;
+
+                    case UiaConstants.HasKeyboardFocusPropertyId:
+                        result = Variant.FromBool(Win32Host.Current.Focus.Focused == renderer);
+                        break;
+
+                    case UiaConstants.IsEnabledPropertyId:
+                        result = Variant.FromBool(renderer.IsInputVisible);
+                        break;
+
+                    case UiaConstants.IsControlElementPropertyId:
+                    case UiaConstants.IsContentElementPropertyId:
+                        result = Variant.FromBool(true);
+                        break;
+
+                    case UiaConstants.IsOffscreenPropertyId:
+                        result = Variant.FromBool(!AutomationTree.IsOnScreen(renderer));
+                        break;
+
+                    case UiaConstants.FrameworkIdPropertyId:
+                        result = Variant.FromString("XForms");
+                        break;
+                }
+
+                return 0;
+            });
+
+            *value = result;
+            return hr;
+        }
+
+        public int GetHostRawElementProvider(out nint provider)
+        {
+            // Only the window's root element is hosted by the window
+            provider = 0;
+            return 0;
+        }
+
+        public int Navigate(int direction, out nint fragment)
+        {
+            nint result = 0;
+            int hr = this.OnUIThread((renderer) =>
+            {
+                result = AutomationTree.Navigate(renderer, direction);
+                return 0;
+            });
+
+            fragment = result;
+            return hr;
+        }
+
+        public int GetRuntimeId(out nint runtimeId)
+        {
+            runtimeId = UiaNative.CreateIntArray(UiaConstants.UiaAppendRuntimeId, this._runtimeId);
+            return 0;
+        }
+
+        public int GetBoundingRectangle(out UiaRect rectangle)
+        {
+            var result = new UiaRect();
+            int hr = this.OnUIThread((renderer) =>
+            {
+                result = AutomationTree.ScreenBounds(renderer.AbsoluteOrigin(), renderer.Frame.Size);
+                return 0;
+            });
+
+            rectangle = result;
+            return hr;
+        }
+
+        public int GetEmbeddedFragmentRoots(out nint roots)
+        {
+            roots = 0;
+            return 0;
+        }
+
+        public int SetFocus()
+        {
+            return this.OnUIThread((renderer) =>
+            {
+                Win32Host.Current.Focus.SetFocus(renderer, showRing: true);
+                return 0;
+            });
+        }
+
+        public int GetFragmentRoot(out nint root)
+        {
+            root = AutomationTree.GetInterface<IRawElementProviderFragmentRoot>(AutomationTree.Root);
+            return 0;
+        }
+
+        public int Invoke()
+        {
+            return this.OnUIThread((renderer) =>
+            {
+                Win32Host.Current.Focus.Activate(renderer);
+                return 0;
+            });
+        }
+    }
+
+    /// <summary>
+    /// The automation element for the window's client area.
+    /// </summary>
+    [GeneratedComClass]
+    internal sealed unsafe partial class RootProvider : IRawElementProviderSimple, IRawElementProviderFragment, IRawElementProviderFragmentRoot
+    {
+        private readonly Win32Host _host;
+
+        public RootProvider(
+            Win32Host host)
+        {
+            this._host = host;
+        }
+
+        public int GetProviderOptions(out int options)
+        {
+            options = UiaConstants.ServerSideProvider | UiaConstants.UseComThreading;
+            return 0;
+        }
+
+        public int GetPatternProvider(int patternId, out nint provider)
+        {
+            provider = 0;
+            return 0;
+        }
+
+        public int GetPropertyValue(int propertyId, Variant* value)
+        {
+            // The window's own (hosting) provider supplies its name and type
+            *value = (propertyId == UiaConstants.FrameworkIdPropertyId) ? Variant.FromString("XForms") : new Variant();
+            return 0;
+        }
+
+        public int GetHostRawElementProvider(out nint provider)
+        {
+            return UiaNative.UiaHostProviderFromHwnd((nint)this._host.Hwnd.Value, out provider);
+        }
+
+        public int Navigate(int direction, out nint fragment)
+        {
+            nint result = 0;
+            this._host.InvokeSync(() =>
+            {
+                if ((direction == UiaConstants.FirstChild) || (direction == UiaConstants.LastChild))
+                {
+                    var children = AutomationTree.GetChildren(null);
+                    if (children.Count > 0)
+                    {
+                        var child = (direction == UiaConstants.FirstChild) ? children[0] : children[children.Count - 1];
+                        result = AutomationTree.GetInterface<IRawElementProviderFragment>(AutomationTree.GetElement(child));
+                    }
+                }
+
+                return 0;
+            });
+
+            fragment = result;
+            return 0;
+        }
+
+        public int GetRuntimeId(out nint runtimeId)
+        {
+            // The window's host provider supplies the root's runtime ID
+            runtimeId = 0;
+            return 0;
+        }
+
+        public int GetBoundingRectangle(out UiaRect rectangle)
+        {
+            // The window's host provider supplies the root's bounds
+            rectangle = new UiaRect();
+            return 0;
+        }
+
+        public int GetEmbeddedFragmentRoots(out nint roots)
+        {
+            roots = 0;
+            return 0;
+        }
+
+        public int SetFocus()
+        {
+            return 0;
+        }
+
+        public int GetFragmentRoot(out nint root)
+        {
+            root = AutomationTree.GetInterface<IRawElementProviderFragmentRoot>(this);
+            return 0;
+        }
+
+        public int ElementProviderFromPoint(double x, double y, out nint fragment)
+        {
+            nint result = 0;
+            this._host.InvokeSync(() =>
+            {
+                var element = AutomationTree.AccessibleAt(this._host.ScreenToClient(x, y));
+                result = (null != element)
+                    ? AutomationTree.GetInterface<IRawElementProviderFragment>(AutomationTree.GetElement(element))
+                    : AutomationTree.GetInterface<IRawElementProviderFragment>(this);
+                return 0;
+            });
+
+            fragment = result;
+            return 0;
+        }
+
+        public int GetFocus(out nint fragment)
+        {
+            nint result = 0;
+            this._host.InvokeSync(() =>
+            {
+                var focused = this._host.Focus.Focused;
+                if ((null != focused) && AutomationTree.IsAccessible(focused))
+                {
+                    result = AutomationTree.GetInterface<IRawElementProviderFragment>(AutomationTree.GetElement(focused));
+                }
+
+                return 0;
+            });
+
+            fragment = result;
+            return 0;
+        }
+    }
+}

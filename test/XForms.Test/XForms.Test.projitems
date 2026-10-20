@@ -13,6 +13,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)MarginPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TabbedPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TestApp.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TextAndListPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PickersPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DockLayoutPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DistributedStackLayoutPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ThemeManager.cs" />
