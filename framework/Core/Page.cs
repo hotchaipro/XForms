@@ -87,6 +87,15 @@ namespace XForms
             }
         }
 
+        // Frames slide pages in and out
+        internal override bool HasFrameworkAnimator
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         internal override void OnRendererCreated()
         {
             base.OnRendererCreated();

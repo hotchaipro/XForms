@@ -12,6 +12,8 @@ namespace XForms.Android.Renderers
         where TNativeElement : AndroidView
     {
         private AndroidView _nativeView;
+        private AnimationLayer[] _layers;
+        private AndroidView _rootView;
 
         public ViewRenderer(
             global::Android.Content.Context context,
@@ -61,7 +63,7 @@ namespace XForms.Android.Renderers
 
             set
             {
-                var nativeView = this._nativeView;
+                var nativeView = this._rootView ?? this._nativeView;
                 if (null != nativeView)
                 {
                     nativeView.Visibility = (value ? global::Android.Views.ViewStates.Visible : global::Android.Views.ViewStates.Gone);
@@ -113,11 +115,21 @@ namespace XForms.Android.Renderers
             // such as ListView lay out their content using the mode of the last
             // measure, not just its size. Android caches measurements per spec,
             // so this costs nothing when the view hasn't changed.
-            nativeView.Measure(
+            // A wrapping animation layer fills itself with the view
+            var rootView = this._rootView ?? nativeView;
+            rootView.Measure(
                 AndroidView.MeasureSpec.MakeMeasureSpec(right - left, MeasureSpecMode.Exactly),
                 AndroidView.MeasureSpec.MakeMeasureSpec(bottom - top, MeasureSpecMode.Exactly));
 
-            nativeView.Layout(left, top, right, bottom);
+            rootView.Layout(left, top, right, bottom);
+
+            if (null != this._layers)
+            {
+                foreach (var layer in this._layers)
+                {
+                    layer.UpdatePivot();
+                }
+            }
         }
 
         public virtual void InvalidateMeasure()
@@ -182,23 +194,6 @@ namespace XForms.Android.Renderers
             }
         }
 
-        public virtual float Opacity
-        {
-            get
-            {
-                return (float)this._nativeView?.Alpha;
-            }
-
-            set
-            {
-                var nativeView = this._nativeView;
-                if (null != nativeView)
-                {
-                    nativeView.Alpha = value;
-                }
-            }
-        }
-
         public virtual Origin Anchor
         {
             get
@@ -228,167 +223,44 @@ namespace XForms.Android.Renderers
             }
         }
 
-        // TODO: Consider changing the type of Scale to Vector2 so the X and Y axes can be scaled independently
-        public virtual float Scale
+        public IAnimationLayer[] CreateAnimationLayers(
+            int count)
+        {
+            var nativeView = this._nativeView;
+            if ((null != this._layers) || (null == nativeView))
+            {
+                throw new InvalidOperationException("The view's animation layers can't be created.");
+            }
+
+            // The innermost layer is the view itself; outer ones are views that
+            // wrap it, each filling the one outside it
+            float density = this.DevicePixelsToPixels(1);
+            var layers = new AnimationLayer[count];
+            layers[count - 1] = new AnimationLayer(nativeView, density);
+
+            AndroidView inner = nativeView;
+            for (int i = count - 2; i >= 0; i -= 1)
+            {
+                var wrapper = new AnimationLayerView(this.NativeContext);
+                wrapper.AddView(inner);
+                layers[i] = new AnimationLayer(wrapper, density);
+                inner = wrapper;
+            }
+
+            if (inner != nativeView)
+            {
+                this._rootView = inner;
+            }
+
+            this._layers = layers;
+            return layers;
+        }
+
+        protected override object RootNativeElement
         {
             get
             {
-                return (float)this._nativeView?.ScaleX;
-            }
-
-            set
-            {
-                var nativeView = this._nativeView;
-                if (null != nativeView)
-                {
-                    nativeView.ScaleX = value;
-                    nativeView.ScaleY = value;
-                }
-            }
-        }
-
-        public virtual Angle Rotation
-        {
-            get
-            {
-                return Angle.FromDegrees((float)this._nativeView?.Rotation);
-            }
-
-            set
-            {
-                var nativeView = this._nativeView;
-                if (null != nativeView)
-                {
-                    nativeView.Rotation = value.Degrees;
-                }
-            }
-        }
-
-        public virtual Point Translation
-        {
-            get
-            {
-                var nativeView = this._nativeView;
-                if (null == nativeView)
-                {
-                    return Point.Zero;
-                }
-
-                return new Point(
-                    this.PixelsToDevicePixels(nativeView.TranslationX),
-                    this.PixelsToDevicePixels(nativeView.TranslationY));
-            }
-
-            set
-            {
-                var nativeView = this._nativeView;
-                if (null != nativeView)
-                {
-                    nativeView.TranslationX = this.DevicePixelsToPixels(value.X);
-                    nativeView.TranslationY = this.DevicePixelsToPixels(value.Y);
-                }
-            }
-        }
-
-        public virtual Task ScaleTo(
-            float scale,
-            TimeSpan duration,
-            EasingFunction ease)
-        {
-            var nativeView = this._nativeView;
-            if (null == nativeView)
-            {
-                return null;
-            }
-
-            var animation = nativeView.Animate();
-            animation.ScaleX(scale);
-            animation.ScaleY(scale);
-            animation.SetDuration((long)duration.TotalMilliseconds);
-            var androidEase = GetAndroidInterpolator(ease);
-            animation.SetInterpolator(androidEase);
-            return RunAnimationAsync(animation);
-        }
-
-        public virtual Task RotateTo(
-            Angle angle,
-            TimeSpan duration,
-            EasingFunction ease)
-        {
-            var nativeView = this._nativeView;
-            if (null == nativeView)
-            {
-                return null;
-            }
-
-            var animation = nativeView.Animate();
-            animation.Rotation(angle.Degrees);
-            animation.SetDuration((long)duration.TotalMilliseconds);
-            var androidEase = GetAndroidInterpolator(ease);
-            animation.SetInterpolator(androidEase);
-            return RunAnimationAsync(animation);
-        }
-
-        public Task TranslateTo(
-            Point point,
-            TimeSpan duration,
-            EasingFunction ease)
-        {
-            var nativeView = this._nativeView;
-            if (null == nativeView)
-            {
-                return null;
-            }
-
-            var animation = nativeView.Animate();
-            animation.TranslationX(this.DevicePixelsToPixels(point.X));
-            animation.TranslationY(this.DevicePixelsToPixels(point.Y));
-            animation.SetDuration((long)duration.TotalMilliseconds);
-            var androidEase = GetAndroidInterpolator(ease);
-            animation.SetInterpolator(androidEase);
-            return RunAnimationAsync(animation);
-        }
-
-        public virtual void StopAnimation()
-        {
-            this._nativeView?.Animation?.Cancel();
-        }
-
-        private global::Android.Animation.ObjectAnimator _spinAnimator;
-
-        public void StartContinuousRotation(
-            TimeSpan period)
-        {
-            this.StopContinuousRotation();
-
-            var nativeView = this._nativeView;
-            if (null == nativeView)
-            {
-                return;
-            }
-
-            // The render thread runs property animations of a hardware layer's rotation
-            var animator = global::Android.Animation.ObjectAnimator.OfFloat(nativeView, "rotation", 0f, 360f);
-            animator.SetDuration((long)period.TotalMilliseconds);
-            animator.RepeatCount = global::Android.Animation.ValueAnimator.Infinite;
-            animator.SetInterpolator(new global::Android.Views.Animations.LinearInterpolator());
-            animator.Start();
-            this._spinAnimator = animator;
-        }
-
-        public void StopContinuousRotation()
-        {
-            var animator = this._spinAnimator;
-            if (null != animator)
-            {
-                this._spinAnimator = null;
-                animator.Cancel();
-                animator.Dispose();
-
-                if (null != this._nativeView)
-                {
-                    this._nativeView.Rotation = 0;
-                }
+                return (object)this._rootView ?? this.NativeElement;
             }
         }
 
@@ -403,120 +275,6 @@ namespace XForms.Android.Renderers
             nativeView.Focusable = true;
             nativeView.FocusableInTouchMode = true;
             return nativeView.RequestFocus();
-        }
-
-        private ITimeInterpolator GetAndroidInterpolator(
-            EasingFunction ease)
-        {
-            ITimeInterpolator androidEase = null;
-
-            if (null != ease)
-            {
-                var cubicEase = ease as CubicEase;
-                var elasticEase = ease as SpringEase;
-
-                if (null != cubicEase)
-                {
-                    if (ease.EasingMode == EasingMode.EaseIn)
-                    {
-                        androidEase = new AccelerateInterpolator(1.5f);
-                    }
-                    else if (ease.EasingMode == EasingMode.EaseOut)
-                    {
-                        androidEase = new DecelerateInterpolator(1.5f);
-                    }
-                    else if (ease.EasingMode == EasingMode.EaseInOut)
-                    {
-                        // TODO: A custom interpolator. This is actually a circular ease, not a cubic ease-in-out
-                        androidEase = new AccelerateDecelerateInterpolator();
-                    }
-                    else
-                    {
-                        throw new NotSupportedException("Unsupported easing mode.");
-                    }
-                }
-                else if (null != elasticEase)
-                {
-                    // TODO: Custom interpolators
-                    if (ease.EasingMode == EasingMode.EaseIn)
-                    {
-                        androidEase = new BounceInterpolator();
-                    }
-                    else if (ease.EasingMode == EasingMode.EaseOut)
-                    {
-                        androidEase = new BounceInterpolator();
-                    }
-                    else if (ease.EasingMode == EasingMode.EaseInOut)
-                    {
-                        androidEase = new BounceInterpolator();
-                    }
-                    else
-                    {
-                        throw new NotSupportedException("Unsupported easing mode.");
-                    }
-                }
-                else
-                {
-                    throw new NotSupportedException("Unsupported easing function.");
-                }
-            }
-
-            return androidEase;
-        }
-
-        private sealed class AsyncAnimatorListener : Java.Lang.Object, global::Android.Animation.Animator.IAnimatorListener
-        {
-            private TaskCompletionSource<object> _tcs;
-
-            public AsyncAnimatorListener()
-            {
-                this._tcs = new TaskCompletionSource<object>();
-            }
-
-            public Task Task
-            {
-                get
-                {
-                    return this._tcs.Task;
-                }
-            }
-
-            public void OnAnimationCancel(
-                global::Android.Animation.Animator animation)
-            {
-                this._tcs.SetCanceled();
-            }
-
-            public void OnAnimationEnd(
-                global::Android.Animation.Animator animation)
-            {
-                this._tcs.TrySetResult(null);
-            }
-
-            public void OnAnimationRepeat(
-                global::Android.Animation.Animator animation)
-            {
-            }
-
-            public void OnAnimationStart(
-                global::Android.Animation.Animator animation)
-            {
-            }
-        }
-
-        private static Task RunAnimationAsync(
-            ViewPropertyAnimator animator)
-        {
-            if (null == animator)
-            {
-                throw new ArgumentNullException(nameof(animator));
-            }
-
-            AsyncAnimatorListener listener = new AsyncAnimatorListener();
-            animator.SetListener(listener);
-            animator.Start();
-
-            return listener.Task;
         }
 
         protected override void OnNativeElementSet(

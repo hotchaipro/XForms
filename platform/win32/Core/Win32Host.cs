@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -285,7 +285,7 @@ namespace XForms.Win32
             ViewRenderer root)
         {
             this._root = root;
-            this._target->SetRoot((IDCompositionVisual*)root.Visual);
+            this._target->SetRoot((IDCompositionVisual*)root.RootVisual);
             this.RequestLayout();
         }
 

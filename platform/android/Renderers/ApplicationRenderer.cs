@@ -147,6 +147,31 @@ namespace XForms.Android.Renderers
             }
         }
 
+        public void RequestFrame(
+            Action<TimeSpan> onFrame)
+        {
+            // The UI thread's choreographer calls back as the next frame starts
+            global::Android.Views.Choreographer.Instance.PostFrameCallback(new FrameCallback(onFrame));
+        }
+
+        private sealed class FrameCallback : Java.Lang.Object, global::Android.Views.Choreographer.IFrameCallback
+        {
+            private readonly Action<TimeSpan> _onFrame;
+
+            public FrameCallback(
+                Action<TimeSpan> onFrame)
+            {
+                this._onFrame = onFrame;
+            }
+
+            public void DoFrame(
+                long frameTimeNanos)
+            {
+                this._onFrame(TimeSpan.FromTicks(frameTimeNanos / 100));
+                this.Dispose();
+            }
+        }
+
         public Version GetVersion()
         {
             Version version = new Version(0, 0);

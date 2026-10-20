@@ -99,6 +99,19 @@ namespace XForms.iOS.Renderers
             }
         }
 
+        public void RequestFrame(
+            Action<TimeSpan> onFrame)
+        {
+            // A display link fires once, as the next frame starts
+            CoreAnimation.CADisplayLink link = null;
+            link = CoreAnimation.CADisplayLink.Create(() =>
+            {
+                link.Invalidate();
+                onFrame(TimeSpan.FromSeconds(link.Timestamp));
+            });
+            link.AddToRunLoop(Foundation.NSRunLoop.Main, Foundation.NSRunLoopMode.Common);
+        }
+
         public Version GetVersion()
         {
             var versionString = Foundation.NSBundle.MainBundle.ObjectForInfoDictionary("CFBundleShortVersionString")?.ToString();

@@ -95,7 +95,7 @@ namespace XForms.Win32
             var previousFocus = this._previousFocus[index];
             this._overlays.RemoveAt(index);
             this._previousFocus.RemoveAt(index);
-            this._visual->RemoveVisual((IDCompositionVisual*)overlay.Renderer.Visual);
+            this._visual->RemoveVisual((IDCompositionVisual*)overlay.Renderer.RootVisual);
             this._host.RequestCommit();
 
             // Return keyboard focus to where it was before the popup opened

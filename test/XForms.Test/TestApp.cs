@@ -60,6 +60,10 @@ namespace XForms.Test
                     this.NavigateTo(new PanelsPage());
                     return;
 
+                case "animation":
+                    this.NavigateTo(new AnimationPage());
+                    return;
+
                 case "xaml":
                     this.NavigateTo(new XamlPage());
                     return;

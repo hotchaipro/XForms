@@ -613,7 +613,7 @@ from. Where XForms keeps its own name, the reason is in
 | (new) | `Animator` | HotChai.Game, Jetpack Compose (`graphicsLayer`) | Render properties (translation, scale, rotation, opacity, clip, transform origin), set directly or animated |
 | (new) | `View.Animator` | | The app's animator for a view: `init`-only, null by default |
 | (new) | `Control.CreateOwnAnimator()` | | Protected: a control's own animator for its content, kept in a private field; nested inside the app's |
-| `Task` returned by animations | `AnimationHandle` | HotChai.Game | Can be awaited or cancelled; an interrupted animation never completes |
+| `Task` returned by animations | `AnimationHandle` | HotChai.Game | Can be awaited or cancelled; completes with `true` when the animation finishes and `false` when it's stopped or replaced |
 | `Timer` | `DispatcherTimer` | WPF, WinUI, Avalonia | No priorities |
 | `PointerInputEvent` | `PointerEventArgs` | Avalonia | With pointer ID, position, button and modifier state |
 | `KeyInputEvent` | `KeyEventArgs` | WPF, Avalonia | `Key` stays |
@@ -642,7 +642,8 @@ from. Where XForms keeps its own name, the reason is in
 | `View.ScaleTo`, `RotateTo`, `TranslateTo` | `Animator.ScaleTo`, `RotateTo` and `TranslateTo` (and their `From` forms), plus `FadeTo` and `RevealTo` | HotChai.Game; MAUI (method names) |
 | `View.StartContinuousRotation`, `StopContinuousRotation` | A looping `RotateFrom(0°, 360°, period, loop: true)` on the control's own animator, and cancelling its handle | HotChai.Game |
 | `View.StopAnimation()` | `Animator.Stop()`, or cancelling a handle | HotChai.Game |
-| (new) | `Animator.TranslateFrom(oldOffset, zero)` for layout transitions, used by transition panels | HotChai.Game (`MoveTo`) |
+| (new) | `Panel.ChildTransitions` (a `LayoutTransition`): moved children slide from their old positions and added ones fade in | WinUI (`ChildrenTransitions`), Android (`LayoutTransition`) |
+| (new) | `Application.RequestAnimationFrame` | Browsers (`requestAnimationFrame`) | A one-time callback before the display's next frame, for redrawing every frame |
 | `View.AccessibilityLabel` | Keep | SwiftUI, Flutter, React Native |
 | `UserControl.DrawBackground(IDrawContext, Rectangle)` | `Control.Render(DrawingContext)` | Avalonia |
 | `UserControl.Invalidate()` | `InvalidateVisual()` | WPF, Avalonia |
@@ -741,7 +742,7 @@ today:
 | Render transforms (translate, scale, rotate) | Partly: views have translation, scale and rotation today, but no transform origin or clip. They move to the `Animator`, so a XAML element with a render transform is created with one |
 | Routed events: bubbling, pointer capture, and an input filter to build tunneling on | No: input bubbles, but capture and the filter aren't public |
 | Hit-testing non-rectangular shapes | No: no hit-test override |
-| Storyboards | Partly. Animations of translation, scale, rotation, opacity and clip would map to `Animator` channels, which don't exist yet. Animations of layout properties aren't supported, by design. |
+| Storyboards | Partly. Animations of translation, scale, rotation, opacity and clip map to `Animator` channels. Animations of layout properties aren't supported, by design. |
 | Rich text: inlines and font families | No |
 | Automation peers: states, values and patterns | No: only a role and a label |
 
@@ -837,7 +838,7 @@ All three success criteria hold:
 | No rounded rectangles | `CornerRadius` is accepted but drawn square | 2, **done**: `FillRoundedRectangle` and `DrawRoundedRectangle` |
 | No visual states (pressed, pointer over) | The button dims its template root while pressed | 4 (pointer events), toolkit |
 | `TextEntry` raises no event when its text changes | None: two-way bindings behave as one-way | 3, **done**: `TextBox.TextChanged`, and views raise `PropertyChanged`; the spike's `TwoWay` bindings work |
-| No opacity animation, and no frame callback | Opacity is stepped on the UI thread by a timer; translation uses `TranslateTo` | 6 |
+| No opacity animation, and no frame callback | Opacity is stepped on the UI thread by a timer; translation uses `TranslateTo` | 6, **done**: `FadeTo` and `Application.RequestAnimationFrame` |
 | No loaded or attached event | The storyboard starts in a UI-thread callback queued from the page's constructor | 1, **new**: `Attached` and `Detached` events, which come with creating renderers at attach |
 | `XForms.Timer` hides `System.Threading.Timer` in any file that uses `XForms` | Fully qualified name | 1, **new**: rename it to `DispatcherTimer` |
 | The primitives look different on each platform: `Control.BackgroundColor` is painted behind owner-drawn controls on Android but not on Win32, the default text color is black on Win32 and Android's gray, and `TextEntry`'s background is white on Win32 and gray on Android | Owner-drawn spike elements report a transparent background | 2, **done**: the spike's workarounds are gone |
@@ -1151,6 +1152,57 @@ Neither changed the order of the phases. Both added items, which are below.
      a child created without one) and animates layout changes with
      `TranslateFrom` and `RevealFrom`.
    - Add a per-frame callback for controls that redraw every frame.
+
+   **Status: done.**
+   - **`Animator`:**
+     - It holds ten channels: translation, scale and rotation, opacity, and
+       a clip's four edges, around a transform origin. Reading a value
+       during an animation gives where it is now.
+     - `To` and `From` methods (`TranslateTo`, `ScaleFrom`, `RotateFrom`,
+       `FadeTo`, `RevealTo`, `RevealFrom` and so on) take an easing, a delay,
+       looping and auto-reverse.
+     - They return an `AnimationHandle`. It can be awaited (`true` when the
+       animation finishes, `false` when it's stopped or replaced) or
+       cancelled, and it completes on the UI thread.
+     - Setting a value stops that channel's animation.
+     - `EasingFunction` gained `Ease(t)`, so platforms can sample any curve.
+       `SpringEase` is a real spring, and there's a linear easing.
+   - **Layers:**
+     - Each animator gets its own native layer when the view is attached,
+       through `IViewRenderer.CreateAnimationLayers`. The app's (or the
+       framework's) is outermost, and a control's own are inside it.
+     - The animation members are gone from `IViewRenderer`.
+     - Win32: a composition visual per layer, with a translate, scale and
+       rotate transform group, opacity and a rectangle clip. Easing curves
+       become cubic segments that the compositor plays.
+     - Android: the view itself is the innermost layer, and outer layers
+       are wrapper views. Animations are property animators with the easing
+       sampled into a table. The clip is the view's outline (`ClipBounds`
+       didn't clip).
+     - iOS: the view's layer, with wrapper views for outer layers, and
+       keyframe animations of the layer's transform, opacity and a mask.
+   - **Pages** get a framework animator for frame transitions.
+   - **Layout transitions:** `Panel.ChildTransitions` (a `LayoutTransition`)
+     slides children that move from their old positions and fades added
+     ones in. Its children get framework animators when they're attached.
+     This replaces the planned transition panel: any panel can animate its
+     layout.
+   - **Frame callback:** `Application.RequestAnimationFrame` calls back
+     once before the next frame. It uses `DwmFlush` on Win32, `Choreographer`
+     on Android and `CADisplayLink` on iOS.
+   - **Toolkit:** `ProgressRing` spins with a looping `RotateFrom`, and
+     continuations of animations use the handle's `Completion`.
+   - **Verified** on Win32 and Android (animation test page): looping,
+     nested animators, a spring, a reveal, an interrupted move, layout
+     transitions and the frame callback. SoonerOrLater runs unchanged on
+     Android, including swipes and its undo button. iOS is only built.
+   - **Not done:**
+     - The framework's popups, scrolled content and list rows don't get
+       animators yet; list rows come with phase 9.
+     - Win32's frame callback waits for each frame on a pool thread, which
+       sometimes misses one (about 48 frames per second on a 60 Hz
+       display).
+     - Hit testing on Win32 follows translation, but not scale or rotation.
 7. **Lightweight controls.** After the Animator, since it decides which views
    have layers.
    - Draw owner-drawn controls, `Border`, panels and `TextBlock` into their

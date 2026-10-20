@@ -19,6 +19,12 @@ namespace XForms
 
         void InvokeOnUIThreadAsync(Action action);
 
+        /// <summary>
+        /// Calls back once, on the UI thread, when the display is about to show
+        /// its next frame, with the frame's time.
+        /// </summary>
+        void RequestFrame(Action<TimeSpan> onFrame);
+
         void Exit();
 
         void ApplyTheme(AppTheme theme);
@@ -304,6 +310,42 @@ namespace XForms
             }
 
             this.Renderer.InvokeOnUIThreadAsync(action);
+        }
+
+        private List<Action<TimeSpan>> _frameCallbacks = new List<Action<TimeSpan>>();
+
+        /// <summary>
+        /// Calls the callback once, on the UI thread, before the display's next
+        /// frame, with the frame's time (as a browser's
+        /// <c>requestAnimationFrame</c>). Request again from the callback to run
+        /// every frame, for animations the compositor can't play, such as
+        /// redrawing an owner-drawn view.
+        /// </summary>
+        public void RequestAnimationFrame(
+            Action<TimeSpan> callback)
+        {
+            if (null == callback)
+            {
+                throw new ArgumentNullException(nameof(callback));
+            }
+
+            this._frameCallbacks.Add(callback);
+            if (1 == this._frameCallbacks.Count)
+            {
+                this.Renderer.RequestFrame(this.OnFrame);
+            }
+        }
+
+        private void OnFrame(
+            TimeSpan frameTime)
+        {
+            // Callbacks requested from these run on the next frame
+            var callbacks = this._frameCallbacks;
+            this._frameCallbacks = new List<Action<TimeSpan>>();
+            foreach (var callback in callbacks)
+            {
+                callback(frameTime);
+            }
         }
 
         /// <summary>

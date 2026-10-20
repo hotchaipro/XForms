@@ -56,6 +56,18 @@ namespace XForms.Android.Renderers
         {
             get
             {
+                return this.RootNativeElement;
+            }
+        }
+
+        /// <summary>
+        /// The native object a parent adds: the native element, or a view
+        /// wrapping it.
+        /// </summary>
+        protected virtual object RootNativeElement
+        {
+            get
+            {
                 return this._nativeElement;
             }
         }

@@ -476,7 +476,7 @@ namespace XForms.Toolkit
             }
 
             this._contentLayout.Animator.TranslateTo(new Point(direction * this.Bounds.Size.Width, 0), TimeSpan.FromMilliseconds(100), new CubicEase(EasingMode.EaseInOut));
-            this._swipeItem.Animator.TranslateTo(new Point(0, 0), TimeSpan.FromMilliseconds(100), new CubicEase(EasingMode.EaseInOut)).ContinueWith((ignore) =>
+            this._swipeItem.Animator.TranslateTo(new Point(0, 0), TimeSpan.FromMilliseconds(100), new CubicEase(EasingMode.EaseInOut)).Completion.ContinueWith((ignore) =>
             {
                 Application.InvokeOnUIThreadAsync(() =>
                 {
@@ -498,7 +498,7 @@ namespace XForms.Toolkit
 
             this._contentLayout.Animator.TranslateTo(Point.Zero, TimeSpan.FromMilliseconds(100), new CubicEase(EasingMode.EaseInOut));
             this._swipeItem.Animator.TranslateTo(
-                new Point(-direction * this.Bounds.Size.Width, 0), TimeSpan.FromMilliseconds(100), new CubicEase(EasingMode.EaseInOut)).ContinueWith(
+                new Point(-direction * this.Bounds.Size.Width, 0), TimeSpan.FromMilliseconds(100), new CubicEase(EasingMode.EaseInOut)).Completion.ContinueWith(
                 (ignore) => { this._swipeItem.Animator.Translation = new XForms.Point(-1000, 0); }, TaskContinuationOptions.ExecuteSynchronously);
         }
 

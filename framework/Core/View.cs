@@ -43,30 +43,13 @@ namespace XForms
         /// </summary>
         bool ClipToBounds { set; }
 
-        float Opacity { get; set; }
-
-        float Scale { get; set; }
-
-        Task ScaleTo(float scale, TimeSpan duration, EasingFunction ease);
-
-        Angle Rotation { get; set; }
-
-        Task RotateTo(Angle angle, TimeSpan duration, EasingFunction ease);
-
-        Point Translation { get; set; }
-
-        Task TranslateTo(Point point, TimeSpan duration, EasingFunction ease);
-
-        void StopAnimation();
-
         /// <summary>
-        /// Spins the view continuously, one turn per period, on the platform's
-        /// compositor or animation thread (so it keeps turning while the UI
-        /// thread is busy).
+        /// Creates the view's animation layers, one per animator, outermost
+        /// first: each wraps the next, and the innermost wraps the view's own
+        /// content and children. Called once, when the native view is created,
+        /// and only for views with animators.
         /// </summary>
-        void StartContinuousRotation(TimeSpan period);
-
-        void StopContinuousRotation();
+        IAnimationLayer[] CreateAnimationLayers(int count);
 
         /// <summary>
         /// Moves keyboard focus to the view. Returns false where the platform
@@ -167,14 +150,53 @@ namespace XForms
                 native.ClipToBounds = true;
             }
 
-            this._animator?.OnRendererCreated();
+            this.CreateAnimationLayers(native);
+        }
+
+        // One native layer per animator: the app's (or the framework's) outside,
+        // the control's own inside it
+        private void CreateAnimationLayers(
+            IViewRenderer native)
+        {
+            if ((null == this._animator) && this.HasFrameworkAnimator)
+            {
+                this._animator = new Animator();
+                this._animator.Attach(this);
+            }
+
+            var animators = new List<Animator>();
+            if (null != this._animator)
+            {
+                animators.Add(this._animator);
+            }
 
             if (null != this._ownAnimators)
             {
-                foreach (var animator in this._ownAnimators)
-                {
-                    animator.OnRendererCreated();
-                }
+                animators.AddRange(this._ownAnimators);
+            }
+
+            if (0 == animators.Count)
+            {
+                return;
+            }
+
+            var layers = native.CreateAnimationLayers(animators.Count);
+            for (int i = 0; i < animators.Count; i += 1)
+            {
+                animators[i].Bind(layers[i]);
+            }
+        }
+
+        /// <summary>
+        /// Whether the framework animates the view (pages, for transitions, and
+        /// children of panels with layout transitions), so it needs an animator
+        /// layer even when the app gives it no animator.
+        /// </summary>
+        internal virtual bool HasFrameworkAnimator
+        {
+            get
+            {
+                return (this.Parent is Panel panel) && (null != panel.ChildTransitions);
             }
         }
 
@@ -356,6 +378,10 @@ namespace XForms
         {
             if (null == this._animator)
             {
+                if (this.HasRenderer)
+                {
+                    throw new InvalidOperationException("The view was attached without an animator; give it one when it's created, or override HasFrameworkAnimator.");
+                }
                 var animator = new Animator();
                 animator.Attach(this);
                 this._animator = animator;

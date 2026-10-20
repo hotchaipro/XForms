@@ -133,7 +133,7 @@ namespace XForms
                     // Current page animates out of the frame
                     var currentAnimator = currentPage.GetOrCreateAnimator();
                     currentAnimator.Translation = XForms.Point.Zero;
-                    currentAnimator.TranslateTo(new XForms.Point(-this.Bounds.Size.Width, 0), TimeSpan.FromMilliseconds(150), new CubicEase(EasingMode.EaseOut)).ContinueWith(
+                    currentAnimator.TranslateTo(new XForms.Point(-this.Bounds.Size.Width, 0), TimeSpan.FromMilliseconds(150), new CubicEase(EasingMode.EaseOut)).Completion.ContinueWith(
                         (task) => this.Application.InvokeOnUIThreadAsync(() => { currentPage.IsVisible = false; }));
                 }
                 else
@@ -156,7 +156,7 @@ namespace XForms
                 var newAnimator = newPage.GetOrCreateAnimator();
                 newAnimator.Translation = new XForms.Point(-this.Bounds.Size.Width, 0);
                 newPage.IsVisible = true;
-                newAnimator.TranslateTo(XForms.Point.Zero, TimeSpan.FromMilliseconds(150), new CubicEase(EasingMode.EaseIn)).ContinueWith(
+                newAnimator.TranslateTo(XForms.Point.Zero, TimeSpan.FromMilliseconds(150), new CubicEase(EasingMode.EaseIn)).Completion.ContinueWith(
                         (task) => this.Application.InvokeOnUIThreadAsync(() => { if (null != currentPage) currentPage.IsVisible = false; }));
             }
 

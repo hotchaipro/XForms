@@ -111,6 +111,18 @@ namespace XForms.Win32
             }
         }
 
+        public void RequestFrame(
+            Action<TimeSpan> onFrame)
+        {
+            // Wait for the compositor's next frame off the UI thread
+            System.Threading.Tasks.Task.Run(() =>
+            {
+                PInvoke.DwmFlush();
+                var now = TimeSpan.FromSeconds(System.Diagnostics.Stopwatch.GetTimestamp() / (double)System.Diagnostics.Stopwatch.Frequency);
+                this._host.Post(() => onFrame(now));
+            });
+        }
+
         public void Exit()
         {
             PInvoke.PostQuitMessage(0);

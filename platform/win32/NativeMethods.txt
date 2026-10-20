@@ -102,6 +102,7 @@ ID2D1StrokeStyle
 D2D1_ARC_SEGMENT
 D2D1_STROKE_STYLE_PROPERTIES
 IDCompositionRotateTransform
+IDCompositionTranslateTransform
 DWRITE_TEXT_METRICS
 ID2D1LinearGradientBrush
 ID2D1GradientStopCollection
@@ -122,3 +123,4 @@ IDWriteLocalizedStrings
 IDWriteInlineObject
 DWRITE_TRIMMING
 DWRITE_LINE_METRICS
+DwmFlush

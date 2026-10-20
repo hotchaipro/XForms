@@ -43,11 +43,13 @@ namespace XForms.Toolkit
 
                 if (value)
                 {
-                    this._ownAnimator.StartContinuousRotation(RevolutionPeriod);
+                    // One turn per period, until stopped
+                    this._ownAnimator.RotateFrom(Angle.Zero, Angle.FromDegrees(360), RevolutionPeriod, loop: true);
                 }
                 else
                 {
-                    this._ownAnimator.StopContinuousRotation();
+                    this._ownAnimator.Stop();
+                    this._ownAnimator.Rotation = Angle.Zero;
                 }
             }
         }

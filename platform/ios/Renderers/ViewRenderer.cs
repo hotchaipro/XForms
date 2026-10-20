@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using CoreGraphics;
 using UIKit;
 
@@ -9,6 +8,8 @@ namespace XForms.iOS.Renderers
         where TNativeElement : UIView
     {
         private UIView _nativeView;
+        private AnimationLayer[] _layers;
+        private UIView _rootView;
 
         public ViewRenderer(
             View view)
@@ -45,7 +46,7 @@ namespace XForms.iOS.Renderers
 
             set
             {
-                var nativeView = this._nativeView;
+                var nativeView = this._rootView ?? this._nativeView;
                 if (null != nativeView)
                 {
                     nativeView.Hidden = !value;
@@ -85,17 +86,34 @@ namespace XForms.iOS.Renderers
                 return;
             }
 
+            // A wrapping animation layer is placed at the frame; the views
+            // inside it fill it
+            Place(this._rootView ?? nativeView, frame);
+            if (null != this._rootView)
+            {
+                var inner = new Rect(0, 0, frame.Width, frame.Height);
+                for (int i = 1; i < this._layers.Length; i += 1)
+                {
+                    Place(this._layers[i].View, inner);
+                }
+            }
+        }
+
+        private static void Place(
+            UIView view,
+            Rect frame)
+        {
             // NOTE: Set the bounds and center rather than the frame, which is
             // undefined while the view has a transform (scale, rotation)
             var size = new CGSize(frame.Width, frame.Height);
-            var bounds = nativeView.Bounds;
+            var bounds = view.Bounds;
             if (bounds.Size != size)
             {
-                nativeView.Bounds = new CGRect(bounds.Location, size);
+                view.Bounds = new CGRect(bounds.Location, size);
             }
 
-            var anchor = nativeView.Layer.AnchorPoint;
-            nativeView.Center = new CGPoint(
+            var anchor = view.Layer.AnchorPoint;
+            view.Center = new CGPoint(
                 frame.X + (anchor.X * frame.Width),
                 frame.Y + (anchor.Y * frame.Height));
         }
@@ -141,23 +159,6 @@ namespace XForms.iOS.Renderers
             }
         }
 
-        public virtual float Opacity
-        {
-            get
-            {
-                return (float)this._nativeView?.Alpha;
-            }
-
-            set
-            {
-                var nativeView = this._nativeView;
-                if (null != nativeView)
-                {
-                    nativeView.Alpha = value;
-                }
-            }
-        }
-
         public virtual Origin Anchor
         {
             get
@@ -181,199 +182,44 @@ namespace XForms.iOS.Renderers
             }
         }
 
-        private void UpdateTransform()
+        public IAnimationLayer[] CreateAnimationLayers(
+            int count)
         {
-            var transform = CGAffineTransform.MakeIdentity();
-            transform.Scale(this._scale, this._scale);
-            transform.Rotate(this._rotation.Radians);
-            transform.Translate(this._translation.X, this._translation.Y);
-            this._nativeView.Transform = transform;
+            var nativeView = this._nativeView;
+            if ((null != this._layers) || (null == nativeView))
+            {
+                throw new InvalidOperationException("The view's animation layers can't be created.");
+            }
+
+            // The innermost layer is the view itself; outer ones are views that
+            // wrap it, each filling the one outside it
+            var layers = new AnimationLayer[count];
+            layers[count - 1] = new AnimationLayer(nativeView);
+
+            UIView inner = nativeView;
+            for (int i = count - 2; i >= 0; i -= 1)
+            {
+                var wrapper = new UIView();
+                wrapper.AddSubview(inner);
+                layers[i] = new AnimationLayer(wrapper);
+                inner = wrapper;
+            }
+
+            if (inner != nativeView)
+            {
+                this._rootView = inner;
+            }
+
+            this._layers = layers;
+            return layers;
         }
 
-        // TODO: Consider changing the type of Scale to Vector2 so the X and Y axes can be scaled independently
-        private float _scale = 1.0f;
-        public virtual float Scale
+        protected override object RootNativeElement
         {
             get
             {
-                return this._scale;
+                return (object)this._rootView ?? this.NativeElement;
             }
-
-            set
-            {
-                this._scale = value;
-                UpdateTransform();
-            }
-        }
-
-        private Angle _rotation = Angle.Zero;
-        public virtual Angle Rotation
-        {
-            get
-            {
-                return this._rotation;
-            }
-
-            set
-            {
-                this._rotation = value;
-                UpdateTransform();
-            }
-        }
-
-        private Point _translation = Point.Zero;
-        public virtual Point Translation
-        {
-            get
-            {
-                return this._translation;
-            }
-
-            set
-            {
-                this._translation = value;
-                UpdateTransform();
-            }
-        }
-
-        private UIViewAnimationOptions GetAnimationCurve(
-            EasingFunction ease)
-        {
-            UIViewAnimationOptions curve;
-
-            if (null == ease)
-            {
-                curve = UIViewAnimationOptions.CurveLinear;
-            }
-            else
-            {
-                var cubicEase = ease as CubicEase;
-                var elasticEase = ease as SpringEase;
-
-                if (null != cubicEase)
-                {
-                    if (ease.EasingMode == EasingMode.EaseIn)
-                    {
-                        curve = UIViewAnimationOptions.CurveEaseIn;
-                    }
-                    else if (ease.EasingMode == EasingMode.EaseOut)
-                    {
-                        curve = UIViewAnimationOptions.CurveEaseOut;
-                    }
-                    else if (ease.EasingMode == EasingMode.EaseInOut)
-                    {
-                        curve = UIViewAnimationOptions.CurveEaseInOut;
-                    }
-                    else
-                    {
-                        throw new NotSupportedException("Unsupported easing mode.");
-                    }
-                }
-                else if (null != elasticEase)
-                {
-                    // TODO: Custom interpolators
-
-                    if (ease.EasingMode == EasingMode.EaseIn)
-                    {
-                        curve = UIViewAnimationOptions.CurveEaseIn;
-                    }
-                    else if (ease.EasingMode == EasingMode.EaseOut)
-                    {
-                        curve = UIViewAnimationOptions.CurveEaseOut;
-                    }
-                    else if (ease.EasingMode == EasingMode.EaseInOut)
-                    {
-                        curve = UIViewAnimationOptions.CurveEaseInOut;
-                    }
-                    else
-                    {
-                        throw new NotSupportedException("Unsupported easing mode.");
-                    }
-                }
-                else
-                {
-                    throw new NotSupportedException("Unsupported easing function.");
-                }
-            }
-
-            return curve;
-        }
-
-        public virtual Task ScaleTo(
-            float scale,
-            TimeSpan duration,
-            EasingFunction ease)
-        {
-            var tcs = new TaskCompletionSource<object>();
-
-            UIView.Animate(
-                duration.TotalSeconds,
-                0,
-                GetAnimationCurve(ease),
-                () => { this.Scale = scale; },
-                () => { tcs.TrySetResult(null); });
-
-            return tcs.Task;
-        }
-
-        public virtual Task RotateTo(
-            Angle angle,
-            TimeSpan duration,
-            EasingFunction ease)
-        {
-            var tcs = new TaskCompletionSource<object>();
-
-            UIView.Animate(
-                duration.TotalSeconds,
-                0,
-                GetAnimationCurve(ease),
-                () => { this.Rotation = angle; },
-                () => { tcs.TrySetResult(null); });
-
-            return tcs.Task;
-        }
-
-        public Task TranslateTo(
-            Point point,
-            TimeSpan duration,
-            EasingFunction ease)
-        {
-            var tcs = new TaskCompletionSource<object>();
-
-            UIView.Animate(
-                duration.TotalSeconds,
-                0,
-                GetAnimationCurve(ease),
-                () => { this.Translation = point; },
-                () => { tcs.TrySetResult(null); });
-
-            return tcs.Task;
-        }
-
-        private const string SpinAnimationKey = "xforms.spin";
-
-        public void StartContinuousRotation(
-            TimeSpan period)
-        {
-            var layer = this._nativeView?.Layer;
-            if (null == layer)
-            {
-                return;
-            }
-
-            // Core Animation runs this in the render server, off the UI thread
-            var animation = CoreAnimation.CABasicAnimation.FromKeyPath("transform.rotation.z");
-            animation.From = Foundation.NSNumber.FromDouble(0);
-            animation.To = Foundation.NSNumber.FromDouble(2 * Math.PI);
-            animation.Duration = period.TotalSeconds;
-            animation.RepeatCount = float.PositiveInfinity;
-            animation.RemovedOnCompletion = false;
-            layer.AddAnimation(animation, SpinAnimationKey);
-        }
-
-        public void StopContinuousRotation()
-        {
-            this._nativeView?.Layer.RemoveAnimation(SpinAnimationKey);
         }
 
         public bool Focus()
@@ -381,11 +227,6 @@ namespace XForms.iOS.Renderers
             // NOTE: Only native views that can become first responder take focus
             // (owner-drawn and layout views do when their view is focusable)
             return this._nativeView?.BecomeFirstResponder() ?? false;
-        }
-
-        public virtual void StopAnimation()
-        {
-            this._nativeView.Layer.RemoveAllAnimations();
         }
 
         protected override void OnNativeElementSet(

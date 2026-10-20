@@ -194,25 +194,32 @@ their own glyphs (chevrons, calendar icons) with lines and shapes rather
 than icon fonts, which differ between platforms.
 
 Animation goes through an `Animator`, which holds a view's translation,
-scale, rotation and opacity. These don't affect layout. A view has no
-animator unless it's given one when it's created:
+scale, rotation, opacity and clip, around a transform origin. These don't
+affect layout. A view has no animator unless it's given one when it's
+created:
 - the app's, through the `init`-only `View.Animator`
   (`new ProgressRing { Animator = new() }`);
 - a control's own, private ones, from `Control.CreateOwnAnimator()` in its
   constructor.
 
-The framework gives its own animated views (pages) an animator. The
-animators' `ScaleTo`, `RotateTo` and `TranslateTo`, and
-`StartContinuousRotation`, run on the platform's compositor or animation
-thread:
-- Win32: DirectComposition.
-- Android: a property animator.
-- iOS: Core Animation.
+The framework gives its own animated views an animator: pages, and the
+children of panels with `ChildTransitions`. Each animator has its own
+native layer, nested: the app's outside, a control's own inside it, with
+the view's content and children innermost. The animators' `To` and `From`
+methods (translate, scale, rotate, fade, reveal) run on the platform's
+compositor or animation thread:
+- Win32: a DirectComposition visual per layer, with its transforms, opacity
+  and clip animated by the compositor.
+- Android: the view and wrapper views, animated by property animators.
+- iOS: Core Animation keyframe animations.
+
+Each returns an `AnimationHandle`, which can be awaited for whether the
+animation finished or was interrupted. `Application.RequestAnimationFrame`
+calls back before the display's next frame, for drawing that changes every
+frame.
 
 The toolkit's `ProgressRing` is an arc drawn once and spun by its own
-animator. For now every animator of a view drives the view's one native
-object. Nested layers per animator are planned (see
-[alignment.md](alignment.md)).
+animator.
 
 ## Input
 
