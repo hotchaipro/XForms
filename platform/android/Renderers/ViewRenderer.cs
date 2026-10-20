@@ -90,7 +90,7 @@ namespace XForms.Android.Renderers
         }
 
         public virtual void ArrangeNative(
-            Rectangle frame)
+            Rect frame)
         {
             var nativeView = this._nativeView;
             if (null == nativeView)
@@ -104,6 +104,11 @@ namespace XForms.Android.Renderers
             int right = (int)Math.Round(this.DevicePixelsToPixels(frame.X + frame.Width));
             int bottom = (int)Math.Round(this.DevicePixelsToPixels(frame.Y + frame.Height));
 
+            // Never lose a pixel to edge rounding: a view arranged at exactly its
+            // measured size (text in particular) would otherwise wrap or clip
+            right = Math.Max(right, left + (int)Math.Ceiling(this.DevicePixelsToPixels(frame.Width) - 0.01f));
+            bottom = Math.Max(bottom, top + (int)Math.Ceiling(this.DevicePixelsToPixels(frame.Height) - 0.01f));
+
             // NOTE: Always finish with an exact measure at the final size: views
             // such as ListView lay out their content using the mode of the last
             // measure, not just its size. Android caches measurements per spec,
@@ -115,7 +120,7 @@ namespace XForms.Android.Renderers
             nativeView.Layout(left, top, right, bottom);
         }
 
-        public virtual void InvalidateLayout()
+        public virtual void InvalidateMeasure()
         {
             this._nativeView?.RequestLayout();
         }
@@ -436,7 +441,7 @@ namespace XForms.Android.Renderers
             return androidEase;
         }
 
-        private sealed class AsyncAnimatorListener : Java.Lang.Object, Animator.IAnimatorListener
+        private sealed class AsyncAnimatorListener : Java.Lang.Object, global::Android.Animation.Animator.IAnimatorListener
         {
             private TaskCompletionSource<object> _tcs;
 
@@ -454,24 +459,24 @@ namespace XForms.Android.Renderers
             }
 
             public void OnAnimationCancel(
-                Animator animation)
+                global::Android.Animation.Animator animation)
             {
                 this._tcs.SetCanceled();
             }
 
             public void OnAnimationEnd(
-                Animator animation)
+                global::Android.Animation.Animator animation)
             {
                 this._tcs.TrySetResult(null);
             }
 
             public void OnAnimationRepeat(
-                Animator animation)
+                global::Android.Animation.Animator animation)
             {
             }
 
             public void OnAnimationStart(
-                Animator animation)
+                global::Android.Animation.Animator animation)
             {
             }
         }
@@ -521,7 +526,7 @@ namespace XForms.Android.Renderers
         {
             bool result = false;
 
-            if (this.IsInputVisible)
+            if (this.IsHitTestVisible)
             {
                 var control = this.ViewDelegate;
                 if (null != control)
@@ -573,7 +578,7 @@ namespace XForms.Android.Renderers
                             this.PixelsToDevicePixels(motionEvent.GetX()),
                             this.PixelsToDevicePixels(motionEvent.GetY()));
 
-                        var pointerEvent = new PointerInputEvent(contactPoint, pointerState, isInContact);
+                        var pointerEvent = new PointerEventArgs(contactPoint, pointerState, isInContact);
 
                         result = control.HandlePointerEvent(pointerEvent);
 
@@ -605,7 +610,7 @@ namespace XForms.Android.Renderers
             this.NativeElement?.Parent?.RequestDisallowInterceptTouchEvent(false);
         }
 
-        public virtual bool IsInputVisible
+        public virtual bool IsHitTestVisible
         {
             get
             {

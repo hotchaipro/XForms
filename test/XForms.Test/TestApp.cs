@@ -11,6 +11,18 @@ namespace XForms.Test
         {
         }
 
+        /// <summary>
+        /// The page to start on: "pickers", "xaml", "benchmark-views" or
+        /// "benchmark-drawn" (otherwise the text and list page). Set by each
+        /// platform's entry point, for example from an environment variable or
+        /// an intent extra.
+        /// </summary>
+        public static string StartPage
+        {
+            get;
+            set;
+        }
+
         protected override void OnStart()
         {
             base.OnStart();
@@ -22,11 +34,23 @@ namespace XForms.Test
         {
             await ThemeResources.Default.LoadResourcesAsync();
 
-            // XFORMS_TEST_PAGE picks another page, such as "pickers"
-            if (string.Equals(Environment.GetEnvironmentVariable("XFORMS_TEST_PAGE"), "pickers", StringComparison.OrdinalIgnoreCase))
+            switch (StartPage?.ToLowerInvariant())
             {
-                this.NavigateTo(new PickersPage());
-                return;
+                case "pickers":
+                    this.NavigateTo(new PickersPage());
+                    return;
+
+                case "benchmark-views":
+                    this.NavigateTo(new BenchmarkPage(drawAsOneView: false));
+                    return;
+
+                case "xaml":
+                    this.NavigateTo(new XamlPage());
+                    return;
+
+                case "benchmark-drawn":
+                    this.NavigateTo(new BenchmarkPage(drawAsOneView: true));
+                    return;
             }
 
             this.NavigateTo(new TextAndListPage());

@@ -19,7 +19,7 @@ namespace XForms.Toolkit
 
         protected PickerField()
         {
-            this.IsKeyboardFocusable = true;
+            this.Focusable = true;
         }
 
         protected override AccessibilityRole DefaultAccessibilityRole
@@ -59,15 +59,15 @@ namespace XForms.Toolkit
         /// <summary>
         /// Draws the glyph at the end of the field, centered in the bounds.
         /// </summary>
-        protected abstract void DrawGlyph(IDrawContext drawContext, Rectangle bounds, Color color);
+        protected abstract void DrawGlyph(IDrawContext drawContext, Rect bounds, Color color);
 
         protected TextFormat CreateTextFormat()
         {
             return new TextFormat()
             {
                 FontSize = FontSize,
-                HorizontalAlignment = LayoutAlignment.Start,
-                VerticalAlignment = LayoutAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center,
             };
         }
 
@@ -84,7 +84,7 @@ namespace XForms.Toolkit
 
         protected override void DrawBackground(
             IDrawContext drawContext,
-            Rectangle bounds)
+            Rect bounds)
         {
             var theme = this.Theme;
 
@@ -95,14 +95,14 @@ namespace XForms.Toolkit
                 drawContext.FillRectangle(bounds, theme.ForegroundColor.MultiplyAlpha(0.08f));
             }
 
-            var textBounds = new Rectangle(TextInset, 0, Math.Max(0, bounds.Width - TextInset - GlyphWidth), bounds.Height);
+            var textBounds = new Rect(TextInset, 0, Math.Max(0, bounds.Width - TextInset - GlyphWidth), bounds.Height);
             drawContext.DrawText(
                 this.DisplayText,
                 textBounds,
                 this.IsPlaceholder ? theme.SubtleForegroundColor : theme.ForegroundColor,
                 this.CreateTextFormat());
 
-            this.DrawGlyph(drawContext, new Rectangle(bounds.Width - GlyphWidth, 0, GlyphWidth, bounds.Height), theme.SubtleForegroundColor);
+            this.DrawGlyph(drawContext, new Rect(bounds.Width - GlyphWidth, 0, GlyphWidth, bounds.Height), theme.SubtleForegroundColor);
         }
 
         protected override void OnApplyTheme(
@@ -110,11 +110,11 @@ namespace XForms.Toolkit
         {
             base.OnApplyTheme(theme);
 
-            this.Invalidate();
+            this.InvalidateVisual();
         }
 
         public override bool HandlePointerEvent(
-            PointerInputEvent pointerInputEvent)
+            PointerEventArgs pointerInputEvent)
         {
             if (base.HandlePointerEvent(pointerInputEvent))
             {
@@ -131,7 +131,7 @@ namespace XForms.Toolkit
                     {
                         this.SetPressed(false);
                         var point = pointerInputEvent.Point;
-                        if ((point.X >= 0) && (point.Y >= 0) && (point.X < this.Frame.Width) && (point.Y < this.Frame.Height))
+                        if ((point.X >= 0) && (point.Y >= 0) && (point.X < this.Bounds.Width) && (point.Y < this.Bounds.Height))
                         {
                             this.OpenPicker();
                         }
@@ -154,7 +154,7 @@ namespace XForms.Toolkit
             if (isPressed != this._isPressed)
             {
                 this._isPressed = isPressed;
-                this.Invalidate();
+                this.InvalidateVisual();
             }
         }
 
@@ -164,7 +164,7 @@ namespace XForms.Toolkit
         }
 
         protected override bool OnKeyDown(
-            KeyInputEvent keyInputEvent)
+            KeyEventArgs keyInputEvent)
         {
             if ((keyInputEvent.Key == Key.F4) || (keyInputEvent.IsAltDown && (keyInputEvent.Key == Key.Down)))
             {
@@ -177,7 +177,7 @@ namespace XForms.Toolkit
 
         protected override void OnFocusChanged()
         {
-            this.Invalidate();
+            this.InvalidateVisual();
         }
 
         /// <summary>
@@ -185,7 +185,7 @@ namespace XForms.Toolkit
         /// </summary>
         protected static void DrawChevronDown(
             IDrawContext drawContext,
-            Rectangle bounds,
+            Rect bounds,
             Color color)
         {
             var center = bounds.Center;
@@ -198,7 +198,7 @@ namespace XForms.Toolkit
         /// </summary>
         protected internal static void DrawPopupFrame(
             IDrawContext drawContext,
-            Rectangle bounds,
+            Rect bounds,
             AppTheme theme)
         {
             drawContext.FillRectangle(bounds, theme.BackgroundColor);

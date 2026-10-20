@@ -20,6 +20,9 @@ namespace XForms.Test
 
             if (null == this._app)
             {
+                // An intent extra picks another page: adb shell am start ... --es page benchmark-views
+                TestApp.StartPage = this.Intent?.GetStringExtra("page");
+
                 var platform = new AndroidPlatform(this);
                 this._app = new TestApp(platform);
             }

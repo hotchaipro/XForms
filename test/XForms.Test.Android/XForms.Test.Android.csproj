@@ -22,6 +22,7 @@
     <ProjectReference Include="..\..\framework\XForms.Framework.csproj" />
     <ProjectReference Include="..\..\platform\android\XForms.Framework.Android.csproj" />
     <ProjectReference Include="..\..\toolkit\XForms.Toolkit.csproj" />
+    <ProjectReference Include="..\..\spikes\XForms.Xaml\XForms.Xaml.csproj" />
   </ItemGroup>
 
 </Project>

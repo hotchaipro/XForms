@@ -82,15 +82,18 @@ namespace XForms
 
         private Dictionary<IAttachedProperty, object> _properties;
 
+        private IElementRenderer _renderer;
+
         protected Element()
         {
             this._properties = new Dictionary<IAttachedProperty, object>();
-            this.Renderer = this.CreateRenderer();
 
             // TODO: Use a weak delegate
             Application.Current.ThemeChanged += Application_ThemeChanged;
 
-            this.OnLoaded();
+            // NOTE: The theme is applied before any derived constructor runs, so
+            // values set by constructors and initializers take precedence. No
+            // native object exists yet: it's created when the element is attached.
             this.OnApplyTheme(Application.Current.Theme);
         }
 
@@ -110,10 +113,63 @@ namespace XForms
             }
         }
 
-        public virtual IElementRenderer Renderer
+        /// <summary>
+        /// The element's native object, created the first time it's needed: when
+        /// the element is attached to a parent (or shown). Every constructor and
+        /// object initializer has run by then.
+        /// </summary>
+        internal IElementRenderer Renderer
         {
-            get;
-            private set;
+            get
+            {
+                if (null == this._renderer)
+                {
+                    this.CreateRendererNow();
+                }
+
+                return this._renderer;
+            }
+        }
+
+        /// <summary>
+        /// The native object if it has been created, or null. Property setters
+        /// push values to it; until it exists, the element keeps them.
+        /// </summary>
+        internal IElementRenderer CreatedRenderer
+        {
+            get
+            {
+                return this._renderer;
+            }
+        }
+
+        /// <summary>
+        /// Whether the element's native object has been created, which happens
+        /// when it's first attached.
+        /// </summary>
+        internal bool HasRenderer
+        {
+            get
+            {
+                return (null != this._renderer);
+            }
+        }
+
+        private void CreateRendererNow()
+        {
+            var renderer = this.CreateRenderer();
+            this._renderer = renderer;
+
+            renderer.OnApplyTheme(this.Theme);
+            this.OnRendererCreated();
+        }
+
+        /// <summary>
+        /// Called once the native object exists, to push the values the element
+        /// kept until then.
+        /// </summary>
+        internal virtual void OnRendererCreated()
+        {
         }
 
         public object BindingContext
@@ -150,7 +206,12 @@ namespace XForms
         public bool HasDescendant(
             Element element)
         {
-            return this.Renderer.HasDescendant(element);
+            if (element == this)
+            {
+                return true;
+            }
+
+            return this._renderer?.HasDescendant(element) ?? false;
         }
 
         private void SetProperty(
@@ -175,10 +236,6 @@ namespace XForms
 
         internal abstract IEnumerable<Element> GetChildElements();
 
-        protected virtual void OnLoaded()
-        {
-        }
-
         private void Application_ThemeChanged(
             object sender,
             AppTheme theme)
@@ -189,7 +246,7 @@ namespace XForms
         protected virtual void OnApplyTheme(
             AppTheme theme)
         {
-            this.Renderer.OnApplyTheme(theme);
+            this._renderer?.OnApplyTheme(theme);
         }
     }
 }

@@ -8,12 +8,12 @@ namespace XForms
             Color color);
 
         void DrawRectangle(
-            Rectangle rectangle,
+            Rect rectangle,
             Color color,
             float strokeWidth = 1.0f);
 
         void FillRectangle(
-            Rectangle rectangle,
+            Rect rectangle,
             Color color);
 
         void DrawEllipse(
@@ -30,17 +30,17 @@ namespace XForms
             Color color);
 
         void FillEllipse(
-            Rectangle rectangle,
+            Rect rectangle,
             Color color);
 
         void FillEllipseShadow(
-            Rectangle rectangle,
+            Rect rectangle,
             Color color,
             float blurAmount = 8.0f);
 
         void DrawImage(
             Bitmap bitmap,
-            Rectangle destinationRectangle,
+            Rect destinationRectangle,
             Color tint);
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace XForms
 
         void DrawText(
             string text,
-            Rectangle bounds,
+            Rect bounds,
             Color color,
             TextFormat textFormat);
     }

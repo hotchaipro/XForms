@@ -51,7 +51,7 @@ namespace XForms.Android
                 float height = NativeConversions.PixelsToDevicePixels(this.Context, bottom - top - this.PaddingTop - this.PaddingBottom);
 
                 // Content smaller than the viewport still fills it
-                content.Arrange(new Rectangle(0, 0, Math.Max(0, width), Math.Max(content.DesiredSize.Height, height)));
+                content.Arrange(new Rect(0, 0, Math.Max(0, width), Math.Max(content.DesiredSize.Height, height)));
             }
 
             // The ScrollView keeps its scroll position within the content's new extent

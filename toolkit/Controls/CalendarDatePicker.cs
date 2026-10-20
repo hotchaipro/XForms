@@ -11,7 +11,7 @@ namespace XForms.Toolkit
     {
         private DateTime? _selectedDate;
         private Popup _popup;
-        private CalendarControl _calendar;
+        private CalendarView _calendar;
 
         public CalendarDatePicker()
         {
@@ -29,7 +29,7 @@ namespace XForms.Toolkit
             set
             {
                 this._selectedDate = value?.Date;
-                this.Invalidate();
+                this.InvalidateVisual();
             }
         }
 
@@ -90,11 +90,11 @@ namespace XForms.Toolkit
         /// </summary>
         protected override void DrawGlyph(
             IDrawContext drawContext,
-            Rectangle bounds,
+            Rect bounds,
             Color color)
         {
             var center = bounds.Center;
-            var page = new Rectangle(center.X - 7, center.Y - 5.5f, 14, 12);
+            var page = new Rect(center.X - 7, center.Y - 5.5f, 14, 12);
             drawContext.DrawRectangle(page, color, 1.0f);
             drawContext.DrawLine(new Point(page.X, page.Y + 3.5f), new Point(page.Right, page.Y + 3.5f), color, 1.0f);
             drawContext.DrawLine(new Point(page.X + 3.5f, page.Y - 2), new Point(page.X + 3.5f, page.Y + 1), color, 1.0f);
@@ -105,7 +105,7 @@ namespace XForms.Toolkit
         {
             if (null == this._popup)
             {
-                this._calendar = new CalendarControl();
+                this._calendar = new CalendarView();
                 this._calendar.SelectedDateChanged += this.Calendar_SelectedDateChanged;
 
                 this._popup = new Popup()
@@ -149,7 +149,7 @@ namespace XForms.Toolkit
         private sealed class CalendarFrame : UserControl
         {
             public CalendarFrame(
-                CalendarControl calendar)
+                CalendarView calendar)
             {
                 calendar.Margin = new Thickness(PopupBorderThickness);
                 this.Content = calendar;
@@ -157,7 +157,7 @@ namespace XForms.Toolkit
 
             protected override void DrawBackground(
                 IDrawContext drawContext,
-                Rectangle bounds)
+                Rect bounds)
             {
                 drawContext.Clear(Colors.Transparent);
                 DrawPopupFrame(drawContext, bounds, this.Theme);

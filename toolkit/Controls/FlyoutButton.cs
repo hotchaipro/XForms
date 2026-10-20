@@ -12,7 +12,7 @@ namespace XForms.Toolkit
         public event EventHandler Expanding;
         public event EventHandler Collapsing;
 
-        private DockLayout _layout;
+        private DockPanel _layout;
         private InnerButton _innerButton;
 
         private bool _isExpanded;
@@ -23,16 +23,16 @@ namespace XForms.Toolkit
         {
             this._innerButton = new InnerButton(this)
             {
-                HorizontalAlignment = LayoutAlignment.Fill,
-                VerticalAlignment = LayoutAlignment.Fill,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Stretch,
             };
 
-            this._layout = new DockLayout();
+            this._layout = new DockPanel();
             //this._layout.IsClippedToBounds = false;
 
             this._layout.Children.Add(
                 this._innerButton,
-                DockRegion.CenterOverlay);
+                Dock.CenterOverlay);
 
             this.Content = this._layout;
         }
@@ -75,7 +75,7 @@ namespace XForms.Toolkit
             }
 
             // Start the buttons out at half size
-            button.Scale = 0.5f;
+            button.FlyoutAnimator.Scale = 0.5f;
 
             this._layout.Children.Insert(0, button);
 
@@ -108,8 +108,8 @@ namespace XForms.Toolkit
             this.IsLightDismissEnabled = true;
 
             // Rotate and scale the button to the pressed position
-            var nowait = this._innerButton.RotateTo(Angle.FromDegrees(90), TimeSpan.FromMilliseconds(250), new CubicEase(EasingMode.EaseOut));
-            nowait = this._innerButton.ScaleTo(0.75f, TimeSpan.FromMilliseconds(250), new CubicEase(EasingMode.EaseOut));
+            var nowait = this._innerButton.FlyoutAnimator.RotateTo(Angle.FromDegrees(90), TimeSpan.FromMilliseconds(250), new CubicEase(EasingMode.EaseOut));
+            nowait = this._innerButton.FlyoutAnimator.ScaleTo(0.75f, TimeSpan.FromMilliseconds(250), new CubicEase(EasingMode.EaseOut));
 
             for (int i = 0; i < this._layout.Children.Count - 1; i += 1)
             {
@@ -122,13 +122,13 @@ namespace XForms.Toolkit
                 button.IsEnabled = true;
 
                 // Start the buttons out at half size
-                button.Scale = 0.5f;
+                button.FlyoutAnimator.Scale = 0.5f;
 
                 // HACK: Redraw button to workaround drawing issue
-                button.Invalidate();
+                button.InvalidateVisual();
 
                 // Scale the buttons up to full size
-                nowait = button.ScaleTo(1.0f, TimeSpan.FromMilliseconds(250), new CubicEase(EasingMode.EaseOut));
+                nowait = button.FlyoutAnimator.ScaleTo(1.0f, TimeSpan.FromMilliseconds(250), new CubicEase(EasingMode.EaseOut));
 
                 // Spread the buttons out on an arc
                 // TODO: Handle more than 3 buttons
@@ -144,9 +144,9 @@ namespace XForms.Toolkit
                         angle = 15 + ((float)i * (60 / (float)(this._buttonCount - 1)));
                     }
                 }
-                float distance = ((button.Size.Width + this._innerButton.Size.Width) / 2) + 15;
+                float distance = ((button.Bounds.Size.Width + this._innerButton.Bounds.Size.Width) / 2) + 15;
                 var point = Point.Translate(new Point(0, 0), Angle.FromDegrees(angle), -distance);
-                nowait = button.TranslateTo(point, TimeSpan.FromMilliseconds(250), new CubicEase(EasingMode.EaseOut));
+                nowait = button.FlyoutAnimator.TranslateTo(point, TimeSpan.FromMilliseconds(250), new CubicEase(EasingMode.EaseOut));
 
                 // CONSIDER: Morph the color from white to accent
                 //this._innerButton.Animate(String.Empty, (value) => { this._innerButton.BackgroundColor = Color.FromRgb(0, 0, 0); }, length: AnimationLengthMs, easing: Easing.CubicOut);
@@ -173,8 +173,8 @@ namespace XForms.Toolkit
             this._isExpanded = false;
 
             // Unrotate and scale the button back to the collapsed state
-            var nowait = this._innerButton.RotateTo(Angle.FromDegrees(0), TimeSpan.FromMilliseconds(250), new SpringEase(EasingMode.EaseIn));
-            nowait = this._innerButton.ScaleTo(1.0f, TimeSpan.FromMilliseconds(250), new SpringEase(EasingMode.EaseIn));
+            var nowait = this._innerButton.FlyoutAnimator.RotateTo(Angle.FromDegrees(0), TimeSpan.FromMilliseconds(250), new SpringEase(EasingMode.EaseIn));
+            nowait = this._innerButton.FlyoutAnimator.ScaleTo(1.0f, TimeSpan.FromMilliseconds(250), new SpringEase(EasingMode.EaseIn));
 
             var animationTasks = new List<Task>();
 
@@ -189,8 +189,8 @@ namespace XForms.Toolkit
                 button.IsEnabled = false;
 
                 // Move and scale the buttons back to the collapsed position
-                nowait = button.TranslateTo(new Point(0, 0), TimeSpan.FromMilliseconds(250), new SpringEase(EasingMode.EaseIn));
-                nowait = button.ScaleTo(0.5f, TimeSpan.FromMilliseconds(250), new SpringEase(EasingMode.EaseIn));
+                nowait = button.FlyoutAnimator.TranslateTo(new Point(0, 0), TimeSpan.FromMilliseconds(250), new SpringEase(EasingMode.EaseIn));
+                nowait = button.FlyoutAnimator.ScaleTo(0.5f, TimeSpan.FromMilliseconds(250), new SpringEase(EasingMode.EaseIn));
             }
             this.Collapsing?.Invoke(this, EventArgs.Empty);
 

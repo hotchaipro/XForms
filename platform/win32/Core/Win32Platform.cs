@@ -24,9 +24,9 @@ namespace XForms.Win32
 
         public IPageRenderer CreatePageRenderer(Page page) => new PageRenderer(page);
 
-        public ILayoutRenderer CreateLayoutRenderer(Layout layout) => new LayoutRenderer(layout);
+        public IPanelRenderer CreatePanelRenderer(Panel layout) => new PanelRenderer(layout);
 
-        public ITextViewRenderer CreateLabelRenderer(TextView label) => new TextViewRenderer(label);
+        public ITextBlockRenderer CreateTextBlockRenderer(TextBlock label) => new TextBlockRenderer(label);
 
         public IContentControlRenderer CreateContentControlRenderer(ContentControl customControl) => new ContentControlRenderer(customControl);
 
@@ -36,13 +36,13 @@ namespace XForms.Win32
 
         public IListViewRenderer CreateListViewRenderer(ListView listView) => new ListViewRenderer(listView);
 
-        public ITextEntryRenderer CreateTextEntryRenderer(TextEntry textEntry) => new TextEntryRenderer(textEntry);
+        public ITextBoxRenderer CreateTextBoxRenderer(TextBox textEntry) => new TextBoxRenderer(textEntry);
 
         public IUserControlRenderer CreateUserControlRenderer(UserControl userControl) => new UserControlRenderer(userControl);
 
         public IImageRenderer CreateImageRenderer(Image image) => new ImageRenderer(image);
 
-        public IScrollViewRenderer CreateScrollViewRenderer(ScrollView scrollView) => new ScrollViewRenderer(scrollView);
+        public IScrollViewerRenderer CreateScrollViewerRenderer(ScrollViewer scrollView) => new ScrollViewerRenderer(scrollView);
 
         public IPopupRenderer CreatePopupRenderer(Popup popup) => new PopupRenderer(popup);
 

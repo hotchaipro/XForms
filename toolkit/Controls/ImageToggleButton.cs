@@ -1,5 +1,5 @@
 ﻿using System;
-using XForms.Input;
+using XForms.Input;
 using XForms.Controls;
 
 namespace XForms.Toolkit
@@ -52,13 +52,13 @@ namespace XForms.Toolkit
                 {
                     this._isChecked = value;
 
-                    this.Invalidate();
+                    this.InvalidateVisual();
 
                     this.IsCheckedChanged?.Invoke(this, new ToggledEventArgs(value));
                 }
                 else
                 {
-                    this.Invalidate();
+                    this.InvalidateVisual();
                 }
             }
         }
@@ -74,7 +74,7 @@ namespace XForms.Toolkit
             {
                 this._checkedIcon = value;
 
-                this.Invalidate();
+                this.InvalidateVisual();
             }
         }
 
@@ -89,7 +89,7 @@ namespace XForms.Toolkit
             {
                 this._uncheckedIcon = value;
 
-                this.Invalidate();
+                this.InvalidateVisual();
             }
         }
 
@@ -104,7 +104,7 @@ namespace XForms.Toolkit
             {
                 this._iconSize = value;
 
-                this.Invalidate();
+                this.InvalidateVisual();
             }
         }
 
@@ -119,21 +119,21 @@ namespace XForms.Toolkit
             {
                 this._tintColor = value;
 
-                this.Invalidate();
+                this.InvalidateVisual();
             }
         }
 
         protected override void DrawBackground(
             IDrawContext drawContext,
-            Rectangle bounds)
+            Rect bounds)
         {
             base.DrawBackground(drawContext, bounds);
 
-            Rectangle iconBounds = bounds;
+            Rect iconBounds = bounds;
             if (this._iconSize.HasValue)
             {
                 Size iconSize = this._iconSize.Value;
-                iconBounds = new Rectangle(
+                iconBounds = new Rect(
                     bounds.Left + ((bounds.Width - iconSize.Width) / 2),
                     bounds.Top + ((bounds.Height - iconSize.Height) / 2),
                     iconSize.Width,

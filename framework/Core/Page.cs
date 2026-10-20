@@ -5,19 +5,20 @@ namespace XForms
 {
     public interface IPageDelegate
     {
-        bool HandlePointerEvent(PointerInputEvent pointerInputEvent);
+        bool HandlePointerEvent(PointerEventArgs pointerInputEvent);
     }
 
     public interface IPageRenderer : IViewRenderer
     {
-        void SetLayout(ILayoutRenderer layoutRenderer);
+        void SetLayout(IPanelRenderer layoutRenderer);
 
         Color BackgroundColor { get; set; }
     }
 
     public class Page : View, IPageDelegate
     {
-        private Layout _layout;
+        private Panel _layout;
+        private Color _backgroundColor;
 
         public Page()
         {
@@ -28,11 +29,11 @@ namespace XForms
         {
 #if !DEBUG_LAYOUT
             // Need an opaque background to support overlapping page animations
-            this.Renderer.BackgroundColor = theme.BackgroundColor;
+            this.BackgroundColor = theme.BackgroundColor;
 #endif
         }
 
-        public new IPageRenderer Renderer
+        internal new IPageRenderer Renderer
         {
             get
             {
@@ -40,20 +41,29 @@ namespace XForms
             }
         }
 
+        private IPageRenderer Native
+        {
+            get
+            {
+                return (IPageRenderer)this.CreatedRenderer;
+            }
+        }
+
         public Color BackgroundColor
         {
             get
             {
-                return this.Renderer.BackgroundColor;
+                return this._backgroundColor;
             }
 
             set
             {
-                this.Renderer.BackgroundColor = value;
+                this._backgroundColor = value;
+                this.Native?.BackgroundColor = value;
             }
         }
 
-        public Layout Layout
+        public Panel Content
         {
             get
             {
@@ -69,8 +79,29 @@ namespace XForms
 
                 this._layout = value;
 
-                this.Renderer.SetLayout(value.Renderer);
-                this.InvalidateLayout();
+                var native = this.Native;
+                if (null != native)
+                {
+                    native.SetLayout((IPanelRenderer)value.AttachTo(this));
+                    value.NotifyAttached();
+                }
+
+                this.InvalidateMeasure();
+            }
+        }
+
+        internal override void OnRendererCreated()
+        {
+            base.OnRendererCreated();
+
+            var native = this.Native;
+            native.BackgroundColor = this._backgroundColor;
+
+            var layout = this._layout;
+            if (null != layout)
+            {
+                native.SetLayout((IPanelRenderer)layout.AttachTo(this));
+                layout.NotifyAttached();
             }
         }
 
@@ -96,7 +127,7 @@ namespace XForms
         }
 
         public override bool HandlePointerEvent(
-            PointerInputEvent pointerInputEvent)
+            PointerEventArgs pointerInputEvent)
         {
             return this.Application.HandlePreviewInput(this, pointerInputEvent);
         }
@@ -117,7 +148,7 @@ namespace XForms
         protected override void ArrangeOverride(
             Size finalSize)
         {
-            this._layout?.Arrange(new Rectangle(0, 0, finalSize.Width, finalSize.Height));
+            this._layout?.Arrange(new Rect(0, 0, finalSize.Width, finalSize.Height));
         }
 
         internal override IEnumerable<Element> GetChildElements()

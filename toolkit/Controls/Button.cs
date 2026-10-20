@@ -1,11 +1,14 @@
 ﻿using System;
-using XForms.Input;
+using XForms.Input;
 using XForms.Controls;
 
 namespace XForms.Toolkit
 {
     public class Button : UserControl, ITapGestureDelegate
     {
+        // Animates the control itself (press feedback, spinning)
+        private readonly Animator _ownAnimator;
+
         protected override AccessibilityRole DefaultAccessibilityRole
         {
             get
@@ -33,11 +36,13 @@ namespace XForms.Toolkit
 
         public Button()
         {
+            this._ownAnimator = this.CreateOwnAnimator();
+
             this._textFormat = new TextFormat()
             {
                 FontSize = 14.0f,
-                HorizontalAlignment = LayoutAlignment.Center,
-                VerticalAlignment = LayoutAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
             };
 
             this.GestureRecognizer = new TapGestureRecognizer(this);
@@ -54,7 +59,7 @@ namespace XForms.Toolkit
             {
                 this._isEnabled = value;
 
-                this.Invalidate();
+                this.InvalidateVisual();
             }
         }
 
@@ -69,7 +74,7 @@ namespace XForms.Toolkit
             {
                 this._isAlert = value;
 
-                this.Invalidate();
+                this.InvalidateVisual();
             }
         }
 
@@ -84,7 +89,7 @@ namespace XForms.Toolkit
             {
                 this._text = value;
 
-                this.Invalidate();
+                this.InvalidateVisual();
             }
         }
 
@@ -121,9 +126,9 @@ namespace XForms.Toolkit
 
         protected override void DrawBackground(
             IDrawContext drawContext,
-            Rectangle bounds)
+            Rect bounds)
         {
-            Rectangle textBounds = new Rectangle(bounds.X, bounds.Y, bounds.Width, bounds.Height);
+            Rect textBounds = new Rect(bounds.X, bounds.Y, bounds.Width, bounds.Height);
 
             if (this.IsEnabled)
             {
@@ -151,12 +156,12 @@ namespace XForms.Toolkit
 
         void ITapGestureDelegate.OnTapBegan()
         {
-            this.ScaleTo(TouchDownScale, TimeSpan.FromMilliseconds(25), new CubicEase(EasingMode.EaseIn));
+            this._ownAnimator.ScaleTo(TouchDownScale, TimeSpan.FromMilliseconds(25), new CubicEase(EasingMode.EaseIn));
         }
 
         void ITapGestureDelegate.OnTapEnded()
         {
-            this.ScaleTo(1.0f, TimeSpan.FromMilliseconds(100), new CubicEase(EasingMode.EaseIn));
+            this._ownAnimator.ScaleTo(1.0f, TimeSpan.FromMilliseconds(100), new CubicEase(EasingMode.EaseIn));
         }
 
         void ITapGestureDelegate.OnTapped()

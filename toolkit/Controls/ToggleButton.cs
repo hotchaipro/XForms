@@ -1,11 +1,14 @@
 ﻿using System;
-using XForms.Input;
+using XForms.Input;
 using XForms.Controls;
 
 namespace XForms.Toolkit
 {
     public sealed class ToggleButton : UserControl, ITapGestureDelegate
     {
+        // Animates the control itself (press feedback, spinning)
+        private readonly Animator _ownAnimator;
+
         protected override AccessibilityRole DefaultAccessibilityRole
         {
             get
@@ -35,15 +38,18 @@ namespace XForms.Toolkit
 
         public ToggleButton()
         {
+            this._ownAnimator = this.CreateOwnAnimator();
+
             this._textFormat = new TextFormat()
             {
                 FontSize = 10.0f,
-                HorizontalAlignment = LayoutAlignment.Center,
-                VerticalAlignment = LayoutAlignment.End,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Bottom,
             };
 
-            this.Size = new Size(72, 60);
-            this.Scale = IsUncheckedScale;
+            this.Width = 72;
+            this.Height = 60;
+            this._ownAnimator.Scale = IsUncheckedScale;
 
             this.GestureRecognizer = new TapGestureRecognizer(this);
         }
@@ -61,7 +67,7 @@ namespace XForms.Toolkit
                 {
                     this._isChecked = value;
 
-                    this.Invalidate();
+                    this.InvalidateVisual();
                     this.UpdateScale();
 
                     this.IsCheckedChanged?.Invoke(this, new ToggledEventArgs(value));
@@ -80,7 +86,7 @@ namespace XForms.Toolkit
             {
                 this._icon = value;
 
-                this.Invalidate();
+                this.InvalidateVisual();
             }
         }
 
@@ -95,7 +101,7 @@ namespace XForms.Toolkit
             {
                 this._text = value;
 
-                this.Invalidate();
+                this.InvalidateVisual();
             }
         }
 
@@ -109,20 +115,20 @@ namespace XForms.Toolkit
 
         protected override void DrawBackground(
             IDrawContext drawContext,
-            Rectangle bounds)
+            Rect bounds)
         {
             base.DrawBackground(drawContext, bounds);
 
             // Calculate text bounds
 
             float textHeight = bounds.Height / 4;
-            Rectangle textBounds = new Rectangle(bounds.X, bounds.Bottom - textHeight, bounds.Width, textHeight);
+            Rect textBounds = new Rect(bounds.X, bounds.Bottom - textHeight, bounds.Width, textHeight);
 
             // Calculate button bounds
 
             float buttonDimension = Math.Min(bounds.Width, bounds.Height - textHeight);
             float buttonRadius = buttonDimension / 2;
-            Rectangle buttonBounds = new Rectangle(
+            Rect buttonBounds = new Rect(
                 bounds.Center.X - buttonRadius,
                 bounds.Center.Y - (textHeight / 2) - buttonRadius,
                 buttonDimension,
@@ -131,7 +137,7 @@ namespace XForms.Toolkit
             // Calculate image bounds
 
             float imageDimension = buttonDimension / 2;
-            Rectangle imageBounds = new Rectangle(
+            Rect imageBounds = new Rect(
                 buttonBounds.Center.X - (imageDimension / 2),
                 buttonBounds.Center.Y - (imageDimension / 2),
                 imageDimension,
@@ -160,15 +166,15 @@ namespace XForms.Toolkit
         {
             if (this._isTouchDown)
             {
-                this.ScaleTo(IsUncheckedScale - TouchDownScaleDelta, TimeSpan.FromMilliseconds(25), new CubicEase(EasingMode.EaseIn));
+                this._ownAnimator.ScaleTo(IsUncheckedScale - TouchDownScaleDelta, TimeSpan.FromMilliseconds(25), new CubicEase(EasingMode.EaseIn));
             }
             else if (this.IsChecked)
             {
-                this.ScaleTo(1.0f, TimeSpan.FromMilliseconds(100), new CubicEase(EasingMode.EaseIn));
+                this._ownAnimator.ScaleTo(1.0f, TimeSpan.FromMilliseconds(100), new CubicEase(EasingMode.EaseIn));
             }
             else
             {
-                this.ScaleTo(IsUncheckedScale, TimeSpan.FromMilliseconds(100), new CubicEase(EasingMode.EaseOut));
+                this._ownAnimator.ScaleTo(IsUncheckedScale, TimeSpan.FromMilliseconds(100), new CubicEase(EasingMode.EaseOut));
             }
         }
 
@@ -177,7 +183,7 @@ namespace XForms.Toolkit
         void ITapGestureDelegate.OnTapBegan()
         {
             this._isTouchDown = true;
-            this.Invalidate();
+            this.InvalidateVisual();
             this.UpdateScale();
         }
 
@@ -189,7 +195,7 @@ namespace XForms.Toolkit
         void ITapGestureDelegate.OnTapEnded()
         {
             this._isTouchDown = false;
-            this.Invalidate();
+            this.InvalidateVisual();
             this.UpdateScale();
         }
 

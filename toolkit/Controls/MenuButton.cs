@@ -1,11 +1,14 @@
 ﻿using System;
-using XForms.Input;
+using XForms.Input;
 using XForms.Controls;
 
 namespace XForms.Toolkit
 {
     internal sealed class MenuButton : UserControl, ITapGestureDelegate
     {
+        // Animates the control itself (press feedback, spinning)
+        private readonly Animator _ownAnimator;
+
         private const float TouchDownScale = 0.9f;
 
         private TextFormat _textFormat;
@@ -14,6 +17,8 @@ namespace XForms.Toolkit
             MenuBar menuBar,
             MenuItem menuItem)
         {
+            this._ownAnimator = this.CreateOwnAnimator();
+
             if (null == menuBar)
             {
                 throw new ArgumentNullException(nameof(menuBar));
@@ -27,11 +32,12 @@ namespace XForms.Toolkit
             this._textFormat = new TextFormat()
             {
                 FontSize = 10.0f,
-                HorizontalAlignment = LayoutAlignment.Center,
-                VerticalAlignment = LayoutAlignment.End,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Bottom,
             };
 
-            this.Size = new Size(72, 50);
+            this.Width = 72;
+            this.Height = 50;
 
             this.MenuBar = menuBar;
             this.MenuItem = menuItem;
@@ -47,7 +53,7 @@ namespace XForms.Toolkit
             System.ComponentModel.PropertyChangedEventArgs e)
         {
             this.IsVisible = this.MenuItem.IsVisible;
-            this.Invalidate();
+            this.InvalidateVisual();
         }
 
         public MenuBar MenuBar
@@ -85,7 +91,7 @@ namespace XForms.Toolkit
 
         protected override void DrawBackground(
             IDrawContext drawContext,
-            Rectangle bounds)
+            Rect bounds)
         {
             base.DrawBackground(drawContext, bounds);
 
@@ -95,13 +101,13 @@ namespace XForms.Toolkit
             float imageDimension = Math.Min(bounds.Width, bounds.Height) * 0.75f;
             float textHeight = bounds.Height * 0.25f;
 
-            Rectangle imageBounds = new Rectangle(
+            Rect imageBounds = new Rect(
                 bounds.Center.X - (imageDimension / 2f),
                 bounds.Center.Y - ((imageDimension + textHeight) / 2f),
                 imageDimension,
                 imageDimension);
 
-            Rectangle textBounds = new Rectangle(bounds.X, imageBounds.Bottom, bounds.Width, textHeight);
+            Rect textBounds = new Rect(bounds.X, imageBounds.Bottom, bounds.Width, textHeight);
 
             drawContext.DrawImage(this.MenuItem.Icon, imageBounds, this.ForegroundColor);
             drawContext.DrawText(this.MenuItem.Text, textBounds, this.ForegroundColor, this._textFormat);
@@ -111,12 +117,12 @@ namespace XForms.Toolkit
 
         void ITapGestureDelegate.OnTapBegan()
         {
-            this.ScaleTo(TouchDownScale, TimeSpan.FromMilliseconds(25), new CubicEase(EasingMode.EaseIn));
+            this._ownAnimator.ScaleTo(TouchDownScale, TimeSpan.FromMilliseconds(25), new CubicEase(EasingMode.EaseIn));
         }
 
         void ITapGestureDelegate.OnTapEnded()
         {
-            this.ScaleTo(1.0f, TimeSpan.FromMilliseconds(100), new CubicEase(EasingMode.EaseIn));
+            this._ownAnimator.ScaleTo(1.0f, TimeSpan.FromMilliseconds(100), new CubicEase(EasingMode.EaseIn));
         }
 
         void ITapGestureDelegate.OnTapped()

@@ -54,28 +54,28 @@ namespace XForms.Android
             return PixelsToDevicePixels(context, nativeDimension);
         }
 
-        public static LayoutAlignment FromAndroidHorizontalLayoutGravityFlags(
+        public static HorizontalAlignment FromAndroidHorizontalLayoutGravityFlags(
             this global::Android.Views.GravityFlags gravityFlags)
         {
-            LayoutAlignment alignment;
+            HorizontalAlignment alignment;
 
             var horizontalGravityFlags = gravityFlags & global::Android.Views.GravityFlags.HorizontalGravityMask;
 
             if (horizontalGravityFlags == global::Android.Views.GravityFlags.Left)
             {
-                alignment = LayoutAlignment.Start;
+                alignment = HorizontalAlignment.Left;
             }
             else if (horizontalGravityFlags == global::Android.Views.GravityFlags.Right)
             {
-                alignment = LayoutAlignment.End;
+                alignment = HorizontalAlignment.Right;
             }
             else if (horizontalGravityFlags == global::Android.Views.GravityFlags.CenterHorizontal)
             {
-                alignment = LayoutAlignment.Center;
+                alignment = HorizontalAlignment.Center;
             }
             else if (horizontalGravityFlags ==  global::Android.Views.GravityFlags.FillHorizontal)
             {
-                alignment = LayoutAlignment.Fill;
+                alignment = HorizontalAlignment.Stretch;
             }
             else
             {
@@ -86,23 +86,23 @@ namespace XForms.Android
         }
 
         public static global::Android.Views.GravityFlags ToAndroidHorizontalLayoutGravityFlags(
-            this LayoutAlignment layoutAlignment)
+            this HorizontalAlignment layoutAlignment)
         {
             global::Android.Views.GravityFlags gravityFlags;
 
-            if (layoutAlignment == LayoutAlignment.Start)
+            if (layoutAlignment == HorizontalAlignment.Left)
             {
                 gravityFlags = global::Android.Views.GravityFlags.Left;
             }
-            else if (layoutAlignment == LayoutAlignment.End)
+            else if (layoutAlignment == HorizontalAlignment.Right)
             {
                 gravityFlags = global::Android.Views.GravityFlags.Right;
             }
-            else if (layoutAlignment == LayoutAlignment.Center)
+            else if (layoutAlignment == HorizontalAlignment.Center)
             {
                 gravityFlags = global::Android.Views.GravityFlags.CenterHorizontal;
             }
-            else if (layoutAlignment == LayoutAlignment.Fill)
+            else if (layoutAlignment == HorizontalAlignment.Stretch)
             {
                 gravityFlags = global::Android.Views.GravityFlags.FillHorizontal;
             }
@@ -114,28 +114,28 @@ namespace XForms.Android
             return gravityFlags;
         }
 
-        public static LayoutAlignment FromAndroidVerticalLayoutGravityFlags(
+        public static VerticalAlignment FromAndroidVerticalLayoutGravityFlags(
             this global::Android.Views.GravityFlags gravityFlags)
         {
-            LayoutAlignment alignment;
+            VerticalAlignment alignment;
 
             var verticalGravityFlags = gravityFlags & global::Android.Views.GravityFlags.VerticalGravityMask;
 
             if (verticalGravityFlags == global::Android.Views.GravityFlags.Top)
             {
-                alignment = LayoutAlignment.Start;
+                alignment = VerticalAlignment.Top;
             }
             else if (verticalGravityFlags == global::Android.Views.GravityFlags.Bottom)
             {
-                alignment = LayoutAlignment.End;
+                alignment = VerticalAlignment.Bottom;
             }
             else if (verticalGravityFlags == global::Android.Views.GravityFlags.CenterVertical)
             {
-                alignment = LayoutAlignment.Center;
+                alignment = VerticalAlignment.Center;
             }
             else if (verticalGravityFlags == global::Android.Views.GravityFlags.FillVertical)
             {
-                alignment = LayoutAlignment.Fill;
+                alignment = VerticalAlignment.Stretch;
             }
             else
             {
@@ -146,23 +146,23 @@ namespace XForms.Android
         }
 
         public static global::Android.Views.GravityFlags ToAndroidVerticalLayoutGravityFlags(
-            this LayoutAlignment layoutAlignment)
+            this VerticalAlignment layoutAlignment)
         {
             global::Android.Views.GravityFlags gravityFlags;
 
-            if (layoutAlignment == LayoutAlignment.Start)
+            if (layoutAlignment == VerticalAlignment.Top)
             {
                 gravityFlags = global::Android.Views.GravityFlags.Top;
             }
-            else if (layoutAlignment == LayoutAlignment.End)
+            else if (layoutAlignment == VerticalAlignment.Bottom)
             {
                 gravityFlags = global::Android.Views.GravityFlags.Bottom;
             }
-            else if (layoutAlignment == LayoutAlignment.Center)
+            else if (layoutAlignment == VerticalAlignment.Center)
             {
                 gravityFlags = global::Android.Views.GravityFlags.CenterVertical;
             }
-            else if (layoutAlignment == LayoutAlignment.Fill)
+            else if (layoutAlignment == VerticalAlignment.Stretch)
             {
                 gravityFlags = global::Android.Views.GravityFlags.FillVertical;
             }

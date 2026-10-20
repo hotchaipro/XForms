@@ -15,49 +15,54 @@ namespace XForms.Test
 
             this._tabPage1 = new TabPage1();
 
-            var pageLayout = new DockLayout()
+            var pageLayout = new DockPanel()
             {
-                Size = new Size(400, 400),
+                Width = 400,
+                Height = 400,
             };
 
-            var tabBar = new TabBar()
+            var tabBar = new TabStrip()
             {
-                Size = new Size(Dimension.Auto, 60),
+                Height = 60,
             };
 
-            pageLayout.Children.Add(tabBar, DockRegion.Top);
+            pageLayout.Children.Add(tabBar, Dock.Top);
 
             tabBar.AddButton(
-                new TabButton()
+                new TabStripItem()
                 {
-                    Size = tabButtonSize,
+                    Width = tabButtonSize.Width,
+                    Height = tabButtonSize.Height,
                     Text = "one",
                     Icon = ThemeResources.Default.AboutLogo,
                 },
                 this._tabPage1);
 
             tabBar.AddButton(
-                new TabButton()
+                new TabStripItem()
                 {
-                    Size = tabButtonSize,
+                    Width = tabButtonSize.Width,
+                    Height = tabButtonSize.Height,
                     Text = "two",
                     Icon = ThemeResources.Default.AboutLogo,
                 },
                 this._tabPage1);
 
             tabBar.AddButton(
-                new TabButton()
+                new TabStripItem()
                 {
-                    Size = tabButtonSize,
+                    Width = tabButtonSize.Width,
+                    Height = tabButtonSize.Height,
                     Text = "three",
                     Icon = ThemeResources.Default.AboutLogo,
                 },
                 this._tabPage1);
 
             tabBar.AddButton(
-                new TabButton()
+                new TabStripItem()
                 {
-                    Size = tabButtonSize,
+                    Width = tabButtonSize.Width,
+                    Height = tabButtonSize.Height,
                     Text = "four",
                     Icon = ThemeResources.Default.AboutLogo,
                 },
@@ -66,7 +71,7 @@ namespace XForms.Test
             var menuBar = new MenuBar()
             {
             };
-            pageLayout.Children.Add(menuBar, DockRegion.Bottom);
+            pageLayout.Children.Add(menuBar, Dock.Bottom);
 
             menuBar.MenuItems.Add(new MenuItem()
             {
@@ -87,7 +92,7 @@ namespace XForms.Test
                 Icon = ThemeResources.Default.AboutLogo,
             });
 
-            this.Layout = pageLayout;
+            this.Content = pageLayout;
         }
     }
 

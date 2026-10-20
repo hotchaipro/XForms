@@ -237,7 +237,7 @@ namespace XForms
 
         internal bool HandlePreviewInput(
             Page page,
-            PointerInputEvent pointerInputEvent)
+            PointerEventArgs pointerInputEvent)
         {
             bool handled = false;
 
@@ -257,14 +257,14 @@ namespace XForms
 
         internal bool HandlePreviewInput(
             View view,
-            PointerInputEvent pointerInputEvent)
+            PointerEventArgs pointerInputEvent)
         {
             return this.HandleLightDismissEvent(view, pointerInputEvent);
         }
 
         private bool HandleLightDismissEvent(
             View view,
-            PointerInputEvent pointerInputEvent)
+            PointerEventArgs pointerInputEvent)
         {
             bool handled = false;
 

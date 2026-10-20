@@ -85,7 +85,7 @@ namespace XForms.iOS
             float contentWidth = this.IsHorizontalScrollingEnabled ? Math.Max(desiredSize.Width, viewportWidth) : viewportWidth;
             float contentHeight = this.IsVerticalScrollingEnabled ? Math.Max(desiredSize.Height, viewportHeight) : viewportHeight;
 
-            content.Arrange(new Rectangle(0, 0, contentWidth, contentHeight));
+            content.Arrange(new Rect(0, 0, contentWidth, contentHeight));
 
             this.ContentSize = new CGSize(contentWidth, contentHeight);
         }

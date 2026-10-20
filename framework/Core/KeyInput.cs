@@ -27,9 +27,9 @@ namespace XForms
     /// <summary>
     /// A key pressed while a view has keyboard focus.
     /// </summary>
-    public sealed class KeyInputEvent
+    public sealed class KeyEventArgs
     {
-        public KeyInputEvent(
+        public KeyEventArgs(
             Key key,
             bool isShiftDown,
             bool isAltDown)

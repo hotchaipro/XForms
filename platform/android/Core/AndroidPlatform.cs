@@ -38,16 +38,16 @@ namespace XForms.Android
             return new PageRenderer(this._androidApplication.ApplicationContext, page);
         }
 
-        public ITextViewRenderer CreateLabelRenderer(
-            TextView textView)
+        public ITextBlockRenderer CreateTextBlockRenderer(
+            TextBlock textView)
         {
-            return new TextViewRenderer(this._androidApplication.ApplicationContext, textView);
+            return new TextBlockRenderer(this._androidApplication.ApplicationContext, textView);
         }
 
-        public ILayoutRenderer CreateLayoutRenderer(
-            Layout layout)
+        public IPanelRenderer CreatePanelRenderer(
+            Panel layout)
         {
-            return new LayoutRenderer(this._androidApplication.ApplicationContext, layout);
+            return new PanelRenderer(this._androidApplication.ApplicationContext, layout);
         }
 
         public IContentControlRenderer CreateContentControlRenderer(
@@ -74,10 +74,10 @@ namespace XForms.Android
             return new ListViewRenderer(this._androidApplication.ApplicationContext, listView);
         }
 
-        public ITextEntryRenderer CreateTextEntryRenderer(
-            TextEntry textEntry)
+        public ITextBoxRenderer CreateTextBoxRenderer(
+            TextBox textEntry)
         {
-            return new TextEntryRenderer(this._androidApplication.ApplicationContext, textEntry);
+            return new TextBoxRenderer(this._androidApplication.ApplicationContext, textEntry);
         }
 
 
@@ -88,10 +88,10 @@ namespace XForms.Android
         //}
 
 
-        public IScrollViewRenderer CreateScrollViewRenderer(
-            ScrollView scrollView)
+        public IScrollViewerRenderer CreateScrollViewerRenderer(
+            ScrollViewer scrollView)
         {
-            return new ScrollViewRenderer(this._androidApplication.ApplicationContext, scrollView);
+            return new ScrollViewerRenderer(this._androidApplication.ApplicationContext, scrollView);
         }
 
         public IUserControlRenderer CreateUserControlRenderer(

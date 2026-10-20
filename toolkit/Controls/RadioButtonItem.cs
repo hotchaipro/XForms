@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
+using System.ComponentModel;
 using XForms.Controls;
 
 namespace XForms.Toolkit
 {
     public sealed class RadioButtonItemCollection : IEnumerable<RadioButtonItem>
     {
-        private RadioButtonPicker _radioButtonGroup;
+        private RadioButtons _radioButtonGroup;
         private List<RadioButtonItem> _items;
 
         internal RadioButtonItemCollection(
-            RadioButtonPicker radioButtonGroup)
+            RadioButtons radioButtonGroup)
         {
             if (null == radioButtonGroup)
             {

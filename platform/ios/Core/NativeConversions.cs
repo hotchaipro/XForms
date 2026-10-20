@@ -49,15 +49,15 @@ namespace XForms.iOS
         }
 
         public static CGRect ToCGRect(
-            this Rectangle rectangle)
+            this Rect rectangle)
         {
             return new CGRect(rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
         }
 
-        public static Rectangle ToRectangle(
+        public static Rect ToRectangle(
             this CGRect rect)
         {
-            return new Rectangle((float)rect.X, (float)rect.Y, (float)rect.Width, (float)rect.Height);
+            return new Rect((float)rect.X, (float)rect.Y, (float)rect.Width, (float)rect.Height);
         }
 
         public static TextAlignment ToTextAlignment(
@@ -86,17 +86,17 @@ namespace XForms.iOS
         }
 
         public static UITextAlignment ToUITextAlignment(
-            this LayoutAlignment alignment)
+            this HorizontalAlignment alignment)
         {
             switch (alignment)
             {
-                case LayoutAlignment.Center:
+                case HorizontalAlignment.Center:
                     return UITextAlignment.Center;
 
-                case LayoutAlignment.End:
+                case HorizontalAlignment.Right:
                     return UITextAlignment.Right;
 
-                case LayoutAlignment.Fill:
+                case HorizontalAlignment.Stretch:
                     return UITextAlignment.Justified;
 
                 default:

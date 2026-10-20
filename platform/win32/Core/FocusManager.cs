@@ -59,12 +59,12 @@ namespace XForms.Win32
         public static bool IsFocusable(
             ViewRenderer renderer)
         {
-            if (renderer is TextEntryRenderer)
+            if (renderer is TextBoxRenderer)
             {
                 return true;
             }
 
-            return (renderer.Element is View view) && view.IsKeyboardFocusable && renderer.IsInputVisible;
+            return (renderer.Element is View view) && view.Focusable && renderer.IsHitTestVisible;
         }
 
         private void CollectFocusable(
@@ -113,7 +113,7 @@ namespace XForms.Win32
         /// Offers the key to the focused view, then to its ancestors.
         /// </summary>
         private bool DispatchKey(
-            KeyInputEvent keyInputEvent)
+            KeyEventArgs keyInputEvent)
         {
             for (var renderer = this._focused; null != renderer; renderer = renderer.ParentRenderer)
             {
@@ -155,9 +155,9 @@ namespace XForms.Win32
             }
 
             // A native text entry handles its own keys (except Tab and Escape)
-            bool isTextEntry = this._focused is TextEntryRenderer;
+            bool isTextBox = this._focused is TextBoxRenderer;
 
-            if (!isTextEntry && this.DispatchKey(new KeyInputEvent(key, isShiftDown, isAltDown)))
+            if (!isTextBox && this.DispatchKey(new KeyEventArgs(key, isShiftDown, isAltDown)))
             {
                 return true;
             }
@@ -175,7 +175,7 @@ namespace XForms.Win32
 
                 case Key.Enter:
                 case Key.Space:
-                    if ((null != this._focused) && !isTextEntry)
+                    if ((null != this._focused) && !isTextBox)
                     {
                         this.Activate(this._focused);
                         return true;
@@ -269,7 +269,7 @@ namespace XForms.Win32
         {
             this.SetFocused(renderer);
 
-            if (renderer is TextEntryRenderer textEntry)
+            if (renderer is TextBoxRenderer textEntry)
             {
                 // The native control draws its own caret and focus state
                 textEntry.Focus();
@@ -327,8 +327,8 @@ namespace XForms.Win32
         /// <summary>
         /// Called when a native text entry takes focus by itself, such as on a click.
         /// </summary>
-        public void OnTextEntryFocused(
-            TextEntryRenderer textEntry)
+        public void OnTextBoxFocused(
+            TextBoxRenderer textEntry)
         {
             this.SetFocused(textEntry);
             this.HideRing();
@@ -422,7 +422,7 @@ namespace XForms.Win32
         /// <summary>
         /// The view's bounds (in window DIPs) within its ancestors' bounds.
         /// </summary>
-        private static Rectangle VisibleBounds(
+        private static Rect VisibleBounds(
             ViewRenderer renderer)
         {
             var origin = renderer.AbsoluteOrigin();
@@ -440,7 +440,7 @@ namespace XForms.Win32
                 bottom = Math.Min(bottom, ancestorOrigin.Y + ancestor.Frame.Height);
             }
 
-            return new Rectangle(left, top, Math.Max(0, right - left), Math.Max(0, bottom - top));
+            return new Rect(left, top, Math.Max(0, right - left), Math.Max(0, bottom - top));
         }
 
         private void EnsureRingVisual()
@@ -492,14 +492,14 @@ namespace XForms.Win32
                     },
                 });
 
-                var drawContext = new DrawContext(context, new Rectangle(0, 0, 0, 0));
+                var drawContext = new DrawContext(context, new Rect(0, 0, 0, 0));
                 drawContext.Clear(Colors.Transparent);
 
                 // Windows' focus visual: a dark ring with a light inner edge
                 float w = width / scale;
                 float h = height / scale;
-                drawContext.DrawRectangle(new Rectangle(RingThickness / 2, RingThickness / 2, w - RingThickness, h - RingThickness), Color.FromArgb(0xFF, 0x00, 0x00, 0x00), RingThickness);
-                drawContext.DrawRectangle(new Rectangle(RingThickness + 0.5f, RingThickness + 0.5f, w - (2 * RingThickness) - 1, h - (2 * RingThickness) - 1), Colors.White, 1);
+                drawContext.DrawRectangle(new Rect(RingThickness / 2, RingThickness / 2, w - RingThickness, h - RingThickness), Color.FromArgb(0xFF, 0x00, 0x00, 0x00), RingThickness);
+                drawContext.DrawRectangle(new Rect(RingThickness + 0.5f, RingThickness + 0.5f, w - (2 * RingThickness) - 1, h - (2 * RingThickness) - 1), Colors.White, 1);
                 drawContext.Release();
             }
             finally

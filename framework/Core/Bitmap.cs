@@ -33,7 +33,7 @@ namespace XForms
             private set;
         }
 
-        public new IBitmapRenderer Renderer
+        internal new IBitmapRenderer Renderer
         {
             get
             {

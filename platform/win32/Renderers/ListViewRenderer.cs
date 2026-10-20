@@ -113,7 +113,7 @@ namespace XForms.Win32.Renderers
             // Drop the rows the content passed over on its way here
             float offset = this._scroller.Offset;
             this.RealizeRows(offset, offset + this.ViewportHeight);
-            this.Host.UpdateTextEntryPositions();
+            this.Host.UpdateTextBoxPositions();
             this.Host.Flush();
         }
 
@@ -381,7 +381,7 @@ namespace XForms.Win32.Renderers
 
             foreach (var pair in this._realizedRows)
             {
-                pair.Value.Arrange(new Rectangle(0, this._rowTops[pair.Key], this._width, this._rowHeights[pair.Key]));
+                pair.Value.Arrange(new Rect(0, this._rowTops[pair.Key], this._width, this._rowHeights[pair.Key]));
             }
         }
 
@@ -426,7 +426,7 @@ namespace XForms.Win32.Renderers
         }
 
         public override void ArrangeNative(
-            Rectangle frame)
+            Rect frame)
         {
             base.ArrangeNative(frame);
 

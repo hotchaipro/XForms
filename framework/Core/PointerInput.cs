@@ -10,9 +10,9 @@ namespace XForms
         Canceled,
     }
 
-    public sealed class PointerInputEvent
+    public sealed class PointerEventArgs
     {
-        public PointerInputEvent(
+        public PointerEventArgs(
             Point point,
             PointerInputState state,
             bool isInContact)

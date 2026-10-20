@@ -38,7 +38,7 @@ namespace XForms.Win32
 
         private readonly ConcurrentQueue<Action> _invokeQueue = new ConcurrentQueue<Action>();
         private readonly HashSet<ViewRenderer> _dirtyRenderers = new HashSet<ViewRenderer>();
-        private readonly List<TextEntryRenderer> _textEntries = new List<TextEntryRenderer>();
+        private readonly List<TextBoxRenderer> _textEntries = new List<TextBoxRenderer>();
         private HWND _hwnd;
         private bool _isUpdatePending;
         private bool _isLayoutPending;
@@ -46,7 +46,7 @@ namespace XForms.Win32
         private PointerDispatcher _pointers;
         private FocusManager _focus;
         private bool _isUpdating;
-        private bool _isTextEntryUpdatePending;
+        private bool _isTextBoxUpdatePending;
         private int _uiThreadId;
 
         private Win32Host()
@@ -288,8 +288,8 @@ namespace XForms.Win32
             this.RequestLayout();
         }
 
-        public void RegisterTextEntry(
-            TextEntryRenderer textEntry)
+        public void RegisterTextBox(
+            TextBoxRenderer textEntry)
         {
             this._textEntries.Add(textEntry);
         }
@@ -439,16 +439,16 @@ namespace XForms.Win32
 
                 var root = (View)this._root.Element;
                 root.Measure(size);
-                root.Arrange(new Rectangle(0, 0, size.Width, size.Height));
+                root.Arrange(new Rect(0, 0, size.Width, size.Height));
 
                 this._overlays.Layout();
 
-                this.UpdateTextEntryPositions();
+                this.UpdateTextBoxPositions();
             }
 
-            if (this._isTextEntryUpdatePending)
+            if (this._isTextBoxUpdatePending)
             {
-                this.UpdateTextEntryPositions();
+                this.UpdateTextBoxPositions();
             }
 
             if (this._dirtyRenderers.Count > 0)
@@ -465,15 +465,15 @@ namespace XForms.Win32
             this.CompositionDevice->Commit();
         }
 
-        public void RequestTextEntryPositionUpdate()
+        public void RequestTextBoxPositionUpdate()
         {
-            this._isTextEntryUpdatePending = true;
+            this._isTextBoxUpdatePending = true;
             this.ScheduleUpdate();
         }
 
-        public void UpdateTextEntryPositions()
+        public void UpdateTextBoxPositions()
         {
-            this._isTextEntryUpdatePending = false;
+            this._isTextBoxUpdatePending = false;
 
             foreach (var textEntry in this._textEntries)
             {

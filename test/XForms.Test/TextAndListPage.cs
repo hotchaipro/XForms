@@ -13,50 +13,51 @@ namespace XForms.Test
     public class TextAndListPage : Page
     {
         private readonly TaskSource _tasks;
-        private readonly TextEntry _titleEntry;
-        private readonly TextEntry _notesEntry;
+        private readonly TextBox _titleEntry;
+        private readonly TextBox _notesEntry;
 
         public TextAndListPage()
         {
             this.BackgroundColor = this.Application.Theme.BackgroundColor;
 
-            var pageLayout = new DockLayout();
+            var pageLayout = new DockPanel();
 
             // Editor: a single-line title, a multiline note and an add button
-            var editorLayout = new DockLayout()
+            var editorLayout = new DockPanel()
             {
-                HorizontalAlignment = LayoutAlignment.Fill,
-                VerticalAlignment = LayoutAlignment.Start,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Top,
                 Margin = new Thickness(16, 8, 16, 8),
             };
 
-            this._titleEntry = new TextEntry()
+            this._titleEntry = new TextBox()
             {
                 PlaceholderText = "New task",
-                HorizontalAlignment = LayoutAlignment.Fill,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
                 Margin = new Thickness(0, 0, 0, 8),
             };
-            editorLayout.Children.Add(this._titleEntry, DockRegion.Top);
+            editorLayout.Children.Add(this._titleEntry, Dock.Top);
 
-            this._notesEntry = new TextEntry()
+            this._notesEntry = new TextBox()
             {
                 PlaceholderText = "Notes (multiline)",
-                Multiline = true,
-                HorizontalAlignment = LayoutAlignment.Fill,
+                AcceptsReturn = true,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
                 Margin = new Thickness(0, 0, 0, 8),
             };
-            editorLayout.Children.Add(this._notesEntry, DockRegion.Top);
+            editorLayout.Children.Add(this._notesEntry, Dock.Top);
 
             var addButton = new Button()
             {
                 Text = "Add",
-                Size = new Size(120, 40),
-                HorizontalAlignment = LayoutAlignment.End,
+                Width = 120,
+                Height = 40,
+                HorizontalAlignment = HorizontalAlignment.Right,
             };
             addButton.Clicked += this.AddButton_Clicked;
-            editorLayout.Children.Add(addButton, DockRegion.Top);
+            editorLayout.Children.Add(addButton, Dock.Top);
 
-            pageLayout.Children.Add(editorLayout, DockRegion.Top);
+            pageLayout.Children.Add(editorLayout, Dock.Top);
 
             // List of tasks filling the rest of the page
             this._tasks = new TaskSource();
@@ -67,9 +68,9 @@ namespace XForms.Test
 
             var listView = new ListView();
             listView.Bind(this._tasks);
-            pageLayout.Children.Add(listView, DockRegion.CenterOverlay);
+            pageLayout.Children.Add(listView, Dock.CenterOverlay);
 
-            this.Layout = pageLayout;
+            this.Content = pageLayout;
         }
 
         private void AddButton_Clicked(
@@ -148,18 +149,18 @@ namespace XForms.Test
 
         private sealed class TaskItemView : ListViewItem
         {
-            private readonly TextView _textView;
+            private readonly TextBlock _textView;
 
             public TaskItemView()
             {
-                this.HorizontalAlignment = LayoutAlignment.Fill;
+                this.HorizontalAlignment = HorizontalAlignment.Stretch;
 
-                this._textView = new TextView()
+                this._textView = new TextBlock()
                 {
-                    HorizontalAlignment = LayoutAlignment.Fill,
-                    VerticalAlignment = LayoutAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    VerticalAlignment = VerticalAlignment.Center,
                     Margin = new Thickness(16, 12, 16, 12),
-                    WordWrap = true,
+                    TextWrapping = TextWrapping.Wrap,
                     FontSize = 17,
                 };
 

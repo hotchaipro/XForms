@@ -40,7 +40,7 @@ namespace XForms.Android
         }
 
         private RectF ToNativeRectFPixels(
-            Rectangle rectangle)
+            Rect rectangle)
         {
             return new RectF(
                 NativeConversions.DevicePixelsToPixels(this.NativeContext, rectangle.X),
@@ -64,7 +64,7 @@ namespace XForms.Android
         }
 
         public void DrawRectangle(
-            Rectangle rectangle,
+            Rect rectangle,
             Color color,
             float strokeWidth = 1.0f)
         {
@@ -84,7 +84,7 @@ namespace XForms.Android
         }
 
         public void FillRectangle(
-            Rectangle rectangle,
+            Rect rectangle,
             Color color)
         {
             var rect = ToNativeRectFPixels(rectangle);
@@ -108,7 +108,7 @@ namespace XForms.Android
             Color color,
             float strokeWidth = 1.0f)
         {
-            var rect = new Rectangle(
+            var rect = new Rect(
                 centerPoint.X - radiusX,
                 centerPoint.Y - radiusY,
                 2 * radiusX,
@@ -123,7 +123,7 @@ namespace XForms.Android
             float radiusY,
             Color color)
         {
-            var rect = new Rectangle(
+            var rect = new Rect(
                 centerPoint.X - radiusX,
                 centerPoint.Y - radiusY,
                 2 * radiusX,
@@ -133,7 +133,7 @@ namespace XForms.Android
         }
 
         public void DrawEllipse(
-            Rectangle rectangle,
+            Rect rectangle,
             Color color,
             float strokeWidth = 1.0f)
         {
@@ -153,7 +153,7 @@ namespace XForms.Android
         }
 
         public void FillEllipse(
-            Rectangle rectangle,
+            Rect rectangle,
             Color color)
         {
             var rect = ToNativeRectFPixels(rectangle);
@@ -172,7 +172,7 @@ namespace XForms.Android
 
         public void DrawImage(
             Bitmap bitmap,
-            Rectangle destinationRectangle,
+            Rect destinationRectangle,
             Color tint)
         {
             if (null == bitmap)
@@ -187,7 +187,7 @@ namespace XForms.Android
 
         internal void DrawImage(
             global::Android.Graphics.Bitmap nativeBitmap,
-            Rectangle destinationRectangle,
+            Rect destinationRectangle,
             Color tint)
         {
             if (null == nativeBitmap)
@@ -219,7 +219,7 @@ namespace XForms.Android
         // TODO: Replace with a Shadow property on View
         // ANDROID: View.Elevation
         public void FillEllipseShadow(
-            Rectangle rectangle,
+            Rect rectangle,
             Color color,
             float shadowBlur = 8.0f)
         {
@@ -279,7 +279,7 @@ namespace XForms.Android
             Color color,
             float strokeWidth = 1.0f)
         {
-            var oval = this.ToNativeRectFPixels(new Rectangle(center.X - radius, center.Y - radius, 2 * radius, 2 * radius));
+            var oval = this.ToNativeRectFPixels(new Rect(center.X - radius, center.Y - radius, 2 * radius, 2 * radius));
 
             // NOTE: Android measures angles from 3 o'clock; XForms from 12 o'clock
             var paint = this.CreateStrokePaint(color, strokeWidth);
@@ -315,7 +315,7 @@ namespace XForms.Android
 
         public void DrawText(
             string text,
-            Rectangle bounds,
+            Rect bounds,
             Color color,
             TextFormat textFormat)
         {
@@ -343,19 +343,19 @@ namespace XForms.Android
             paint.SetTypeface(typeface);
 
             float originX;
-            if (textFormat.HorizontalAlignment == LayoutAlignment.Start)
+            if (textFormat.HorizontalAlignment == HorizontalAlignment.Left)
             {
                 originX = 0;
             }
-            else if (textFormat.HorizontalAlignment == LayoutAlignment.Center)
+            else if (textFormat.HorizontalAlignment == HorizontalAlignment.Center)
             {
                 originX = 0.5f;
             }
-            else if (textFormat.HorizontalAlignment == LayoutAlignment.End)
+            else if (textFormat.HorizontalAlignment == HorizontalAlignment.Right)
             {
                 originX = 1.0f;
             }
-            else if (textFormat.HorizontalAlignment == LayoutAlignment.Fill)
+            else if (textFormat.HorizontalAlignment == HorizontalAlignment.Stretch)
             {
                 originX = 0.5f;
             }
@@ -365,19 +365,19 @@ namespace XForms.Android
             }
 
             float originY;
-            if (textFormat.VerticalAlignment == LayoutAlignment.Start)
+            if (textFormat.VerticalAlignment == VerticalAlignment.Top)
             {
                 originY = 0;
             }
-            else if (textFormat.VerticalAlignment == LayoutAlignment.Center)
+            else if (textFormat.VerticalAlignment == VerticalAlignment.Center)
             {
                 originY = 0.5f;
             }
-            else if (textFormat.VerticalAlignment == LayoutAlignment.End)
+            else if (textFormat.VerticalAlignment == VerticalAlignment.Bottom)
             {
                 originY = 1.0f;
             }
-            else if (textFormat.VerticalAlignment == LayoutAlignment.Fill)
+            else if (textFormat.VerticalAlignment == VerticalAlignment.Stretch)
             {
                 originY = 0.5f;
             }

@@ -39,16 +39,16 @@ namespace XForms.iOS
             return new PageRenderer(page);
         }
 
-        public ITextViewRenderer CreateLabelRenderer(
-            TextView textView)
+        public ITextBlockRenderer CreateTextBlockRenderer(
+            TextBlock textView)
         {
-            return new TextViewRenderer(textView);
+            return new TextBlockRenderer(textView);
         }
 
-        public ILayoutRenderer CreateLayoutRenderer(
-            Layout layout)
+        public IPanelRenderer CreatePanelRenderer(
+            Panel layout)
         {
-            return new LayoutRenderer(layout);
+            return new PanelRenderer(layout);
         }
 
         public IContentControlRenderer CreateContentControlRenderer(
@@ -75,18 +75,18 @@ namespace XForms.iOS
             return new ListViewRenderer(listView);
         }
 
-        public ITextEntryRenderer CreateTextEntryRenderer(
-            TextEntry textEntry)
+        public ITextBoxRenderer CreateTextBoxRenderer(
+            TextBox textEntry)
         {
-            return new TextEntryRenderer(textEntry);
+            return new TextBoxRenderer(textEntry);
         }
 
 
 
-        public IScrollViewRenderer CreateScrollViewRenderer(
-            ScrollView scrollView)
+        public IScrollViewerRenderer CreateScrollViewerRenderer(
+            ScrollViewer scrollView)
         {
-            return new ScrollViewRenderer(scrollView);
+            return new ScrollViewerRenderer(scrollView);
         }
 
         public IUserControlRenderer CreateUserControlRenderer(

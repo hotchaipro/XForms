@@ -83,7 +83,7 @@ namespace XForms.iOS.Renderers
             var safeFrame = window.SafeAreaLayoutGuide.LayoutFrame;
             var windowSize = new Size((float)safeFrame.Width, (float)safeFrame.Height);
 
-            Rectangle frame;
+            Rect frame;
             if (this.PlacementTarget?.Renderer.NativeElement is UIView anchor)
             {
                 var anchorFrame = anchor.ConvertRectToView(anchor.Bounds, window);
@@ -111,7 +111,7 @@ namespace XForms.iOS.Renderers
 
                 float left = (float)(anchorFrame.Left - safeFrame.Left);
                 float x = Math.Max(EdgeMargin, Math.Min(left, windowSize.Width - size.Width - EdgeMargin));
-                frame = new Rectangle(x, y, size.Width, size.Height);
+                frame = new Rect(x, y, size.Width, size.Height);
             }
             else
             {
@@ -120,11 +120,11 @@ namespace XForms.iOS.Renderers
                     Math.Max(0, windowSize.Height - (2 * WindowMargin))));
 
                 var size = content.DesiredSize;
-                frame = new Rectangle((windowSize.Width - size.Width) / 2, (windowSize.Height - size.Height) / 2, size.Width, size.Height);
+                frame = new Rect((windowSize.Width - size.Width) / 2, (windowSize.Height - size.Height) / 2, size.Width, size.Height);
             }
 
             // NOTE: The content is positioned in window coordinates
-            content.Arrange(new Rectangle(
+            content.Arrange(new Rect(
                 (float)Math.Round(frame.X + safeFrame.Left),
                 (float)Math.Round(frame.Y + safeFrame.Top),
                 frame.Width,

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using XForms.Layouts;
+using XForms.Layouts;
 using XForms.Controls;
 
 namespace XForms.Toolkit
@@ -11,12 +11,12 @@ namespace XForms.Toolkit
         OK = 1,
     }
 
-    public class MessageBox : Popover
+    public class MessageBox : Flyout
     {
         private TaskCompletionSource<MessageBoxResult> _task;
         private string _message, _title;
         private MessageBoxResult _result;
-        private TextView _messageView;
+        private TextBlock _messageView;
 
         public static async Task<MessageBoxResult> ShowAsync(
             string message,
@@ -45,37 +45,38 @@ namespace XForms.Toolkit
             this._title = title;
             this._result = MessageBoxResult.Cancel;
 
-            var contentLayout = new DockLayout()
+            var contentLayout = new DockPanel()
             {
-                MaximumSize = new Size(300f, Dimension.Auto),
+                MaxWidth = 300f,
             };
 
-            this._messageView = new TextView()
+            this._messageView = new TextBlock()
             {
                 Text = this._message,
-                ForegroundColor = Colors.White,
+                Foreground = Colors.White,
                 FontSize = 14f,
-                WordWrap = true,
-                HorizontalAlignment = LayoutAlignment.Fill,
-                VerticalAlignment = LayoutAlignment.Fill,
+                TextWrapping = TextWrapping.Wrap,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Stretch,
                 Margin = new Thickness(20),
             };
-            contentLayout.Children.Add(this._messageView, DockRegion.Top);
+            contentLayout.Children.Add(this._messageView, Dock.Top);
 
-            var buttonsLayout = new DistributedStackLayout()
+            var buttonsLayout = new UniformGrid()
             {
-                HorizontalAlignment = LayoutAlignment.Fill,
-                VerticalAlignment = LayoutAlignment.End,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Bottom,
             };
-            contentLayout.Children.Add(buttonsLayout, DockRegion.Top);
+            contentLayout.Children.Add(buttonsLayout, Dock.Top);
 
             var cancelButton = new Button()
             {
                 Text = "Cancel",
                 IsAlertStyle = true,
-                Size = new Size(100, 30),
+                Width = 100,
+                Height = 30,
                 Margin = new Thickness(5),
-                HorizontalAlignment = LayoutAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center,
             };
             cancelButton.Clicked += CancelButton_Clicked;
             buttonsLayout.Children.Add(cancelButton);
@@ -84,9 +85,10 @@ namespace XForms.Toolkit
             {
                 Text = "Ok",
                 IsAlertStyle = true,
-                Size = new Size(100, 30),
+                Width = 100,
+                Height = 30,
                 Margin = new Thickness(5),
-                HorizontalAlignment = LayoutAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center,
             };
             okButton.Clicked += OkButton_Clicked;
             buttonsLayout.Children.Add(okButton);
@@ -136,11 +138,11 @@ namespace XForms.Toolkit
 
             if (theme == AppTheme.Dark)
             {
-                this._messageView.ForegroundColor = Colors.White;
+                this._messageView.Foreground = Colors.White;
             }
             else
             {
-                this._messageView.ForegroundColor = Colors.Black;
+                this._messageView.Foreground = Colors.Black;
             }
         }
 

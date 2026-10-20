@@ -33,6 +33,8 @@ namespace XForms.Controls
     public class Popup : Element, IPopupDelegate
     {
         private bool _isOpen;
+        private View _content;
+        private View _placementTarget;
 
         public Popup()
         {
@@ -47,12 +49,27 @@ namespace XForms.Controls
         {
             get
             {
-                return this.Renderer.Content;
+                return this._content;
             }
 
             set
             {
-                this.Renderer.Content = value;
+                var oldContent = this._content;
+                if (value == oldContent)
+                {
+                    return;
+                }
+
+                this._content = value;
+
+                var native = this.Native;
+                if (null != native)
+                {
+                    value?.AttachTo(this);
+                    native.Content = value;
+                    oldContent?.NotifyDetached();
+                    value?.NotifyAttached();
+                }
             }
         }
 
@@ -64,12 +81,13 @@ namespace XForms.Controls
         {
             get
             {
-                return this.Renderer.PlacementTarget;
+                return this._placementTarget;
             }
 
             set
             {
-                this.Renderer.PlacementTarget = value;
+                this._placementTarget = value;
+                this.Native?.PlacementTarget = value;
             }
         }
 
@@ -121,11 +139,35 @@ namespace XForms.Controls
             this.Closed?.Invoke(this, EventArgs.Empty);
         }
 
-        public new IPopupRenderer Renderer
+        internal new IPopupRenderer Renderer
         {
             get
             {
                 return (IPopupRenderer)base.Renderer;
+            }
+        }
+
+        private IPopupRenderer Native
+        {
+            get
+            {
+                return (IPopupRenderer)this.CreatedRenderer;
+            }
+        }
+
+        internal override void OnRendererCreated()
+        {
+            base.OnRendererCreated();
+
+            var native = this.Native;
+            native.PlacementTarget = this._placementTarget;
+
+            var content = this._content;
+            if (null != content)
+            {
+                content.AttachTo(this);
+                native.Content = content;
+                content.NotifyAttached();
             }
         }
 

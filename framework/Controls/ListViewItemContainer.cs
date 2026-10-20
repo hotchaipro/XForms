@@ -13,13 +13,13 @@ namespace XForms.Controls
     /// override <see cref="ListView.CreateItemContainer"/>) to add behavior such
     /// as swipe gestures.
     /// </summary>
-    public class ListViewItemContainer : DockLayout, ITapGestureDelegate
+    public class ListViewItemContainer : DockPanel, ITapGestureDelegate
     {
         private ListViewItem _content;
 
         public ListViewItemContainer()
         {
-            this.VerticalAlignment = LayoutAlignment.Fill;
+            this.VerticalAlignment = VerticalAlignment.Stretch;
             this.GestureRecognizer = new TapGestureRecognizer(this);
         }
 
@@ -84,7 +84,7 @@ namespace XForms.Controls
         protected virtual void AddContent(
             ListViewItem content)
         {
-            this.Children.Add(content, DockRegion.CenterOverlay);
+            this.Children.Add(content, Dock.CenterOverlay);
         }
 
         internal void Bind(

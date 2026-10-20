@@ -6,14 +6,14 @@ namespace XForms
 {
     public interface IViewDelegate
     {
-        bool HandlePointerEvent(PointerInputEvent pointerInputEvent);
+        bool HandlePointerEvent(PointerEventArgs pointerInputEvent);
     }
 
     public interface IViewRenderer : IElementRenderer
     {
         bool IsVisible { get; set; }
 
-        bool IsInputVisible { get; set; }
+        bool IsHitTestVisible { get; set; }
 
         /// <summary>
         /// Measures the native view within the available size (which excludes the
@@ -27,12 +27,12 @@ namespace XForms
         /// native container arranges its children by calling back into
         /// <see cref="View.LayoutContent"/>.
         /// </summary>
-        void ArrangeNative(Rectangle frame);
+        void ArrangeNative(Rect frame);
 
         /// <summary>
         /// Asks the platform to lay this view (and its ancestors) out again.
         /// </summary>
-        void InvalidateLayout();
+        void InvalidateMeasure();
 
         float Opacity { get; set; }
 
@@ -68,11 +68,16 @@ namespace XForms
 
     public abstract class View : Element, IViewDelegate
     {
+        private bool _isVisible = true;
+        private bool _isHitTestVisible = true;
+        private Animator _animator;
+        private List<Animator> _ownAnimators;
+
         protected View()
         {
         }
 
-        public new IViewRenderer Renderer
+        internal new IViewRenderer Renderer
         {
             get
             {
@@ -80,37 +85,210 @@ namespace XForms
             }
         }
 
+        private IViewRenderer Native
+        {
+            get
+            {
+                return (IViewRenderer)this.CreatedRenderer;
+            }
+        }
+
         public bool IsVisible
         {
             get
             {
-                return this.Renderer.IsVisible;
+                return this._isVisible;
             }
 
             set
             {
-                if (value != this.Renderer.IsVisible)
+                if (value != this._isVisible)
                 {
-                    this.Renderer.IsVisible = value;
+                    this._isVisible = value;
+                    this.Native?.IsVisible = value;
 
                     // A hidden view takes no space, so its parent must lay out again
-                    this.Renderer.InvalidateLayout();
+                    this.InvalidateMeasure();
                 }
             }
         }
 
-        public bool IsInputVisible
+        public bool IsHitTestVisible
         {
             get
             {
-                return this.Renderer.IsInputVisible;
+                return this._isHitTestVisible;
             }
 
             set
             {
-                this.Renderer.IsInputVisible = value;
+                this._isHitTestVisible = value;
+                this.Native?.IsHitTestVisible = value;
             }
         }
+
+        internal override void OnRendererCreated()
+        {
+            base.OnRendererCreated();
+
+            var native = this.Native;
+            if (!this._isVisible)
+            {
+                native.IsVisible = false;
+            }
+
+            if (!this._isHitTestVisible)
+            {
+                native.IsHitTestVisible = false;
+            }
+
+            this._animator?.OnRendererCreated();
+
+            if (null != this._ownAnimators)
+            {
+                foreach (var animator in this._ownAnimators)
+                {
+                    animator.OnRendererCreated();
+                }
+            }
+        }
+
+        #region Attach
+
+        /// <summary>
+        /// The view this view was added to, or null.
+        /// </summary>
+        public Element Parent
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Raised when the view is added to a parent (or shown), once its native
+        /// object exists.
+        /// </summary>
+        public event EventHandler Attached;
+
+        /// <summary>
+        /// Raised when the view is removed from its parent.
+        /// </summary>
+        public event EventHandler Detached;
+
+        /// <summary>
+        /// Attaches the view to its parent: creates its native object if it
+        /// doesn't have one yet, and returns it for the parent to add.
+        /// </summary>
+        internal IViewRenderer AttachTo(
+            Element parent)
+        {
+            this.Parent = parent;
+            return this.Renderer;
+        }
+
+        /// <summary>
+        /// Called by the parent once it has added the view's native object.
+        /// </summary>
+        internal void NotifyAttached()
+        {
+            this.OnAttached();
+            this.Attached?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Called by the parent once it has removed the view's native object.
+        /// </summary>
+        internal void NotifyDetached()
+        {
+            if (null == this.Parent)
+            {
+                return;
+            }
+
+            this.Parent = null;
+            this.OnDetached();
+            this.Detached?.Invoke(this, EventArgs.Empty);
+        }
+
+        protected virtual void OnAttached()
+        {
+        }
+
+        protected virtual void OnDetached()
+        {
+        }
+
+        #endregion Attach
+
+        #region Animation
+
+        /// <summary>
+        /// The app's animator for the view: its translation, scale, rotation and
+        /// opacity, set directly or animated. Null (the default) for a view that
+        /// never animates. Set it when the view is created, for example
+        /// <c>new ProgressRing { Animator = new() }</c>. Controls never set their
+        /// own; they use <see cref="Controls.Control.CreateOwnAnimator"/>.
+        /// </summary>
+        public Animator Animator
+        {
+            get
+            {
+                return this._animator;
+            }
+
+            init
+            {
+                if (null != this._animator)
+                {
+                    throw new InvalidOperationException("The view already has an Animator.");
+                }
+
+                if (null != value)
+                {
+                    value.Attach(this);
+                }
+
+                this._animator = value;
+            }
+        }
+
+        /// <summary>
+        /// Creates one of a control's own animators (see
+        /// <see cref="Controls.Control.CreateOwnAnimator"/>).
+        /// </summary>
+        internal Animator CreateOwnAnimatorCore()
+        {
+            if (this.HasRenderer)
+            {
+                throw new InvalidOperationException("CreateOwnAnimator must be called before the view is attached, from its constructor.");
+            }
+
+            var animator = new Animator();
+            animator.Attach(this);
+
+            this._ownAnimators ??= new List<Animator>();
+            this._ownAnimators.Add(animator);
+
+            return animator;
+        }
+
+        /// <summary>
+        /// The view's animator, creating one for the framework's own animated
+        /// views (pages, popups, scrolled content and list rows).
+        /// </summary>
+        internal Animator GetOrCreateAnimator()
+        {
+            if (null == this._animator)
+            {
+                var animator = new Animator();
+                animator.Attach(this);
+                this._animator = animator;
+            }
+
+            return this._animator;
+        }
+
+        #endregion Animation
 
         #region Accessibility
 
@@ -173,40 +351,76 @@ namespace XForms
         private Size _requestedSize = new Size(Dimension.Auto, Dimension.Auto);
         private Size _maximumSize = new Size(Dimension.Auto, Dimension.Auto);
         private Thickness _margin = Thickness.Zero;
-        private LayoutAlignment _horizontalAlignment = LayoutAlignment.Fill;
-        private LayoutAlignment _verticalAlignment = LayoutAlignment.Fill;
-        private Rectangle _frame;
+        private HorizontalAlignment _horizontalAlignment = HorizontalAlignment.Stretch;
+        private VerticalAlignment _verticalAlignment = VerticalAlignment.Stretch;
+        private Rect _frame;
         private Size _contentMeasureSize = new Size(float.NaN, float.NaN);
 
         /// <summary>
-        /// Gets the size the view was last laid out at, or sets the size the view
-        /// asks for (use <see cref="Dimension.Auto"/> to size to the content).
+        /// The width the view asks for, or <see cref="Dimension.Auto"/> (the default) to size to its content.
         /// </summary>
-        public Size Size
+        public float Width
         {
             get
             {
-                return this._frame.Size;
+                return this._requestedSize.Width;
             }
 
             set
             {
-                this._requestedSize = value;
-                this.InvalidateLayout();
+                this._requestedSize = new Size(value, this._requestedSize.Height);
+                this.InvalidateMeasure();
             }
         }
 
-        public Size MaximumSize
+        /// <summary>
+        /// The height the view asks for, or <see cref="Dimension.Auto"/> (the default) to size to its content.
+        /// </summary>
+        public float Height
         {
             get
             {
-                return this._maximumSize;
+                return this._requestedSize.Height;
             }
 
             set
             {
-                this._maximumSize = value;
-                this.InvalidateLayout();
+                this._requestedSize = new Size(this._requestedSize.Width, value);
+                this.InvalidateMeasure();
+            }
+        }
+
+        /// <summary>
+        /// The most width the view takes, or <see cref="Dimension.Auto"/> (the default) for no limit.
+        /// </summary>
+        public float MaxWidth
+        {
+            get
+            {
+                return this._maximumSize.Width;
+            }
+
+            set
+            {
+                this._maximumSize = new Size(value, this._maximumSize.Height);
+                this.InvalidateMeasure();
+            }
+        }
+
+        /// <summary>
+        /// The most height the view takes, or <see cref="Dimension.Auto"/> (the default) for no limit.
+        /// </summary>
+        public float MaxHeight
+        {
+            get
+            {
+                return this._maximumSize.Height;
+            }
+
+            set
+            {
+                this._maximumSize = new Size(this._maximumSize.Width, value);
+                this.InvalidateMeasure();
             }
         }
 
@@ -220,11 +434,11 @@ namespace XForms
             set
             {
                 this._margin = value;
-                this.InvalidateLayout();
+                this.InvalidateMeasure();
             }
         }
 
-        public LayoutAlignment HorizontalAlignment
+        public HorizontalAlignment HorizontalAlignment
         {
             get
             {
@@ -234,11 +448,11 @@ namespace XForms
             set
             {
                 this._horizontalAlignment = value;
-                this.InvalidateLayout();
+                this.InvalidateMeasure();
             }
         }
 
-        public LayoutAlignment VerticalAlignment
+        public VerticalAlignment VerticalAlignment
         {
             get
             {
@@ -248,7 +462,7 @@ namespace XForms
             set
             {
                 this._verticalAlignment = value;
-                this.InvalidateLayout();
+                this.InvalidateMeasure();
             }
         }
 
@@ -264,7 +478,7 @@ namespace XForms
         /// <summary>
         /// The view's position and size from the last arrange, relative to its parent.
         /// </summary>
-        public Rectangle Frame
+        public Rect Bounds
         {
             get
             {
@@ -272,10 +486,22 @@ namespace XForms
             }
         }
 
-        public void InvalidateLayout()
+        /// <summary>
+        /// Lays the view out again because its size may have changed: its parent
+        /// measures it again, and arranges it.
+        /// </summary>
+        public void InvalidateMeasure()
         {
             this._contentMeasureSize = new Size(float.NaN, float.NaN);
-            this.Renderer?.InvalidateLayout();
+            this.Renderer?.InvalidateMeasure();
+        }
+
+        /// <summary>
+        /// Arranges the view's children again, without changing the view's size.
+        /// </summary>
+        public void InvalidateArrange()
+        {
+            this.Renderer?.InvalidateMeasure();
         }
 
         /// <summary>
@@ -319,7 +545,7 @@ namespace XForms
         /// after <see cref="Measure"/>.
         /// </summary>
         public void Arrange(
-            Rectangle finalRect)
+            Rect finalRect)
         {
             var margin = this._margin;
 
@@ -333,21 +559,21 @@ namespace XForms
             float width = ArrangeLength(
                 slotWidth,
                 desiredSize.Width - margin.Left - margin.Right,
-                this._horizontalAlignment,
+                (int)this._horizontalAlignment,
                 this._requestedSize.Width,
                 this._maximumSize.Width);
 
             float height = ArrangeLength(
                 slotHeight,
                 desiredSize.Height - margin.Top - margin.Bottom,
-                this._verticalAlignment,
+                (int)this._verticalAlignment,
                 this._requestedSize.Height,
                 this._maximumSize.Height);
 
-            float x = slotX + AlignmentOffset(this._horizontalAlignment, slotWidth, width);
-            float y = slotY + AlignmentOffset(this._verticalAlignment, slotHeight, height);
+            float x = slotX + AlignmentOffset((int)this._horizontalAlignment, slotWidth, width);
+            float y = slotY + AlignmentOffset((int)this._verticalAlignment, slotHeight, height);
 
-            this._frame = new Rectangle(x, y, width, height);
+            this._frame = new Rect(x, y, width, height);
 
             this.Renderer.ArrangeNative(this._frame);
         }
@@ -412,6 +638,12 @@ namespace XForms
         {
         }
 
+        // The alignment enums share these values: start (left or top), center,
+        // end (right or bottom) and stretch
+        private const int Start = 0;
+        private const int End = 2;
+        private const int Stretch = 3;
+
         private static float ConstrainLength(
             float length,
             float requestedLength,
@@ -433,7 +665,7 @@ namespace XForms
         private static float ArrangeLength(
             float slotLength,
             float desiredLength,
-            LayoutAlignment alignment,
+            int alignment,
             float requestedLength,
             float maximumLength)
         {
@@ -443,7 +675,7 @@ namespace XForms
             {
                 length = requestedLength;
             }
-            else if (alignment == LayoutAlignment.Fill)
+            else if (alignment == Stretch)
             {
                 length = slotLength;
             }
@@ -461,127 +693,25 @@ namespace XForms
         }
 
         private static float AlignmentOffset(
-            LayoutAlignment alignment,
+            int alignment,
             float slotLength,
             float length)
         {
             switch (alignment)
             {
-                case LayoutAlignment.Start:
+                case Start:
                     return 0;
 
-                case LayoutAlignment.End:
+                case End:
                     return slotLength - length;
 
                 default:
-                    // Center, or Fill when the length is limited
+                    // Center, or Stretch when the length is limited
                     return (slotLength - length) / 2;
             }
         }
 
         #endregion Layout
-
-        public float Opacity
-        {
-            get
-            {
-                return this.Renderer.Opacity;
-            }
-
-            set
-            {
-                this.Renderer.Opacity = value;
-            }
-        }
-
-        public float Scale
-        {
-            get
-            {
-                return this.Renderer.Scale;
-            }
-
-            set
-            {
-                this.Renderer.Scale = value;
-            }
-        }
-
-        public Task ScaleTo(
-            float scale,
-            TimeSpan duration,
-            EasingFunction ease)
-        {
-            return this.Renderer.ScaleTo(scale, duration, ease);
-        }
-
-        public Angle Rotation
-        {
-            get
-            {
-                return this.Renderer.Rotation;
-            }
-
-            set
-            {
-                this.Renderer.Rotation = value;
-            }
-        }
-
-        public Task RotateTo(
-            Angle angle,
-            TimeSpan duration,
-            EasingFunction ease)
-        {
-            return this.Renderer.RotateTo(angle, duration, ease);
-        }
-
-        public Point Translation
-        {
-            get
-            {
-                return this.Renderer.Translation;
-            }
-
-            set
-            {
-                this.Renderer.Translation = value;
-            }
-        }
-
-        public Task TranslateTo(
-            Point point,
-            TimeSpan duration,
-            EasingFunction ease)
-        {
-            return this.Renderer.TranslateTo(point, duration, ease);
-        }
-
-        public void StopAnimation()
-        {
-            this.Renderer.StopAnimation();
-        }
-
-        /// <summary>
-        /// Spins the view continuously, one turn per period (clockwise, around
-        /// its center), until <see cref="StopContinuousRotation"/>. The platform
-        /// runs the animation off the UI thread where it can.
-        /// </summary>
-        public void StartContinuousRotation(
-            TimeSpan period)
-        {
-            if (period <= TimeSpan.Zero)
-            {
-                throw new ArgumentOutOfRangeException(nameof(period));
-            }
-
-            this.Renderer.StartContinuousRotation(period);
-        }
-
-        public void StopContinuousRotation()
-        {
-            this.Renderer.StopContinuousRotation();
-        }
 
         public GestureRecognizer GestureRecognizer
         {
@@ -598,7 +728,7 @@ namespace XForms
         /// Whether keyboard focus can move to the view (with Tab). By default,
         /// views that respond to taps are focusable.
         /// </summary>
-        public bool IsKeyboardFocusable
+        public bool Focusable
         {
             get
             {
@@ -637,7 +767,7 @@ namespace XForms
         /// </summary>
         public bool Focus()
         {
-            return this.Renderer?.Focus() ?? false;
+            return this.Native?.Focus() ?? false;
         }
 
         /// <summary>
@@ -653,7 +783,7 @@ namespace XForms
         /// whether the key was handled.
         /// </summary>
         protected internal virtual bool OnKeyDown(
-            KeyInputEvent keyInputEvent)
+            KeyEventArgs keyInputEvent)
         {
             return false;
         }
@@ -665,15 +795,15 @@ namespace XForms
         /// </summary>
         protected internal virtual void OnActivate()
         {
-            var center = new Point(this.Frame.Width / 2, this.Frame.Height / 2);
-            this.HandlePointerEvent(new PointerInputEvent(center, PointerInputState.Began, true));
-            this.HandlePointerEvent(new PointerInputEvent(center, PointerInputState.Ended, true));
+            var center = new Point(this.Bounds.Width / 2, this.Bounds.Height / 2);
+            this.HandlePointerEvent(new PointerEventArgs(center, PointerInputState.Began, true));
+            this.HandlePointerEvent(new PointerEventArgs(center, PointerInputState.Ended, true));
         }
 
         #endregion Keyboard
 
         public virtual bool HandlePointerEvent(
-            PointerInputEvent pointerInputEvent)
+            PointerEventArgs pointerInputEvent)
         {
             if (this.Application.HandlePreviewInput(this, pointerInputEvent))
             {

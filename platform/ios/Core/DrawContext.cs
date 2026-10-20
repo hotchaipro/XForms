@@ -39,7 +39,7 @@ namespace XForms.iOS
         }
 
         public void DrawRectangle(
-            Rectangle rectangle,
+            Rect rectangle,
             Color color,
             float strokeWidth = 1.0f)
         {
@@ -50,7 +50,7 @@ namespace XForms.iOS
         }
 
         public void FillRectangle(
-            Rectangle rectangle,
+            Rect rectangle,
             Color color)
         {
             var rect = rectangle.ToCGRect();
@@ -65,7 +65,7 @@ namespace XForms.iOS
             Color color,
             float strokeWidth = 1.0f)
         {
-            var rect = new Rectangle(
+            var rect = new Rect(
                 centerPoint.X - radiusX,
                 centerPoint.Y - radiusY,
                 2 * radiusX,
@@ -75,7 +75,7 @@ namespace XForms.iOS
         }
 
         public void DrawEllipse(
-            Rectangle rectangle,
+            Rect rectangle,
             Color color,
             float strokeWidth = 1.0f)
         {
@@ -90,7 +90,7 @@ namespace XForms.iOS
             float radiusY,
             Color color)
         {
-            var rect = new Rectangle(
+            var rect = new Rect(
                 centerPoint.X - radiusX,
                 centerPoint.Y - radiusY,
                 2 * radiusX,
@@ -100,7 +100,7 @@ namespace XForms.iOS
         }
 
         public void FillEllipse(
-            Rectangle rectangle,
+            Rect rectangle,
             Color color)
         {
             var rect = rectangle.ToCGRect();
@@ -110,7 +110,7 @@ namespace XForms.iOS
 
         public void DrawImage(
             Bitmap bitmap,
-            Rectangle destinationRectangle,
+            Rect destinationRectangle,
             Color tint)
         {
             if (null == bitmap)
@@ -142,7 +142,7 @@ namespace XForms.iOS
 
         // TODO: Replace with a Shadow property on View
         public void FillEllipseShadow(
-            Rectangle rectangle,
+            Rect rectangle,
             Color color,
             float shadowBlur = 8.0f)
         {
@@ -216,7 +216,7 @@ namespace XForms.iOS
 
         public void DrawText(
             string text,
-            Rectangle bounds,
+            Rect bounds,
             Color color,
             TextFormat textFormat)
         {
@@ -258,12 +258,12 @@ namespace XForms.iOS
             nfloat y;
             switch (textFormat.VerticalAlignment)
             {
-                case LayoutAlignment.Center:
-                case LayoutAlignment.Fill:
+                case VerticalAlignment.Center:
+                case VerticalAlignment.Stretch:
                     y = rect.Y + ((rect.Height - textHeight) / 2);
                     break;
 
-                case LayoutAlignment.End:
+                case VerticalAlignment.Bottom:
                     y = rect.Bottom - textHeight;
                     break;
 

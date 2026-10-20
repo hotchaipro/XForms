@@ -62,7 +62,7 @@ namespace XForms.Win32.Renderers
         private IDCompositionSurface* _surface;
         private IDCompositionScaleTransform* _scaleTransform;
         private int _surfaceWidth, _surfaceHeight;
-        private Rectangle _frame;
+        private Rect _frame;
         private Point _translation = Point.Zero;
         private float _scale = 1.0f;
         private Angle _rotation = Angle.Zero;
@@ -125,7 +125,7 @@ namespace XForms.Win32.Renderers
             get;
         } = new List<ViewRenderer>();
 
-        public Rectangle Frame
+        public Rect Frame
         {
             get
             {
@@ -219,7 +219,7 @@ namespace XForms.Win32.Renderers
         }
 
         public virtual void ArrangeNative(
-            Rectangle frame)
+            Rect frame)
         {
             bool isResized = (frame.Width != this._frame.Width) || (frame.Height != this._frame.Height);
 
@@ -238,7 +238,7 @@ namespace XForms.Win32.Renderers
             }
         }
 
-        public virtual void InvalidateLayout()
+        public virtual void InvalidateMeasure()
         {
             this.Host.RequestLayout();
         }
@@ -441,7 +441,7 @@ namespace XForms.Win32.Renderers
                     },
                 });
 
-                var drawContext = new DrawContext(context, new Rectangle(0, 0, this._frame.Width, this._frame.Height));
+                var drawContext = new DrawContext(context, new Rect(0, 0, this._frame.Width, this._frame.Height));
                 drawContext.Clear(this._backgroundColor);
                 this.DrawContent(drawContext);
                 drawContext.Release();
@@ -480,10 +480,10 @@ namespace XForms.Win32.Renderers
         protected virtual void OnVisibilityChanged()
         {
             // Text entry windows follow their views' visibility on the next update
-            this.Host.RequestTextEntryPositionUpdate();
+            this.Host.RequestTextBoxPositionUpdate();
         }
 
-        public bool IsInputVisible
+        public bool IsHitTestVisible
         {
             get;
             set;

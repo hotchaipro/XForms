@@ -118,7 +118,7 @@ namespace XForms.iOS
             var location = touch.LocationInView(view);
             var point = new Point((float)location.X, (float)location.Y);
 
-            return viewDelegate.HandlePointerEvent(new PointerInputEvent(point, state, true));
+            return viewDelegate.HandlePointerEvent(new PointerEventArgs(point, state, true));
         }
     }
 }

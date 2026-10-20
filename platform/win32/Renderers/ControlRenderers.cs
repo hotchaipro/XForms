@@ -59,7 +59,7 @@ namespace XForms.Win32.Renderers
                 throw new ArgumentException("Invalid image source.", nameof(source));
             }
 
-            this.InvalidateLayout();
+            this.InvalidateMeasure();
             this.InvalidateRender();
         }
 
@@ -93,7 +93,7 @@ namespace XForms.Win32.Renderers
         protected override void DrawContent(
             DrawContext drawContext)
         {
-            drawContext.DrawBitmap(this._bitmap, new Rectangle(0, 0, this.Frame.Width, this.Frame.Height), this._tint);
+            drawContext.DrawBitmap(this._bitmap, new Rect(0, 0, this.Frame.Width, this.Frame.Height), this._tint);
         }
     }
 
@@ -194,10 +194,10 @@ namespace XForms.Win32.Renderers
                 : this.PlaceCentered(content, windowSize);
 
             this._chrome.ArrangeNative(frame);
-            content.Arrange(new Rectangle(0, 0, frame.Width, frame.Height));
+            content.Arrange(new Rect(0, 0, frame.Width, frame.Height));
         }
 
-        private Rectangle PlaceCentered(
+        private Rect PlaceCentered(
             View content,
             Size windowSize)
         {
@@ -206,7 +206,7 @@ namespace XForms.Win32.Renderers
                 Math.Max(0, windowSize.Height - (2 * WindowMargin))));
 
             var size = content.DesiredSize;
-            return new Rectangle(
+            return new Rect(
                 (float)Math.Round((windowSize.Width - size.Width) / 2),
                 (float)Math.Round((windowSize.Height - size.Height) / 2),
                 size.Width,
@@ -217,7 +217,7 @@ namespace XForms.Win32.Renderers
         /// Below the target, or above it when there's more room there, starting at
         /// its left edge and kept inside the window.
         /// </summary>
-        private Rectangle PlaceNextTo(
+        private Rect PlaceNextTo(
             View content,
             ViewRenderer target,
             Size windowSize)
@@ -245,7 +245,7 @@ namespace XForms.Win32.Renderers
             }
 
             float x = Math.Max(EdgeMargin, Math.Min(origin.X, windowSize.Width - size.Width - EdgeMargin));
-            return new Rectangle((float)Math.Round(x), (float)Math.Round(y), size.Width, size.Height);
+            return new Rect((float)Math.Round(x), (float)Math.Round(y), size.Width, size.Height);
         }
     }
 

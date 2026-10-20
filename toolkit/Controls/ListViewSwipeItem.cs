@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System;
 using XForms.Controls;
 
 namespace XForms.Toolkit
@@ -21,8 +21,8 @@ namespace XForms.Toolkit
             this._textFormat = new TextFormat()
             {
                 FontSize = 12.0f,
-                HorizontalAlignment = LayoutAlignment.End,
-                VerticalAlignment = LayoutAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Right,
+                VerticalAlignment = VerticalAlignment.Center,
             };
 
             this._swipeDirection = ListViewSwipeDirection.Primary;
@@ -39,9 +39,9 @@ namespace XForms.Toolkit
             {
                 this._swipeDirection = value;
 
-                this._textFormat.HorizontalAlignment = (value == ListViewSwipeDirection.Primary ? LayoutAlignment.End : LayoutAlignment.Start);
+                this._textFormat.HorizontalAlignment = (value == ListViewSwipeDirection.Primary ? HorizontalAlignment.Right : HorizontalAlignment.Left);
 
-                this.Invalidate();
+                this.InvalidateVisual();
             }
         }
 
@@ -56,7 +56,7 @@ namespace XForms.Toolkit
             {
                 this._command = value;
 
-                this.Invalidate();
+                this.InvalidateVisual();
             }
         }
 
@@ -79,7 +79,7 @@ namespace XForms.Toolkit
             {
                 this._iconSize = value;
 
-                this.Invalidate();
+                this.InvalidateVisual();
             }
         }
 
@@ -114,7 +114,7 @@ namespace XForms.Toolkit
 
         protected override void DrawBackground(
             IDrawContext drawContext,
-            Rectangle bounds)
+            Rect bounds)
         {
             const float Padding = 10.0f;
 
@@ -124,13 +124,13 @@ namespace XForms.Toolkit
 
             float origin = (this._swipeDirection == ListViewSwipeDirection.Primary ? 1.0f : 0.0f);
 
-            Rectangle imageBounds = new Rectangle(
+            Rect imageBounds = new Rect(
                 bounds.X + (origin * (bounds.Width - this._iconSize.Width)),
                 bounds.Center.Y - (this._iconSize.Height / 2.0f),
                 this._iconSize.Width,
                 this._iconSize.Height);
 
-            Rectangle textBounds = bounds.Deflate(imageBounds.Width + Padding, 0);
+            Rect textBounds = bounds.Deflate(imageBounds.Width + Padding, 0);
 
             if (null != this.Icon)
             {

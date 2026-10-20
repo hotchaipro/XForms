@@ -10,117 +10,119 @@ namespace XForms.Test
     /// </summary>
     public class PickersPage : Page
     {
-        private readonly TextView _status;
+        private readonly TextBlock _status;
 
         public PickersPage()
         {
-            var layout = new DockLayout()
+            var layout = new DockPanel()
             {
                 Margin = new Thickness(20),
             };
 
-            this._status = new TextView()
+            this._status = new TextBlock()
             {
                 Text = "Nothing chosen yet",
-                HorizontalAlignment = LayoutAlignment.Start,
+                HorizontalAlignment = HorizontalAlignment.Left,
                 Margin = new Thickness(0, 0, 0, 12),
             };
-            layout.Children.Add(this._status, DockRegion.Top);
+            layout.Children.Add(this._status, Dock.Top);
 
             layout.Children.Add(
-                new TextEntry()
+                new TextBox()
                 {
                     PlaceholderText = "Name",
-                    HorizontalAlignment = LayoutAlignment.Fill,
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
                     Margin = new Thickness(0, 0, 0, 12),
                 },
-                DockRegion.Top);
+                Dock.Top);
 
-            var unitPicker = new ListPicker()
+            var unitPicker = new ComboBox()
             {
-                HorizontalAlignment = LayoutAlignment.Start,
+                HorizontalAlignment = HorizontalAlignment.Left,
                 Margin = new Thickness(0, 0, 0, 12),
             };
             foreach (var unit in new[] { "days", "weeks", "months", "years" })
             {
-                unitPicker.Items.Add(new ListPickerItem(unit));
+                unitPicker.Items.Add(new ComboBoxItem(unit));
             }
             unitPicker.SelectionChanged += (sender, item) => this._status.Text = "Unit: " + item.Text;
-            layout.Children.Add(unitPicker, DockRegion.Top);
+            layout.Children.Add(unitPicker, Dock.Top);
 
-            var countPicker = new ListPicker()
+            var countPicker = new ComboBox()
             {
-                HorizontalAlignment = LayoutAlignment.Start,
+                HorizontalAlignment = HorizontalAlignment.Left,
                 Margin = new Thickness(0, 0, 0, 12),
             };
             for (int count = 1; count <= 30; count += 1)
             {
-                countPicker.Items.Add(new ListPickerItem(count.ToString()));
+                countPicker.Items.Add(new ComboBoxItem(count.ToString()));
             }
             countPicker.SelectionChanged += (sender, item) => this._status.Text = "Count: " + item.Text;
-            layout.Children.Add(countPicker, DockRegion.Top);
+            layout.Children.Add(countPicker, Dock.Top);
 
             var datePicker = new CalendarDatePicker()
             {
-                HorizontalAlignment = LayoutAlignment.Start,
+                HorizontalAlignment = HorizontalAlignment.Left,
                 Margin = new Thickness(0, 0, 0, 12),
                 MinimumDate = DateTime.Today,
             };
             datePicker.SelectedDateChanged += (sender, date) => this._status.Text = "Start: " + date?.ToLongDateString();
-            layout.Children.Add(datePicker, DockRegion.Top);
+            layout.Children.Add(datePicker, Dock.Top);
 
             var popoverButton = new Button()
             {
                 Text = "Schedule...",
-                HorizontalAlignment = LayoutAlignment.Start,
-                Size = new Size(150, 44),
+                HorizontalAlignment = HorizontalAlignment.Left,
+                Width = 150,
+                Height = 44,
                 Margin = new Thickness(0, 0, 0, 12),
             };
-            popoverButton.Clicked += (sender, e) => new SchedulePopover(this._status).ShowAsync();
-            layout.Children.Add(popoverButton, DockRegion.Top);
+            popoverButton.Clicked += (sender, e) => new ScheduleFlyout(this._status).ShowAsync();
+            layout.Children.Add(popoverButton, Dock.Top);
 
             layout.Children.Add(
 
                 new ProgressRing()
                 {
-                    HorizontalAlignment = LayoutAlignment.Start,
+                    HorizontalAlignment = HorizontalAlignment.Left,
                     Margin = new Thickness(0, 0, 0, 12),
                 },
-                DockRegion.Top);
+                Dock.Top);
 
             layout.Children.Add(
 
                 new Image()
                 {
                     Source = "AboutLogo.png",
-                    HorizontalAlignment = LayoutAlignment.Start,
-                    VerticalAlignment = LayoutAlignment.Start,
-                    MaximumSize = new Size(96, 96),
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalAlignment = VerticalAlignment.Top,
+                    MaxWidth = 96,
+                    MaxHeight = 96,
                 },
-                DockRegion.Left);
+                Dock.Left);
 
             layout.Children.Add(
-                new CalendarControl()
+                new CalendarView()
                 {
-                    HorizontalAlignment = LayoutAlignment.Start,
-                    VerticalAlignment = LayoutAlignment.Start,
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalAlignment = VerticalAlignment.Top,
                     Margin = new Thickness(20, 0, 0, 0),
                 },
-                DockRegion.Left);
+                Dock.Left);
 
-            this.Layout = layout;
+            this.Content = layout;
         }
 
-        private sealed class SchedulePopover : Popover
+        private sealed class ScheduleFlyout : Flyout
         {
-            private readonly TextView _status;
+            private readonly TextBlock _status;
 
-            public SchedulePopover(
-                TextView status)
+            public ScheduleFlyout(
+                TextBlock status)
             {
                 this._status = status;
 
-                var calendar = new CalendarControl()
+                var calendar = new CalendarView()
                 {
                     MinimumDate = DateTime.Today.AddDays(1),
                 };

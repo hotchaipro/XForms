@@ -1,25 +1,25 @@
 ﻿using System;
-using XForms.Layouts;
+using XForms.Layouts;
 using XForms.Controls;
 
 namespace XForms.Toolkit
 {
     public class MenuBar : ContentControl, IMenuItemContainer
     {
-        private DockLayout _buttonsLayout;
+        private DockPanel _buttonsLayout;
 
         public MenuBar()
         {
-            this._buttonsLayout = new DockLayout()
+            this._buttonsLayout = new DockPanel()
             {
-                HorizontalAlignment = LayoutAlignment.Center,
-                VerticalAlignment = LayoutAlignment.Fill,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Stretch,
             };
 
-            this.HorizontalAlignment = LayoutAlignment.Fill;
-            this.VerticalAlignment = LayoutAlignment.Start;
+            this.HorizontalAlignment = HorizontalAlignment.Stretch;
+            this.VerticalAlignment = VerticalAlignment.Top;
 
-            this.Size = new Size(Dimension.Auto, 50);
+            this.Height = 50;
 
             this.MenuItems = new MenuItemCollection(this);
 
@@ -55,7 +55,7 @@ namespace XForms.Toolkit
             }
 
             var menuButton = new MenuButton(this, menuItem);
-            this._buttonsLayout.Children.Add(menuButton, DockRegion.Left);
+            this._buttonsLayout.Children.Add(menuButton, Dock.Left);
         }
     }
 }

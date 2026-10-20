@@ -27,7 +27,7 @@ namespace XForms.Android.Renderers
         }
 
         public void SetLayout(
-            ILayoutRenderer layoutRenderer)
+            IPanelRenderer layoutRenderer)
         {
             this._nativePage.RemoveAllViews();
             this._nativePage.AddView((global::Android.Views.View)layoutRenderer.NativeElement);

@@ -1,55 +1,138 @@
 # XForms
-XForms is a cross-platform UI framework optimized for building custom user interfaces.
 
-## What's in XForms?
-XForms is a UI framework that provides a very thin cross-platform wrapper around the essential components of a user interface:
+XForms is a lightweight .NET UI framework for apps with a custom look that
+should look the same on every platform, while keeping the platform's own
+text rendering, text entry and scrolling.
 
-* Windows (Forms)
-* Navigation
-* Layout
-* Input
-* Custom-drawn controls
+## What makes XForms different
 
-XForms abstracts these basic components just enough to provide a consistent look for your application across platforms.
+- **Native text, custom look.** Text rendering (the platform's fonts, shaping
+  and emoji), text entry (input methods, spell checking, selection,
+  accessibility, autofill), scrolling physics and virtualized lists all use
+  the platform's own implementation. Everything else is owner-drawn, so
+  controls look identical everywhere and don't change when a platform's
+  design language does.
 
-Think of XForms as providing the containers for your custom-drawn controls.
+  Other frameworks usually pick one side:
+  - **MAUI and React Native** use native controls, so apps look different on
+    each platform.
+  - **Flutter, Avalonia, Compose Multiplatform and Uno's Skia renderer** draw
+    everything, text and text entry included.
 
-## Versus Xamarin.Forms
-Xamarin.Forms is focused on apps that want to provide a "native" look on each platform. Your Xamarin.Forms app will look and work differently on each platform, and there are very few options to give your UI a custom look and feel.
+  XForms does both: native where quality comes from the platform, owner-drawn
+  everywhere else.
+- **A small framework, with controls on top.** All platform-specific code
+  lives in a small framework. Control libraries, including XForms' own
+  toolkit, are written once on its public API. The compiler enforces that,
+  so any control library you write runs on every supported platform.
+- **No markup or styling machinery.** There's no XAML, styling engine or
+  binding engine to learn or carry. Controls are plain C# that draws and lays
+  itself out.
+- **Lean.** On Windows, XForms uses Win32, DirectComposition, Direct2D and
+  DirectWrite directly, with no XAML or Windows App SDK. Its test app is
+  about 21 MB self-contained and trimmed, compared with about 221 MB for the
+  same app on WinUI 3. The Windows backend uses source-generated interop, so
+  it's trimmable and compatible with Native AOT.
+- **Native performance.** Layout is shared across platforms but driven by
+  each platform's own layout system, and animations run on the platform's
+  compositor, off the UI thread.
 
-In short, Xamarin.Forms is about churning out generic iOS apps that look like every other iOS app, and generic Android apps that look like every other Android app.
+## Why choose XForms
 
-In contrast, XForms is focused on apps that want to provide a custom user interface that has a consistent look across platforms.
+XForms is a good fit when:
+- you want a distinctive, fully custom design that's identical on every
+  platform;
+- you also want text and text entry to behave exactly as they do in the
+  platform's own apps;
+- you work in C# and prefer a small, understandable stack to a large
+  framework.
 
-## Why not Native?
-If you've been shipping apps for more than a few years, you'll know that the "native" look on every platform periodically changes, and apps that once looked sleek and modern now look obviously dated--not necessarily bad, just dated because they're using old "native" controls.
+It's not the right choice (yet) when:
+- you need macOS, Linux or the web today;
+- you need a large ready-made control set, design tooling or hot reload;
+- you want a native look on each platform (consider MAUI), or need to reuse
+  WPF or WinUI XAML (consider Avalonia or Uno Platform).
 
-I noticed that some old iOS apps in particular still looked great, and the thing they all had in common was a completely custom user interface that still looked and worked great for their scenario.
+See [docs/comparisons.md](docs/comparisons.md) for detailed comparisons with
+Uno Platform, Avalonia, .NET MAUI, Electron, React Native, Flutter and
+Compose Multiplatform.
+
+## Why a custom look?
+
+If you've been shipping apps for more than a few years, you'll know that the
+"native" look on every platform periodically changes, and apps that once
+looked sleek and modern now look obviously dated. Not necessarily bad, just
+dated, because they're using old "native" controls.
+
+I noticed that some old iOS apps in particular still looked great, and the
+thing they all had in common was a completely custom user interface that still
+looked and worked great for their scenario.
 
 That's when the light clicked on for me.
 
-Despite how much each platform owner (Apple, Google, Windows) push you to support their latest and greatest native look (so your app looks like every other app and you'll probably have to rewrite it for every platform as well), it may not be your best option.
+Despite how much each platform owner (Apple, Google, Microsoft) pushes you to
+support their latest native look, so your app looks like every other app and
+you'll probably have to rewrite it for every platform as well, it may not be
+your best option.
 
-If you agree that makes sense for your app, then XForms may be just what you need.
+If you agree that makes sense for your app, then XForms may be just what you
+need.
 
-## Is XForms for Me?
-If you're writing an enterprise application where familiarity is the top priority (i.e., "boring" is a good thing), you really should look into Xamarin.Forms.
+## How it's organized
 
-If your objective is to create a modern, exciting and unique user interface without having to re-write it for each platform, XForms may be for you.
+| Folder | Project | What it is |
+|---|---|---|
+| `framework/` | `XForms.Framework` | The platform-neutral framework: app hosting, layout, input, accessibility, popups, and the native primitives |
+| `platform/win32/` | `XForms.Framework.Win32` | Windows: Win32, DirectComposition, Direct2D, DirectWrite, RichEdit |
+| `platform/android/` | `XForms.Framework.Android` | Android: native views |
+| `platform/ios/` | `XForms.Framework.iOS` | iOS: UIKit |
+| `toolkit/` | `XForms.Toolkit` | Cross-platform controls (buttons, pickers, calendar, menus, popovers, ...), built only on the framework's public API |
+| `test/` | `XForms.Test.*` | Test apps for each platform, with shared pages in `test/XForms.Test` |
 
-## Architecture
+An app references the framework, one platform project, and the control
+libraries it uses. See [docs/architecture.md](docs/architecture.md) for how
+the layers, layout, drawing, input, popups and lists work.
 
-XForms is a framework that contains all the platform-specific code, plus a
-toolkit of controls built on the framework's public API. Other control
-libraries can be built the same way and run on every platform. See
-[docs/architecture.md](docs/architecture.md).
+## Building
 
-For how XForms compares with Uno Platform, Avalonia, .NET MAUI, Electron, React
-Native, Flutter and Compose Multiplatform, see
-[docs/comparisons.md](docs/comparisons.md).
+Requirements:
+- the .NET 10 SDK;
+- the .NET Android workload, for Android;
+- the .NET iOS workload, and a Mac, to build for and run on iOS.
 
-## The current state of affairs:
+Build everything with:
 
-* Windows (Win32, DirectComposition and DirectWrite, no XAML): in development
-* Android: in development
-* iOS: in development (builds; not yet tested on a device)
+```bash
+dotnet build XForms.slnx
+```
+
+Run the Windows test app with:
+
+```bash
+dotnet run --project test/XForms.Test.Win32
+```
+
+## Status
+
+XForms is in active development, and its API is changing.
+
+| Platform | Status |
+|---|---|
+| Windows (Win32, no XAML) | In development: rendering, input, scrolling, lists, keyboard focus and UI Automation work |
+| Android | In development: rendering, input, scrolling and lists work |
+| iOS | In development: builds, but not yet tested since the latest restructure |
+
+Planned work includes aligning the API with WPF, WinUI and Avalonia
+conventions, lightweight controls, a richer drawing API, an animation system
+played by the compositor, and accessibility and keyboard focus on every
+platform.
+
+## Documentation
+
+- [Architecture](docs/architecture.md): the layers, and how layout, drawing,
+  input, popups, lists and accessibility work.
+- [Comparisons](docs/comparisons.md): XForms compared with Uno Platform,
+  Avalonia, .NET MAUI, Electron, React Native, Flutter and Compose
+  Multiplatform.
+- [Alignment](docs/alignment.md): the framework's main gaps, and the plan to
+  align its API with familiar frameworks.

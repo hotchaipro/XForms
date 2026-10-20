@@ -20,7 +20,7 @@ namespace XForms
             this._backStack = new Stack<Page>();
         }
 
-        public new IFrameRenderer Renderer
+        internal new IFrameRenderer Renderer
         {
             get
             {
@@ -37,8 +37,9 @@ namespace XForms
             }
 
             page.IsVisible = false;
-
+            page.AttachTo(this);
             this.Renderer.Push(page);
+            page.NotifyAttached();
         }
 
         public virtual bool CanNavigateBack
@@ -130,8 +131,9 @@ namespace XForms
                 if (navigationMode == NavigationMode.Forward)
                 {
                     // Current page animates out of the frame
-                    currentPage.Translation = XForms.Point.Zero;
-                    currentPage.TranslateTo(new XForms.Point(-this.Size.Width, 0), TimeSpan.FromMilliseconds(150), new CubicEase(EasingMode.EaseOut)).ContinueWith(
+                    var currentAnimator = currentPage.GetOrCreateAnimator();
+                    currentAnimator.Translation = XForms.Point.Zero;
+                    currentAnimator.TranslateTo(new XForms.Point(-this.Bounds.Size.Width, 0), TimeSpan.FromMilliseconds(150), new CubicEase(EasingMode.EaseOut)).ContinueWith(
                         (task) => this.Application.InvokeOnUIThreadAsync(() => { currentPage.IsVisible = false; }));
                 }
                 else
@@ -145,15 +147,16 @@ namespace XForms
             if (navigationMode == NavigationMode.Forward)
             {
                 // New page stays in position and is uncovered as the current page moves out of the frame
-                newPage.Translation = XForms.Point.Zero;
+                newPage.GetOrCreateAnimator().Translation = XForms.Point.Zero;
                 newPage.IsVisible = true;
             }
             else
             {
                 // New page animates into the frame
-                newPage.Translation = new XForms.Point(-this.Size.Width, 0);
+                var newAnimator = newPage.GetOrCreateAnimator();
+                newAnimator.Translation = new XForms.Point(-this.Bounds.Size.Width, 0);
                 newPage.IsVisible = true;
-                newPage.TranslateTo(XForms.Point.Zero, TimeSpan.FromMilliseconds(150), new CubicEase(EasingMode.EaseIn)).ContinueWith(
+                newAnimator.TranslateTo(XForms.Point.Zero, TimeSpan.FromMilliseconds(150), new CubicEase(EasingMode.EaseIn)).ContinueWith(
                         (task) => this.Application.InvokeOnUIThreadAsync(() => { if (null != currentPage) currentPage.IsVisible = false; }));
             }
 
@@ -167,7 +170,13 @@ namespace XForms
             Page page,
             bool hideCurrentPage = true)
         {
+            bool isNew = (page.Parent != this);
+            page.AttachTo(this);
             this.Renderer.SetContent(page, hideCurrentPage);
+            if (isNew)
+            {
+                page.NotifyAttached();
+            }
         }
 
         internal override IEnumerable<Element> GetChildElements()

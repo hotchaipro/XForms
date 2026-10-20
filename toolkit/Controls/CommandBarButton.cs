@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using XForms.Input;
-using XForms.Layouts;
+using XForms.Layouts;
 using XForms.Controls;
 
 namespace XForms.Toolkit
@@ -10,11 +10,11 @@ namespace XForms.Toolkit
     {
         private CommandBar _commandBar;
         private List<CommandBarButton> _buttons;
-        private DockRegion _buttonRegion;
+        private Dock _buttonRegion;
 
         internal CommandBarButtonCollection(
             CommandBar commandBar,
-            DockRegion buttonRegion)
+            Dock buttonRegion)
         {
             if (null == commandBar)
             {
@@ -42,7 +42,8 @@ namespace XForms.Toolkit
                 throw new ArgumentNullException(nameof(button));
             }
 
-            button.Size = new Size(48f, 48f);
+            button.Width = 48f;
+            button.Height = 48f;
 
             this._commandBar.ButtonsLayout.Children.Add(button, this._buttonRegion);
         }
@@ -50,6 +51,9 @@ namespace XForms.Toolkit
 
     internal sealed class CommandBarButton : UserControl, ITapGestureDelegate
     {
+        // Animates the control itself (press feedback, spinning)
+        private readonly Animator _ownAnimator;
+
         protected override AccessibilityRole DefaultAccessibilityRole
         {
             get
@@ -74,14 +78,16 @@ namespace XForms.Toolkit
 
         public CommandBarButton()
         {
+            this._ownAnimator = this.CreateOwnAnimator();
+
             this._textFormat = new TextFormat()
             {
                 FontSize = 9.0f,
-                HorizontalAlignment = LayoutAlignment.Center,
-                VerticalAlignment = LayoutAlignment.End,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Bottom,
             };
 
-            this.Scale = 1.0f;
+            this._ownAnimator.Scale = 1.0f;
 
             this.GestureRecognizer = new TapGestureRecognizer(this);
         }
@@ -103,7 +109,7 @@ namespace XForms.Toolkit
             {
                 this._icon = value;
 
-                this.Invalidate();
+                this.InvalidateVisual();
             }
         }
 
@@ -118,7 +124,7 @@ namespace XForms.Toolkit
             {
                 this._text = value;
 
-                this.Invalidate();
+                this.InvalidateVisual();
             }
         }
 
@@ -150,14 +156,14 @@ namespace XForms.Toolkit
 
         protected override void DrawBackground(
             IDrawContext drawContext,
-            Rectangle bounds)
+            Rect bounds)
         {
             base.DrawBackground(drawContext, bounds);
 
             float imageDimension = Math.Min(bounds.Width, bounds.Height) * 0.65f;
             float textHeight = bounds.Height * 0.35f;
 
-            Rectangle imageBounds = new Rectangle(
+            Rect imageBounds = new Rect(
                 bounds.Center.X - (imageDimension / 2f),
                 bounds.Center.Y - ((imageDimension + textHeight) / 2f),
                 imageDimension,
@@ -165,7 +171,7 @@ namespace XForms.Toolkit
 
             drawContext.DrawImage(this._icon, imageBounds, this.AccentColor);
 
-            Rectangle textBounds = new Rectangle(bounds.X, imageBounds.Bottom, bounds.Width, bounds.Bottom - imageBounds.Bottom);
+            Rect textBounds = new Rect(bounds.X, imageBounds.Bottom, bounds.Width, bounds.Bottom - imageBounds.Bottom);
 
             drawContext.DrawText(this.Text, textBounds, this.AccentColor, this._textFormat);
         }
@@ -174,7 +180,7 @@ namespace XForms.Toolkit
 
         void ITapGestureDelegate.OnTapBegan()
         {
-            this.ScaleTo(PressedScale, TimeSpan.FromMilliseconds(25), new CubicEase(EasingMode.EaseIn));
+            this._ownAnimator.ScaleTo(PressedScale, TimeSpan.FromMilliseconds(25), new CubicEase(EasingMode.EaseIn));
         }
 
         void ITapGestureDelegate.OnTapped()
@@ -184,9 +190,9 @@ namespace XForms.Toolkit
 
         void ITapGestureDelegate.OnTapEnded()
         {
-            if (this.Scale != 1.0f)
+            if (this._ownAnimator.Scale != 1.0f)
             {
-                this.ScaleTo(1.0f, TimeSpan.FromMilliseconds(100), new SpringEase(EasingMode.EaseOut));
+                this._ownAnimator.ScaleTo(1.0f, TimeSpan.FromMilliseconds(100), new SpringEase(EasingMode.EaseOut));
             }
         }
 

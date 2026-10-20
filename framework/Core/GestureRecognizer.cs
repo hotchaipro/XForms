@@ -62,7 +62,7 @@ namespace XForms
         }
 
         public void HandlePointerInput(
-            PointerInputEvent inputEvent,
+            PointerEventArgs inputEvent,
             ref GestureEventResult result)
         {
             if (inputEvent.State == PointerInputState.Began)
@@ -90,7 +90,7 @@ namespace XForms
         }
 
         protected abstract void OnPointerInput(
-            PointerInputEvent inputEvent,
+            PointerEventArgs inputEvent,
             ref GestureEventResult result);
     }
 }

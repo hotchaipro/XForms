@@ -7,7 +7,7 @@ namespace XForms.Controls
     {
         void InvokeDrawBackground(
             IDrawContext drawContext,
-            Rectangle bounds);
+            Rect bounds);
     }
 
     public interface IUserControlRenderer : IControlRenderer
@@ -36,14 +36,27 @@ namespace XForms.Controls
 
             set
             {
+                var oldContent = this._content;
+                if (value == oldContent)
+                {
+                    return;
+                }
+
                 this._content = value;
 
-                this.Renderer.SetContent(value?.Renderer);
-                this.InvalidateLayout();
+                var native = this.Native;
+                if (null != native)
+                {
+                    native.SetContent(value?.AttachTo(this));
+                    oldContent?.NotifyDetached();
+                    value?.NotifyAttached();
+                }
+
+                this.InvalidateMeasure();
             }
         }
 
-        public new IUserControlRenderer Renderer
+        internal new IUserControlRenderer Renderer
         {
             get
             {
@@ -51,9 +64,32 @@ namespace XForms.Controls
             }
         }
 
-        public virtual void Invalidate()
+        private IUserControlRenderer Native
         {
-            this.Renderer?.Invalidate();
+            get
+            {
+                return (IUserControlRenderer)this.CreatedRenderer;
+            }
+        }
+
+        /// <summary>
+        /// Draws the control again.
+        /// </summary>
+        public virtual void InvalidateVisual()
+        {
+            this.Native?.Invalidate();
+        }
+
+        internal override void OnRendererCreated()
+        {
+            base.OnRendererCreated();
+
+            var content = this._content;
+            if (null != content)
+            {
+                this.Native.SetContent(content.AttachTo(this));
+                content.NotifyAttached();
+            }
         }
 
         protected override IElementRenderer CreateRenderer()
@@ -63,14 +99,14 @@ namespace XForms.Controls
 
         protected virtual void DrawBackground(
             IDrawContext drawContext,
-            Rectangle bounds)
+            Rect bounds)
         {
             drawContext.Clear(this.BackgroundColor);
         }
 
         void IDrawDelegate.InvokeDrawBackground(
             IDrawContext drawContext,
-            Rectangle bounds)
+            Rect bounds)
         {
             this.DrawBackground(drawContext, bounds);
         }
@@ -91,7 +127,7 @@ namespace XForms.Controls
         protected override void ArrangeOverride(
             Size finalSize)
         {
-            this._content?.Arrange(new Rectangle(0, 0, finalSize.Width, finalSize.Height));
+            this._content?.Arrange(new Rect(0, 0, finalSize.Width, finalSize.Height));
         }
 
         internal override IEnumerable<Element> GetChildElements()
@@ -108,7 +144,7 @@ namespace XForms.Controls
         {
             base.OnApplyTheme(theme);
 
-            this.Invalidate();
+            this.InvalidateVisual();
         }
     }
 }

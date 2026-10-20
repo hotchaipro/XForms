@@ -140,32 +140,34 @@ namespace XForms.Toolkit
         private ListViewSwipeItem _swipeItem;
         private CommandBar _commandBar;
         private CommandBarCommandCollection _commandBarCommands;
-        private DockLayout _contentLayout;
+        private DockPanel _contentLayout;
 
         public CommandListViewItemContainer()
         {
-            this.VerticalAlignment = LayoutAlignment.Fill;
+            this.VerticalAlignment = VerticalAlignment.Stretch;
 
             this._swipeItem = new ListViewSwipeItem()
             {
-                HorizontalAlignment = LayoutAlignment.Fill,
-                VerticalAlignment = LayoutAlignment.Fill,
+                Animator = new(),
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Stretch,
                 IconSize = new Size(30, 30),
             };
-            this.Children.Add(this._swipeItem, DockRegion.CenterOverlay);
+            this.Children.Add(this._swipeItem, Dock.CenterOverlay);
 
-            this._contentLayout = new DockLayout()
+            this._contentLayout = new DockPanel()
             {
-                VerticalAlignment = LayoutAlignment.Fill,
-                HorizontalAlignment = LayoutAlignment.Fill,
+                Animator = new(),
+                VerticalAlignment = VerticalAlignment.Stretch,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
             };
-            this.Children.Add(this._contentLayout, DockRegion.CenterOverlay);
+            this.Children.Add(this._contentLayout, Dock.CenterOverlay);
 
             this._commandBar = new CommandBar()
             {
                 IsVisible = false,
             };
-            this._contentLayout.Children.Add(this._commandBar, DockRegion.Bottom);
+            this._contentLayout.Children.Add(this._commandBar, Dock.Bottom);
 
             this.GestureRecognizer = new SwipeGestureRecognizer(this);
         }
@@ -181,7 +183,7 @@ namespace XForms.Toolkit
         protected override void AddContent(
             ListViewItem content)
         {
-            this._contentLayout.Children.Add(content, DockRegion.CenterOverlay);
+            this._contentLayout.Children.Add(content, Dock.CenterOverlay);
         }
 
         protected override void OnBind()
@@ -197,10 +199,10 @@ namespace XForms.Toolkit
             this._commandBar.BindingContext = this.Item;
 
             // Reset swipe defaults
-            this._swipeItem.StopAnimation();
-            this._swipeItem.Translation = Point.Zero;
-            this._contentLayout.StopAnimation();
-            this._contentLayout.Translation = Point.Zero;
+            this._swipeItem.Animator.Stop();
+            this._swipeItem.Animator.Translation = Point.Zero;
+            this._contentLayout.Animator.Stop();
+            this._contentLayout.Animator.Translation = Point.Zero;
         }
 
         protected override void OnRecycle()
@@ -210,11 +212,11 @@ namespace XForms.Toolkit
             this._commandBar.BindingContext = null;
 
             // Reset swipe commands
-            this._swipeItem.StopAnimation();
-            this._swipeItem.Translation = Point.Zero;
+            this._swipeItem.Animator.Stop();
+            this._swipeItem.Animator.Translation = Point.Zero;
             this._swipeItem.Reset();
-            this._contentLayout.StopAnimation();
-            this._contentLayout.Translation = Point.Zero;
+            this._contentLayout.Animator.Stop();
+            this._contentLayout.Animator.Translation = Point.Zero;
         }
 
         public bool IsCommandBarVisible
@@ -301,9 +303,9 @@ namespace XForms.Toolkit
             this._longSwipe = false;
 
             // HACK: Prevent flicker
-            this._swipeItem.Translation = new XForms.Point(-1000, 0);
+            this._swipeItem.Animator.Translation = new XForms.Point(-1000, 0);
 
-            this._contentLayout.Translation = Point.Zero;
+            this._contentLayout.Animator.Translation = Point.Zero;
             UpdateSwipeCommand(direction);
 
             return true;
@@ -353,9 +355,9 @@ namespace XForms.Toolkit
             }
 
             // Limit position
-            if (dx > this.Size.Width)
+            if (dx > this.Bounds.Size.Width)
             {
-                dx = this.Size.Width;
+                dx = this.Bounds.Size.Width;
             }
             else if (dx < 0)
             {
@@ -363,13 +365,13 @@ namespace XForms.Toolkit
             }
 
             // Check for long swipe
-            if ((!this._longSwipe) && (dx >= this.Size.Width * LongSwipeDistancePercentage))
+            if ((!this._longSwipe) && (dx >= this.Bounds.Size.Width * LongSwipeDistancePercentage))
             {
                 // Switch to long swipe
                 this._longSwipe = true;
                 UpdateSwipeCommand(direction);
             }
-            else if ((this._longSwipe) && (dx < (this.Size.Width * LongSwipeDistancePercentage) - Application.TouchSlop))
+            else if ((this._longSwipe) && (dx < (this.Bounds.Size.Width * LongSwipeDistancePercentage) - Application.TouchSlop))
             {
                 // Reset back to short swipe
                 this._longSwipe = false;
@@ -393,10 +395,10 @@ namespace XForms.Toolkit
 
             float position = dx * direction;
 
-            this._contentLayout.Translation = new Point(position, 0);
-            this._swipeItem.Translation = new Point(position - (direction * this.Size.Width), 0);
+            this._contentLayout.Animator.Translation = new Point(position, 0);
+            this._swipeItem.Animator.Translation = new Point(position - (direction * this.Bounds.Size.Width), 0);
             float dimmedOpacity = (Application.Current.Theme == AppTheme.Light ? 0.1f : 0.25f);
-            this._swipeItem.Opacity = (this._swipeEnabled ? 1.0f : dimmedOpacity);
+            this._swipeItem.Animator.Opacity = (this._swipeEnabled ? 1.0f : dimmedOpacity);
 
             return true;
         }
@@ -473,15 +475,15 @@ namespace XForms.Toolkit
                 return;
             }
 
-            this._contentLayout.TranslateTo(new Point(direction * this.Size.Width, 0), TimeSpan.FromMilliseconds(100), new CubicEase(EasingMode.EaseInOut));
-            this._swipeItem.TranslateTo(new Point(0, 0), TimeSpan.FromMilliseconds(100), new CubicEase(EasingMode.EaseInOut)).ContinueWith((ignore) =>
+            this._contentLayout.Animator.TranslateTo(new Point(direction * this.Bounds.Size.Width, 0), TimeSpan.FromMilliseconds(100), new CubicEase(EasingMode.EaseInOut));
+            this._swipeItem.Animator.TranslateTo(new Point(0, 0), TimeSpan.FromMilliseconds(100), new CubicEase(EasingMode.EaseInOut)).ContinueWith((ignore) =>
             {
                 Application.InvokeOnUIThreadAsync(() =>
                 {
                     this._swipeCommand?.Execute(this.Item);
 
-                    this._contentLayout.Translation = Point.Zero;
-                    this._swipeItem.Translation = new Point(-1000, 0);
+                    this._contentLayout.Animator.Translation = Point.Zero;
+                    this._swipeItem.Animator.Translation = new Point(-1000, 0);
                 });
             });
         }
@@ -494,10 +496,10 @@ namespace XForms.Toolkit
                 return;
             }
 
-            this._contentLayout.TranslateTo(Point.Zero, TimeSpan.FromMilliseconds(100), new CubicEase(EasingMode.EaseInOut));
-            this._swipeItem.TranslateTo(
-                new Point(-direction * this.Size.Width, 0), TimeSpan.FromMilliseconds(100), new CubicEase(EasingMode.EaseInOut)).ContinueWith(
-                (ignore) => { this._swipeItem.Translation = new XForms.Point(-1000, 0); }, TaskContinuationOptions.ExecuteSynchronously);
+            this._contentLayout.Animator.TranslateTo(Point.Zero, TimeSpan.FromMilliseconds(100), new CubicEase(EasingMode.EaseInOut));
+            this._swipeItem.Animator.TranslateTo(
+                new Point(-direction * this.Bounds.Size.Width, 0), TimeSpan.FromMilliseconds(100), new CubicEase(EasingMode.EaseInOut)).ContinueWith(
+                (ignore) => { this._swipeItem.Animator.Translation = new XForms.Point(-1000, 0); }, TaskContinuationOptions.ExecuteSynchronously);
         }
 
         #endregion Swipe input

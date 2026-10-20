@@ -20,7 +20,7 @@ namespace XForms
         List,
         ListItem,
         Image,
-        TextEntry,
+        TextBox,
         Group,
     }
 }

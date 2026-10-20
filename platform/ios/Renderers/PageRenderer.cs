@@ -20,7 +20,7 @@ namespace XForms.iOS.Renderers
         }
 
         public void SetLayout(
-            ILayoutRenderer layoutRenderer)
+            IPanelRenderer layoutRenderer)
         {
             foreach (var subview in this.NativeElement.Subviews)
             {

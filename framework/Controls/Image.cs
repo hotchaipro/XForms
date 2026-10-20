@@ -36,8 +36,7 @@ namespace XForms.Controls
             set
             {
                 this._tint = value;
-
-                this.Renderer.SetTint(value);
+                this.Native?.SetTint(value);
             }
         }
 
@@ -51,16 +50,40 @@ namespace XForms.Controls
             set
             {
                 this._source = value;
-
-                this.Renderer.SetSource(value);
+                this.Native?.SetSource(value);
+                this.InvalidateMeasure();
             }
         }
 
-        public new IImageRenderer Renderer
+        internal new IImageRenderer Renderer
         {
             get
             {
                 return (IImageRenderer)base.Renderer;
+            }
+        }
+
+        private IImageRenderer Native
+        {
+            get
+            {
+                return (IImageRenderer)this.CreatedRenderer;
+            }
+        }
+
+        internal override void OnRendererCreated()
+        {
+            base.OnRendererCreated();
+
+            var native = this.Native;
+            if (this._tint != Colors.Transparent)
+            {
+                native.SetTint(this._tint);
+            }
+
+            if (null != this._source)
+            {
+                native.SetSource(this._source);
             }
         }
 

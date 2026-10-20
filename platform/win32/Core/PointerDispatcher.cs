@@ -104,7 +104,7 @@ namespace XForms.Win32
             }
 
             // A click on a text entry (such as on its placeholder) focuses it
-            if (hit is TextEntryRenderer textEntry)
+            if (hit is TextBoxRenderer textEntry)
             {
                 this._host.Focus.SetFocus(textEntry, showRing: false);
                 this._isActive = false;
@@ -133,7 +133,7 @@ namespace XForms.Win32
             // Offer the touch to the deepest view first, then its ancestors
             for (var renderer = hit; null != renderer; renderer = renderer.ParentRenderer)
             {
-                if ((renderer.Element is View) && renderer.IsInputVisible)
+                if ((renderer.Element is View) && renderer.IsHitTestVisible)
                 {
                     var origin = renderer.AbsoluteOrigin();
                     var local = new Point(point.X - origin.X, point.Y - origin.Y);
@@ -250,7 +250,7 @@ namespace XForms.Win32
         {
 
 
-            return ((View)renderer.Element).HandlePointerEvent(new PointerInputEvent(local, state, true));
+            return ((View)renderer.Element).HandlePointerEvent(new PointerEventArgs(local, state, true));
         }
 
         private void BeginDragScrolling(

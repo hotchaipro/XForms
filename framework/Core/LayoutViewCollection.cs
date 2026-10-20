@@ -6,10 +6,10 @@ namespace XForms
 {
     public class LayoutViewCollection : IEnumerable<View>
     {
-        private Layout _parentLayout;
+        private Panel _parentLayout;
 
         internal LayoutViewCollection(
-            Layout parent)
+            Panel parent)
         {
             if (null == parent)
             {

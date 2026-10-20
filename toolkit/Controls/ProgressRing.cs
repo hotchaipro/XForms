@@ -11,6 +11,9 @@ namespace XForms.Toolkit
     /// </summary>
     public class ProgressRing : UserControl
     {
+        // Spins the ring
+        private readonly Animator _ownAnimator;
+
         private const float DefaultSize = 32.0f;
         private static readonly TimeSpan RevolutionPeriod = TimeSpan.FromSeconds(1);
 
@@ -18,6 +21,8 @@ namespace XForms.Toolkit
 
         public ProgressRing()
         {
+            this._ownAnimator = this.CreateOwnAnimator();
+
             this.IsActive = true;
         }
 
@@ -38,11 +43,11 @@ namespace XForms.Toolkit
 
                 if (value)
                 {
-                    this.StartContinuousRotation(RevolutionPeriod);
+                    this._ownAnimator.StartContinuousRotation(RevolutionPeriod);
                 }
                 else
                 {
-                    this.StopContinuousRotation();
+                    this._ownAnimator.StopContinuousRotation();
                 }
             }
         }
@@ -56,7 +61,7 @@ namespace XForms.Toolkit
 
         protected override void DrawBackground(
             IDrawContext drawContext,
-            Rectangle bounds)
+            Rect bounds)
         {
             drawContext.Clear(Colors.Transparent);
 
@@ -70,7 +75,7 @@ namespace XForms.Toolkit
         {
             base.OnApplyTheme(theme);
 
-            this.Invalidate();
+            this.InvalidateVisual();
         }
     }
 }

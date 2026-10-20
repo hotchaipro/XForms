@@ -1,11 +1,25 @@
 ﻿using System;
-using XForms.Input;
+using XForms.Input;
 using XForms.Controls;
 
 namespace XForms.Toolkit
 {
     public class FloatingButton : UserControl, ISwipeGestureDelegate
     {
+        // Animates the button within a FlyoutButton
+        private readonly Animator _flyoutAnimator;
+
+        /// <summary>
+        /// The animator a <see cref="FlyoutButton"/> moves and scales the button
+        /// with. The public Animator stays the app's.
+        /// </summary>
+        internal Animator FlyoutAnimator
+        {
+            get
+            {
+                return this._flyoutAnimator;
+            }
+        }
         private Bitmap _icon;
         private bool _isTouchDown;
         private bool _isSubtleStyle;
@@ -15,6 +29,7 @@ namespace XForms.Toolkit
 
         public FloatingButton()
         {
+            this._flyoutAnimator = this.CreateOwnAnimator();
             this.GestureRecognizer = new SwipeGestureRecognizer(this);
 
             this.IsEnabled = true;
@@ -37,7 +52,7 @@ namespace XForms.Toolkit
             {
                 this._isSubtleStyle = value;
 
-                this.Invalidate();
+                this.InvalidateVisual();
             }
         }
 
@@ -146,7 +161,7 @@ namespace XForms.Toolkit
 
         protected override void DrawBackground(
             IDrawContext drawContext,
-            Rectangle bounds)
+            Rect bounds)
         {
             base.DrawBackground(drawContext, bounds);
 
@@ -157,9 +172,9 @@ namespace XForms.Toolkit
 
             Size shadowPadding = new Size(bounds.Width / 10, bounds.Height / 10);
             Size shadowThinPadding = new Size(shadowPadding.Width / 2, shadowPadding.Height / 2);
-            Rectangle buttonRect = bounds.Deflate(shadowPadding.Width, shadowPadding.Height);
-            Rectangle shadowRect = Rectangle.FromLTRB(bounds.X, buttonRect.Top - shadowThinPadding.Height, buttonRect.Right + shadowThinPadding.Width, bounds.Bottom);
-            Rectangle imageRect = buttonRect.Deflate(buttonRect.Width / 6, buttonRect.Height / 6);
+            Rect buttonRect = bounds.Deflate(shadowPadding.Width, shadowPadding.Height);
+            Rect shadowRect = Rect.FromLTRB(bounds.X, buttonRect.Top - shadowThinPadding.Height, buttonRect.Right + shadowThinPadding.Width, bounds.Bottom);
+            Rect imageRect = buttonRect.Deflate(buttonRect.Width / 6, buttonRect.Height / 6);
 
             float blurAmount = Math.Min(shadowPadding.Width, shadowPadding.Height) / 1.5f;
 
@@ -209,7 +224,7 @@ namespace XForms.Toolkit
             this.OnTapBegan();
 
             this._isTouchDown = true;
-            this.Invalidate();
+            this.InvalidateVisual();
         }
 
         void ITapGestureDelegate.OnTapEnded()
@@ -217,7 +232,7 @@ namespace XForms.Toolkit
             this.OnTapEnded();
 
             this._isTouchDown = false;
-            this.Invalidate();
+            this.InvalidateVisual();
         }
 
         void ITapGestureDelegate.OnTapped()

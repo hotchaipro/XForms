@@ -1,26 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using XForms.Input;
-using XForms.Layouts;
+using XForms.Layouts;
 using XForms.Controls;
 
 namespace XForms.Toolkit
 {
     public class DaysOfWeekPicker : ContentControl
     {
-        private DistributedStackLayout _buttonsLayout;
+        private UniformGrid _buttonsLayout;
         private DayOfWeekToggleButton[] _buttons = new DayOfWeekToggleButton[7];
 
         public DaysOfWeekPicker()
         {
-            this._buttonsLayout = new DistributedStackLayout()
+            this._buttonsLayout = new UniformGrid()
             {
-                HorizontalAlignment = LayoutAlignment.Fill,
-                VerticalAlignment = LayoutAlignment.Fill,
-                MaximumSize = new Size(320, Dimension.Auto),
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Stretch,
+                MaxWidth = 320,
             };
 
-            this.Size = new Size(Dimension.Auto, 40);
+            this.Height = 40;
 
             this._buttons[(int)DayOfWeek.Monday] = AddButton("M");
             this._buttons[(int)DayOfWeek.Tuesday] = AddButton("T");
@@ -85,6 +85,9 @@ namespace XForms.Toolkit
 
     internal sealed class DayOfWeekToggleButton : UserControl, ITapGestureDelegate
     {
+        // Animates the control itself (press feedback, spinning)
+        private readonly Animator _ownAnimator;
+
         private const float TouchDownScaleDelta = 0.05f;
         private const float IsUncheckedScale = 0.8f;
 
@@ -98,6 +101,8 @@ namespace XForms.Toolkit
         internal DayOfWeekToggleButton(
             DaysOfWeekPicker parent)
         {
+            this._ownAnimator = this.CreateOwnAnimator();
+
             if (null == parent)
             {
                 throw new ArgumentNullException(nameof(parent));
@@ -108,12 +113,13 @@ namespace XForms.Toolkit
             this._textFormat = new TextFormat()
             {
                 FontSize = 20.0f,
-                HorizontalAlignment = LayoutAlignment.Center,
-                VerticalAlignment = LayoutAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
             };
 
-            this.Size = new Size(40, 40);
-            this.Scale = IsUncheckedScale;
+            this.Width = 40;
+            this.Height = 40;
+            this._ownAnimator.Scale = IsUncheckedScale;
 
             this.GestureRecognizer = new TapGestureRecognizer(this);
         }
@@ -130,7 +136,7 @@ namespace XForms.Toolkit
                 if (this._text != value)
                 {
                     this._text = value;
-                    this.Invalidate();
+                    this.InvalidateVisual();
                 }
             }
         }
@@ -148,7 +154,7 @@ namespace XForms.Toolkit
                 {
                     this._isChecked = value;
 
-                    this.Invalidate();
+                    this.InvalidateVisual();
                     this.UpdateScale();
 
                     this.IsCheckedChanged?.Invoke(this, new ToggledEventArgs(value));
@@ -163,20 +169,20 @@ namespace XForms.Toolkit
 
         protected override void DrawBackground(
             IDrawContext drawContext,
-            Rectangle bounds)
+            Rect bounds)
         {
             base.DrawBackground(drawContext, bounds);
 
             // Calculate text bounds
 
             float textHeight = bounds.Height;
-            Rectangle textBounds = new Rectangle(bounds.X, bounds.Bottom - textHeight, bounds.Width, textHeight);
+            Rect textBounds = new Rect(bounds.X, bounds.Bottom - textHeight, bounds.Width, textHeight);
 
             // Calculate button bounds
 
             float buttonDimension = Math.Min(bounds.Width, bounds.Height);
             float buttonRadius = buttonDimension / 2;
-            Rectangle buttonBounds = new Rectangle(
+            Rect buttonBounds = new Rect(
                 bounds.Center.X - buttonRadius,
                 bounds.Center.Y - buttonRadius,
                 buttonDimension,
@@ -203,15 +209,15 @@ namespace XForms.Toolkit
         {
             if (this._isTouchDown)
             {
-                this.ScaleTo(IsUncheckedScale - TouchDownScaleDelta, TimeSpan.FromMilliseconds(25), new CubicEase(EasingMode.EaseIn));
+                this._ownAnimator.ScaleTo(IsUncheckedScale - TouchDownScaleDelta, TimeSpan.FromMilliseconds(25), new CubicEase(EasingMode.EaseIn));
             }
             else if (this.IsChecked)
             {
-                this.ScaleTo(1.0f, TimeSpan.FromMilliseconds(100), new CubicEase(EasingMode.EaseIn));
+                this._ownAnimator.ScaleTo(1.0f, TimeSpan.FromMilliseconds(100), new CubicEase(EasingMode.EaseIn));
             }
             else
             {
-                this.ScaleTo(IsUncheckedScale, TimeSpan.FromMilliseconds(100), new CubicEase(EasingMode.EaseOut));
+                this._ownAnimator.ScaleTo(IsUncheckedScale, TimeSpan.FromMilliseconds(100), new CubicEase(EasingMode.EaseOut));
             }
         }
 
@@ -220,7 +226,7 @@ namespace XForms.Toolkit
         void ITapGestureDelegate.OnTapBegan()
         {
             this._isTouchDown = true;
-            this.Invalidate();
+            this.InvalidateVisual();
             this.UpdateScale();
         }
 
@@ -232,7 +238,7 @@ namespace XForms.Toolkit
         void ITapGestureDelegate.OnTapEnded()
         {
             this._isTouchDown = false;
-            this.Invalidate();
+            this.InvalidateVisual();
             this.UpdateScale();
         }
 

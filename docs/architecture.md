@@ -92,17 +92,26 @@ An element doesn't talk to the platform directly. It asks the platform
 object:
 
 ```
-TextView ──CreateRenderer()──► IPlatform.CreateLabelRenderer(...)
-                                  │
-            Android: TextViewRenderer → android.widget.TextView
-            iOS:     TextViewRenderer → UILabel
-            Win32:   TextViewRenderer → DirectComposition visual + DirectWrite
+TextBlock ──CreateRenderer()──► IPlatform.CreateTextBlockRenderer(...)
+                                   │
+            Android: TextBlockRenderer → android.widget.TextView
+            iOS:     TextBlockRenderer → UILabel
+            Win32:   TextBlockRenderer → DirectComposition visual + DirectWrite
 ```
 
-Renderer interfaces (`IViewRenderer`, `ITextEntryRenderer`, `IListViewRenderer`,
+Renderer interfaces (`IViewRenderer`, `ITextBoxRenderer`, `IListViewRenderer`,
 and so on) are the contract each platform implements. Control libraries don't
 create renderers. They build on the primitives, chiefly `UserControl` for
 owner-drawn controls and `ContentControl` for composition.
+
+**Native objects are created when a view is attached.** A view keeps its
+property values itself, and its renderer is created the first time a parent
+attaches it (a panel adds it, a control sets it as content, a frame shows a
+page, a popup opens). By then every constructor and object initializer has
+run. The renderer then receives the values the view kept, and containers
+attach their children in turn. `View.Attached` and `View.Detached` report
+when a view is added to and removed from its parent. The `Renderer`
+properties are internal: no public API exposes a native object.
 
 ## Layout
 
@@ -114,13 +123,13 @@ All platforms share one layout engine, in `View`, with WPF-style semantics:
   Measuring reports the content's size. Fill alignment doesn't stretch during
   measure.
 - **Arrange.** `View.Arrange(rect)` applies alignment and margin, sets
-  `Frame`, and positions the native view (`IViewRenderer.ArrangeNative`).
+  `Bounds`, and positions the native view (`IViewRenderer.ArrangeNative`).
 - **Containers.** Native containers call back into the shared engine for
   their children (`MeasureContent`, and `LayoutContent` or `ArrangeContent`).
   So the platform's own layout system drives and caches the passes, but every
-  platform computes the same positions. `Layout` subclasses (`DockLayout`,
-  `DistributedStackLayout`) and owner-drawn controls implement
-  `MeasureOverride` and `ArrangeOverride`.
+  platform computes the same positions. `Panel` subclasses (`DockPanel`,
+  `UniformGrid`) and owner-drawn controls implement `MeasureOverride` and
+  `ArrangeOverride`.
 
 Because the platform drives the passes, layout runs exactly when the platform
 lays out:
@@ -139,7 +148,7 @@ That keeps native performance and native animation behavior.
 - iOS: Core Graphics.
 - Win32: Direct2D, with DirectWrite for text.
 
-The control calls `Invalidate()` to redraw. A `UserControl` can also host a
+The control calls `InvalidateVisual()` to redraw. A `UserControl` can also host a
 child view through its `Content`, which is how controls combine drawing with
 native text.
 
@@ -149,18 +158,30 @@ line of text the way `DrawText` draws it, so controls can size themselves to
 their text. Controls draw their own glyphs (chevrons, calendar icons) with
 lines and shapes rather than icon fonts, which differ between platforms.
 
-For animation, `View` has transforms (`ScaleTo`, `TranslateTo`) and
-`StartContinuousRotation`, which spins a view on the platform's compositor or
-animation thread:
+Animation goes through an `Animator`, which holds a view's translation,
+scale, rotation and opacity. These don't affect layout. A view has no
+animator unless it's given one when it's created:
+- the app's, through the `init`-only `View.Animator`
+  (`new ProgressRing { Animator = new() }`);
+- a control's own, private ones, from `Control.CreateOwnAnimator()` in its
+  constructor.
+
+The framework gives its own animated views (pages) an animator. The
+animators' `ScaleTo`, `RotateTo` and `TranslateTo`, and
+`StartContinuousRotation`, run on the platform's compositor or animation
+thread:
 - Win32: DirectComposition.
 - Android: a property animator.
 - iOS: Core Animation.
 
-The toolkit's `ProgressRing` is an arc drawn once and spun this way.
+The toolkit's `ProgressRing` is an arc drawn once and spun by its own
+animator. For now every animator of a view drives the view's one native
+object. Nested layers per animator are planned (see
+[alignment.md](alignment.md)).
 
 ## Input
 
-Platforms deliver pointer input as `PointerInputEvent`s (Began, Moved, Ended
+Platforms deliver pointer input as `PointerEventArgs` (Began, Moved, Ended
 and Canceled) to the deepest view under the pointer, then to its ancestors,
 until one handles it. Views usually handle input through gesture recognizers
 (`TapGestureRecognizer`, `SwipeGestureRecognizer`). Two rules keep scrolling
@@ -175,9 +196,9 @@ Owner-drawn controls can also handle input directly by overriding
 `View.HandlePointerEvent`, as the toolkit's pickers and calendar do.
 
 Keyboard input goes to the focused view through public `View` API:
-- `IsKeyboardFocusable`. Views with a tap gesture are focusable by default.
+- `Focusable`. Views with a tap gesture are focusable by default.
 - `Focus()`, `IsFocused` and `OnFocusChanged`.
-- `OnKeyDown(KeyInputEvent)`. A key the focused view doesn't handle bubbles
+- `OnKeyDown(KeyEventArgs)`. A key the focused view doesn't handle bubbles
   up to its ancestors.
 - `OnActivate`, for Enter, Space or a screen reader's "invoke". By default it
   sends the view a tap.
@@ -249,13 +270,17 @@ other threads.
 | Drawing | `Canvas` | Core Graphics | Direct2D, DirectWrite |
 | Text entry | `EditText` | `UITextField` / `UITextView` | RichEdit (`RichEditD2DPT`) |
 | List | `ListView` | `UITableView` | Virtualized compositor list |
-| Scrolling | Native (`ScrollView`) | Native (`UIScrollView`) | Compositor-animated, with touch flick |
+| Scrolling | Native (`android.widget.ScrollView`) | Native (`UIScrollView`) | Compositor-animated, with touch flick |
 | Popups | `PopupWindow` | View over the window | Topmost composition target |
 | Accessibility | Not yet | Not yet | UI Automation |
 | Keyboard focus | Not yet | Not yet | Tab order, focus ring, activation |
 | Interop | .NET for Android | .NET for iOS | Source-generated (CsWin32, `GeneratedComInterface`): trimmable and Native AOT-compatible |
 
 ## Current state
+
+[alignment.md](alignment.md) proposes aligning the framework's API with WPF,
+WinUI and Avalonia (and with MAUI for app services), and lists the gaps to
+fill.
 
 The split is in place: the toolkit, including its pickers, calendar and
 progress ring, builds against public API only, and no platform has

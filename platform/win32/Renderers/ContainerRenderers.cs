@@ -9,15 +9,15 @@ using XForms.Controls;
 
 namespace XForms.Win32.Renderers
 {
-    internal sealed class LayoutRenderer : ViewRenderer, ILayoutRenderer
+    internal sealed class PanelRenderer : ViewRenderer, IPanelRenderer
     {
-        public LayoutRenderer(
-            Layout layout)
+        public PanelRenderer(
+            Panel layout)
             : base(layout, isContainer: true)
         {
         }
 
-        void ILayoutRenderer.ClearChildren()
+        void IPanelRenderer.ClearChildren()
         {
             this.ClearChildren();
         }
@@ -59,7 +59,7 @@ namespace XForms.Win32.Renderers
         }
 
         public void SetLayout(
-            ILayoutRenderer layoutRenderer)
+            IPanelRenderer layoutRenderer)
         {
             this.ClearChildren();
             this.AddChild((ViewRenderer)layoutRenderer);
@@ -140,7 +140,7 @@ namespace XForms.Win32.Renderers
         protected override void DrawContent(
             DrawContext drawContext)
         {
-            this._drawDelegate.InvokeDrawBackground(drawContext, new Rectangle(0, 0, this.Frame.Width, this.Frame.Height));
+            this._drawDelegate.InvokeDrawBackground(drawContext, new Rect(0, 0, this.Frame.Width, this.Frame.Height));
         }
     }
 
@@ -198,7 +198,7 @@ namespace XForms.Win32.Renderers
         }
 
         public override void ArrangeNative(
-            Rectangle frame)
+            Rect frame)
         {
             base.ArrangeNative(frame);
 
@@ -206,7 +206,7 @@ namespace XForms.Win32.Renderers
             {
                 var page = (View)child.Element;
                 page.Measure(frame.Size);
-                page.Arrange(new Rectangle(0, 0, frame.Width, frame.Height));
+                page.Arrange(new Rect(0, 0, frame.Width, frame.Height));
             }
         }
     }

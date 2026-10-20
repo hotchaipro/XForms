@@ -13,12 +13,12 @@ namespace XForms.Win32
     internal sealed unsafe class DrawContext : IDrawContext
     {
         private readonly ID2D1DeviceContext* _context;
-        private readonly Rectangle _bounds;
+        private readonly Rect _bounds;
         private ID2D1SolidColorBrush* _brush;
 
         public DrawContext(
             ID2D1DeviceContext* context,
-            Rectangle bounds)
+            Rect bounds)
         {
             this._context = context;
             this._bounds = bounds;
@@ -59,7 +59,7 @@ namespace XForms.Win32
         }
 
         public void DrawRectangle(
-            Rectangle rectangle,
+            Rect rectangle,
             Color color,
             float strokeWidth = 1.0f)
         {
@@ -67,7 +67,7 @@ namespace XForms.Win32
         }
 
         public void FillRectangle(
-            Rectangle rectangle,
+            Rect rectangle,
             Color color)
         {
             this._context->FillRectangle(rectangle.ToD2DRect(), this.Brush(color));
@@ -93,14 +93,14 @@ namespace XForms.Win32
         }
 
         public void FillEllipse(
-            Rectangle rectangle,
+            Rect rectangle,
             Color color)
         {
             this.FillEllipse(rectangle.Center, rectangle.Width / 2, rectangle.Height / 2, color);
         }
 
         public void FillEllipseShadow(
-            Rectangle rectangle,
+            Rect rectangle,
             Color color,
             float blurAmount = 8.0f)
         {
@@ -112,7 +112,7 @@ namespace XForms.Win32
 
         public void DrawImage(
             Bitmap bitmap,
-            Rectangle destinationRectangle,
+            Rect destinationRectangle,
             Color tint)
         {
             this.DrawBitmap(((BitmapRenderer)bitmap?.Renderer)?.NativeBitmap, destinationRectangle, tint);
@@ -124,7 +124,7 @@ namespace XForms.Win32
         /// </summary>
         public void DrawBitmap(
             ID2D1Bitmap1* nativeBitmap,
-            Rectangle destinationRectangle,
+            Rect destinationRectangle,
             Color tint)
         {
             if (null == nativeBitmap)
@@ -210,15 +210,15 @@ namespace XForms.Win32
         /// </summary>
         public void DrawIcon(
             char glyph,
-            Rectangle bounds,
+            Rect bounds,
             Color color,
             float fontSize)
         {
             var textFormat = new TextFormat()
             {
                 FontSize = fontSize,
-                HorizontalAlignment = LayoutAlignment.Center,
-                VerticalAlignment = LayoutAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
             };
 
             this.DrawText(glyph.ToString(), bounds, color, textFormat, TextResources.IconFontFamily);
@@ -226,7 +226,7 @@ namespace XForms.Win32
 
         public void DrawText(
             string text,
-            Rectangle bounds,
+            Rect bounds,
             Color color,
             TextFormat textFormat)
         {
@@ -235,7 +235,7 @@ namespace XForms.Win32
 
         public void DrawText(
             string text,
-            Rectangle bounds,
+            Rect bounds,
             Color color,
             TextFormat textFormat,
             string fontFamily)
@@ -420,7 +420,7 @@ namespace XForms.Win32
         }
 
         public static D2D_RECT_F ToD2DRect(
-            this Rectangle rectangle)
+            this Rect rectangle)
         {
             return new D2D_RECT_F()
             {
@@ -432,15 +432,15 @@ namespace XForms.Win32
         }
 
         public static DWRITE_TEXT_ALIGNMENT ToDWriteTextAlignment(
-            this LayoutAlignment alignment)
+            this HorizontalAlignment alignment)
         {
             switch (alignment)
             {
-                case LayoutAlignment.Center:
-                case LayoutAlignment.Fill:
+                case HorizontalAlignment.Center:
+                case HorizontalAlignment.Stretch:
                     return DWRITE_TEXT_ALIGNMENT.DWRITE_TEXT_ALIGNMENT_CENTER;
 
-                case LayoutAlignment.End:
+                case HorizontalAlignment.Right:
                     return DWRITE_TEXT_ALIGNMENT.DWRITE_TEXT_ALIGNMENT_TRAILING;
 
                 default:
@@ -465,15 +465,15 @@ namespace XForms.Win32
         }
 
         public static DWRITE_PARAGRAPH_ALIGNMENT ToDWriteParagraphAlignment(
-            this LayoutAlignment alignment)
+            this VerticalAlignment alignment)
         {
             switch (alignment)
             {
-                case LayoutAlignment.Center:
-                case LayoutAlignment.Fill:
+                case VerticalAlignment.Center:
+                case VerticalAlignment.Stretch:
                     return DWRITE_PARAGRAPH_ALIGNMENT.DWRITE_PARAGRAPH_ALIGNMENT_CENTER;
 
-                case LayoutAlignment.End:
+                case VerticalAlignment.Bottom:
                     return DWRITE_PARAGRAPH_ALIGNMENT.DWRITE_PARAGRAPH_ALIGNMENT_FAR;
 
                 default:

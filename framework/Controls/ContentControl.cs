@@ -25,18 +25,51 @@ namespace XForms.Controls
 
             set
             {
+                var oldContent = this._content;
+                if (value == oldContent)
+                {
+                    return;
+                }
+
                 this._content = value;
 
-                this.Renderer.SetContent(value?.Renderer);
-                this.InvalidateLayout();
+                var native = this.Native;
+                if (null != native)
+                {
+                    native.SetContent(value?.AttachTo(this));
+                    oldContent?.NotifyDetached();
+                    value?.NotifyAttached();
+                }
+
+                this.InvalidateMeasure();
             }
         }
 
-        public new IContentControlRenderer Renderer
+        internal new IContentControlRenderer Renderer
         {
             get
             {
                 return (IContentControlRenderer)base.Renderer;
+            }
+        }
+
+        private IContentControlRenderer Native
+        {
+            get
+            {
+                return (IContentControlRenderer)this.CreatedRenderer;
+            }
+        }
+
+        internal override void OnRendererCreated()
+        {
+            base.OnRendererCreated();
+
+            var content = this._content;
+            if (null != content)
+            {
+                this.Native.SetContent(content.AttachTo(this));
+                content.NotifyAttached();
             }
         }
 
@@ -61,7 +94,7 @@ namespace XForms.Controls
         protected override void ArrangeOverride(
             Size finalSize)
         {
-            this._content?.Arrange(new Rectangle(0, 0, finalSize.Width, finalSize.Height));
+            this._content?.Arrange(new Rect(0, 0, finalSize.Width, finalSize.Height));
         }
 
         internal override IEnumerable<Element> GetChildElements()

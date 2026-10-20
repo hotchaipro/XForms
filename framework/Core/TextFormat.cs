@@ -8,8 +8,8 @@ namespace XForms
         {
             this.FontSize = 12.0f;
             this.FontWeight = FontWeight.Normal;
-            this.VerticalAlignment = LayoutAlignment.Start;
-            this.HorizontalAlignment = LayoutAlignment.Start;
+            this.VerticalAlignment = VerticalAlignment.Top;
+            this.HorizontalAlignment = HorizontalAlignment.Left;
         }
 
         public float FontSize
@@ -24,13 +24,13 @@ namespace XForms
             set;
         }
 
-        public LayoutAlignment VerticalAlignment
+        public VerticalAlignment VerticalAlignment
         {
             get;
             set;
         }
 
-        public LayoutAlignment HorizontalAlignment
+        public HorizontalAlignment HorizontalAlignment
         {
             get;
             set;

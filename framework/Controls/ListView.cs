@@ -84,15 +84,49 @@ namespace XForms.Controls
 
         public ListView()
         {
-            this.HorizontalAlignment = LayoutAlignment.Fill;
-            this.VerticalAlignment = LayoutAlignment.Fill;
+            this.HorizontalAlignment = HorizontalAlignment.Stretch;
+            this.VerticalAlignment = VerticalAlignment.Stretch;
         }
 
-        public new IListViewRenderer Renderer
+        private float? _footerHeight;
+        private ListViewSource _source;
+        private object _pendingScrollItem;
+
+        internal new IListViewRenderer Renderer
         {
             get
             {
                 return (IListViewRenderer)base.Renderer;
+            }
+        }
+
+        private IListViewRenderer Native
+        {
+            get
+            {
+                return (IListViewRenderer)this.CreatedRenderer;
+            }
+        }
+
+        internal override void OnRendererCreated()
+        {
+            base.OnRendererCreated();
+
+            var native = this.Native;
+            if (this._footerHeight.HasValue)
+            {
+                native.FooterHeight = this._footerHeight.Value;
+            }
+
+            if (null != this._source)
+            {
+                native.Bind(this._source);
+            }
+
+            if (null != this._pendingScrollItem)
+            {
+                native.ScrollToItem(this._pendingScrollItem);
+                this._pendingScrollItem = null;
             }
         }
 
@@ -108,12 +142,13 @@ namespace XForms.Controls
         {
             get
             {
-                return this.Renderer.FooterHeight;
+                return this._footerHeight ?? this.Native?.FooterHeight ?? 0;
             }
 
             set
             {
-                this.Renderer.FooterHeight = value;
+                this._footerHeight = value;
+                this.Native?.FooterHeight = value;
             }
         }
 
@@ -129,13 +164,22 @@ namespace XForms.Controls
         public void Bind(
             ListViewSource source)
         {
-            this.Renderer.Bind(source);
+            this._source = source;
+            this.Native?.Bind(source);
         }
 
         public void ScrollToItem(
             object item)
         {
-            this.Renderer.ScrollToItem(item);
+            var native = this.Native;
+            if (null != native)
+            {
+                native.ScrollToItem(item);
+            }
+            else
+            {
+                this._pendingScrollItem = item;
+            }
         }
 
         public void ClearSelection()

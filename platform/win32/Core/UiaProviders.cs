@@ -62,7 +62,7 @@ namespace XForms.Win32.Automation
             }
 
             // A visible RichEdit window describes itself
-            return !((renderer is TextEntryRenderer textEntry) && textEntry.IsEditWindowShown);
+            return !((renderer is TextBoxRenderer textEntry) && textEntry.IsEditWindowShown);
         }
 
         /// <summary>
@@ -216,7 +216,7 @@ namespace XForms.Win32.Automation
             ViewRenderer renderer)
         {
             var origin = renderer.AbsoluteOrigin();
-            var visible = new Rectangle(origin.X, origin.Y, renderer.Frame.Width, renderer.Frame.Height);
+            var visible = new Rect(origin.X, origin.Y, renderer.Frame.Width, renderer.Frame.Height);
 
             for (var ancestor = renderer.ParentRenderer; null != ancestor; ancestor = ancestor.ParentRenderer)
             {
@@ -231,7 +231,7 @@ namespace XForms.Win32.Automation
                     return false;
                 }
 
-                visible = new Rectangle(left, top, right - left, bottom - top);
+                visible = new Rect(left, top, right - left, bottom - top);
             }
 
             return true;
@@ -298,7 +298,7 @@ namespace XForms.Win32.Automation
                 case AccessibilityRole.List: return UiaConstants.ListControlTypeId;
                 case AccessibilityRole.ListItem: return UiaConstants.ListItemControlTypeId;
                 case AccessibilityRole.Image: return UiaConstants.ImageControlTypeId;
-                case AccessibilityRole.TextEntry: return UiaConstants.EditControlTypeId;
+                case AccessibilityRole.TextBox: return UiaConstants.EditControlTypeId;
                 case AccessibilityRole.Group: return UiaConstants.GroupControlTypeId;
                 default: return UiaConstants.TextControlTypeId;
             }
@@ -356,7 +356,7 @@ namespace XForms.Win32.Automation
             ViewRenderer renderer)
         {
             var view = (View)renderer.Element;
-            return view.IsKeyboardFocusable || (view.AccessibilityRole == AccessibilityRole.ListItem);
+            return view.Focusable || (view.AccessibilityRole == AccessibilityRole.ListItem);
         }
 
         public int GetProviderOptions(out int options)
@@ -408,7 +408,7 @@ namespace XForms.Win32.Automation
                         break;
 
                     case UiaConstants.IsEnabledPropertyId:
-                        result = Variant.FromBool(renderer.IsInputVisible);
+                        result = Variant.FromBool(renderer.IsHitTestVisible);
                         break;
 
                     case UiaConstants.IsControlElementPropertyId:

@@ -45,7 +45,7 @@ namespace XForms.Input
         }
 
         protected override void OnPointerInput(
-            PointerInputEvent touch,
+            PointerEventArgs touch,
             ref GestureEventResult result)
         {
             result.DidHandleEvent = true;

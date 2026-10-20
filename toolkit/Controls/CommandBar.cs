@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using XForms.Layouts;
+using XForms.Layouts;
 using XForms.Controls;
 
 namespace XForms.Toolkit
@@ -35,28 +35,28 @@ namespace XForms.Toolkit
 
     public class CommandBar : ContentControl
     {
-        private DockLayout _buttonsLayout;
+        private DockPanel _buttonsLayout;
         private CommandBarButtonCollection _primaryButtons;
         private CommandBarButtonCollection _secondaryButtons;
 
         public CommandBar()
         {
-            this._buttonsLayout = new DockLayout()
+            this._buttonsLayout = new DockPanel()
             {
-                HorizontalAlignment = LayoutAlignment.Fill,
-                VerticalAlignment = LayoutAlignment.Fill,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Stretch,
             };
 
-            this._primaryButtons = new CommandBarButtonCollection(this, DockRegion.Left);
-            this._secondaryButtons = new CommandBarButtonCollection(this, DockRegion.Right);
+            this._primaryButtons = new CommandBarButtonCollection(this, Dock.Left);
+            this._secondaryButtons = new CommandBarButtonCollection(this, Dock.Right);
 
-            this.HorizontalAlignment = LayoutAlignment.Fill;
-            this.VerticalAlignment = LayoutAlignment.Start;
+            this.HorizontalAlignment = HorizontalAlignment.Stretch;
+            this.VerticalAlignment = VerticalAlignment.Top;
 
             this.Content = this._buttonsLayout;
         }
 
-        internal DockLayout ButtonsLayout
+        internal DockPanel ButtonsLayout
         {
             get
             {

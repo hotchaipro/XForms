@@ -280,7 +280,7 @@ namespace XForms.iOS
             // Lay the content out at its full height and let the cell clip it, so
             // when the table animates the row taller the rows below slide away to
             // uncover the content (rather than the content stretching)
-            this._itemContainer.Arrange(new Rectangle(0, 0, (float)bounds.Width, requiredHeight));
+            this._itemContainer.Arrange(new Rect(0, 0, (float)bounds.Width, requiredHeight));
 
             // While a row closes, fill the gap with the item background
             var theme = XForms.Application.Current?.Theme;

@@ -77,7 +77,7 @@ namespace XForms.iOS.Renderers
         }
 
         public virtual void ArrangeNative(
-            Rectangle frame)
+            Rect frame)
         {
             var nativeView = this._nativeView;
             if (null == nativeView)
@@ -100,7 +100,7 @@ namespace XForms.iOS.Renderers
                 frame.Y + (anchor.Y * frame.Height));
         }
 
-        public virtual void InvalidateLayout()
+        public virtual void InvalidateMeasure()
         {
             this._nativeView?.RequestLayout();
         }
@@ -400,7 +400,7 @@ namespace XForms.iOS.Renderers
             }
         }
 
-        public virtual bool IsInputVisible
+        public virtual bool IsHitTestVisible
         {
             get
             {
