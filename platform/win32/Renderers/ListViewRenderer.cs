@@ -22,8 +22,8 @@ namespace XForms.Win32.Renderers
         private readonly ScrollController _scroller;
         private readonly List<float> _rowHeights = new List<float>();
         private readonly List<bool> _isRowMeasured = new List<bool>();
-        private readonly Dictionary<int, ListViewItemContainer> _realizedRows = new Dictionary<int, ListViewItemContainer>();
-        private readonly Stack<ListViewItemContainer> _recycledContainers = new Stack<ListViewItemContainer>();
+        private readonly Dictionary<int, ListViewItem> _realizedRows = new Dictionary<int, ListViewItem>();
+        private readonly Stack<ListViewItem> _recycledContainers = new Stack<ListViewItem>();
         private float[] _rowTops = Array.Empty<float>();
         private bool _areRowTopsValid;
         private ListViewSource _source;
@@ -186,7 +186,7 @@ namespace XForms.Win32.Renderers
             }
 
             // Renumber the realized rows after the change
-            var shifted = new Dictionary<int, ListViewItemContainer>();
+            var shifted = new Dictionary<int, ListViewItem>();
             foreach (var pair in this._realizedRows)
             {
                 shifted[(pair.Key >= index) ? pair.Key + count : pair.Key] = pair.Value;
@@ -347,7 +347,7 @@ namespace XForms.Win32.Renderers
 
         private void MeasureRow(
             int index,
-            ListViewItemContainer container)
+            ListViewItem container)
         {
             container.Measure(new Size(this._width, float.PositiveInfinity));
 

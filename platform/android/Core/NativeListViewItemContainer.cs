@@ -15,7 +15,7 @@ namespace XForms.Android
     {
         private const long ResizeDurationMilliseconds = 250;
 
-        private ListViewItemContainer _itemContainer;
+        private ListViewItem _itemContainer;
         private object _item;
         private object _measuredItem;
         private int _displayedHeight = -1;
@@ -34,7 +34,7 @@ namespace XForms.Android
             this.SetClipChildren(true);
         }
 
-        internal ListViewItemContainer ItemContainer
+        internal ListViewItem ItemContainer
         {
             get
             {

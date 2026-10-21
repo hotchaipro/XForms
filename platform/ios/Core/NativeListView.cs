@@ -167,7 +167,7 @@ namespace XForms.iOS
     {
         public static readonly NSString CellReuseIdentifier = new NSString("XForms.ListViewItem");
 
-        private ListViewItemContainer _itemContainer;
+        private ListViewItem _itemContainer;
         private UIView _closingSnapshot;
 
         public NativeListViewCell()
@@ -178,7 +178,7 @@ namespace XForms.iOS
             this.ClipsToBounds = true;
         }
 
-        internal ListViewItemContainer ItemContainer
+        internal ListViewItem ItemContainer
         {
             get
             {

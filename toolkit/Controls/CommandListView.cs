@@ -75,7 +75,7 @@ namespace XForms.Toolkit
             get;
         }
 
-        public override ListViewItemContainer CreateItemContainer()
+        public override ListViewItem CreateItemContainer()
         {
             return new CommandListViewItemContainer();
         }
@@ -85,13 +85,53 @@ namespace XForms.Toolkit
     /// An item view in a <see cref="CommandListView"/>, which can show or hide
     /// its command bar.
     /// </summary>
-    public class CommandListViewItem : ListViewItem
+    public class CommandListViewItem : ContentControl
     {
+        private object _item;
+
+        /// <summary>
+        /// The item the view shows. The list's item source sets it as the view
+        /// is reused for item after item.
+        /// </summary>
+        public object Item
+        {
+            get
+            {
+                return this._item;
+            }
+
+            set
+            {
+                if (value != this._item)
+                {
+                    this._item = value;
+                    this.OnItemChanged();
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Called when the view starts showing another item: bind it here.
+        /// </summary>
+        protected virtual void OnItemChanged()
+        {
+        }
+
+        // An opaque row, so the swipe commands beneath show only when it moves
+        public override Color BackgroundColor
+        {
+            get
+            {
+                return this.ActualTheme.Colors.Background;
+            }
+        }
+
         private CommandListViewItemContainer CommandContainer
         {
             get
             {
-                return this.Container as CommandListViewItemContainer;
+                return ListViewItem.ContainerFromContent(this) as CommandListViewItemContainer;
             }
         }
 
@@ -135,7 +175,7 @@ namespace XForms.Toolkit
     /// list's command bar below the item when tapped, and runs a swipe command
     /// when the item is swiped sideways.
     /// </summary>
-    public class CommandListViewItemContainer : ListViewItemContainer, ISwipeGestureDelegate
+    public class CommandListViewItemContainer : ListViewItem, ISwipeGestureDelegate
     {
         private ListViewSwipeItem _swipeItem;
         private CommandBar _commandBar;
@@ -181,9 +221,15 @@ namespace XForms.Toolkit
         }
 
         protected override void AddContent(
-            ListViewItem content)
+            View content)
         {
             this._contentLayout.Children.Add(content, Dock.CenterOverlay);
+        }
+
+        protected override void RemoveContent(
+            View content)
+        {
+            this._contentLayout.Children.Remove(content);
         }
 
         protected override void OnBind()
@@ -527,24 +573,18 @@ namespace XForms.Toolkit
                 return;
             }
 
-            // Hide the previously selected command bar
-            var previousContainer = listView.SelectedItemContainer;
-            if ((null != previousContainer) && (previousContainer != this) && (previousContainer is CommandListViewItemContainer previous))
+            // Hide the previously selected item's command bar
+            var previous = listView.ContainerFromItem(listView.SelectedItem) as CommandListViewItemContainer;
+            if ((null != previous) && (previous != this))
             {
                 previous.IsCommandBarVisible = false;
             }
 
             this.ToggleCommandBar();
 
-            bool isSelected = this._commandBar.IsVisible;
-
-            // Update the selected item container
-            if (previousContainer != this)
-            {
-                listView.SelectedItemContainer = this;
-            }
-
-            listView.NotifyItemClicked(this.Item, this.Content, isSelected);
+            // Click the item; selecting it (or unselecting it, tapped again)
+            // follows the command bar
+            base.OnTapped();
         }
 
         #endregion Tap input

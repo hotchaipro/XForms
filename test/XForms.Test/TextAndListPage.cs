@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using XForms.Controls;
 using XForms.Toolkit;
 using XForms.Layouts;
@@ -12,7 +12,7 @@ namespace XForms.Test
     /// </summary>
     public class TextAndListPage : Page
     {
-        private readonly TaskSource _tasks;
+        private readonly ObservableCollection<string> _tasks;
         private readonly TextBox _titleEntry;
         private readonly TextBox _notesEntry;
 
@@ -57,15 +57,28 @@ namespace XForms.Test
 
             pageLayout.Children.Add(editorLayout, Dock.Top);
 
-            // List of tasks filling the rest of the page
-            this._tasks = new TaskSource();
+            // List of tasks filling the rest of the page: an observable
+            // collection, shown by item views made once and reused
+            this._tasks = new ObservableCollection<string>();
             for (int i = 1; i <= 40; i += 1)
             {
                 this._tasks.Add($"Task {i}" + ((i % 5 == 0) ? "\nwith a second line of detail" : String.Empty));
             }
 
-            var listView = new ListView();
-            listView.Bind(this._tasks);
+            var listView = new ListView<string>()
+            {
+                ItemsSource = this._tasks,
+                ItemViewFactory = ItemViewFactory<string>.Create(
+                    () => new TextBlock()
+                    {
+                        HorizontalAlignment = HorizontalAlignment.Stretch,
+                        VerticalAlignment = VerticalAlignment.Center,
+                        Margin = new Thickness(16, 12, 16, 12),
+                        TextWrapping = TextWrapping.Wrap,
+                        FontSize = 17,
+                    },
+                    (view, task) => view.Text = task),
+            };
             pageLayout.Children.Add(listView, Dock.CenterOverlay);
 
             this.Content = pageLayout;
@@ -87,96 +100,6 @@ namespace XForms.Test
 
             this._titleEntry.Text = String.Empty;
             this._notesEntry.Text = String.Empty;
-        }
-
-        private sealed class TaskSource : ListViewSource
-        {
-            private readonly List<string> _items = new List<string>();
-
-            public override int Count
-            {
-                get
-                {
-                    return this._items.Count;
-                }
-            }
-
-            public override object this[int index]
-            {
-                get
-                {
-                    return this._items[index];
-                }
-            }
-
-            public void Add(
-                string item)
-            {
-                this._items.Add(item);
-            }
-
-            public void Insert(
-                int index,
-                string item)
-            {
-                this._items.Insert(index, item);
-
-                this.NotifyCollectionChanged(
-                    this,
-                    new System.Collections.Specialized.NotifyCollectionChangedEventArgs(
-                        System.Collections.Specialized.NotifyCollectionChangedAction.Add,
-                        item,
-                        index));
-            }
-
-            public override int IndexOf(
-                object item)
-            {
-                return this._items.IndexOf((string)item);
-            }
-
-            public override ListViewItem GetItemView(
-                View reuseView,
-                object item)
-            {
-                var itemView = reuseView as TaskItemView ?? new TaskItemView();
-                itemView.Text = (string)item;
-                return itemView;
-            }
-        }
-
-        private sealed class TaskItemView : ListViewItem
-        {
-            private readonly TextBlock _textView;
-
-            public TaskItemView()
-            {
-                this.HorizontalAlignment = HorizontalAlignment.Stretch;
-
-                this._textView = new TextBlock()
-                {
-                    HorizontalAlignment = HorizontalAlignment.Stretch,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    Margin = new Thickness(16, 12, 16, 12),
-                    TextWrapping = TextWrapping.Wrap,
-                    FontSize = 17,
-                };
-
-                this.Content = this._textView;
-            }
-
-            public string Text
-            {
-                get
-                {
-                    return this._textView.Text;
-                }
-
-                set
-                {
-                    this._textView.Text = value;
-                }
-            }
         }
     }
 }

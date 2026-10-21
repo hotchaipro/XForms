@@ -645,7 +645,7 @@ from. Where XForms keeps its own name, the reason is in
 | `ScrollView` | `ScrollViewer` | WPF, WinUI, Avalonia | |
 | `ListView` | `ListView<T>` | WinUI, Avalonia | Typed items |
 | `ListViewSource` | `ItemsSource` (`IReadOnlyList<T>`), with item views created once and bound to each item | WinUI, Avalonia (name) | Observable collections update the list |
-| `ListViewItemContainer` | `ListViewItem` | WinUI, Avalonia | The container, as in those frameworks |
+| `ListViewItemContainer` | `ListViewItem` | WinUI, Avalonia | The container, as in those frameworks. **Done** |
 | `ListViewItem` (the item's view) | (any `View`) | | Created by the list's item-view factory |
 | `Image`, `ImageSource`, `Bitmap` | `Image`, `ImageSource`, `Bitmap` | Avalonia, MAUI | Keep |
 | `UserControl` (owner-drawn) | Any `Control`, overriding `Render` | Avalonia, WPF | Owner-drawing moves to the base `Control` |
@@ -716,7 +716,8 @@ from. Where XForms keeps its own name, the reason is in
 | (new) | `TextBox.Submitted`, `IsPassword`, `MaxLength`, `IsReadOnly`, `SelectionStart`, `SelectionLength`, `SelectedText`, `Select`, `SelectAll`, `SelectionChanged` | WPF, WinUI (selection, `MaxLength`, `IsReadOnly`); MAUI (`Completed`, `IsPassword`) | `Submitted` is MAUI's `Completed` |
 | `ScrollView.ScrollTo` and `VerticalOffset` | `ScrollToVerticalOffset` and `VerticalOffset` | WPF |
 | `ListView.Bind(source)` | `ItemsSource` | All |
-| `ListView.ItemClicked` | `ItemClick` | WinUI |
+| `ListView.ItemClicked` | `ItemClick` | WinUI | **Done** |
+| (new) | `ListView.SelectionMode`, `SelectedItems`, `ContainerFromItem` | WinUI | **Done** |
 
 ### Toolkit
 
@@ -1446,6 +1447,42 @@ Neither changed the order of the phases. Both added items, which are below.
 10. **Lists.** Add `ListView<T>` with typed item sources and item views that
    are created once and bound to many items, plus grouping, horizontal and
    grid layouts, and selection modes.
+
+   **Status: done**, except horizontal and grid layouts.
+   - **`ListView<T>`:**
+     - `ItemsSource` is an `IReadOnlyList<T>`. An observable collection
+       updates the list as it changes (without groups, the change passes
+       through, so the platform list animates it).
+     - `ItemViewFactory` (`ItemViewFactory<T>.Create(create, bind)`) makes
+       item views and binds them; a view is made once and rebound as the
+       list scrolls, and a factory reuses only views it made.
+     - `GroupKeySelector` groups consecutive items with the same key under a
+       header (`GroupHeaderFactory`, by default the key as text).
+     - Typed `SelectedItem` and `SelectedItems`, and `ScrollIntoView`.
+   - **`ListView`:**
+     - `SelectionMode` (`None`, `Single`, `Multiple`), `SelectedItem`,
+       `SelectedItems`, and `SelectionChanged` with added and removed items.
+       Tapping a selected item again (single) unselects it.
+     - `ItemClick` (`ItemClickEventArgs.ClickedItem`) replaces `ItemClicked`.
+     - `ContainerFromItem` replaces `SelectedItemContainer`.
+   - **Renames:** the container is `ListViewItem` (it was
+     `ListViewItemContainer`), as in WinUI and Avalonia. It draws the row's
+     background and selection, and `IsSelected` tells it. Item views are any
+     view (the old item-view base class is gone), and
+     `ListViewItem.ContainerFromContent` finds a view's container.
+   - **Toolkit:** `CommandListView`'s items select with their command bar.
+     `CommandListViewItem` (a content control) keeps an `Item` and
+     `OnItemChanged` for the views it hosts.
+   - **SoonerOrLater:** its item sources return any view and set the item.
+   - **Verified** on Win32 and Android (a lists test page: groups,
+     selection modes, adding and removing), the text and list page on
+     `ListView<T>`, and SoonerOrLater's command list. iOS is only built.
+   - **Not done:**
+     - Horizontal and grid layouts. Each platform's list is vertical
+       (Android's `ListView`, `UITableView`, and Win32's own); horizontal and
+       grid layouts need a framework virtualizing layout (as WinUI's
+       `ItemsRepeater`), which lightweight views now make practical.
+     - Pull-to-refresh and incremental loading (from the gap analysis).
 11. **App layer.**
    - Asynchronous, instance-based navigation, with parameters, results,
      modal pages and transitions.

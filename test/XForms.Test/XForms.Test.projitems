@@ -12,6 +12,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)AnimationPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BenchmarkPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ControlPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ListsPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MarginPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TabbedPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TestApp.cs" />

@@ -25,13 +25,17 @@ namespace XForms.Controls
         public abstract int IndexOf(
             object item);
 
-        public abstract ListViewItem GetItemView(
+        /// <summary>
+        /// The view for an item: the view it reuses (made for an earlier item),
+        /// bound to this item, or a new one.
+        /// </summary>
+        public abstract View GetItemView(
             View reuseView,
             object item);
 
-        public virtual ListViewItemContainer GetItemContainer(
+        public virtual ListViewItem GetItemContainer(
             ListView listView,
-            ListViewItemContainer reuseContainer,
+            ListViewItem reuseContainer,
             object item)
         {
             if (null == listView)
@@ -50,8 +54,6 @@ namespace XForms.Controls
                 reuseContainer.Content,
                 item);
             reuseContainer.Content = itemView;
-
-            itemView.Item = item;
 
             return reuseContainer;
         }

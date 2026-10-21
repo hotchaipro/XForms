@@ -94,6 +94,10 @@ namespace XForms.Test
                     this.NavigateTo(new TextEntryPage());
                     return;
 
+                case "lists":
+                    this.NavigateTo(new ListsPage());
+                    return;
+
                 case "theme":
                     this.NavigateTo(new ThemePage());
                     return;
