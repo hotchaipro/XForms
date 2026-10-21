@@ -27,6 +27,14 @@ namespace XForms.Toolkit
             }
         }
 
+        public override bool? AccessibilityIsChecked
+        {
+            get
+            {
+                return this.IsChecked;
+            }
+        }
+
         private const float TouchDownScaleDelta = 0.05f;
         private const float IsUncheckedScale = 0.8f;
 
@@ -74,6 +82,7 @@ namespace XForms.Toolkit
 
                     this.IsCheckedChanged?.Invoke(this, new ToggledEventArgs(value));
                     this.OnPropertyChanged();
+                    this.NotifyAccessibilityStateChanged();
                 }
             }
         }

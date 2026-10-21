@@ -26,7 +26,16 @@ namespace XForms.Win32.Automation
         {
             get
             {
-                return _root ??= new RootProvider(Win32Host.Current);
+                if (null == _root)
+                {
+                    _root = new RootProvider(Win32Host.Current);
+
+                    // Once a client has asked for the tree, views tell it when
+                    // their states change
+                    View.AccessibilityStateChanged += RaiseStateChanged;
+                }
+
+                return _root;
             }
         }
 
@@ -167,6 +176,44 @@ namespace XForms.Win32.Automation
             Marshal.Release(provider);
         }
 
+        /// <summary>
+        /// Tells screen readers that a view's checked or selected state, or its
+        /// value, changed.
+        /// </summary>
+        private static void RaiseStateChanged(
+            View view)
+        {
+            if (!(view.Renderer is ViewRenderer renderer) || !IsAccessible(renderer) || !UiaNative.UiaClientsAreListening())
+            {
+                return;
+            }
+
+            nint provider = GetInterface<IRawElementProviderSimple>(GetElement(renderer));
+            var empty = new Variant();
+            if (view.AccessibilityIsChecked is bool isChecked)
+            {
+                UiaNative.UiaRaiseAutomationPropertyChangedEvent(provider, UiaConstants.ToggleToggleStatePropertyId, empty, Variant.FromInt(isChecked ? UiaConstants.ToggleStateOn : UiaConstants.ToggleStateOff));
+            }
+
+            if (view.IsAccessibilityActionSupported(AccessibilityAction.Select))
+            {
+                UiaNative.UiaRaiseAutomationPropertyChangedEvent(provider, UiaConstants.SelectionItemIsSelectedPropertyId, empty, Variant.FromBool(view.AccessibilityIsSelected));
+                if (view.AccessibilityIsSelected)
+                {
+                    UiaNative.UiaRaiseAutomationEvent(provider, UiaConstants.SelectionItemElementSelectedEventId);
+                }
+            }
+
+            if (null != view.AccessibilityValue)
+            {
+                var value = Variant.FromString(view.AccessibilityValue);
+                UiaNative.UiaRaiseAutomationPropertyChangedEvent(provider, UiaConstants.ValueValuePropertyId, empty, value);
+                Marshal.FreeBSTR(value.PointerValue);
+            }
+
+            Marshal.Release(provider);
+        }
+
         public static nint Navigate(
             ViewRenderer element,
             int direction)
@@ -258,7 +305,7 @@ namespace XForms.Win32.Automation
     /// An automation element for one accessible view.
     /// </summary>
     [GeneratedComClass]
-    internal sealed unsafe partial class ElementProvider : IRawElementProviderSimple, IRawElementProviderFragment, IInvokeProvider
+    internal sealed unsafe partial class ElementProvider : IRawElementProviderSimple, IRawElementProviderFragment, IInvokeProvider, IToggleProvider, ISelectionItemProvider, IValueProvider
     {
         private readonly WeakReference<ViewRenderer> _renderer;
         private readonly int _runtimeId;
@@ -294,6 +341,8 @@ namespace XForms.Win32.Automation
             {
                 case AccessibilityRole.Button: return UiaConstants.ButtonControlTypeId;
                 case AccessibilityRole.ToggleButton: return UiaConstants.CheckBoxControlTypeId;
+                case AccessibilityRole.RadioButton: return UiaConstants.RadioButtonControlTypeId;
+                case AccessibilityRole.ComboBox: return UiaConstants.ComboBoxControlTypeId;
                 case AccessibilityRole.TabItem: return UiaConstants.TabItemControlTypeId;
                 case AccessibilityRole.List: return UiaConstants.ListControlTypeId;
                 case AccessibilityRole.ListItem: return UiaConstants.ListItemControlTypeId;
@@ -352,12 +401,7 @@ namespace XForms.Win32.Automation
             }
         }
 
-        private static bool IsInvokable(
-            ViewRenderer renderer)
-        {
-            var view = (View)renderer.Element;
-            return view.Focusable || (view.AccessibilityRole == AccessibilityRole.ListItem);
-        }
+
 
         public int GetProviderOptions(out int options)
         {
@@ -370,9 +414,40 @@ namespace XForms.Win32.Automation
             nint result = 0;
             int hr = this.OnUIThread((renderer) =>
             {
-                if ((patternId == UiaConstants.InvokePatternId) && IsInvokable(renderer))
+                var view = (View)renderer.Element;
+                switch (patternId)
                 {
-                    result = AutomationTree.GetInterface<IInvokeProvider>(this);
+                    case UiaConstants.InvokePatternId:
+                        if (view.IsAccessibilityActionSupported(AccessibilityAction.Invoke))
+                        {
+                            result = AutomationTree.GetInterface<IInvokeProvider>(this);
+                        }
+
+                        break;
+
+                    case UiaConstants.TogglePatternId:
+                        if (view.IsAccessibilityActionSupported(AccessibilityAction.Toggle))
+                        {
+                            result = AutomationTree.GetInterface<IToggleProvider>(this);
+                        }
+
+                        break;
+
+                    case UiaConstants.SelectionItemPatternId:
+                        if (view.IsAccessibilityActionSupported(AccessibilityAction.Select))
+                        {
+                            result = AutomationTree.GetInterface<ISelectionItemProvider>(this);
+                        }
+
+                        break;
+
+                    case UiaConstants.ValuePatternId:
+                        if (null != view.AccessibilityValue)
+                        {
+                            result = AutomationTree.GetInterface<IValueProvider>(this);
+                        }
+
+                        break;
                 }
 
                 return 0;
@@ -422,6 +497,26 @@ namespace XForms.Win32.Automation
 
                     case UiaConstants.FrameworkIdPropertyId:
                         result = Variant.FromString("XForms");
+                        break;
+
+                    case UiaConstants.ToggleToggleStatePropertyId:
+                        if (view.AccessibilityIsChecked is bool isChecked)
+                        {
+                            result = Variant.FromInt(isChecked ? UiaConstants.ToggleStateOn : UiaConstants.ToggleStateOff);
+                        }
+
+                        break;
+
+                    case UiaConstants.SelectionItemIsSelectedPropertyId:
+                        result = Variant.FromBool(view.AccessibilityIsSelected);
+                        break;
+
+                    case UiaConstants.ValueValuePropertyId:
+                        if (null != view.AccessibilityValue)
+                        {
+                            result = Variant.FromString(view.AccessibilityValue);
+                        }
+
                         break;
                 }
 
@@ -492,13 +587,108 @@ namespace XForms.Win32.Automation
             return 0;
         }
 
+        private const int E_FAIL = unchecked((int)0x80004005);
+        private const int E_ACCESSDENIED = unchecked((int)0x80070005);
+
+        private int Perform(
+            AccessibilityAction action)
+        {
+            return this.OnUIThread((renderer) => ((View)renderer.Element).PerformAccessibilityAction(action) ? 0 : E_FAIL);
+        }
+
         public int Invoke()
         {
-            return this.OnUIThread((renderer) =>
+            return this.Perform(AccessibilityAction.Invoke);
+        }
+
+        public int Toggle()
+        {
+            return this.Perform(AccessibilityAction.Toggle);
+        }
+
+        public int get_ToggleState(out int state)
+        {
+            int result = 0;
+            int hr = this.OnUIThread((renderer) =>
             {
-                Win32Host.Current.Focus.Activate(renderer);
+                result = (((View)renderer.Element).AccessibilityIsChecked == true) ? UiaConstants.ToggleStateOn : UiaConstants.ToggleStateOff;
                 return 0;
             });
+
+            state = result;
+            return hr;
+        }
+
+        public int Select()
+        {
+            return this.Perform(AccessibilityAction.Select);
+        }
+
+        public int AddToSelection()
+        {
+            return this.Perform(AccessibilityAction.Select);
+        }
+
+        public int RemoveFromSelection()
+        {
+            // An item is unselected by selecting another
+            return E_FAIL;
+        }
+
+        public int get_IsSelected(out int isSelected)
+        {
+            int result = 0;
+            int hr = this.OnUIThread((renderer) =>
+            {
+                result = ((View)renderer.Element).AccessibilityIsSelected ? 1 : 0;
+                return 0;
+            });
+
+            isSelected = result;
+            return hr;
+        }
+
+        public int get_SelectionContainer(out nint container)
+        {
+            nint result = 0;
+            int hr = this.OnUIThread((renderer) =>
+            {
+                var parent = AutomationTree.GetParent(renderer);
+                if (null != parent)
+                {
+                    result = AutomationTree.GetInterface<IRawElementProviderSimple>(AutomationTree.GetElement(parent));
+                }
+
+                return 0;
+            });
+
+            container = result;
+            return hr;
+        }
+
+        public int SetValue(nint value)
+        {
+            // Values are chosen with the view's own picker
+            return E_ACCESSDENIED;
+        }
+
+        public int get_Value(out nint value)
+        {
+            string result = null;
+            int hr = this.OnUIThread((renderer) =>
+            {
+                result = ((View)renderer.Element).AccessibilityValue;
+                return 0;
+            });
+
+            value = Marshal.StringToBSTR(result ?? string.Empty);
+            return hr;
+        }
+
+        public int get_IsReadOnly(out int isReadOnly)
+        {
+            isReadOnly = 1;
+            return 0;
         }
     }
 

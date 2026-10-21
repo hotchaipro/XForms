@@ -102,6 +102,10 @@ namespace XForms.Test
                     _ = this.NavigateAsync(new AppLayerPage());
                     return;
 
+                case "a11y":
+                    _ = this.NavigateAsync(new AccessibilityPage());
+                    return;
+
                 case "theme":
                     _ = this.NavigateAsync(new ThemePage());
                     return;

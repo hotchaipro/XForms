@@ -158,8 +158,9 @@ namespace XForms
 
         public bool Focus()
         {
-            // NOTE: Keyboard focus needs a native object on Android and iOS
-            return false;
+            // NOTE: Keyboard focus needs a native object on Android and iOS:
+            // the layer's takes it
+            return this.View.LayerView?.FocusLightweight(this.View) ?? false;
         }
 
         public void AddHostedView(

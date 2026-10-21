@@ -10,6 +10,30 @@ namespace XForms.Toolkit
         // Animates the control itself (press feedback, spinning)
         private readonly DrawnAnimator _ownAnimator;
 
+        protected override AccessibilityRole DefaultAccessibilityRole
+        {
+            get
+            {
+                return AccessibilityRole.RadioButton;
+            }
+        }
+
+        protected override string DefaultAccessibilityLabel
+        {
+            get
+            {
+                return this.RadioButtonItem.Text;
+            }
+        }
+
+        public override bool AccessibilityIsSelected
+        {
+            get
+            {
+                return this.IsChecked;
+            }
+        }
+
         private const float TouchDownScaleDelta = 0.05f;
         private const float IsUncheckedScale = 0.8f;
 
@@ -71,6 +95,7 @@ namespace XForms.Toolkit
                     this.UpdateScale();
 
                     this.IsCheckedChanged?.Invoke(this, new ToggledEventArgs(value));
+                    this.NotifyAccessibilityStateChanged();
                 }
             }
         }

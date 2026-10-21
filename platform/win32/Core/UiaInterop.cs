@@ -67,6 +67,51 @@ namespace XForms.Win32.Automation
         int Invoke();
     }
 
+    [GeneratedComInterface]
+    [Guid("56d00bd0-c4f4-433c-a836-1a52a57e0892")]
+    internal partial interface IToggleProvider
+    {
+        [PreserveSig]
+        int Toggle();
+
+        [PreserveSig]
+        int get_ToggleState(out int state);
+    }
+
+    [GeneratedComInterface]
+    [Guid("2acad808-b2d4-452d-a407-91ff1ad167b2")]
+    internal partial interface ISelectionItemProvider
+    {
+        [PreserveSig]
+        int Select();
+
+        [PreserveSig]
+        int AddToSelection();
+
+        [PreserveSig]
+        int RemoveFromSelection();
+
+        [PreserveSig]
+        int get_IsSelected(out int isSelected);
+
+        [PreserveSig]
+        int get_SelectionContainer(out nint container);
+    }
+
+    [GeneratedComInterface]
+    [Guid("c7935180-6fb3-4201-b174-7df73adbf64a")]
+    internal partial interface IValueProvider
+    {
+        [PreserveSig]
+        int SetValue(nint value);
+
+        [PreserveSig]
+        int get_Value(out nint value);
+
+        [PreserveSig]
+        int get_IsReadOnly(out int isReadOnly);
+    }
+
     [StructLayout(LayoutKind.Sequential)]
     internal struct UiaRect
     {
@@ -140,20 +185,33 @@ namespace XForms.Win32.Automation
         public const int IsOffscreenPropertyId = 30022;
         public const int FrameworkIdPropertyId = 30024;
         public const int ProviderDescriptionPropertyId = 30107;
+        public const int ValueValuePropertyId = 30045;
+        public const int SelectionItemIsSelectedPropertyId = 30079;
+        public const int ToggleToggleStatePropertyId = 30086;
 
         // Patterns
         public const int InvokePatternId = 10000;
+        public const int ValuePatternId = 10002;
+        public const int SelectionItemPatternId = 10010;
+        public const int TogglePatternId = 10015;
+
+        // ToggleState
+        public const int ToggleStateOff = 0;
+        public const int ToggleStateOn = 1;
 
         // Events
         public const int AutomationFocusChangedEventId = 20005;
+        public const int SelectionItemElementSelectedEventId = 20012;
 
         // Control types
         public const int ButtonControlTypeId = 50000;
         public const int CheckBoxControlTypeId = 50002;
+        public const int ComboBoxControlTypeId = 50003;
         public const int EditControlTypeId = 50004;
         public const int ImageControlTypeId = 50006;
         public const int ListItemControlTypeId = 50007;
         public const int ListControlTypeId = 50008;
+        public const int RadioButtonControlTypeId = 50013;
         public const int TabItemControlTypeId = 50019;
         public const int TextControlTypeId = 50020;
         public const int GroupControlTypeId = 50026;
@@ -173,6 +231,9 @@ namespace XForms.Win32.Automation
 
         [DllImport("UIAutomationCore.dll")]
         public static extern int UiaRaiseAutomationEvent(nint provider, int eventId);
+
+        [DllImport("UIAutomationCore.dll")]
+        public static extern int UiaRaiseAutomationPropertyChangedEvent(nint provider, int propertyId, Variant oldValue, Variant newValue);
 
         [DllImport("UIAutomationCore.dll")]
         public static extern bool UiaClientsAreListening();

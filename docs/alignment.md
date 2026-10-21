@@ -1356,7 +1356,7 @@ Neither changed the order of the phases. Both added items, which are below.
      platform.
    - Rerun the benchmark to confirm the gain.
 
-   **Status: done**, except accessibility on Android and iOS.
+   **Status: done.** (Accessibility on Android and iOS came in phase 12.)
    - **Which views are lightweight** is decided when a view's renderer is
      created: owner-drawn and content controls, panels and text blocks, with
      no animator, whose parent allows it. Pages, list rows, scroll views'
@@ -1408,9 +1408,8 @@ Neither changed the order of the phases. Both added items, which are below.
      switching, and SoonerOrLater (tabs, swipes, the flyout menu, Settings,
      dark mode). iOS is only built.
    - **Not done:**
-     - On Android and iOS, lightweight views have no keyboard focus or
-       accessibility nodes. Virtual accessibility nodes belong with
-       accessibility (phase 12).
+     - On Android and iOS, lightweight views had no keyboard focus or
+       accessibility nodes. Phase 12 added both.
      - Lightweight views draw within their layer's surface: what they draw
        outside it is clipped, and a native view inside a hidden or clipping
        lightweight view is hidden but not clipped.
@@ -1538,3 +1537,53 @@ Neither changed the order of the phases. Both added items, which are below.
      - Changing the text size wasn't tested (it's a system setting).
 12. **Ongoing.** Accessibility (states, values, actions; Android and iOS) and
     keyboard focus on every platform, alongside the phases above.
+
+    **Status: done** for this plan; accessibility stays ongoing as controls
+    are added.
+    - **Framework:** `AccessibilityIsChecked`, `AccessibilityIsSelected` and
+      `AccessibilityValue`; `AccessibilityAction` (invoke, toggle, select)
+      with `IsAccessibilityActionSupported` and `PerformAccessibilityAction`;
+      `NotifyAccessibilityStateChanged`. New roles: `RadioButton` and
+      `ComboBox`. The toolkit's toggle buttons, tabs, radio buttons (which
+      weren't exposed before), pickers and floating buttons, and list items,
+      report their states and values.
+    - **Win32:** the Toggle, SelectionItem and Value patterns (Value is
+      read-only: pickers choose with their own popup), with property-changed
+      and element-selected events.
+    - **Android:** an accessibility delegate on every native view (class,
+      text, checked and selected states, click); each layer's lightweight
+      views are virtual nodes, with accessibility focus, clicks, touch
+      exploration (hover) and change events. A view group with a node
+      provider leaves its native children out, so the layer adds them, in
+      reading order with the virtual nodes.
+    - **iOS:** labels, values and traits on layers, and a
+      `UIAccessibilityElement` for each accessible lightweight view, with
+      activation.
+    - **Keyboard focus:** on Android and iOS a layer's native view takes
+      focus for the lightweight views inside it; the layer tracks the focused
+      one, routes keys to it and draws its ring. Tab follows the view tree on
+      every platform: Android's own Tab order sorts views by position, which
+      put a page's layer before everything inside it, so Tab never reached
+      its lightweight views. A layer that holds focus only for its
+      lightweight views turns off Android's default highlight, which greyed
+      the whole page.
+    - **Test page:** `a11y` (a button, toggle, picker, radio buttons and a
+      selectable list).
+    - **Verified:**
+      - Win32, with a UI Automation client: the tree, patterns and states,
+        and Invoke, Toggle and Select changing the app.
+      - Android, with a UI Automator dump (the nodes TalkBack reads): roles,
+        text, checked and selected states and reading order, on the test page
+        and in SoonerOrLater (tabs and the labeled floating buttons). Tab,
+        Shift+Tab and Enter across lightweight and native views, with the
+        ring.
+      - iOS is only built.
+      - Not run: TalkBack itself (turning it on is a system setting), so
+        virtual-node clicks, accessibility focus and touch exploration on
+        Android weren't exercised; they use the same framework actions as
+        Win32.
+    - **Not done:**
+      - Text boxes on Android leave Tab to Android's own order.
+      - Collapsed flyout buttons and a hidden (scaled to zero) button are
+        still exposed, since they're visible to the framework.
+      - Expand and collapse (for pickers), ranges (sliders) and headings.

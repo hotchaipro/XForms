@@ -677,6 +677,273 @@ namespace XForms
             return hit;
         }
 
+        #region Lightweight focus
+
+        // On Android and iOS, a lightweight view has no native object to take
+        // keyboard focus: its layer's native view takes it, and the layer
+        // keeps track of which lightweight view inside it is focused.
+        private View _focusedLightweight;
+        private View _pendingLightweightFocus;
+        private bool _hasNativeFocus;
+
+        /// <summary>
+        /// The lightweight view inside this layer that has keyboard focus, or
+        /// null.
+        /// </summary>
+        internal View FocusedLightweight
+        {
+            get
+            {
+                return this._focusedLightweight;
+            }
+        }
+
+        /// <summary>
+        /// The layer view (the nearest ancestor with a native object) that a
+        /// lightweight view draws into.
+        /// </summary>
+        internal View LayerView
+        {
+            get
+            {
+                for (var parent = this.Parent as View; null != parent; parent = parent.Parent as View)
+                {
+                    if (!parent.IsLightweight)
+                    {
+                        return parent;
+                    }
+                }
+
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Whether a lightweight view inside this layer can take keyboard focus.
+        /// </summary>
+        internal bool HasFocusableLightweight
+        {
+            get
+            {
+                return this.HasLightweightChildren && (0 < this.GetFocusableLightweight().Count);
+            }
+        }
+
+        // The focusable lightweight views inside this layer, in order
+        private List<View> GetFocusableLightweight()
+        {
+            var result = new List<View>();
+            CollectFocusableLightweight(this, result);
+            return result;
+        }
+
+        private static void CollectFocusableLightweight(
+            View parent,
+            List<View> result)
+        {
+            var children = parent.DrawingOrderChildren;
+            for (int i = 0; i < children.Count; i += 1)
+            {
+                var child = children[i];
+                if (!child.IsLightweight || !child._isVisible || !child._isHitTestVisible)
+                {
+                    continue;
+                }
+
+                if (child.Focusable)
+                {
+                    result.Add(child);
+                }
+
+                CollectFocusableLightweight(child, result);
+            }
+        }
+
+        private void SetLightweightFocus(
+            View view)
+        {
+            var previous = this._focusedLightweight;
+            if (previous == view)
+            {
+                return;
+            }
+
+            this._focusedLightweight = view;
+            if (null != previous)
+            {
+                previous.IsFocused = false;
+            }
+
+            if (null != view)
+            {
+                view.IsFocused = true;
+            }
+
+            // Draws the focus ring
+            this.Native?.InvalidateLayerContent();
+        }
+
+        /// <summary>
+        /// Moves keyboard focus to a lightweight view inside this layer, taking
+        /// native focus for the layer if it hasn't it.
+        /// </summary>
+        internal bool FocusLightweight(
+            View view)
+        {
+            if (this._hasNativeFocus)
+            {
+                this.IsFocused = false;
+                this.SetLightweightFocus(view);
+                return true;
+            }
+
+            this._pendingLightweightFocus = view;
+            bool result = this.Native?.Focus() ?? false;
+            this._pendingLightweightFocus = null;
+            return result;
+        }
+
+        /// <summary>
+        /// The layer's native view gained or lost keyboard focus. Focus goes to
+        /// the lightweight view asked for, or to the layer itself when it is
+        /// focusable, or else to its first (or, moving backward, last)
+        /// focusable lightweight view.
+        /// </summary>
+        internal void OnNativeFocusChanged(
+            bool hasFocus,
+            bool isBackward)
+        {
+            this._hasNativeFocus = hasFocus;
+            if (!hasFocus)
+            {
+                this.SetLightweightFocus(null);
+                this.IsFocused = false;
+                return;
+            }
+
+            var target = this._pendingLightweightFocus;
+            if ((null == target) && !this.Focusable)
+            {
+                var focusable = this.GetFocusableLightweight();
+                if (0 < focusable.Count)
+                {
+                    target = isBackward ? focusable[focusable.Count - 1] : focusable[0];
+                }
+            }
+
+            if (null != target)
+            {
+                this.SetLightweightFocus(target);
+            }
+            else
+            {
+                this.IsFocused = true;
+            }
+        }
+
+        /// <summary>
+        /// Moves keyboard focus from this view to the next (or previous)
+        /// focusable view in the tree it is in, wrapping around: lightweight
+        /// and native views alike, in view order, as on Win32. (Android and
+        /// iOS order native views by position, which puts a layer before the
+        /// views inside it.)
+        /// </summary>
+        internal bool MoveFocus(
+            bool isForward)
+        {
+            var root = this;
+            while (root.Parent is View parent)
+            {
+                root = parent;
+            }
+
+            var focusable = new List<View>();
+            CollectFocusable(root, focusable);
+            int index = focusable.IndexOf(this);
+            for (int i = 1; i < focusable.Count; i += 1)
+            {
+                int next = (index < 0)
+                    ? (isForward ? i - 1 : focusable.Count - i)
+                    : (index + (isForward ? i : -i) + (focusable.Count * 2)) % focusable.Count;
+                if (focusable[next].Focus())
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static void CollectFocusable(
+            View parent,
+            List<View> result)
+        {
+            var children = parent.DrawingOrderChildren;
+            for (int i = 0; i < children.Count; i += 1)
+            {
+                var child = children[i];
+                if (!child._isVisible || !child._isHitTestVisible || !child.HasRenderer)
+                {
+                    continue;
+                }
+
+                if (child.Focusable || (child is Controls.TextBox))
+                {
+                    result.Add(child);
+                }
+
+                CollectFocusable(child, result);
+            }
+        }
+
+        /// <summary>
+        /// Delivers a key from the layer's native view: to its focused
+        /// lightweight view, or to the layer. Tab moves among the lightweight
+        /// views. Returns whether the key was used.
+        /// </summary>
+        internal bool RouteLayerKeyDown(
+            KeyEventArgs e)
+        {
+            if ((e.Key == Key.Tab) && ((e.KeyModifiers & ~KeyModifiers.Shift) == KeyModifiers.None)
+                && (this._focusedLightweight ?? this).MoveFocus(isForward: !e.KeyModifiers.HasFlag(KeyModifiers.Shift)))
+            {
+                return true;
+            }
+
+            return (this._focusedLightweight ?? this).RouteKeyDown(e);
+        }
+
+        internal bool RouteLayerKeyUp(
+            KeyEventArgs e)
+        {
+            return (this._focusedLightweight ?? this).RouteKeyUp(e);
+        }
+
+        /// <summary>
+        /// Draws a ring around the focused lightweight view, above the layer's
+        /// lightweight content.
+        /// </summary>
+        internal void PaintLightweightFocusRing(
+            DrawingContext context)
+        {
+            var focused = this._focusedLightweight;
+            if ((null == focused) || !focused.IsLightweight || (focused.LayerView != this))
+            {
+                return;
+            }
+
+            const float outset = 2.0f;
+            var offset = focused.OffsetInLayer;
+            var size = focused.Bounds;
+            context.DrawRoundedRectangle(
+                new Rect(offset.X - outset, offset.Y - outset, size.Width + (outset * 2), size.Height + (outset * 2)),
+                4.0f,
+                this.ActualTheme.Colors.Foreground,
+                2.0f);
+        }
+
+        #endregion Lightweight focus
+
         #endregion Lightweight views
 
         #region Theme
@@ -850,6 +1117,192 @@ namespace XForms
             get
             {
                 return null;
+            }
+        }
+
+        /// <summary>
+        /// Whether the view is checked, or null when it has no checked state.
+        /// </summary>
+        public virtual bool? AccessibilityIsChecked
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Whether the view (a list item, tab or radio button) is selected.
+        /// </summary>
+        public virtual bool AccessibilityIsSelected
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// The value assistive technology reads after the label, such as a
+        /// picker's current choice, or null.
+        /// </summary>
+        public virtual string AccessibilityValue
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Whether assistive technology can ask the view to do the action.
+        /// </summary>
+        public virtual bool IsAccessibilityActionSupported(
+            AccessibilityAction action)
+        {
+            switch (action)
+            {
+                case AccessibilityAction.Invoke:
+                    return this.Focusable || (this.AccessibilityRole == AccessibilityRole.ListItem);
+
+                case AccessibilityAction.Toggle:
+                    return this.AccessibilityIsChecked.HasValue;
+
+                case AccessibilityAction.Select:
+                    return (this.AccessibilityRole == AccessibilityRole.ListItem)
+                        || (this.AccessibilityRole == AccessibilityRole.TabItem)
+                        || (this.AccessibilityRole == AccessibilityRole.RadioButton);
+
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// Does an action for assistive technology. By default, each action
+        /// does what a tap would (toggling, selecting); selecting something
+        /// already selected does nothing. Returns whether the action was done.
+        /// </summary>
+        public virtual bool PerformAccessibilityAction(
+            AccessibilityAction action)
+        {
+            if (!this.IsAccessibilityActionSupported(action))
+            {
+                return false;
+            }
+
+            if ((action == AccessibilityAction.Select) && this.AccessibilityIsSelected)
+            {
+                return true;
+            }
+
+            this.OnActivate();
+            return true;
+        }
+
+        /// <summary>
+        /// The text a screen reader reads for the view: its label, then its
+        /// value. A list item without a label is named by the text inside it.
+        /// </summary>
+        internal string AccessibilityText
+        {
+            get
+            {
+                string label = this.AccessibilityLabel;
+                if (string.IsNullOrEmpty(label) && (this.AccessibilityRole == AccessibilityRole.ListItem))
+                {
+                    var text = new System.Text.StringBuilder();
+                    AppendAccessibilityText(this, text);
+                    label = text.ToString();
+                }
+
+                // A picker may be labeled by its value
+                string value = this.AccessibilityValue;
+                if (string.IsNullOrEmpty(value) || (value == label))
+                {
+                    return label;
+                }
+
+                return string.IsNullOrEmpty(label) ? value : label + ", " + value;
+            }
+        }
+
+        private static void AppendAccessibilityText(
+            View parent,
+            System.Text.StringBuilder text)
+        {
+            var children = parent.DrawingOrderChildren;
+            for (int i = 0; i < children.Count; i += 1)
+            {
+                var child = children[i];
+                if (!child.IsVisible)
+                {
+                    continue;
+                }
+
+                if ((child.AccessibilityRole == AccessibilityRole.Text) && !string.IsNullOrEmpty(child.AccessibilityLabel))
+                {
+                    if (text.Length > 0)
+                    {
+                        text.Append(", ");
+                    }
+
+                    text.Append(child.AccessibilityLabel);
+                }
+                else
+                {
+                    AppendAccessibilityText(child, text);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Whether a screen reader's activate gesture does anything.
+        /// </summary>
+        internal bool IsAccessibilityActionable
+        {
+            get
+            {
+                return this.IsAccessibilityActionSupported(AccessibilityAction.Invoke)
+                    || this.IsAccessibilityActionSupported(AccessibilityAction.Toggle)
+                    || this.IsAccessibilityActionSupported(AccessibilityAction.Select);
+            }
+        }
+
+        /// <summary>
+        /// What a screen reader's activate gesture (a double tap) does: toggles,
+        /// selects or invokes.
+        /// </summary>
+        internal bool PerformDefaultAccessibilityAction()
+        {
+            if (this.IsAccessibilityActionSupported(AccessibilityAction.Toggle))
+            {
+                return this.PerformAccessibilityAction(AccessibilityAction.Toggle);
+            }
+
+            if (this.IsAccessibilityActionSupported(AccessibilityAction.Select))
+            {
+                return this.PerformAccessibilityAction(AccessibilityAction.Select);
+            }
+
+            return this.PerformAccessibilityAction(AccessibilityAction.Invoke);
+        }
+
+        /// <summary>
+        /// Raised (for the platforms) when a view's accessible state, value or
+        /// label changes.
+        /// </summary>
+        internal static event Action<View> AccessibilityStateChanged;
+
+        /// <summary>
+        /// Tells assistive technology that the view's checked or selected
+        /// state, value or label changed.
+        /// </summary>
+        protected void NotifyAccessibilityStateChanged()
+        {
+            if (null != this.Renderer)
+            {
+                AccessibilityStateChanged?.Invoke(this);
             }
         }
 
@@ -1923,6 +2376,15 @@ namespace XForms
         /// </summary>
         public bool Focus()
         {
+            // A layer with focus inside it takes it back from its lightweight
+            // view
+            if (this._hasNativeFocus && (null != this._focusedLightweight))
+            {
+                this.SetLightweightFocus(null);
+                this.IsFocused = true;
+                return true;
+            }
+
             return this.Native?.Focus() ?? false;
         }
 

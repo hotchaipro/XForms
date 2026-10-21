@@ -45,6 +45,7 @@ namespace XForms.iOS
             {
                 var drawContext = new DrawContext(UIGraphics.GetCurrentContext(), this.Bounds);
                 LightweightPainter.PaintDescendants(this._owner, drawContext);
+                this._owner.PaintLightweightFocusRing(drawContext);
             }
         }
 
@@ -139,13 +140,85 @@ namespace XForms.iOS
             this._isLayoutValid = true;
         }
 
+        #region Accessibility
+
+        // An accessible view is one element (a list item is named by the text
+        // inside it); otherwise the view holds its lightweight views'
+        // elements and its subviews
+        public override bool IsAccessibilityElement
+        {
+            get
+            {
+                return this._owner.AccessibilityRole != AccessibilityRole.None;
+            }
+
+            set
+            {
+            }
+        }
+
+        public override string AccessibilityLabel
+        {
+            get
+            {
+                return NativeAccessibility.LabelFor(this._owner);
+            }
+
+            set
+            {
+            }
+        }
+
+        public override string AccessibilityValue
+        {
+            get
+            {
+                return NativeAccessibility.ValueFor(this._owner);
+            }
+
+            set
+            {
+            }
+        }
+
+        public override UIAccessibilityTrait AccessibilityTraits
+        {
+            get
+            {
+                return NativeAccessibility.TraitsFor(this._owner);
+            }
+
+            set
+            {
+            }
+        }
+
+        public override bool AccessibilityActivate()
+        {
+            return this._owner.IsAccessibilityActionable && this._owner.PerformDefaultAccessibilityAction();
+        }
+
+        // NOTE: Null (nil) means the subviews
+        [Export("accessibilityElements")]
+        public NSObject[] GetAccessibilityElements()
+        {
+            if ((this._owner.AccessibilityRole != AccessibilityRole.None) || !this._owner.HasLightweightChildren)
+            {
+                return null;
+            }
+
+            return NativeAccessibility.ElementsFor(this, this._owner);
+        }
+
+        #endregion Accessibility
+
         #region Keyboard
 
         public override bool CanBecomeFirstResponder
         {
             get
             {
-                return this._owner.Focusable;
+                return this._owner.Focusable || this._owner.HasFocusableLightweight;
             }
         }
 
@@ -154,7 +227,7 @@ namespace XForms.iOS
             bool result = base.BecomeFirstResponder();
             if (result)
             {
-                this._owner.IsFocused = true;
+                this._owner.OnNativeFocusChanged(true, isBackward: false);
             }
 
             return result;
@@ -165,7 +238,7 @@ namespace XForms.iOS
             bool result = base.ResignFirstResponder();
             if (result)
             {
-                this._owner.IsFocused = false;
+                this._owner.OnNativeFocusChanged(false, isBackward: false);
             }
 
             return result;
@@ -212,7 +285,7 @@ namespace XForms.iOS
                 }
 
                 var keyEvent = new KeyEventArgs(key, ToKeyModifiers(uiKey.ModifierFlags));
-                handled |= isDown ? this._owner.RouteKeyDown(keyEvent) : this._owner.RouteKeyUp(keyEvent);
+                handled |= isDown ? this._owner.RouteLayerKeyDown(keyEvent) : this._owner.RouteLayerKeyUp(keyEvent);
             }
 
             return handled;

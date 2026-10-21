@@ -25,6 +25,14 @@ namespace XForms.Toolkit
             }
         }
 
+        public override bool AccessibilityIsSelected
+        {
+            get
+            {
+                return this.IsChecked;
+            }
+        }
+
         public event EventHandler<ToggledEventArgs> IsCheckedChanged;
 
         private const float DefaultScale = 0.8f;
@@ -70,6 +78,7 @@ namespace XForms.Toolkit
                     this.UpdateState();
 
                     this.IsCheckedChanged?.Invoke(this, new ToggledEventArgs(value));
+                    this.NotifyAccessibilityStateChanged();
                 }
                 else
                 {

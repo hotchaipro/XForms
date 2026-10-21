@@ -288,6 +288,11 @@ namespace XForms.Android.Renderers
 
             if (null != newElement)
             {
+                if (this.Element is View accessibleView)
+                {
+                    AndroidAccessibility.Attach(newElement, accessibleView);
+                }
+
                 newElement.Touch += Element_Touch;
                 newElement.GenericMotion += Element_GenericMotion;
                 newElement.FocusChange += Element_FocusChange;
@@ -470,7 +475,7 @@ namespace XForms.Android.Renderers
         {
             if (this.Element is View view)
             {
-                view.IsFocused = e.HasFocus;
+                view.OnNativeFocusChanged(e.HasFocus, (sender as NativeLayoutView)?.IsFocusBackward ?? false);
             }
         }
 
@@ -494,11 +499,11 @@ namespace XForms.Android.Renderers
             var keyEvent = new KeyEventArgs(key, ToKeyModifiers(e.Event.MetaState));
             if (e.Event.Action == KeyEventActions.Down)
             {
-                e.Handled = view.RouteKeyDown(keyEvent);
+                e.Handled = view.RouteLayerKeyDown(keyEvent);
             }
             else if (e.Event.Action == KeyEventActions.Up)
             {
-                e.Handled = view.RouteKeyUp(keyEvent);
+                e.Handled = view.RouteLayerKeyUp(keyEvent);
             }
         }
 

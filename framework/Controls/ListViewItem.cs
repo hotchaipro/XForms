@@ -43,6 +43,14 @@ namespace XForms.Controls
             }
         }
 
+        public override bool AccessibilityIsSelected
+        {
+            get
+            {
+                return this.IsSelected;
+            }
+        }
+
         /// <summary>
         /// The container of a view that shows a list item (the view, or one of
         /// its ancestors, is a container's content), or null.
@@ -96,6 +104,7 @@ namespace XForms.Controls
                     this._isSelected = value;
                     this._background.InvalidateVisual();
                     this.OnIsSelectedChanged();
+                    this.NotifyAccessibilityStateChanged();
                 }
             }
         }

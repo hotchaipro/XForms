@@ -213,6 +213,15 @@ namespace XForms.Toolkit
                 this.IsSubtleStyle = true;
             }
 
+            // Labeled by the flyout button's label
+            protected override string DefaultAccessibilityLabel
+            {
+                get
+                {
+                    return this._outerButton.AccessibilityLabel;
+                }
+            }
+
             protected override void OnTapBegan()
             {
                 base.OnTapBegan();

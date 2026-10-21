@@ -33,6 +33,19 @@ namespace XForms.Toolkit
             this.GestureRecognizer = new SwipeGestureRecognizer(this);
 
             this.IsEnabled = true;
+            this.Focusable = true;
+        }
+
+        /// <summary>
+        /// The button shows only an icon: give it an
+        /// <see cref="View.AccessibilityLabel"/>.
+        /// </summary>
+        protected override AccessibilityRole DefaultAccessibilityRole
+        {
+            get
+            {
+                return AccessibilityRole.Button;
+            }
         }
 
         public bool IsEnabled

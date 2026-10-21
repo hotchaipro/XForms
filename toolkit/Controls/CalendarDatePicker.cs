@@ -39,6 +39,7 @@ namespace XForms.Toolkit
                 this._selectedDate = date;
                 this.InvalidateVisual();
                 this.OnPropertyChanged();
+                this.NotifyAccessibilityStateChanged();
             }
         }
 

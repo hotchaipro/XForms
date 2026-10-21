@@ -26,7 +26,15 @@ namespace XForms.Toolkit
         {
             get
             {
-                return AccessibilityRole.Button;
+                return AccessibilityRole.ComboBox;
+            }
+        }
+
+        public override string AccessibilityValue
+        {
+            get
+            {
+                return this.IsPlaceholder ? null : this.DisplayText;
             }
         }
 

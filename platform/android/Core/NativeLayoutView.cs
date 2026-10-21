@@ -33,6 +33,86 @@ namespace XForms.Android
             this.SetClipToPadding(false);
         }
 
+        internal XForms.View Owner
+        {
+            get
+            {
+                return this._owner;
+            }
+        }
+
+        private LayerNodeProvider _nodeProvider;
+
+        /// <summary>
+        /// The virtual accessibility nodes for the lightweight views inside, or
+        /// null until an accessibility service asks for them.
+        /// </summary>
+        internal LayerNodeProvider NodeProvider
+        {
+            get
+            {
+                return this._nodeProvider;
+            }
+        }
+
+        internal LayerNodeProvider GetOrCreateNodeProvider()
+        {
+            return this._nodeProvider ??= new LayerNodeProvider(this);
+        }
+
+        protected override bool DispatchHoverEvent(
+            global::Android.Views.MotionEvent e)
+        {
+            if ((null != this._nodeProvider) && this._nodeProvider.DispatchHover(e))
+            {
+                return true;
+            }
+
+            return base.DispatchHoverEvent(e);
+        }
+
+        /// <summary>
+        /// Whether keyboard focus last arrived moving backward (Shift+Tab), so
+        /// the last lightweight view inside takes it.
+        /// </summary>
+        internal bool IsFocusBackward
+        {
+            get;
+            private set;
+        }
+
+        protected override void OnFocusChanged(
+            bool gainFocus,
+            [global::Android.Runtime.GeneratedEnum] FocusSearchDirection direction,
+            global::Android.Graphics.Rect previouslyFocusedRect)
+        {
+            this.IsFocusBackward = gainFocus && (direction == FocusSearchDirection.Backward);
+
+            // A layer that has focus for its lightweight views draws their
+            // ring instead of Android's highlight over all of it
+            if (global::Android.OS.Build.VERSION.SdkInt >= global::Android.OS.BuildVersionCodes.O)
+            {
+                this.DefaultFocusHighlightEnabled = this._owner.Focusable;
+            }
+
+            base.OnFocusChanged(gainFocus, direction, previouslyFocusedRect);
+        }
+
+        public override void AddFocusables(
+            System.Collections.Generic.IList<global::Android.Views.View> views,
+            [global::Android.Runtime.GeneratedEnum] FocusSearchDirection direction,
+            [global::Android.Runtime.GeneratedEnum] FocusablesFlags focusableMode)
+        {
+            // Keyboard focus can move into a layer with focusable lightweight
+            // views inside it
+            if (!this.Focusable && this._owner.HasFocusableLightweight)
+            {
+                this.Focusable = true;
+            }
+
+            base.AddFocusables(views, direction, focusableMode);
+        }
+
         protected override void OnMeasure(
             int widthMeasureSpec,
             int heightMeasureSpec)
@@ -58,6 +138,8 @@ namespace XForms.Android
             this._owner.LayoutContent(new Size(
                 NativeConversions.PixelsToDevicePixels(this.Context, right - left),
                 NativeConversions.PixelsToDevicePixels(this.Context, bottom - top)));
+
+            this._nodeProvider?.NotifyLayoutChanged();
         }
 
         protected override void DispatchDraw(
@@ -72,6 +154,11 @@ namespace XForms.Android
             }
 
             base.DispatchDraw(canvas);
+
+            if (null != this._owner.FocusedLightweight)
+            {
+                this._owner.PaintLightweightFocusRing(new DrawContext(this.Context, canvas));
+            }
         }
 
         public override bool ShouldDelayChildPressedState()

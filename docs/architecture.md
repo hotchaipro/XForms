@@ -268,18 +268,34 @@ Keyboard input goes to the focused view through public `View` API:
 
 The platform handles Tab and Shift+Tab (focus order), Escape (closes the top
 popup, then goes back) and Alt+Left (back) on Win32. Android and iOS route
-hardware keys to the focused view the same way, and use their native focus
-navigation.
+hardware keys to the focused view the same way. There, a lightweight view has
+no native object to take focus: its layer's native view takes it, and the
+layer tracks which lightweight view inside it is focused, routes keys to it
+and draws its focus ring. Tab and Shift+Tab follow the view tree, lightweight
+and native views alike, on every platform (Android and iOS would otherwise
+order native views by position, which puts a layer before the views inside
+it).
 
 ## Accessibility
 
-Views describe themselves with `AccessibilityRole` and `AccessibilityLabel`.
-Controls provide defaults: a Button is a button named by its text; a list item
-is named by the text inside it. Each platform maps these to its own
-accessibility API:
-- Win32: UI Automation providers (implemented).
-- Android: TalkBack, through `AccessibilityNodeInfo` (not yet implemented).
-- iOS: VoiceOver, through `UIAccessibility` (not yet implemented).
+Views describe themselves with `AccessibilityRole` and `AccessibilityLabel`,
+and controls with state override `AccessibilityIsChecked` (toggles),
+`AccessibilityIsSelected` (list items, tabs, radio buttons) and
+`AccessibilityValue` (a picker's choice). Assistive technology acts on a view
+through `PerformAccessibilityAction` (invoke, toggle or select; by default
+each does what a tap would). A control calls `NotifyAccessibilityStateChanged`
+when its state or value changes. Controls provide defaults: a Button is a
+button named by its text; a list item is named by the text inside it. Each
+platform maps these to its own accessibility API:
+- Win32: UI Automation providers, with the Invoke, Toggle, SelectionItem and
+  Value patterns and their property-changed events.
+- Android: TalkBack, through `AccessibilityNodeInfo`. Every native view gets
+  an accessibility delegate; a layer exposes the lightweight views inside it
+  as virtual nodes (as `ExploreByTouchHelper` does), with touch exploration,
+  in reading order with its native children.
+- iOS: VoiceOver, through `UIAccessibility`: a layer is one element when its
+  view is accessible, and otherwise holds a `UIAccessibilityElement` for each
+  accessible lightweight view, then its subviews.
 
 Native text entries expose themselves natively.
 
@@ -356,8 +372,8 @@ other threads.
 | List | `ListView` | `UITableView` | Virtualized compositor list |
 | Scrolling | Native (`android.widget.ScrollView`) | Native (`UIScrollView`) | Compositor-animated, with touch flick |
 | Popups | `PopupWindow` | View over the window | Topmost composition target |
-| Accessibility | Not yet | Not yet | UI Automation |
-| Keyboard focus | Not yet | Not yet | Tab order, focus ring, activation |
+| Accessibility | `AccessibilityNodeInfo`, virtual nodes for lightweight views | `UIAccessibility` elements | UI Automation |
+| Keyboard focus | Native focus, layer-tracked for lightweight views; view-tree Tab order | The same (first responder) | Tab order, focus ring, activation |
 | Interop | .NET for Android | .NET for iOS | Source-generated (CsWin32, `GeneratedComInterface`): trimmable and Native AOT-compatible |
 
 ## Current state

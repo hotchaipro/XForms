@@ -22,5 +22,32 @@ namespace XForms
         Image,
         TextBox,
         Group,
+        RadioButton,
+
+        /// <summary>
+        /// A field that shows a value and opens a picker for it.
+        /// </summary>
+        ComboBox,
+    }
+
+    /// <summary>
+    /// What assistive technology can ask a view to do.
+    /// </summary>
+    public enum AccessibilityAction
+    {
+        /// <summary>
+        /// Does what a tap would.
+        /// </summary>
+        Invoke,
+
+        /// <summary>
+        /// Checks or unchecks a view with a checked state.
+        /// </summary>
+        Toggle,
+
+        /// <summary>
+        /// Selects a list item, tab or radio button.
+        /// </summary>
+        Select,
     }
 }

@@ -122,6 +122,7 @@ namespace XForms.Toolkit
 
             this._selectedIndex = index;
             this.InvalidateVisual();
+            this.NotifyAccessibilityStateChanged();
 
             this.OnPropertyChanged(nameof(this.SelectedIndex));
             this.OnPropertyChanged(nameof(this.SelectedItem));
