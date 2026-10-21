@@ -24,8 +24,16 @@ namespace XForms.Win32.Renderers
         private const uint EN_KILLFOCUS = 0x0200;
         private const uint EN_CHANGE = 0x0300;
         private const uint EN_REQUESTRESIZE = 0x0701;
+        private const uint EN_SELCHANGE = 0x0702;
         private const int ENM_CHANGE = 0x00000001;
         private const int ENM_REQUESTRESIZE = 0x00040000;
+        private const int ENM_SELCHANGE = 0x00080000;
+        private const uint EM_EXGETSEL = PInvoke.WM_USER + 52;
+        private const uint EM_EXLIMITTEXT = PInvoke.WM_USER + 53;
+        private const uint EM_EXSETSEL = PInvoke.WM_USER + 55;
+        private const uint EM_SETPASSWORDCHAR = 0x00CC;
+        private const uint EM_SETREADONLY = 0x00CF;
+        private const char PasswordChar = '\u25CF';
         private const int IMF_SPELLCHECKING = 0x0800;
         private const int SCF_ALL = 0x0004;
         private const uint ES_MULTILINE = 0x0004;
@@ -47,6 +55,17 @@ namespace XForms.Win32.Renderers
         private RECT _windowBounds;
         private bool _isWindowShown;
         private bool _isFocused;
+        private bool _isPassword;
+        private int _maxLength;
+        private bool _isReadOnly;
+
+        // The range RichEdit reports (cpMin, cpMax)
+        [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+        private struct CharRange
+        {
+            public int Min;
+            public int Max;
+        }
 
         public TextBoxRenderer(
             TextBox textEntry)
@@ -77,10 +96,11 @@ namespace XForms.Win32.Renderers
                 this._hwnd = Create("RICHEDIT50W", (WINDOW_STYLE)style);
             }
 
-            PInvoke.SendMessage(this._hwnd, EM_SETEVENTMASK, 0, ENM_CHANGE | ENM_REQUESTRESIZE);
+            PInvoke.SendMessage(this._hwnd, EM_SETEVENTMASK, 0, ENM_CHANGE | ENM_REQUESTRESIZE | ENM_SELCHANGE);
 
             this.ApplyFormat();
             this.ApplyKeyboardOptions();
+            this.ApplyEditOptions();
 
             if (null != this._placeholderText)
             {
@@ -130,10 +150,96 @@ namespace XForms.Win32.Renderers
             PInvoke.SendMessage(this._hwnd, EM_SETBKGNDCOLOR, 0, (nint)ToColorRef(this._fieldColor).Value);
         }
 
+        private void ApplyEditOptions()
+        {
+            // NOTE: A password shows as dots; RichEdit keeps it from being copied
+            PInvoke.SendMessage(this._hwnd, EM_SETPASSWORDCHAR, this._isPassword ? PasswordChar : 0u, 0);
+
+            // Without a limit, RichEdit stops at 64K characters
+            PInvoke.SendMessage(this._hwnd, EM_EXLIMITTEXT, 0, (0 < this._maxLength) ? this._maxLength : int.MaxValue);
+
+            PInvoke.SendMessage(this._hwnd, EM_SETREADONLY, this._isReadOnly ? 1u : 0u, 0);
+        }
+
+        public bool IsPassword
+        {
+            set
+            {
+                this._isPassword = value;
+                this.ApplyEditOptions();
+                this.ApplyKeyboardOptions();
+            }
+        }
+
+        public int MaxLength
+        {
+            set
+            {
+                this._maxLength = value;
+                this.ApplyEditOptions();
+            }
+        }
+
+        public bool IsReadOnly
+        {
+            set
+            {
+                this._isReadOnly = value;
+                this.ApplyEditOptions();
+            }
+        }
+
+        private CharRange GetSelection()
+        {
+            var range = new CharRange();
+            PInvoke.SendMessage(this._hwnd, EM_EXGETSEL, 0, (nint)(&range));
+            return range;
+        }
+
+        public int SelectionStart
+        {
+            get
+            {
+                return this.GetSelection().Min;
+            }
+        }
+
+        public int SelectionLength
+        {
+            get
+            {
+                var range = this.GetSelection();
+                return Math.Max(0, range.Max - range.Min);
+            }
+        }
+
+        public void Select(
+            int start,
+            int length)
+        {
+            var range = new CharRange() { Min = start, Max = start + length };
+            PInvoke.SendMessage(this._hwnd, EM_EXSETSEL, 0, (nint)(&range));
+        }
+
+        /// <summary>
+        /// Handles Return in a single-line text box: submits instead of beeping.
+        /// Returns whether it handled the key.
+        /// </summary>
+        public bool OnReturnKey()
+        {
+            if (this._multiline)
+            {
+                return false;
+            }
+
+            this.Host.Post(((ITextBoxDelegate)this.Element).OnNativeSubmitted);
+            return true;
+        }
+
         private void ApplyKeyboardOptions()
         {
             nint options = PInvoke.SendMessage(this._hwnd, EM_GETLANGOPTIONS, 0, 0).Value;
-            if (this._keyboardOptions.HasFlag(KeyboardOptions.SpellCheck) && Environment.GetEnvironmentVariable("XFORMS_NOSPELL") != "1") // TEMP
+            if (this._keyboardOptions.HasFlag(KeyboardOptions.SpellCheck) && !this._isPassword && Environment.GetEnvironmentVariable("XFORMS_NOSPELL") != "1") // TEMP
             {
                 options |= IMF_SPELLCHECKING;
             }
@@ -439,6 +545,12 @@ namespace XForms.Win32.Renderers
         public void OnNotify(
             NMHDR* header)
         {
+            if (header->code == EN_SELCHANGE)
+            {
+                this.Host.Post(((ITextBoxDelegate)this.Element).OnNativeSelectionChanged);
+                return;
+            }
+
             if (header->code == EN_REQUESTRESIZE)
             {
                 var request = (REQRESIZE*)header;

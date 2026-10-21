@@ -713,6 +713,7 @@ from. Where XForms keeps its own name, the reason is in
 | `TextEntry.Multiline` | `AcceptsReturn` | WPF, WinUI, Avalonia |
 | `TextEntry.KeyboardOptions` | `IsSpellCheckEnabled`, `IsTextPredictionEnabled` | WinUI |
 | (new) | `TextBox.TextChanged` event | All |
+| (new) | `TextBox.Submitted`, `IsPassword`, `MaxLength`, `IsReadOnly`, `SelectionStart`, `SelectionLength`, `SelectedText`, `Select`, `SelectAll`, `SelectionChanged` | WPF, WinUI (selection, `MaxLength`, `IsReadOnly`); MAUI (`Completed`, `IsPassword`) | `Submitted` is MAUI's `Completed` |
 | `ScrollView.ScrollTo` and `VerticalOffset` | `ScrollToVerticalOffset` and `VerticalOffset` | WPF |
 | `ListView.Bind(source)` | `ItemsSource` | All |
 | `ListView.ItemClicked` | `ItemClick` | WinUI |
@@ -1415,6 +1416,33 @@ Neither changed the order of the phases. Both added items, which are below.
        (the benchmark's scrolled content is one tall surface).
 9. **Text entry.** Add `TextChanged`, a submitted event, password mode,
    maximum length, read-only and a selection API.
+
+   **Status: done.**
+   - **`TextBox`** gained:
+     - `Submitted`: Enter, or the keyboard's Done key, in a single-line box.
+       A box that accepts Return never submits.
+     - `IsPassword` (dots, no suggestions or spell checking).
+     - `MaxLength` (what the user types or pastes; 0 for no limit).
+     - `IsReadOnly` (the text can be selected, not changed).
+     - `SelectionStart`, `SelectionLength`, `SelectedText`, `Select`,
+       `SelectAll` and `SelectionChanged`.
+   - **Platforms:**
+     - Win32: RichEdit's password character, text limit and read-only mode,
+       its selection messages and selection-change notifications. Return in
+       a single-line box submits instead of beeping.
+     - Android: the input type (password variation), a length filter,
+       removing the key listener for read-only, the editor action for Done,
+       and an `EditText` subclass that reports selection changes.
+     - iOS: `SecureTextEntry`, change checks for the length and read-only,
+       the Return key, and `UITextInput` selection.
+   - **Fixed on the way:** the native object's own change notifications,
+     while it was receiving the text box's values, overwrote the text (a
+     password box set from code came up empty on Android).
+   - **Verified** on Win32 (a text entry test page): submitting, a
+     password, the length limit, read-only text, selecting, and Return in a
+     multiline box. On Android: the password and selecting. Typing on the
+     Android emulator wasn't verified: the keyboard shows a stylus tutorial
+     whenever a text box takes focus. iOS is only built.
 10. **Lists.** Add `ListView<T>` with typed item sources and item views that
    are created once and bound to many items, plus grouping, horizontal and
    grid layouts, and selection modes.

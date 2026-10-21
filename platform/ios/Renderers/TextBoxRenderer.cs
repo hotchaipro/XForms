@@ -18,6 +18,9 @@ namespace XForms.iOS.Renderers
         private KeyboardOptions _keyboardOptions;
         private UIColor _textColor;
         private UIColor _tintColor;
+        private bool _isPassword;
+        private int _maxLength;
+        private bool _isReadOnly;
 
         public TextBoxRenderer(
             TextBox textEntry)
@@ -188,9 +191,13 @@ namespace XForms.iOS.Renderers
 
             textField.ShouldReturn = (field) =>
             {
+                ((ITextBoxDelegate)this.Element).OnNativeSubmitted();
                 field.ResignFirstResponder();
                 return true;
             };
+
+            textField.ShouldChangeCharacters = (field, range, replacement) => this.CanChange(field.Text, range, replacement);
+            textField.DidChangeSelection += (sender, e) => ((ITextBoxDelegate)this.Element).OnNativeSelectionChanged();
 
             this._textField = textField;
 
@@ -215,6 +222,8 @@ namespace XForms.iOS.Renderers
             textView.TextContainer.LineFragmentPadding = 0;
 
             textView.Changed += this.TextView_Changed;
+            textView.ShouldChangeText = (view, range, replacement) => this.CanChange(view.Text, range, replacement);
+            textView.SelectionChanged += (sender, e) => ((ITextBoxDelegate)this.Element).OnNativeSelectionChanged();
 
             this._textView = textView;
 
@@ -232,6 +241,107 @@ namespace XForms.iOS.Renderers
 
             this.ApplyKeyboardOptions();
             this.ApplyColors();
+            this.ApplyEditOptions();
+        }
+
+        // Whether an edit may happen: not while read-only, nor past the
+        // maximum length
+        private bool CanChange(
+            string text,
+            Foundation.NSRange range,
+            string replacement)
+        {
+            if (this._isReadOnly)
+            {
+                return false;
+            }
+
+            if (0 < this._maxLength)
+            {
+                int length = (text?.Length ?? 0) - (int)range.Length + (replacement?.Length ?? 0);
+                return length <= this._maxLength;
+            }
+
+            return true;
+        }
+
+        private void ApplyEditOptions()
+        {
+            if (null != this._textField)
+            {
+                this._textField.SecureTextEntry = this._isPassword;
+            }
+            else
+            {
+                this._textView.Editable = !this._isReadOnly;
+            }
+        }
+
+        public bool IsPassword
+        {
+            set
+            {
+                this._isPassword = value;
+                this.ApplyEditOptions();
+            }
+        }
+
+        public int MaxLength
+        {
+            set
+            {
+                this._maxLength = value;
+            }
+        }
+
+        public bool IsReadOnly
+        {
+            set
+            {
+                this._isReadOnly = value;
+                this.ApplyEditOptions();
+            }
+        }
+
+        private IUITextInput TextInput
+        {
+            get
+            {
+                return (IUITextInput)this._textField ?? this._textView;
+            }
+        }
+
+        public int SelectionStart
+        {
+            get
+            {
+                var input = this.TextInput;
+                var range = input.SelectedTextRange;
+                return (null == range) ? 0 : (int)input.GetOffsetFromPosition(input.BeginningOfDocument, range.Start);
+            }
+        }
+
+        public int SelectionLength
+        {
+            get
+            {
+                var input = this.TextInput;
+                var range = input.SelectedTextRange;
+                return (null == range) ? 0 : (int)input.GetOffsetFromPosition(range.Start, range.End);
+            }
+        }
+
+        public void Select(
+            int start,
+            int length)
+        {
+            var input = this.TextInput;
+            var from = input.GetPosition(input.BeginningOfDocument, start);
+            var to = input.GetPosition(input.BeginningOfDocument, start + length);
+            if ((null != from) && (null != to))
+            {
+                input.SelectedTextRange = input.GetTextRange(from, to);
+            }
         }
 
         private void ApplyKeyboardOptions()

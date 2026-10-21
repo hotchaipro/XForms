@@ -16,6 +16,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)TabbedPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TestApp.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TextAndListPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TextEntryPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ThemePage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)XamlPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PickersPage.cs" />

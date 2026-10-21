@@ -169,6 +169,13 @@ namespace XForms.Win32
                     continue;
                 }
 
+                // Return submits a single-line text box
+                if ((msg.message == PInvoke.WM_KEYDOWN) && (msg.wParam.Value == (nuint)Windows.Win32.UI.Input.KeyboardAndMouse.VIRTUAL_KEY.VK_RETURN)
+                    && host.TryHandleTextBoxReturn(msg.hwnd))
+                {
+                    continue;
+                }
+
                 PInvoke.TranslateMessage(&msg);
                 PInvoke.DispatchMessage(&msg);
             }
@@ -299,6 +306,20 @@ namespace XForms.Win32
             TextBoxRenderer textEntry)
         {
             this._textEntries.Add(textEntry);
+        }
+
+        private bool TryHandleTextBoxReturn(
+            HWND hwnd)
+        {
+            foreach (var textEntry in this._textEntries)
+            {
+                if (textEntry.Hwnd == hwnd)
+                {
+                    return textEntry.OnReturnKey();
+                }
+            }
+
+            return false;
         }
 
         /// <summary>

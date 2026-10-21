@@ -17,6 +17,17 @@ namespace XForms.Controls
         /// Called by the platform after the user changes the text.
         /// </summary>
         void OnNativeTextChanged();
+
+        /// <summary>
+        /// Called by the platform when the user submits a single-line text box
+        /// (Enter, or the keyboard's Done or Go key).
+        /// </summary>
+        void OnNativeSubmitted();
+
+        /// <summary>
+        /// Called by the platform after the selection (or the caret) moves.
+        /// </summary>
+        void OnNativeSelectionChanged();
     }
 
     public interface ITextBoxRenderer : IControlRenderer
@@ -25,6 +36,29 @@ namespace XForms.Controls
         string PlaceholderText { get; set; }
         bool Multiline { get; set; }
         KeyboardOptions KeyboardOptions { get; set; }
+
+        /// <summary>
+        /// Shows the text as dots, and offers no suggestions or copying.
+        /// </summary>
+        bool IsPassword { set; }
+
+        /// <summary>
+        /// The most characters the user can enter, or 0 for no limit.
+        /// </summary>
+        int MaxLength { set; }
+
+        bool IsReadOnly { set; }
+
+        /// <summary>
+        /// The selected range, in UTF-16 code units; an empty range is the
+        /// caret.
+        /// </summary>
+        int SelectionStart { get; }
+
+        int SelectionLength { get; }
+
+        void Select(int start, int length);
+
         new void Focus();
     }
 
@@ -67,11 +101,34 @@ namespace XForms.Controls
         private bool _acceptsReturn;
         private KeyboardOptions? _keyboardOptions;
         private bool _focusWhenAttached;
+        private bool _isPassword;
+        private int _maxLength;
+        private bool _isReadOnly;
+
+        // While the native object receives the text box's values, its own
+        // change notifications aren't the user's
+        private bool _isApplyingValues;
+
+        // The selection to apply once the native object exists
+        private int _selectionStart;
+        private int _selectionLength;
 
         /// <summary>
         /// Raised when the text changes, whether the user or code changed it.
         /// </summary>
         public event EventHandler TextChanged;
+
+        /// <summary>
+        /// Raised when the user submits a single-line text box: Enter, or the
+        /// on-screen keyboard's Done or Go key. A text box that accepts Return
+        /// never submits.
+        /// </summary>
+        public event EventHandler Submitted;
+
+        /// <summary>
+        /// Raised when the selection or the caret moves.
+        /// </summary>
+        public event EventHandler SelectionChanged;
 
         public string Text
         {
@@ -101,6 +158,10 @@ namespace XForms.Controls
 
         void ITextBoxDelegate.OnNativeTextChanged()
         {
+            if (this._isApplyingValues)
+            {
+                return;
+            }
             // NOTE: Setting the text from code also changes the native text;
             // only a different value is a change
             string text = this.Native?.Text ?? string.Empty;
@@ -111,6 +172,173 @@ namespace XForms.Controls
 
             this._text = text;
             this.OnTextChanged();
+        }
+
+        void ITextBoxDelegate.OnNativeSubmitted()
+        {
+            if (!this._acceptsReturn)
+            {
+                this.Submitted?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        void ITextBoxDelegate.OnNativeSelectionChanged()
+        {
+            if (this._isApplyingValues)
+            {
+                return;
+            }
+
+            var native = this.Native;
+            if (null != native)
+            {
+                this._selectionStart = native.SelectionStart;
+                this._selectionLength = native.SelectionLength;
+            }
+
+            this.SelectionChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Shows the text as dots (as WPF's and WinUI's <c>PasswordBox</c> and
+        /// MAUI's <c>Entry.IsPassword</c>). A password box is single-line and
+        /// offers no suggestions.
+        /// </summary>
+        public bool IsPassword
+        {
+            get
+            {
+                return this._isPassword;
+            }
+
+            set
+            {
+                this._isPassword = value;
+                this.Native?.IsPassword = value;
+                this.OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// The most characters the user can type or paste, or 0 (the default)
+        /// for no limit.
+        /// </summary>
+        public int MaxLength
+        {
+            get
+            {
+                return this._maxLength;
+            }
+
+            set
+            {
+                if (value < 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value));
+                }
+
+                this._maxLength = value;
+                this.Native?.MaxLength = value;
+                this.OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Whether the user can select and copy the text but not change it.
+        /// </summary>
+        public bool IsReadOnly
+        {
+            get
+            {
+                return this._isReadOnly;
+            }
+
+            set
+            {
+                this._isReadOnly = value;
+                this.Native?.IsReadOnly = value;
+                this.OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Where the selection starts (the caret, when nothing is selected), in
+        /// UTF-16 code units.
+        /// </summary>
+        public int SelectionStart
+        {
+            get
+            {
+                return this.Native?.SelectionStart ?? this._selectionStart;
+            }
+
+            set
+            {
+                this.Select(value, this.SelectionLength);
+            }
+        }
+
+        public int SelectionLength
+        {
+            get
+            {
+                return this.Native?.SelectionLength ?? this._selectionLength;
+            }
+
+            set
+            {
+                this.Select(this.SelectionStart, value);
+            }
+        }
+
+        /// <summary>
+        /// The selected text, or an empty string.
+        /// </summary>
+        public string SelectedText
+        {
+            get
+            {
+                string text = this._text ?? string.Empty;
+                int start = Math.Min(this.SelectionStart, text.Length);
+                int length = Math.Min(this.SelectionLength, text.Length - start);
+                return text.Substring(start, length);
+            }
+        }
+
+        /// <summary>
+        /// Selects a range of the text (clamped to it); a length of 0 moves the
+        /// caret.
+        /// </summary>
+        public void Select(
+            int start,
+            int length)
+        {
+            if ((start < 0) || (length < 0))
+            {
+                throw new ArgumentOutOfRangeException((start < 0) ? nameof(start) : nameof(length));
+            }
+
+            int textLength = (this._text ?? string.Empty).Length;
+            start = Math.Min(start, textLength);
+            length = Math.Min(length, textLength - start);
+
+            this._selectionStart = start;
+            this._selectionLength = length;
+
+            var native = this.Native;
+            if (null != native)
+            {
+                native.Select(start, length);
+            }
+            else
+            {
+                this.SelectionChanged?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        public void SelectAll()
+        {
+            this.Select(0, (this._text ?? string.Empty).Length);
         }
 
         public string PlaceholderText
@@ -196,10 +424,22 @@ namespace XForms.Controls
             base.OnRendererCreated();
 
             var native = this.Native;
-            if (this._acceptsReturn) native.Multiline = true;
-            if (this._keyboardOptions.HasValue) native.KeyboardOptions = this._keyboardOptions.Value;
-            if (null != this._placeholderText) native.PlaceholderText = this._placeholderText;
-            if (null != this._text) native.Text = this._text;
+            this._isApplyingValues = true;
+            try
+            {
+                if (this._acceptsReturn) native.Multiline = true;
+                if (this._keyboardOptions.HasValue) native.KeyboardOptions = this._keyboardOptions.Value;
+                if (null != this._placeholderText) native.PlaceholderText = this._placeholderText;
+                if (this._isPassword) native.IsPassword = true;
+                if (0 < this._maxLength) native.MaxLength = this._maxLength;
+                if (this._isReadOnly) native.IsReadOnly = true;
+                if (null != this._text) native.Text = this._text;
+                if ((0 < this._selectionStart) || (0 < this._selectionLength)) native.Select(this._selectionStart, this._selectionLength);
+            }
+            finally
+            {
+                this._isApplyingValues = false;
+            }
         }
 
         protected override void OnAttached()
