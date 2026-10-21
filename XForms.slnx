@@ -5,6 +5,7 @@
   <Folder Name="/platform/">
     <Project Path="platform/android/XForms.Framework.Android.csproj" />
     <Project Path="platform/ios/XForms.Framework.iOS.csproj" />
+    <Project Path="platform/web/XForms.Framework.Web.csproj" />
     <Project Path="platform/win32/XForms.Framework.Win32.csproj" />
   </Folder>
   <Folder Name="/toolkit/">
@@ -13,6 +14,7 @@
   <Folder Name="/test/">
     <Project Path="test/XForms.Test.Android/XForms.Test.Android.csproj" />
     <Project Path="test/XForms.Test.iOS/XForms.Test.iOS.csproj" />
+    <Project Path="test/XForms.Test.Web/XForms.Test.Web.csproj" />
     <Project Path="test/XForms.Test.Win32/XForms.Test.Win32.csproj" />
   </Folder>
 </Solution>
