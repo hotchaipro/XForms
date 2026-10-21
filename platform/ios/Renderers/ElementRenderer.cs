@@ -80,11 +80,5 @@ namespace XForms.iOS.Renderers
         {
         }
 
-        public bool HasDescendant(
-            Element element)
-        {
-            return false;
-            //throw new NotImplementedException();
-        }
     }
 }

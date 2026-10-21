@@ -38,11 +38,6 @@ namespace XForms.Win32.Renderers
             }
         }
 
-        public bool HasDescendant(
-            Element element)
-        {
-            return false;
-        }
 
         public virtual void OnThemeChanged(
             Theme theme)
@@ -549,7 +544,10 @@ namespace XForms.Win32.Renderers
             float x = point.X - this._frame.X - translation.X;
             float y = point.Y - this._frame.Y - translation.Y;
 
-            if ((x < 0) || (y < 0) || (x >= this._frame.Width) || (y >= this._frame.Height))
+            // Children drawn outside an unclipped view (moved there by an
+            // animator, say) still take input there
+            bool isInside = (x >= 0) && (y >= 0) && (x < this._frame.Width) && (y < this._frame.Height);
+            if (!isInside && this.ClipsHitTesting)
             {
                 return null;
             }
@@ -566,7 +564,19 @@ namespace XForms.Win32.Renderers
                 }
             }
 
-            return this;
+            return isInside ? this : null;
+        }
+
+        /// <summary>
+        /// Whether input outside the view's bounds misses its children too: when
+        /// it clips them (scrolling views always do).
+        /// </summary>
+        protected virtual bool ClipsHitTesting
+        {
+            get
+            {
+                return this._clipToBounds;
+            }
         }
 
         private bool IsEffectivelyVisible

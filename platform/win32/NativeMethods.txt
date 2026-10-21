@@ -14,6 +14,7 @@ SendMessage
 ShowWindow
 UpdateWindow
 LoadCursor
+LoadIcon
 GetClientRect
 GetDpiForWindow
 SetProcessDpiAwarenessContext

@@ -14,6 +14,9 @@ namespace XForms.Win32.Renderers
     /// </summary>
     internal sealed unsafe class ListViewRenderer : ViewRenderer, IListViewRenderer, IScrollableRenderer, IScrollContent
     {
+        // Scrolled-out content takes no input
+        protected override bool ClipsHitTesting => true;
+
         // Rows are realized this far beyond the viewport, in dips
         private const float RealizationMargin = 300;
         private const float DefaultRowHeight = 48;
