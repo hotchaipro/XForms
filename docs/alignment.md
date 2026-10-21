@@ -1746,6 +1746,54 @@ Android and, from phase 17, the browser.
       dispatcher (the browser's event loop) and pointer input (Pointer
       Events).
     - A test host page and a web build of the test app.
+
+    **Status: done.**
+    - **`platform/web`** (`XForms.Framework.Web`): .NET 10 on WebAssembly,
+      with `[JSImport]` and `[JSExport]` and one script, `xforms.js`
+      (served to apps as `_content/XForms.Framework.Web/`). Apps call
+      `WebApplication.RunAsync(title, createApp)`.
+    - **Layers and drawing:** each layer is an absolutely positioned element.
+      Lightweight views and owner-drawn controls draw into a `<canvas>` under
+      the layer's child elements, as on Android. Drawing is recorded in .NET
+      as one command list per layer and replayed by the script: one call
+      into JavaScript per layer, not per shape. Shapes, paths, gradients,
+      shadows, images (tinted through an offscreen canvas), clips,
+      transforms and opacity are supported.
+    - **Layout:** the framework lays the root out to the viewport on
+      animation frames, as Win32's host does; elements get their bounds in
+      CSS pixels (XForms' DIPs), and canvases draw at the device pixel
+      ratio.
+    - **Text:** measured with the canvas and broken into lines in .NET, so
+      drawn text and text elements break alike; a text block is an element
+      showing those lines (styled runs as spans). Generic families (serif,
+      monospace) and fonts from files (`FontFace`) work.
+    - **Input:** Pointer Events go to the element under the pointer, then its
+      ancestors, until one takes the press, which then gets the pointer's
+      moves and release (with pointer capture); hover, leaving the page and
+      the wheel are routed too. Touch pans only scroll views (the page
+      itself doesn't pan or zoom).
+    - **Also:** theming from `prefers-color-scheme` (live) and forced colors;
+      a dispatcher on the browser's event loop; animation layers composed
+      into CSS transforms and stepped on animation frames; images from the
+      app's `Content` folder; the services (clipboard, launcher,
+      preferences and secure storage in local storage, `navigator.share`,
+      vibration, `navigator.onLine`, file inputs and downloads); suspend
+      when the page is hidden.
+    - **Basic versions, finished in phase 18:** text boxes (`<input>` and
+      `<textarea>`), scroll views (native overflow), lists (every item, not
+      yet virtualized; no pull-to-refresh), popups (over a backdrop that
+      dismisses them).
+    - **Test app:** `test/XForms.Test.Web`, with `?page=` picking the page.
+      `dotnet publish` it and serve `wwwroot` (the SDK's development server
+      didn't serve the app's files here).
+    - **Verified** in the browser: the default, accessibility, drawing,
+      animation, app layer and lists pages; clicks on buttons, toggles,
+      radio buttons and list rows; a drop-down; navigating forward and
+      back; preferences and the network status; dark mode switching live;
+      list grids; native scrolling.
+    - **Fixed on the way:** none in the framework; the web platform's own
+      first-run bugs (a native panel given lightweight children, generic
+      font names quoted in CSS, line limits without ellipses) are fixed.
 18. **Web platform: controls, animation and app layer.**
     - Native primitives: `<input>` and `<textarea>` for text boxes, a
       scrolling `<div>` for scroll views, virtualized lists, and popups.
