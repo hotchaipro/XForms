@@ -1,16 +1,11 @@
 ﻿using System;
-using XForms.Platform;
 using XForms;
 
 namespace XForms.Test
 {
     public class TestApp : Application
     {
-        public TestApp(
-            IPlatform platform)
-            : base(platform)
-        {
-        }
+
 
         /// <summary>
         /// The page to start on: "pickers", "panels", "binding", "input", "drawing", "xaml", "benchmark-views" or
@@ -33,6 +28,30 @@ namespace XForms.Test
         {
             get;
             set;
+        }
+
+        /// <summary>
+        /// Re-creates the native host (Android's activity), as a configuration
+        /// change it doesn't declare would; null where there's none. Set by
+        /// the platform's entry point.
+        /// </summary>
+        public static Action RecreateHost
+        {
+            get;
+            set;
+        }
+
+        // For checking the platforms' lifecycle (Android's logcat shows these)
+        protected override void OnSuspend()
+        {
+            base.OnSuspend();
+            Console.WriteLine("XForms.Test: suspended");
+        }
+
+        protected override void OnResume()
+        {
+            base.OnResume();
+            Console.WriteLine("XForms.Test: resumed");
         }
 
         protected override void OnStart()

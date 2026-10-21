@@ -7,11 +7,11 @@ namespace XForms.Android.Renderers
     {
         private Application _application;
         private ApplicationHost _applicationHost;
-        private AndroidApplicationActivity _androidApplication;
+        private AndroidApplication _androidApplication;
 
         public ApplicationRenderer(
             XForms.Application application,
-            AndroidApplicationActivity androidApplication)
+            AndroidApplication androidApplication)
         {
             if (null == application)
             {
@@ -33,13 +33,7 @@ namespace XForms.Android.Renderers
             androidApplication.SafeAreaInsetsChanged += (insets) => this._applicationHost.SafeAreaInsetsChanged(insets);
         }
 
-        public AndroidApplicationActivity Activity
-        {
-            get
-            {
-                return this._androidApplication;
-            }
-        }
+
 
         private Color? _titleBarAccentColor, _titleBarForegroundColor;
 
@@ -95,7 +89,7 @@ namespace XForms.Android.Renderers
         {
             get
             {
-                var activity = this._androidApplication;
+                var activity = this._androidApplication.ActivityOrContext;
 
                 // Android 14 added a contrast setting; "high" is 1
                 if (global::Android.OS.Build.VERSION.SdkInt >= global::Android.OS.BuildVersionCodes.UpsideDownCake)
@@ -119,7 +113,7 @@ namespace XForms.Android.Renderers
                 // Android 12's dynamic color: the wallpaper's accent
                 if (global::Android.OS.Build.VERSION.SdkInt >= global::Android.OS.BuildVersionCodes.S)
                 {
-                    var color = this._androidApplication.Resources.GetColor(global::Android.Resource.Color.SystemAccent1500, null);
+                    var color = this._androidApplication.ActivityOrContext.Resources.GetColor(global::Android.Resource.Color.SystemAccent1500, null);
                     return NativeConversions.FromAndroidColor(color);
                 }
 
@@ -137,7 +131,7 @@ namespace XForms.Android.Renderers
 
         // NOTE: Android applies the font scale itself: text sizes are in
         // scaled pixels
-        public float SystemTextScale => this._androidApplication.Resources.Configuration.FontScale;
+        public float SystemTextScale => this._androidApplication.ActivityOrContext.Resources.Configuration.FontScale;
 
         public string WindowTitle
         {

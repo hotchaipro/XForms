@@ -5,22 +5,17 @@ using XForms.Platform;
 
 namespace XForms.Android
 {
-    public class AndroidPlatform : IPlatform
+    internal sealed class AndroidPlatform : IPlatform
     {
-        private AndroidApplicationActivity _androidApplication;
+        private readonly AndroidApplication _host;
 
         public AndroidPlatform(
-            AndroidApplicationActivity androidApplication)
+            AndroidApplication host)
         {
-            if (null == androidApplication)
-            {
-                throw new ArgumentNullException(nameof(androidApplication));
-            }
-
-            this._androidApplication = androidApplication;
+            this._host = host ?? throw new ArgumentNullException(nameof(host));
 
             // The app's services are this platform's
-            PlatformServices.Current = AndroidServices.Create(androidApplication);
+            PlatformServices.Current = AndroidServices.Create(host);
         }
 
         public bool UsesLightweightRenderers => true;
@@ -28,49 +23,49 @@ namespace XForms.Android
         public IContainerRenderer CreateContainerRenderer(
             View view)
         {
-            return new ContainerRenderer(this._androidApplication.ApplicationContext, view);
+            return new ContainerRenderer(this._host.Context, view);
         }
 
         public IApplicationRenderer CreateApplicationRenderer(
             Application application)
         {
-            return new ApplicationRenderer(application, this._androidApplication);
+            return new ApplicationRenderer(application, this._host);
         }
 
         public IFrameRenderer CreateFrameRenderer(
             Frame frame)
         {
-            return new FrameRenderer(this._androidApplication.ApplicationContext, frame);
+            return new FrameRenderer(this._host.Context, frame);
         }
 
         public ITextBlockRenderer CreateTextBlockRenderer(
             TextBlock textView)
         {
-            return new TextBlockRenderer(this._androidApplication.ApplicationContext, textView);
+            return new TextBlockRenderer(this._host.Context, textView);
         }
 
         public IImageRenderer CreateImageRenderer(
             Image image)
         {
-            return new ImageRenderer(this._androidApplication.ApplicationContext, image);
+            return new ImageRenderer(this._host.Context, image);
         }
 
         public IBitmapRenderer CreateBitmapRenderer(
             Bitmap bitmap)
         {
-            return new BitmapRenderer(this._androidApplication.ApplicationContext, bitmap);
+            return new BitmapRenderer(this._host.Context, bitmap);
         }
 
         public IItemsViewRenderer CreateItemsViewRenderer(
             ItemsView listView)
         {
-            return new ItemsViewRenderer(this._androidApplication.ApplicationContext, listView);
+            return new ItemsViewRenderer(this._host.Context, listView);
         }
 
         public ITextBoxRenderer CreateTextBoxRenderer(
             TextBox textEntry)
         {
-            return new TextBoxRenderer(this._androidApplication.ApplicationContext, textEntry);
+            return new TextBoxRenderer(this._host.Context, textEntry);
         }
 
 
@@ -84,13 +79,13 @@ namespace XForms.Android
         public IScrollViewerRenderer CreateScrollViewerRenderer(
             ScrollViewer scrollView)
         {
-            return new ScrollViewerRenderer(this._androidApplication.ApplicationContext, scrollView);
+            return new ScrollViewerRenderer(this._host.Context, scrollView);
         }
 
         public IPopupRenderer CreatePopupRenderer(
             Popup popup)
         {
-            return new PopupRenderer(this._androidApplication.ApplicationContext, popup);
+            return new PopupRenderer(this._host.Context, popup);
         }
 
 
@@ -98,14 +93,14 @@ namespace XForms.Android
         public ITextLayoutRenderer CreateTextLayout(
             TextLayout layout)
         {
-            return new TextLayoutRenderer(this._androidApplication.ApplicationContext, layout);
+            return new TextLayoutRenderer(this._host.Context, layout);
         }
 
         public void RegisterFont(
             string familyName,
             string fileName)
         {
-            Fonts.Register(this._androidApplication.ApplicationContext, familyName, fileName);
+            Fonts.Register(this._host.Context, familyName, fileName);
         }
 
         public void NavigateToUri(
@@ -123,7 +118,7 @@ namespace XForms.Android
 
             var androidUri = global::Android.Net.Uri.Parse(uri.ToString());
             var intent = new global::Android.Content.Intent(global::Android.Content.Intent.ActionView, androidUri);
-            this._androidApplication.StartActivity(intent);
+            AndroidServices.StartActivity(this._host, intent);
         }
     }
 }

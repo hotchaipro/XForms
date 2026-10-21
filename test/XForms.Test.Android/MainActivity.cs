@@ -7,20 +7,21 @@ namespace XForms.Test
 {
     [Activity(
         Label = "XForms Test",
-        // Dark mode and the text size change in place; XForms restyles the views
+        // Dark mode and the text size change in place; XForms restyles the views.
+        // NOTE: Unlike an app's (see SoonerOrLater), rotating re-creates this
+        // activity, to exercise moving the running app to the new one
         ConfigurationChanges = global::Android.Content.PM.ConfigChanges.UiMode | global::Android.Content.PM.ConfigChanges.FontScale,
         MainLauncher = true,
         Icon = "@drawable/icon")]
-    public class MainActivity : AndroidApplicationActivity
+    public class MainActivity : Activity
     {
-        private TestApp _app;
-
         protected override void OnCreate(
             Bundle bundle)
         {
             base.OnCreate(bundle);
+            global::Android.Util.Log.Info("XForms.Test", $"MainActivity {this.GetHashCode():x} created; the app is {((null == AndroidApplication.Current) ? "new" : "running")}");
 
-            if (null == this._app)
+            if (null == AndroidApplication.Current)
             {
                 // An intent extra picks another page: adb shell am start ... --es page benchmark-views
                 TestApp.StartPage = this.Intent?.GetStringExtra("page");
@@ -32,11 +33,10 @@ namespace XForms.Test
                     AppContext.SetSwitch("XForms.DisableLightweightViews", true);
                 }
 
-                var platform = new AndroidPlatform(this);
-                this._app = new TestApp(platform);
             }
 
-            this._app.Start();
+            TestApp.RecreateHost = () => AndroidApplication.Current?.Activity?.Recreate();
+            AndroidApplication.Run(this, new TestApp());
         }
     }
 }

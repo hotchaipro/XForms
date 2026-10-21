@@ -233,15 +233,51 @@ namespace XForms.Win32
     }
 
     /// <summary>
-    /// Runs an XForms app in a Win32 window.
+    /// Runs an XForms app in a Win32 window, and gives native code the
+    /// running app's window.
     /// </summary>
-    public static class Win32Application
+    public sealed class Win32Application
     {
+        private readonly Win32Host _host;
+
+        private Win32Application(
+            Win32Host host)
+        {
+            this._host = host;
+        }
+
+        /// <summary>
+        /// The running app's host, or null before <see cref="Run"/>.
+        /// </summary>
+        public static Win32Application Current
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// The app's main window (an <c>HWND</c>), such as to own a native
+        /// dialog.
+        /// </summary>
+        public unsafe nint MainWindowHandle
+        {
+            get
+            {
+                return (nint)this._host.Hwnd.Value;
+            }
+        }
+
+        /// <summary>
+        /// Runs the app in a new window, and returns when the app exits. Call
+        /// it from <c>Main</c>, on an STA thread.
+        /// </summary>
         public static void Run(
             string title,
-            Func<IPlatform, Application> createApplication)
+            Application application)
         {
-            Win32Host.Run(title, createApplication);
+            ArgumentNullException.ThrowIfNull(application);
+
+            Win32Host.Run(title, application, (host) => Current = new Win32Application(host));
         }
     }
 }

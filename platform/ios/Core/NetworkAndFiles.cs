@@ -55,10 +55,10 @@ namespace XForms.iOS
     /// </summary>
     internal sealed class DocumentPicker : IFilePicker
     {
-        private readonly NativeApplicationDelegate _application;
+        private readonly IosApplication _application;
 
         public DocumentPicker(
-            NativeApplicationDelegate application)
+            IosApplication application)
         {
             this._application = application;
         }
@@ -109,7 +109,7 @@ namespace XForms.iOS
             picker.DidPickDocumentAtUrls += (sender, e) => completion.TrySetResult(e.Urls);
             picker.WasCancelled += (sender, e) => completion.TrySetResult(Array.Empty<NSUrl>());
 
-            var presenter = this._application.Window?.RootViewController;
+            var presenter = this._application.RootViewController;
             if (null == presenter)
             {
                 return Task.FromResult(Array.Empty<NSUrl>());

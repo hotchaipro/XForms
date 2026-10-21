@@ -290,7 +290,8 @@ namespace XForms.Win32
         /// </summary>
         public static void Run(
             string title,
-            Func<IPlatform, Application> createApplication)
+            Application application,
+            Action<Win32Host> onCreated)
         {
             var host = new Win32Host();
             _current = host;
@@ -300,8 +301,8 @@ namespace XForms.Win32
 
             SynchronizationContext.SetSynchronizationContext(new Win32SynchronizationContext(host));
 
-            var application = createApplication(new Win32Platform(host));
-            application.Start();
+            onCreated(host);
+            ApplicationHost.For(application).Start(new Win32Platform(host));
 
             PInvoke.ShowWindow(host._hwnd, SHOW_WINDOW_CMD.SW_SHOWDEFAULT);
 

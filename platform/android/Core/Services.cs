@@ -15,19 +15,37 @@ namespace XForms.Android
     internal static class AndroidServices
     {
         public static PlatformServices Create(
-            AndroidApplicationActivity activity)
+            AndroidApplication host)
         {
+            var context = host.Context;
             return new PlatformServices()
             {
-                Clipboard = new AndroidClipboard(activity),
-                Launcher = new IntentLauncher(activity),
-                Preferences = new SharedPreferencesStore(activity, ".preferences"),
-                SecureStorage = new KeystoreStorage(activity),
-                Share = new IntentShare(activity),
-                HapticFeedback = new ViewHapticFeedback(activity),
-                Connectivity = new AndroidConnectivity(activity),
-                FilePicker = new DocumentPicker(activity),
+                Clipboard = new AndroidClipboard(context),
+                Launcher = new IntentLauncher(host),
+                Preferences = new SharedPreferencesStore(context, ".preferences"),
+                SecureStorage = new KeystoreStorage(context),
+                Share = new IntentShare(host),
+                HapticFeedback = new ViewHapticFeedback(host),
+                Connectivity = new AndroidConnectivity(host),
+                FilePicker = new DocumentPicker(host),
             };
+        }
+
+        // Starts an activity from the app's activity (or, without one, in a
+        // new task)
+        public static void StartActivity(
+            AndroidApplication host,
+            Intent intent)
+        {
+            var activity = host.Activity;
+            if (null == activity)
+            {
+                intent.AddFlags(ActivityFlags.NewTask);
+                host.Context.StartActivity(intent);
+                return;
+            }
+
+            activity.StartActivity(intent);
         }
     }
 
@@ -74,12 +92,12 @@ namespace XForms.Android
 
     internal sealed class IntentLauncher : ILauncher
     {
-        private readonly Context _context;
+        private readonly AndroidApplication _host;
 
         public IntentLauncher(
-            Context context)
+            AndroidApplication host)
         {
-            this._context = context;
+            this._host = host;
         }
 
         public Task<bool> OpenAsync(
@@ -93,7 +111,7 @@ namespace XForms.Android
             var intent = new Intent(Intent.ActionView, global::Android.Net.Uri.Parse(uri.AbsoluteUri));
             try
             {
-                this._context.StartActivity(intent);
+                AndroidServices.StartActivity(this._host, intent);
                 return Task.FromResult(true);
             }
             catch (ActivityNotFoundException)
@@ -248,12 +266,12 @@ namespace XForms.Android
 
     internal sealed class IntentShare : IShare
     {
-        private readonly Context _context;
+        private readonly AndroidApplication _host;
 
         public IntentShare(
-            Context context)
+            AndroidApplication host)
         {
-            this._context = context;
+            this._host = host;
         }
 
         public Task RequestAsync(
@@ -273,19 +291,19 @@ namespace XForms.Android
                 intent.PutExtra(Intent.ExtraSubject, request.Title);
             }
 
-            this._context.StartActivity(Intent.CreateChooser(intent, request.Title));
+            AndroidServices.StartActivity(this._host, Intent.CreateChooser(intent, request.Title));
             return Task.CompletedTask;
         }
     }
 
     internal sealed class ViewHapticFeedback : IHapticFeedback
     {
-        private readonly AndroidApplicationActivity _activity;
+        private readonly AndroidApplication _host;
 
         public ViewHapticFeedback(
-            AndroidApplicationActivity activity)
+            AndroidApplication host)
         {
-            this._activity = activity;
+            this._host = host;
         }
 
         public bool IsSupported => true;
@@ -296,7 +314,7 @@ namespace XForms.Android
             var feedback = (type == HapticFeedbackType.LongPress)
                 ? global::Android.Views.FeedbackConstants.LongPress
                 : global::Android.Views.FeedbackConstants.VirtualKey;
-            this._activity.Window?.DecorView.PerformHapticFeedback(feedback);
+            this._host.Activity?.Window?.DecorView.PerformHapticFeedback(feedback);
         }
     }
 }

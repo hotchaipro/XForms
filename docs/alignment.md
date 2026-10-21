@@ -2350,22 +2350,26 @@ Win32, Android and the browser, as before.
     - A deliberate bad reference and a deliberate new public type each
       fail the build.
 
-    **Decisions to make before starting:**
+    **Decided** (2026-10-21):
     1. **Registering services:** an explicit call in the app's platform
-       project (recommended: it says what the app uses, and nothing runs
-       behind the app's back), or automatic registration when the toolkit
-       platform assembly loads (a module initializer, which runs only once
-       something touches the assembly, so it would still need a reference
-       that forces the load).
-    2. **The public API analyzer:** adopt it (recommended), or rely on the
-       reference check and review alone.
-    3. **Names:** the hosting classes `Win32Application`,
-       `WebApplication`, `AndroidApplication` and `IosApplication`
-       (recommended: one pattern, and `Win32Application` and
-       `WebApplication` already exist); the toolkit's platforms
-       `XForms.Toolkit.Win32` and so on, matching `XForms.Framework.Win32`.
-    4. **A constructor that touches the platform:** throw (recommended:
-       the mistake shows at once), or queue the work until `OnStart`.
+       project, not automatic registration when the assembly loads.
+    2. **The public API analyzer:** adopted.
+    3. **Names:** `Win32Application`, `WebApplication`,
+       `AndroidApplication` and `IosApplication`; `XForms.Toolkit.Win32`
+       and so on.
+    4. **A constructor that touches the platform** throws.
+
+    **Also in this phase,** to soften what composition costs app
+    developers:
+    - **Hosting rules** in `architecture.md`: what XForms observes on its
+      own (lifecycle, configuration, back, insets), what an app must leave
+      alone (handling back or intercepting keys before XForms sees them),
+      and what it must forward (nothing yet; a later deep-link API would
+      take the activity's `OnNewIntent`).
+    - **Templates:** the test apps and SoonerOrLater are the pattern
+      until there are project templates: the Android activity declares
+      the configuration changes XForms handles in place (dark mode, text
+      size, orientation and screen size), so re-creation is rare.
 
 24. **Themes.** A control says what it does and what state it's in; a
     theme says how it looks. The controls' current look becomes the first

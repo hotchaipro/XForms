@@ -80,7 +80,7 @@ namespace XForms.iOS.Renderers
         {
             get
             {
-                return (UIApplication.SharedApplication.Delegate as NativeApplicationDelegate)?.Window;
+                return IosApplication.Current?.Window;
             }
         }
 

@@ -26,7 +26,7 @@ namespace XForms.Test.Win32
                 AppContext.SetSwitch("XForms.DisableLightweightViews", true);
             }
 
-            Win32Application.Run("XForms Test (Win32)", (platform) => new TestApp(platform));
+            Win32Application.Run("XForms Test (Win32)", new TestApp());
         }
     }
 }

@@ -8,12 +8,12 @@ namespace XForms.iOS.Renderers
         private Application _application;
         private Frame _rootFrame;
         private ApplicationHost _applicationHost;
-        private NativeApplicationDelegate _nativeApplicationDelegate;
+        private IosApplication _nativeApplicationDelegate;
         //private Color? _titleBarAccentColor, _titleBarForegroundColor;
 
         public ApplicationRenderer(
             XForms.Application application,
-            NativeApplicationDelegate nativeApplication)
+            IosApplication nativeApplication)
         {
             if (null == application)
             {

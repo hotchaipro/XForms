@@ -33,41 +33,70 @@ namespace XForms
             }
         }
 
-        public Application(
+        /// <summary>
+        /// Creates the app, before it runs: a platform's <c>Run</c> method
+        /// starts it. Do the app's work in <see cref="OnStart"/>, when the
+        /// platform is there; the constructor can't use the dispatcher,
+        /// windows or anything else of the platform's.
+        /// </summary>
+        protected Application()
+        {
+            this.TitleBar = new TitleBar(this);
+            this._rootFrame = new Frame();
+        }
+
+        /// <summary>
+        /// Whether a platform has started the app.
+        /// </summary>
+        public bool IsStarted
+        {
+            get
+            {
+                return null != this._platform;
+            }
+        }
+
+        // The platform's parts, from the platform that runs the app
+        private void AttachPlatform(
             IPlatform platform)
         {
-            if (null == platform)
+            if (null != this._platform)
             {
-                throw new ArgumentNullException(nameof(platform));
+                throw new InvalidOperationException("The app has already started.");
             }
 
-            this._platform = platform;
-
+            this._platform = platform ?? throw new ArgumentNullException(nameof(platform));
             _CurrentApplication = this;
 
-            this.Renderer = this._platform.CreateApplicationRenderer(this);
+            this._renderer = platform.CreateApplicationRenderer(this);
+            this._dispatcher = new Dispatcher(this._renderer);
+            this._mainWindow = new Window(this._renderer);
+            this._textScale = this._renderer.SystemTextScale;
+        }
 
-            this.TitleBar = new TitleBar(this);
-
-            this._rootFrame = new Frame();
-            this.Dispatcher = new Dispatcher(this.Renderer);
-            this.MainWindow = new Window(this.Renderer);
-            this._textScale = this.Renderer.SystemTextScale;
-
+        private InvalidOperationException NotStarted()
+        {
+            return new InvalidOperationException("The app hasn't started: use the platform in OnStart (or later), not in the app's constructor.");
         }
 
         internal IPlatform Platform
         {
             get
             {
-                return this._platform;
+                return this._platform ?? throw this.NotStarted();
             }
         }
 
+        private IApplicationRenderer _renderer;
+        private Dispatcher _dispatcher;
+        private Window _mainWindow;
+
         public IApplicationRenderer Renderer
         {
-            get;
-            private set;
+            get
+            {
+                return this._renderer ?? throw this.NotStarted();
+            }
         }
 
 
@@ -77,8 +106,13 @@ namespace XForms
             get;
         }
 
-        public void Start()
+        // Called by the platform (through ApplicationHost.Start) as it runs the app
+        internal void Start(
+            IPlatform platform)
         {
+            this.AttachPlatform(platform);
+            this._theme = null;
+
             this.Renderer.SetRootFrame(this._rootFrame);
 
             // The platform's own parts exist once the root is set
@@ -208,6 +242,13 @@ namespace XForms
 
         private void UpdateTheme()
         {
+            if (!this.IsStarted)
+            {
+                // Built when the app starts
+                this._theme = null;
+                return;
+            }
+
             var theme = this.CreateTheme(this.ActualThemeMode, this.ActualAccentColor)
                 ?? throw new InvalidOperationException("CreateTheme returned null.");
 
@@ -479,7 +520,10 @@ namespace XForms
         /// </summary>
         public Dispatcher Dispatcher
         {
-            get;
+            get
+            {
+                return this._dispatcher ?? throw this.NotStarted();
+            }
         }
 
         // The windows besides the main one
@@ -551,7 +595,10 @@ namespace XForms
         /// </summary>
         public Window MainWindow
         {
-            get;
+            get
+            {
+                return this._mainWindow ?? throw this.NotStarted();
+            }
         }
 
         private float _textScale;

@@ -12,7 +12,7 @@ namespace XForms.iOS
     internal static class IosServices
     {
         public static PlatformServices Create(
-            NativeApplicationDelegate application)
+            IosApplication application)
         {
             return new PlatformServices()
             {
@@ -149,10 +149,10 @@ namespace XForms.iOS
 
     internal sealed class ActivityShare : IShare
     {
-        private readonly NativeApplicationDelegate _application;
+        private readonly IosApplication _application;
 
         public ActivityShare(
-            NativeApplicationDelegate application)
+            IosApplication application)
         {
             this._application = application;
         }
@@ -177,7 +177,7 @@ namespace XForms.iOS
             }
 
             var controller = new UIActivityViewController(items.ToArray(), null);
-            var presenter = this._application.Window?.RootViewController;
+            var presenter = this._application.RootViewController;
             if (null != presenter)
             {
                 // On iPad the sheet is a popover, anchored to the window

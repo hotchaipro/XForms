@@ -35,6 +35,11 @@ namespace XForms.Test
             navigation.Children.Add(this.CreateButton("Next (fade)", () => _ = this.Application.NavigateAsync(new AppLayerPage(depth + 1), PageTransition.Fade)));
             navigation.Children.Add(this.CreateButton("Back", async () => this.Show($"Went back: {await this.Application.GoBackAsync()}")));
             navigation.Children.Add(this.CreateButton("Pick a color", this.PickColorAsync));
+            if (null != TestApp.RecreateHost)
+            {
+                navigation.Children.Add(this.CreateButton("Recreate host", () => TestApp.RecreateHost()));
+            }
+
             layout.Children.Add(navigation);
 
             // Services

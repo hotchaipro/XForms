@@ -61,6 +61,16 @@ namespace XForms.Platform
         // ── Lifecycle ──────────────────────────────────────────────────────
 
         /// <summary>
+        /// Starts the app on the platform: creates its renderer, dispatcher and
+        /// main window, shows its root frame, and calls its <c>OnStart</c>.
+        /// </summary>
+        public void Start(
+            IPlatform platform)
+        {
+            this._application.Start(platform);
+        }
+
+        /// <summary>
         /// The app went into the background: it saves its state.
         /// </summary>
         public void Suspend()

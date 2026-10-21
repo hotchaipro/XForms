@@ -196,8 +196,20 @@ namespace XForms.Web
     /// Runs an XForms app in the page.
     /// </summary>
     [SupportedOSPlatform("browser")]
-    public static class WebApplication
+    public sealed class WebApplication
     {
+        private WebApplication()
+        {
+        }
+
+        /// <summary>
+        /// The running app's host, or null before <see cref="RunAsync"/>.
+        /// </summary>
+        public static WebApplication Current
+        {
+            get;
+            private set;
+        }
         private static Task _initialization;
 
         /// <summary>
@@ -210,10 +222,14 @@ namespace XForms.Web
             return _initialization ??= Js.InitializeAsync();
         }
 
+        /// <summary>
+        /// Runs the app in the page. Call it once, from <c>Main</c>.
+        /// </summary>
         public static async Task RunAsync(
             string title,
-            Func<IPlatform, Application> createApplication)
+            Application application)
         {
+            ArgumentNullException.ThrowIfNull(application);
             await InitializeAsync();
 
             var host = new WebHost();
@@ -225,11 +241,11 @@ namespace XForms.Web
 
             try
             {
-                var application = createApplication(new WebPlatform(host));
+                Current = new WebApplication();
 
                 // Saved once the app has suspended (and saved its state)
                 host.Suspending += WebFiles.Save;
-                application.Start();
+                ApplicationHost.For(application).Start(new WebPlatform(host));
             }
             catch (Exception ex)
             {

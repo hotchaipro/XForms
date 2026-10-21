@@ -6,12 +6,12 @@ using XForms.iOS.Renderers;
 
 namespace XForms.iOS
 {
-    public class NativePlatform : IPlatform
+    internal sealed class NativePlatform : IPlatform
     {
-        private NativeApplicationDelegate _nativeApplication;
+        private readonly IosApplication _nativeApplication;
 
         public NativePlatform(
-            NativeApplicationDelegate nativeApplication)
+            IosApplication nativeApplication)
         {
             if (null == nativeApplication)
             {

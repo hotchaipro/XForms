@@ -84,7 +84,7 @@ namespace XForms.Android.Renderers
                 return;
             }
 
-            var parentView = ((ApplicationRenderer)XForms.Application.Current.Renderer).Activity.Window.DecorView.RootView;
+            var parentView = AndroidApplication.Current.Activity.Window.DecorView.RootView;
             this._nativePopup.ShowAtLocation(parentView, GravityFlags.Center, 0, 0);
         }
 
@@ -96,7 +96,7 @@ namespace XForms.Android.Renderers
             float Dips(float pixels) => NativeConversions.PixelsToDevicePixels(context, pixels);
             int Pixels(float dips) => (int)Math.Round(NativeConversions.DevicePixelsToPixels(context, dips));
 
-            var root = ((ApplicationRenderer)XForms.Application.Current.Renderer).Activity.Window.DecorView.RootView;
+            var root = AndroidApplication.Current.Activity.Window.DecorView.RootView;
             var layerLocation = new int[2];
             layer.GetLocationInWindow(layerLocation);
 
