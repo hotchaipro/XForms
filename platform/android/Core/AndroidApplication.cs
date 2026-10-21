@@ -26,6 +26,39 @@ namespace XForms.Android
         public event EventHandler ConfigurationChanged;
 
         private readonly SystemBarsBackground _systemBarsBackground = new SystemBarsBackground();
+        private global::Android.Views.View _rootView;
+        private bool _extendsIntoSafeArea;
+
+        // The system bars and cutout, and the soft keyboard, in pixels
+        private global::Android.Graphics.Rect _barInsets = new global::Android.Graphics.Rect();
+        private int _keyboardInset;
+
+        /// <summary>
+        /// Raised when the system bars, cutout or soft keyboard cover a
+        /// different part of the window, with the insets in DIPs.
+        /// </summary>
+        internal event Action<Thickness> SafeAreaInsetsChanged;
+
+        /// <summary>
+        /// Whether the current page draws under the system bars and cutout.
+        /// The soft keyboard still pushes it up.
+        /// </summary>
+        internal bool ExtendsIntoSafeArea
+        {
+            get
+            {
+                return this._extendsIntoSafeArea;
+            }
+
+            set
+            {
+                if (value != this._extendsIntoSafeArea)
+                {
+                    this._extendsIntoSafeArea = value;
+                    this.ApplyInsets();
+                }
+            }
+        }
         private bool _isStatusBarLight;
         private bool _isNavigationBarLight;
 
@@ -45,6 +78,36 @@ namespace XForms.Android
             base.OnResume();
 
             this.Resuming?.Invoke(this, EventArgs.Empty);
+        }
+
+        private readonly Dictionary<int, System.Threading.Tasks.TaskCompletionSource<(Result, Intent)>> _pendingResults = new Dictionary<int, System.Threading.Tasks.TaskCompletionSource<(Result, Intent)>>();
+        private int _nextRequestCode = 0x5800;
+
+        /// <summary>
+        /// Starts an activity (such as the document picker) and completes with
+        /// its result.
+        /// </summary>
+        internal System.Threading.Tasks.Task<(Result Result, Intent Data)> StartActivityForResultAsync(
+            Intent intent)
+        {
+            int requestCode = this._nextRequestCode++;
+            var completion = new System.Threading.Tasks.TaskCompletionSource<(Result, Intent)>();
+            this._pendingResults[requestCode] = completion;
+            this.StartActivityForResult(intent, requestCode);
+            return completion.Task;
+        }
+
+        protected override void OnActivityResult(
+            int requestCode,
+            [GeneratedEnum] Result resultCode,
+            Intent data)
+        {
+            base.OnActivityResult(requestCode, resultCode, data);
+
+            if (this._pendingResults.Remove(requestCode, out var completion))
+            {
+                completion.SetResult((resultCode, data));
+            }
         }
 
         private BackCallback _backCallback;
@@ -138,8 +201,36 @@ namespace XForms.Android
             // The system bars are transparent, so the root view paints behind them
             view.Background = this._systemBarsBackground;
 
-            view.SetOnApplyWindowInsetsListener(new SystemInsetsListener(this._systemBarsBackground));
+            this._rootView = view;
+            view.SetOnApplyWindowInsetsListener(new SystemInsetsListener(this));
             view.RequestApplyInsets();
+        }
+
+        private void OnInsets(
+            global::Android.Graphics.Rect barInsets,
+            int keyboardInset)
+        {
+            this._barInsets = barInsets;
+            this._keyboardInset = keyboardInset;
+            this.ApplyInsets();
+
+            this._systemBarsBackground.StatusBarHeight = barInsets.Top;
+            this._systemBarsBackground.InvalidateSelf();
+
+            float scale = this.Resources.DisplayMetrics.Density;
+            this.SafeAreaInsetsChanged?.Invoke(new Thickness(
+                barInsets.Left / scale,
+                barInsets.Top / scale,
+                barInsets.Right / scale,
+                Math.Max(barInsets.Bottom, keyboardInset) / scale));
+        }
+
+        // Pads the root view clear of the bars (unless the page extends under
+        // them) and the keyboard
+        private void ApplyInsets()
+        {
+            var bars = this._extendsIntoSafeArea ? new global::Android.Graphics.Rect() : this._barInsets;
+            this._rootView?.SetPadding(bars.Left, bars.Top, bars.Right, Math.Max(bars.Bottom, this._keyboardInset));
         }
 
         /// <summary>
@@ -233,27 +324,28 @@ namespace XForms.Android
 
         private sealed class SystemInsetsListener : Java.Lang.Object, global::Android.Views.View.IOnApplyWindowInsetsListener
         {
-            private readonly SystemBarsBackground _background;
+            private readonly AndroidApplicationActivity _activity;
 
             public SystemInsetsListener(
-                SystemBarsBackground background)
+                AndroidApplicationActivity activity)
             {
-                this._background = background;
+                this._activity = activity;
             }
 
             public WindowInsets OnApplyWindowInsets(
                 global::Android.Views.View view,
                 WindowInsets insets)
             {
-                int left, top, right, bottom;
+                int left, top, right, bottom, keyboard = 0;
 
                 if (OperatingSystem.IsAndroidVersionAtLeast(30))
                 {
-                    var systemInsets = insets.GetInsets(WindowInsets.Type.SystemBars() | WindowInsets.Type.Ime() | WindowInsets.Type.DisplayCutout());
+                    var systemInsets = insets.GetInsets(WindowInsets.Type.SystemBars() | WindowInsets.Type.DisplayCutout());
                     left = systemInsets.Left;
                     top = systemInsets.Top;
                     right = systemInsets.Right;
                     bottom = systemInsets.Bottom;
+                    keyboard = insets.GetInsets(WindowInsets.Type.Ime()).Bottom;
                 }
                 else
                 {
@@ -265,11 +357,7 @@ namespace XForms.Android
 #pragma warning restore CA1422
                 }
 
-                view.SetPadding(left, top, right, bottom);
-
-                this._background.StatusBarHeight = top;
-                this._background.InvalidateSelf();
-
+                this._activity.OnInsets(new global::Android.Graphics.Rect(left, top, right, bottom), keyboard);
                 return insets;
             }
         }

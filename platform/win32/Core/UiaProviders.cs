@@ -622,7 +622,19 @@ namespace XForms.Win32.Automation
         private int Perform(
             AccessibilityAction action)
         {
-            return this.OnUIThread((renderer) => ((View)renderer.Element).PerformAccessibilityAction(action) ? 0 : E_FAIL);
+            // NOTE: Actions must return right away: one may open a modal dialog,
+            // which would block the client (and every later call) until closed
+            return this.OnUIThread((renderer) =>
+            {
+                var view = (View)renderer.Element;
+                if (!view.IsAccessibilityActionSupported(action))
+                {
+                    return E_FAIL;
+                }
+
+                Win32Host.Current.Post(() => view.PerformAccessibilityAction(action));
+                return 0;
+            });
         }
 
         public int Invoke()

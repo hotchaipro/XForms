@@ -76,6 +76,30 @@ namespace XForms
         public event EventHandler SizeChanged;
 
         /// <summary>
+        /// The parts of the window covered by system bars, a display cutout or
+        /// the soft keyboard, in DIPs. Pages are kept clear of them unless a
+        /// page sets <see cref="Page.UsesSafeArea"/> to false, to draw under the
+        /// bars and lay its content out around them itself. Zero on the desktop.
+        /// </summary>
+        public Thickness SafeAreaInsets
+        {
+            get;
+            private set;
+        }
+
+        public event EventHandler SafeAreaInsetsChanged;
+
+        internal void OnSafeAreaInsetsChanged(
+            Thickness insets)
+        {
+            if (insets != this.SafeAreaInsets)
+            {
+                this.SafeAreaInsets = insets;
+                this.SafeAreaInsetsChanged?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        /// <summary>
         /// Resizes the window's content area (on the desktop; elsewhere it does
         /// nothing).
         /// </summary>

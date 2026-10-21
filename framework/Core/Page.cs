@@ -17,6 +17,7 @@ namespace XForms
     {
         private Panel _layout;
         private Color? _backgroundColor;
+        private bool _usesSafeArea = true;
 
         public Page()
         {
@@ -64,6 +65,34 @@ namespace XForms
             {
                 this._backgroundColor = value;
                 this.Native?.BackgroundColor = value;
+            }
+        }
+
+        /// <summary>
+        /// Whether the platform keeps the page clear of the system bars,
+        /// display cutout and soft keyboard (the default). Set it to false to
+        /// draw under them (a full-bleed image, say) and lay content out
+        /// around <see cref="Window.SafeAreaInsets"/> yourself.
+        /// </summary>
+        public bool UsesSafeArea
+        {
+            get
+            {
+                return this._usesSafeArea;
+            }
+
+            set
+            {
+                if (value != this._usesSafeArea)
+                {
+                    this._usesSafeArea = value;
+                    if (this.HasRenderer)
+                    {
+                        this.Application.UpdateSafeAreaUse();
+                    }
+
+                    this.OnPropertyChanged();
+                }
             }
         }
 

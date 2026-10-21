@@ -5,6 +5,7 @@ namespace XForms.iOS.Renderers
     public class ApplicationRenderer : IApplicationRenderer
     {
         private Application _application;
+        private Frame _rootFrame;
         private IApplicationDelegate _applicationDelegate;
         private NativeApplicationDelegate _nativeApplicationDelegate;
         //private Color? _titleBarAccentColor, _titleBarForegroundColor;
@@ -103,6 +104,19 @@ namespace XForms.iOS.Renderers
 
         public bool CanResizeWindow => false;
 
+        public bool ExtendsIntoSafeArea
+        {
+            set
+            {
+                // The current page's view keeps its content in the safe area
+                if (this._rootFrame?.CurrentPage?.Renderer?.NativeElement is NativeLayoutView page)
+                {
+                    page.RespectsSafeArea = !value;
+                    page.InvalidateContentLayout();
+                }
+            }
+        }
+
         public Size MinimumWindowSize
         {
             set
@@ -185,6 +199,7 @@ namespace XForms.iOS.Renderers
         public void SetRootFrame(
             Frame frame)
         {
+            this._rootFrame = frame;
             var frameRenderer = (FrameRenderer)frame.Renderer;
 
             this._nativeApplicationDelegate.SetRootViewController(frameRenderer.ViewController);

@@ -107,6 +107,14 @@ namespace XForms.Win32
 
         public bool CanResizeWindow => true;
 
+        // A desktop window has no system bars over it
+        public bool ExtendsIntoSafeArea
+        {
+            set
+            {
+            }
+        }
+
         public Size MinimumWindowSize
         {
             set

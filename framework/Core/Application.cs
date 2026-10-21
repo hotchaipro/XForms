@@ -16,6 +16,12 @@ namespace XForms
         /// color, high-contrast colors or text size.
         /// </summary>
         void NotifySystemThemeChanged();
+
+        /// <summary>
+        /// The parts of the window covered by system bars, a display cutout or
+        /// the soft keyboard changed (in DIPs).
+        /// </summary>
+        void NotifySafeAreaInsetsChanged(Thickness insets);
     }
 
     public interface IApplicationRenderer
@@ -68,6 +74,13 @@ namespace XForms
         Size MinimumWindowSize { set; }
 
         void ResizeWindow(Size size);
+
+        /// <summary>
+        /// Whether the current page draws under the system bars and display
+        /// cutout (its <see cref="Page.UsesSafeArea"/> is false). Otherwise the
+        /// platform keeps the page clear of them.
+        /// </summary>
+        bool ExtendsIntoSafeArea { set; }
 
         Color? TitleBarAccentColor { get; set; }
 
@@ -778,6 +791,20 @@ namespace XForms
 
         protected virtual void OnLoadResources()
         {
+        }
+
+        void IApplicationDelegate.NotifySafeAreaInsetsChanged(
+            Thickness insets)
+        {
+            this.MainWindow.OnSafeAreaInsetsChanged(insets);
+        }
+
+        /// <summary>
+        /// Keeps the current page clear of the system bars, or not, as it asks.
+        /// </summary>
+        internal void UpdateSafeAreaUse()
+        {
+            this.Renderer.ExtendsIntoSafeArea = !(this._rootFrame?.CurrentPage?.UsesSafeArea ?? true);
         }
 
         void IApplicationDelegate.NotifySuspend()

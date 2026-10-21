@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Globalization;
 using System.Threading.Tasks;
 
@@ -85,6 +87,98 @@ namespace XForms
         Task RequestAsync(ShareRequest request);
     }
 
+    /// <summary>
+    /// How far the device's network reaches.
+    /// </summary>
+    public enum NetworkAccess
+    {
+        /// <summary>The platform can't tell.</summary>
+        Unknown,
+
+        /// <summary>No network.</summary>
+        None,
+
+        /// <summary>A network without the internet (or not yet confirmed to reach it).</summary>
+        Local,
+
+        /// <summary>The internet.</summary>
+        Internet,
+    }
+
+    /// <summary>
+    /// Whether the device is online. <see cref="ConnectivityChanged"/> is
+    /// raised on the UI thread.
+    /// </summary>
+    public interface IConnectivity
+    {
+        NetworkAccess NetworkAccess { get; }
+
+        event EventHandler ConnectivityChanged;
+    }
+
+    /// <summary>
+    /// What a file picker offers.
+    /// </summary>
+    public sealed class FilePickerOptions
+    {
+        public string Title { get; init; }
+
+        /// <summary>
+        /// The file name extensions to offer (such as ".txt"), or null for any
+        /// file.
+        /// </summary>
+        public IReadOnlyList<string> FileTypes { get; init; }
+
+        /// <summary>
+        /// Whether more than one file can be picked.
+        /// </summary>
+        public bool AllowMultiple { get; init; }
+    }
+
+    /// <summary>
+    /// A file the user picked. Mobile platforms grant access to the file only
+    /// (not a path), so read it with <see cref="OpenReadAsync"/>.
+    /// </summary>
+    public sealed class PickedFile
+    {
+        private readonly Func<Task<Stream>> _open;
+
+        public PickedFile(
+            string name,
+            Func<Task<Stream>> open)
+        {
+            this.Name = name;
+            this._open = open ?? throw new ArgumentNullException(nameof(open));
+        }
+
+        /// <summary>
+        /// The file's name, with its extension.
+        /// </summary>
+        public string Name { get; }
+
+        public Task<Stream> OpenReadAsync()
+        {
+            return this._open();
+        }
+    }
+
+    /// <summary>
+    /// The system's dialogs for opening and saving files.
+    /// </summary>
+    public interface IFilePicker
+    {
+        /// <summary>
+        /// Lets the user pick files to open. Returns none when they cancel.
+        /// </summary>
+        Task<IReadOnlyList<PickedFile>> PickAsync(FilePickerOptions options = null);
+
+        /// <summary>
+        /// Lets the user choose where to save a file, then writes it with the
+        /// callback. Returns false when they cancel.
+        /// </summary>
+        Task<bool> SaveAsync(string suggestedName, Func<Stream, Task> write, FilePickerOptions options = null);
+    }
+
     public enum HapticFeedbackType
     {
         /// <summary>A light tap, as for a key or a toggle.</summary>
@@ -125,6 +219,10 @@ namespace XForms
         public IShare Share { get; set; }
 
         public IHapticFeedback HapticFeedback { get; set; }
+
+        public IConnectivity Connectivity { get; set; }
+
+        public IFilePicker FilePicker { get; set; }
     }
 
     /// <summary>

@@ -25,6 +25,8 @@ namespace XForms.Android
                 SecureStorage = new KeystoreStorage(activity),
                 Share = new IntentShare(activity),
                 HapticFeedback = new ViewHapticFeedback(activity),
+                Connectivity = new AndroidConnectivity(activity),
+                FilePicker = new DocumentPicker(activity),
             };
         }
     }

@@ -1634,6 +1634,44 @@ Android and, from phase 17, the browser.
     - Connectivity (`IConnectivity`: whether there's a network, and a change
       event).
     - File pickers (`IFilePicker`: open one or more files, and save a file).
+
+    **Status: done.**
+    - **Safe area:** `Window.SafeAreaInsets` (and `SafeAreaInsetsChanged`)
+      reports what system bars, a display cutout or the soft keyboard cover.
+      Pages are still kept clear of them by the platform (Android pads the
+      root view; iOS pages lay out in the safe area), unless the current page
+      sets `UsesSafeArea = false` to draw under them. The soft keyboard still
+      pushes such a page up on Android.
+    - **Connectivity:** `IConnectivity.NetworkAccess` (none, local or
+      internet) and `ConnectivityChanged`, on the UI thread. Win32 reads the
+      network interfaces (one that's up with a gateway counts as the
+      internet); Android uses the default network's callback (a network the
+      system validated reaches the internet), declaring the network-state
+      permission from the platform assembly; iOS uses `NWPathMonitor`. Each
+      listens to the system only while the app listens.
+    - **File pickers:** `IFilePicker.PickAsync` (one or more files, filtered
+      by extension) returns `PickedFile`s read with `OpenReadAsync`, since
+      mobile platforms grant access to a file rather than a path;
+      `SaveAsync` lets the user choose where, then writes with a callback.
+      Win32 uses the common file dialogs, Android the Storage Access
+      Framework (with activity results on the activity), iOS the document
+      picker.
+    - **Fixed on the way:**
+      - UI Automation actions ran synchronously on the UI thread, so an
+        action that opened a modal dialog blocked the screen reader (and
+        every later call) until it closed. They now return at once, as UI
+        Automation requires.
+      - `Thickness` prints its values.
+    - **Verified:**
+      - Win32: the network status; opening a scratch text file through the
+        Open dialog (its contents shown) and cancelling it.
+      - Android: the network status, and going offline and back with
+        airplane mode; a page drawing under the status bar and back, with
+        the insets reported.
+      - Not verified: saving through the Save dialog on Win32 (its file-name
+        field couldn't be reached from automation, so the dialog was
+        cancelled), the Android document picker (system UI), and all of iOS,
+        which is only built.
 15. **Lists.**
     - Pull-to-refresh (`ListView.IsRefreshEnabled`, `RefreshRequested`,
       `IsRefreshing`).

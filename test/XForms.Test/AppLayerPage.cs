@@ -84,6 +84,49 @@ namespace XForms.Test
             }));
             layout.Children.Add(window);
 
+            // Connectivity, files and the safe area
+            var system = new WrapPanel() { ItemSpacing = 8, LineSpacing = 8 };
+            system.Children.Add(this.CreateButton("Network", () =>
+            {
+                var connectivity = this.Application.Services.Connectivity;
+                connectivity.ConnectivityChanged -= this.Connectivity_Changed;
+                connectivity.ConnectivityChanged += this.Connectivity_Changed;
+                this.Show($"Network: {connectivity.NetworkAccess}");
+            }));
+            system.Children.Add(this.CreateButton("Open file", async () =>
+            {
+                var files = await this.Application.Services.FilePicker.PickAsync(new FilePickerOptions() { Title = "Open a text file", FileTypes = new[] { ".txt" } });
+                if (0 == files.Count)
+                {
+                    this.Show("Open: canceled");
+                    return;
+                }
+
+                using (var stream = await files[0].OpenReadAsync())
+                using (var reader = new System.IO.StreamReader(stream))
+                {
+                    string text = await reader.ReadToEndAsync();
+                    this.Show($"Opened {files[0].Name}: \"{text.Trim()}\"");
+                }
+            }));
+            system.Children.Add(this.CreateButton("Save file", async () =>
+            {
+                bool saved = await this.Application.Services.FilePicker.SaveAsync("hello.txt", async (stream) =>
+                {
+                    using (var writer = new System.IO.StreamWriter(stream))
+                    {
+                        await writer.WriteAsync($"Saved from XForms page {depth}");
+                    }
+                }, new FilePickerOptions() { FileTypes = new[] { ".txt" } });
+                this.Show($"Saved: {saved}");
+            }));
+            system.Children.Add(this.CreateButton("Edge to edge", () =>
+            {
+                this.UsesSafeArea = !this.UsesSafeArea;
+                this.Show($"Uses safe area: {this.UsesSafeArea}; insets {this.Application.MainWindow.SafeAreaInsets}");
+            }));
+            layout.Children.Add(system);
+
             this.Application.MainWindow.SizeChanged += (sender, e) => this.ShowWindow();
             this.Application.TextScaleChanged += (sender, e) => this.ShowWindow();
 
@@ -108,6 +151,13 @@ namespace XForms.Test
         {
             var window = this.Application.MainWindow;
             this.Show($"Window {window.Size.Width:0}×{window.Size.Height:0} (resizable: {window.CanResize}); text scale {this.Application.TextScale:0.##}");
+        }
+
+        private void Connectivity_Changed(
+            object sender,
+            EventArgs e)
+        {
+            this.Show($"Network changed: {this.Application.Services.Connectivity.NetworkAccess}");
         }
 
         private void Show(

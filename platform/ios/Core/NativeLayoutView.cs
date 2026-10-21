@@ -152,6 +152,14 @@ namespace XForms.iOS
             {
                 this.InvalidateContentLayout();
             }
+
+            // The window's safe area, for pages that lay out around it
+            var window = this.Window;
+            if ((null != window) && (Application.Current is IApplicationDelegate application))
+            {
+                var insets = window.SafeAreaInsets;
+                application.NotifySafeAreaInsetsChanged(new Thickness((float)insets.Left, (float)insets.Top, (float)insets.Right, (float)insets.Bottom));
+            }
         }
 
         public override void LayoutSubviews()

@@ -202,6 +202,7 @@ namespace XForms
 
             arriving.IsVisible = true;
             this._currentPage = arriving;
+            this.Application.UpdateSafeAreaUse();
 
             leaving?.OnNavigatedFrom(new NavigationEventArgs(mode));
             arriving.OnNavigatedTo(new NavigationEventArgs(mode));
