@@ -859,8 +859,11 @@ namespace XForms
 
             var focusable = new List<View>();
             CollectFocusable(root, focusable);
+            // From outside the list, every view is a candidate; from inside,
+            // every other view
             int index = focusable.IndexOf(this);
-            for (int i = 1; i < focusable.Count; i += 1)
+            int count = (index < 0) ? focusable.Count + 1 : focusable.Count;
+            for (int i = 1; i < count; i += 1)
             {
                 int next = (index < 0)
                     ? (isForward ? i - 1 : focusable.Count - i)

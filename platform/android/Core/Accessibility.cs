@@ -194,6 +194,7 @@ namespace XForms.Android
         private readonly ConditionalWeakTable<View, object> _ids = new ConditionalWeakTable<View, object>();
         private readonly Dictionary<int, WeakReference<View>> _views = new Dictionary<int, WeakReference<View>>();
         private int _nextId;
+        private int _pruneAt = 64;
         private int _focusedId = InvalidId;
         private int _hoveredId = InvalidId;
 
@@ -209,6 +210,21 @@ namespace XForms.Android
             var box = this._ids.GetValue(view, (v) =>
             {
                 int id = this._nextId++;
+
+                // Drops the views that are gone (list rows come and go)
+                if (this._views.Count >= this._pruneAt)
+                {
+                    foreach (var entry in new List<KeyValuePair<int, WeakReference<View>>>(this._views))
+                    {
+                        if (!entry.Value.TryGetTarget(out _))
+                        {
+                            this._views.Remove(entry.Key);
+                        }
+                    }
+
+                    this._pruneAt = Math.Max(64, this._views.Count * 2);
+                }
+
                 this._views[id] = new WeakReference<View>(v);
                 return id;
             });
