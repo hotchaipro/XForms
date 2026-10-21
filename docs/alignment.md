@@ -722,8 +722,9 @@ from. Where XForms keeps its own name, the reason is in
 
 ### Toolkit
 
-The toolkit becomes `XForms.Controls` in phase 21, taking the panels and
-gestures from the framework in phase 20 (see [Layering](#layering)).
+The toolkit became `XForms.Controls` in phase 21, after taking the panels,
+gestures and controls' base classes from the framework in phase 20 (see
+[Layering](#layering)).
 
 | Current | Proposed | Familiar from | Notes |
 |---|---|---|---|
@@ -2076,6 +2077,20 @@ Win32, Android and the browser, as before.
       for the panels and gestures it now holds).
     - Update both solutions, the test apps, SoonerOrLater and the docs
       (`architecture.md`'s layout and rules, this document's name mapping).
+
+    **Status: done.**
+    - `controls/XForms.Controls` (assembly and root namespace
+      `XForms.Controls`). The former `XForms.Toolkit` types are in
+      `XForms.Controls`, with `Control`, `ContentControl`, `UserControl`,
+      `Border` and now `Panel`, `ViewCollection` and `LayoutTransition`;
+      the panels stay in `XForms.Layouts` and the gesture recognizers in
+      `XForms.Input`.
+    - Both solutions, the test apps, the XAML spike and SoonerOrLater
+      reference it; `architecture.md` and the README describe the layers
+      as they are now.
+    - **Verified:** every project builds (the four platforms, the controls,
+      the four test apps and SoonerOrLater on Win32, Android and the web);
+      the rename changes no behavior that phases 19 and 20 verified.
 
 22. **Later: themes, markup and WinUI compatibility.** Each will be planned
     in detail when it's next.

@@ -27,7 +27,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\framework\XForms.Framework.csproj" />
     <ProjectReference Include="..\..\platform\web\XForms.Framework.Web.csproj" />
-    <ProjectReference Include="..\..\toolkit\XForms.Toolkit.csproj" />
+    <ProjectReference Include="..\..\controls\XForms.Controls.csproj" />
     <ProjectReference Include="..\..\spikes\XForms.Xaml\XForms.Xaml.csproj" />
   </ItemGroup>
 

@@ -8,8 +8,8 @@
     <Project Path="platform/web/XForms.Framework.Web.csproj" />
     <Project Path="platform/win32/XForms.Framework.Win32.csproj" />
   </Folder>
-  <Folder Name="/toolkit/">
-    <Project Path="toolkit/XForms.Toolkit.csproj" />
+  <Folder Name="/controls/">
+    <Project Path="controls/XForms.Controls.csproj" />
   </Folder>
   <Folder Name="/test/">
     <Project Path="test/XForms.Test.Android/XForms.Test.Android.csproj" />

@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    XForms' controls: what controls do (not how they look), with the panels
+    and gestures, built only on the framework's public API, so they behave
+    and lay out the same on every platform.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>XForms.Controls</RootNamespace>
+    <AssemblyName>XForms.Controls</AssemblyName>
+    <IsTrimmable>true</IsTrimmable>
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\framework\XForms.Framework.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -23,7 +23,7 @@ text rendering, text entry and scrolling.
   everywhere else.
 - **A small framework, with controls on top.** All platform-specific code
   lives in a small framework. Control libraries, including XForms' own
-  toolkit, are written once on its public API. The compiler enforces that,
+  XForms.Controls, are written once on its public API. The compiler enforces that,
   so any control library you write runs on every supported platform.
 - **No markup or styling machinery.** There's no XAML, styling engine or
   binding engine to learn or carry. Controls are plain C# that draws and lays
@@ -86,7 +86,8 @@ need.
 | `platform/win32/` | `XForms.Framework.Win32` | Windows: Win32, DirectComposition, Direct2D, DirectWrite, RichEdit |
 | `platform/android/` | `XForms.Framework.Android` | Android: native views |
 | `platform/ios/` | `XForms.Framework.iOS` | iOS: UIKit |
-| `toolkit/` | `XForms.Toolkit` | Cross-platform controls (buttons, pickers, calendar, menus, popovers, ...), built only on the framework's public API |
+| `platform/web/` | `XForms.Framework.Web` | Browsers: .NET on WebAssembly, DOM elements and canvases |
+| `controls/` | `XForms.Controls` | Controls (buttons, pickers, calendar, menus, flyouts, lists, ...), panels and gestures, built only on the framework's public API |
 | `test/` | `XForms.Test.*` | Test apps for each platform, with shared pages in `test/XForms.Test` |
 
 An app references the framework, one platform project, and the control

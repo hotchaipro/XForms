@@ -2,7 +2,6 @@ using System;
 using System.Collections.ObjectModel;
 using XForms.Controls;
 using XForms.Primitives;
-using XForms.Toolkit;
 using XForms.Layouts;
 
 namespace XForms.Test
