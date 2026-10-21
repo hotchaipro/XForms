@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Reflection;
 using Windows.Win32;
@@ -34,7 +34,7 @@ namespace XForms.Win32
 
         public IFrameRenderer CreateFrameRenderer(Frame frame) => new FrameRenderer(frame);
 
-        public IListViewRenderer CreateListViewRenderer(ListView listView) => new ListViewRenderer(listView);
+        public IItemsViewRenderer CreateItemsViewRenderer(ItemsView listView) => new ItemsViewRenderer(listView);
 
         public ITextBoxRenderer CreateTextBoxRenderer(TextBox textEntry) => new TextBoxRenderer(textEntry);
 

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Specialized;
 using CoreGraphics;
 using Foundation;
@@ -77,17 +77,17 @@ namespace XForms.iOS
 
     internal sealed class NativeCollectionViewSource : UICollectionViewDelegateFlowLayout, IUICollectionViewDataSource
     {
-        private readonly ListView _listView;
-        private readonly ListViewSource _items;
+        private readonly ItemsView _listView;
+        private readonly ItemsViewSource _items;
         private readonly ListLayout _layout;
         private UICollectionView _collectionView;
 
         // Binds a spare container to an item to measure it
-        private ListViewItem _measuringContainer;
+        private ItemContainer _measuringContainer;
 
         public NativeCollectionViewSource(
-            ListView listView,
-            ListViewSource items,
+            ItemsView listView,
+            ItemsViewSource items,
             ListLayout layout)
         {
             this._listView = listView;
@@ -177,9 +177,9 @@ namespace XForms.iOS
 
     internal sealed class NativeCollectionViewCell : UICollectionViewCell
     {
-        public static readonly NSString CellReuseIdentifier = new NSString("XForms.ListViewItem.Collection");
+        public static readonly NSString CellReuseIdentifier = new NSString("XForms.ItemContainer.Collection");
 
-        private ListViewItem _itemContainer;
+        private ItemContainer _itemContainer;
 
         [Export("initWithFrame:")]
         public NativeCollectionViewCell(
@@ -189,7 +189,7 @@ namespace XForms.iOS
             this.ClipsToBounds = true;
         }
 
-        internal ListViewItem ItemContainer
+        internal ItemContainer ItemContainer
         {
             get
             {

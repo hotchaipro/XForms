@@ -25,7 +25,7 @@ namespace XForms.Platform
         IImageRenderer CreateImageRenderer(Image image);
         IBitmapRenderer CreateBitmapRenderer(Bitmap bitmap);
         IFrameRenderer CreateFrameRenderer(Frame frame);
-        IListViewRenderer CreateListViewRenderer(ListView listView);
+        IItemsViewRenderer CreateItemsViewRenderer(ItemsView itemsView);
         ITextBoxRenderer CreateTextBoxRenderer(TextBox textEntry);
         IScrollViewerRenderer CreateScrollViewerRenderer(ScrollViewer scrollView);
 

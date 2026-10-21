@@ -112,7 +112,7 @@ namespace XForms.Android.Renderers
             bottom = Math.Max(bottom, top + (int)Math.Ceiling(this.DevicePixelsToPixels(frame.Height) - 0.01f));
 
             // NOTE: Always finish with an exact measure at the final size: views
-            // such as ListView lay out their content using the mode of the last
+            // such as ItemsView lay out their content using the mode of the last
             // measure, not just its size. Android caches measurements per spec,
             // so this costs nothing when the view hasn't changed.
             nativeView.Measure(

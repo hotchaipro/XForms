@@ -59,10 +59,10 @@ namespace XForms.iOS
             return new BitmapRenderer(bitmap);
         }
 
-        public IListViewRenderer CreateListViewRenderer(
-            ListView listView)
+        public IItemsViewRenderer CreateItemsViewRenderer(
+            ItemsView listView)
         {
-            return new ListViewRenderer(listView);
+            return new ItemsViewRenderer(listView);
         }
 
         public ITextBoxRenderer CreateTextBoxRenderer(

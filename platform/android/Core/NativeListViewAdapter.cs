@@ -7,14 +7,14 @@ namespace XForms.Android
 {
     internal class NativeListViewAdapter : global::Android.Widget.BaseAdapter<object>, IDisposable
     {
-        private ListView _listView;
+        private ItemsView _listView;
         private global::Android.Content.Context _context;
-        private ListViewSource _items;
+        private ItemsViewSource _items;
 
         public NativeListViewAdapter(
-            ListView listView,
+            ItemsView listView,
             global::Android.Content.Context context,
-            ListViewSource source)
+            ItemsViewSource source)
         {
             if (null == listView)
             {

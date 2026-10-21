@@ -4,11 +4,11 @@ using System.Collections.Specialized;
 
 namespace XForms.Primitives
 {
-    public abstract class ListViewSource : IEnumerable, INotifyCollectionChanged
+    public abstract class ItemsViewSource : IEnumerable, INotifyCollectionChanged
     {
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 
-        protected ListViewSource()
+        protected ItemsViewSource()
         {
         }
 
@@ -33,22 +33,22 @@ namespace XForms.Primitives
             View reuseView,
             object item);
 
-        public virtual ListViewItem GetItemContainer(
-            ListView listView,
-            ListViewItem reuseContainer,
+        public virtual ItemContainer GetItemContainer(
+            ItemsView itemsView,
+            ItemContainer reuseContainer,
             object item)
         {
-            if (null == listView)
+            if (null == itemsView)
             {
-                throw new ArgumentNullException(nameof(listView));
+                throw new ArgumentNullException(nameof(itemsView));
             }
 
             if (null == reuseContainer)
             {
-                reuseContainer = listView.CreateItemContainer();
+                reuseContainer = itemsView.CreateItemContainer();
             }
 
-            reuseContainer.Bind(listView, item);
+            reuseContainer.Bind(itemsView, item);
 
             var itemView = this.GetItemView(
                 reuseContainer.Content,
@@ -60,7 +60,7 @@ namespace XForms.Primitives
 
         public IEnumerator GetEnumerator()
         {
-            return new ListViewSourceEnumerator(this);
+            return new ItemsViewSourceEnumerator(this);
         }
 
         protected virtual void NotifyCollectionChanged(
@@ -70,13 +70,13 @@ namespace XForms.Primitives
             this.CollectionChanged?.Invoke(sender, e);
         }
 
-        private sealed class ListViewSourceEnumerator : IEnumerator
+        private sealed class ItemsViewSourceEnumerator : IEnumerator
         {
-            private ListViewSource _source;
+            private ItemsViewSource _source;
             private int _index;
 
-            internal ListViewSourceEnumerator(
-                ListViewSource source)
+            internal ItemsViewSourceEnumerator(
+                ItemsViewSource source)
             {
                 if (null == source)
                 {

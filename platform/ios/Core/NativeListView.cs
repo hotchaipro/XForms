@@ -9,7 +9,7 @@ namespace XForms.iOS
 {
     /// <summary>
     /// A UITableView whose rows are XForms list view item containers. Rows are
-    /// recycled by UIKit and rebound through the <see cref="ListViewSource"/>, and
+    /// recycled by UIKit and rebound through the <see cref="ItemsViewSource"/>, and
     /// each row's height comes from measuring its XForms content.
     /// </summary>
     internal sealed class NativeListView : UITableView
@@ -77,13 +77,13 @@ namespace XForms.iOS
 
     internal sealed class NativeListViewSource : UITableViewSource
     {
-        private readonly ListView _listView;
-        private readonly ListViewSource _items;
+        private readonly ItemsView _listView;
+        private readonly ItemsViewSource _items;
         private NativeListView _tableView;
 
         public NativeListViewSource(
-            ListView listView,
-            ListViewSource items)
+            ItemsView listView,
+            ItemsViewSource items)
         {
             if (null == listView)
             {
@@ -165,9 +165,9 @@ namespace XForms.iOS
 
     internal sealed class NativeListViewCell : UITableViewCell
     {
-        public static readonly NSString CellReuseIdentifier = new NSString("XForms.ListViewItem");
+        public static readonly NSString CellReuseIdentifier = new NSString("XForms.ItemContainer");
 
-        private ListViewItem _itemContainer;
+        private ItemContainer _itemContainer;
         private UIView _closingSnapshot;
 
         public NativeListViewCell()
@@ -178,7 +178,7 @@ namespace XForms.iOS
             this.ClipsToBounds = true;
         }
 
-        internal ListViewItem ItemContainer
+        internal ItemContainer ItemContainer
         {
             get
             {

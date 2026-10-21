@@ -14,7 +14,7 @@ namespace XForms.Android.Renderers
     /// vertical list, and a <c>RecyclerView</c> for a horizontal list or a
     /// grid.
     /// </summary>
-    public class ListViewRenderer : ViewRenderer<SwipeRefreshLayout>, IListViewRenderer
+    public class ItemsViewRenderer : ViewRenderer<SwipeRefreshLayout>, IItemsViewRenderer
     {
         private readonly SwipeRefreshLayout _refreshLayout;
 
@@ -24,19 +24,19 @@ namespace XForms.Android.Renderers
         private AndroidListView _nativeListView;
         private RecyclerView _recyclerView;
         private ListLayout _layout = ListLayout.Vertical;
-        private ListViewSource _source;
+        private ItemsViewSource _source;
         private float _footerHeight;
 
-        public ListViewRenderer(
+        public ItemsViewRenderer(
             global::Android.Content.Context context,
-            ListView listView)
+            ItemsView listView)
             : base(context, listView)
         {
             this._refreshLayout = new SwipeRefreshLayout(context)
             {
                 Enabled = false,
             };
-            this._refreshLayout.Refresh += (sender, e) => ((ListView)this.Element).NotifyRefreshRequested();
+            this._refreshLayout.Refresh += (sender, e) => ((ItemsView)this.Element).NotifyRefreshRequested();
             this._refreshLayout.SetOnChildScrollUpCallback(new ScrollUpCallback(this));
 
             this._listFrame = new global::Android.Widget.FrameLayout(context);
@@ -166,10 +166,10 @@ namespace XForms.Android.Renderers
         }
 
         public void Bind(
-            ListViewSource source)
+            ItemsViewSource source)
         {
             this._source = source;
-            var listView = (ListView)this.Element;
+            var listView = (ItemsView)this.Element;
 
             if (null != this._nativeListView)
             {
@@ -208,10 +208,10 @@ namespace XForms.Android.Renderers
         // A pull refreshes only when the list is at its top
         private sealed class ScrollUpCallback : Java.Lang.Object, SwipeRefreshLayout.IOnChildScrollUpCallback
         {
-            private readonly ListViewRenderer _renderer;
+            private readonly ItemsViewRenderer _renderer;
 
             public ScrollUpCallback(
-                ListViewRenderer renderer)
+                ItemsViewRenderer renderer)
             {
                 this._renderer = renderer;
             }
@@ -230,13 +230,13 @@ namespace XForms.Android.Renderers
         /// </summary>
         private sealed class RecyclerAdapter : RecyclerView.Adapter
         {
-            private readonly ListView _listView;
-            private readonly ListViewSource _source;
+            private readonly ItemsView _listView;
+            private readonly ItemsViewSource _source;
             private readonly ListLayout _layout;
 
             public RecyclerAdapter(
-                ListView listView,
-                ListViewSource source,
+                ItemsView listView,
+                ItemsViewSource source,
                 ListLayout layout)
             {
                 this._listView = listView;

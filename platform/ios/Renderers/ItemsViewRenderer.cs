@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Foundation;
 using UIKit;
 using XForms.Primitives;
@@ -10,7 +10,7 @@ namespace XForms.iOS.Renderers
     /// A table view for a vertical list, and a collection view for a
     /// horizontal list or a grid, with a refresh control for pull-to-refresh.
     /// </summary>
-    internal class ListViewRenderer : ViewRenderer<NativeListHost>, IListViewRenderer
+    internal class ItemsViewRenderer : ViewRenderer<NativeListHost>, IItemsViewRenderer
     {
         private readonly NativeListHost _host;
         private readonly UIRefreshControl _refreshControl = new UIRefreshControl();
@@ -19,12 +19,12 @@ namespace XForms.iOS.Renderers
         private NativeListViewSource _tableSource;
         private NativeCollectionView _collectionView;
         private NativeCollectionViewSource _collectionSource;
-        private ListViewSource _source;
+        private ItemsViewSource _source;
         private float _footerHeight;
         private bool _isRefreshEnabled;
 
-        public ListViewRenderer(
-            ListView listView)
+        public ItemsViewRenderer(
+            ItemsView listView)
             : base(listView)
         {
             this._host = new NativeListHost();
@@ -141,11 +141,11 @@ namespace XForms.iOS.Renderers
         }
 
         public void Bind(
-            ListViewSource source)
+            ItemsViewSource source)
         {
             this.Unbind();
             this._source = source;
-            var listView = (ListView)this.Element;
+            var listView = (ItemsView)this.Element;
 
             if (null != this._tableView)
             {

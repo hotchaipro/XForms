@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using Windows.Win32.Foundation;
@@ -17,7 +17,7 @@ namespace XForms.Win32.Renderers
     /// scrolls the content. A line is one item in a vertical or horizontal
     /// list, and a row of items in a grid.
     /// </summary>
-    internal sealed unsafe class ListViewRenderer : ViewRenderer, IListViewRenderer, IScrollableRenderer, IScrollContent, IPullToRefresh
+    internal sealed unsafe class ItemsViewRenderer : ViewRenderer, IItemsViewRenderer, IScrollableRenderer, IScrollContent, IPullToRefresh
     {
         // Scrolled-out content takes no input
         protected override bool ClipsHitTesting => true;
@@ -34,11 +34,11 @@ namespace XForms.Win32.Renderers
         private readonly ScrollController _scroller;
         private readonly List<float> _lineExtents = new List<float>();
         private readonly List<bool> _isLineMeasured = new List<bool>();
-        private readonly Dictionary<int, ListViewItem> _realizedItems = new Dictionary<int, ListViewItem>();
-        private readonly Stack<ListViewItem> _recycledContainers = new Stack<ListViewItem>();
+        private readonly Dictionary<int, ItemContainer> _realizedItems = new Dictionary<int, ItemContainer>();
+        private readonly Stack<ItemContainer> _recycledContainers = new Stack<ItemContainer>();
         private float[] _lineStarts = Array.Empty<float>();
         private bool _areLineStartsValid;
-        private ListViewSource _source;
+        private ItemsViewSource _source;
         private ListLayout _layout = ListLayout.Vertical;
 
         // The list's size across the lines: its width, or its height for a
@@ -51,8 +51,8 @@ namespace XForms.Win32.Renderers
         private IDCompositionVisual3* _indicatorVisual;
         private IDCompositionRotateTransform* _indicatorRotation;
 
-        public ListViewRenderer(
-            ListView listView)
+        public ItemsViewRenderer(
+            ItemsView listView)
             : base(listView, isContainer: false)
         {
             IDCompositionVisual2* contentVisual;
@@ -194,7 +194,7 @@ namespace XForms.Win32.Renderers
         #endregion IScrollContent
 
         public void Bind(
-            ListViewSource source)
+            ItemsViewSource source)
         {
             if (null != this._source)
             {
@@ -256,7 +256,7 @@ namespace XForms.Win32.Renderers
             }
 
             // Renumber the realized items after the change
-            var shifted = new Dictionary<int, ListViewItem>();
+            var shifted = new Dictionary<int, ItemContainer>();
             foreach (var pair in this._realizedItems)
             {
                 shifted[(pair.Key >= index) ? pair.Key + count : pair.Key] = pair.Value;
@@ -405,7 +405,7 @@ namespace XForms.Win32.Renderers
         private void RealizeItem(
             int index)
         {
-            var listView = (ListView)this.Element;
+            var listView = (ItemsView)this.Element;
             var reuse = (this._recycledContainers.Count > 0) ? this._recycledContainers.Pop() : null;
 
             var container = this._source.GetItemContainer(listView, reuse, this._source[index]);
@@ -612,7 +612,7 @@ namespace XForms.Win32.Renderers
             if (refresh)
             {
                 this._isRefreshing = true;
-                ((ListView)this.Element).NotifyRefreshRequested();
+                ((ItemsView)this.Element).NotifyRefreshRequested();
             }
 
             this.PlaceIndicator();

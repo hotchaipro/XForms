@@ -1,9 +1,10 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using XForms.Primitives;
 
-namespace XForms.Primitives
+namespace XForms.Controls
 {
     /// <summary>
     /// How a list makes item views and shows an item in one. A list creates a
@@ -285,7 +286,7 @@ namespace XForms.Primitives
 
         // The rows the platform list shows: the items, with a header before each
         // group when grouping
-        private sealed class Source : ListViewSource
+        private sealed class Source : ItemsViewSource
         {
             private static readonly ItemViewFactory<object> DefaultHeaderFactory = ItemViewFactory<object>.Create(
                 () => new TextBlock()

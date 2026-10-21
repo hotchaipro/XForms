@@ -236,12 +236,12 @@ namespace XForms.Platform
         void ScrollTo(float verticalOffset, bool animated);
     }
 
-    public interface IListViewRenderer : IElementRenderer
+    public interface IItemsViewRenderer : IElementRenderer
     {
         Color BackgroundColor { get; set; }
         float FooterHeight { get; set; }
 
-        void Bind(ListViewSource source);
+        void Bind(ItemsViewSource source);
 
         void ScrollToItem(object item);
 
@@ -253,7 +253,7 @@ namespace XForms.Platform
 
         /// <summary>
         /// Whether pulling the list down past its top asks for a refresh. The
-        /// platform calls <see cref="ListView.NotifyRefreshRequested"/>.
+        /// platform calls <see cref="ItemsView.NotifyRefreshRequested"/>.
         /// </summary>
         bool IsRefreshEnabled { set; }
 

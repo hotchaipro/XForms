@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Globalization;
@@ -133,7 +133,7 @@ namespace XForms.Web.Renderers
     /// containers; a sizer element gives the element its scroll extent.
     /// </summary>
     [SupportedOSPlatform("browser")]
-    internal sealed class ListViewRenderer : ViewRenderer, IListViewRenderer, IScrollingRenderer
+    internal sealed class ItemsViewRenderer : ViewRenderer, IItemsViewRenderer, IScrollingRenderer
     {
         // Lines this far outside the viewport keep containers
         private const float Margin = 400;
@@ -146,14 +146,14 @@ namespace XForms.Web.Renderers
         private const float IndicatorSize = 36;
 
         // The containers by item index, and those ready for reuse
-        private readonly SortedDictionary<int, ListViewItem> _realized = new SortedDictionary<int, ListViewItem>();
-        private readonly List<ListViewItem> _recycled = new List<ListViewItem>();
+        private readonly SortedDictionary<int, ItemContainer> _realized = new SortedDictionary<int, ItemContainer>();
+        private readonly List<ItemContainer> _recycled = new List<ItemContainer>();
 
         // The lines' measured extents (NaN when not measured)
         private readonly List<float> _lineExtents = new List<float>();
 
         private readonly int _sizerId;
-        private ListViewSource _source;
+        private ItemsViewSource _source;
         private ListLayout _layout = ListLayout.Vertical;
         private Rect _viewport;
         private float _scrollOffset;
@@ -164,8 +164,8 @@ namespace XForms.Web.Renderers
         private int _indicatorId;
         private Theme _theme;
 
-        public ListViewRenderer(
-            ListView listView)
+        public ItemsViewRenderer(
+            ItemsView listView)
             : base(listView, "div", isContainer: false)
         {
             this.ApplyOverflow();
@@ -218,7 +218,7 @@ namespace XForms.Web.Renderers
         }
 
         public void Bind(
-            ListViewSource source)
+            ItemsViewSource source)
         {
             if (null != this._source)
             {
@@ -393,7 +393,7 @@ namespace XForms.Web.Renderers
 
         // The item's container, bound to it (reusing a recycled one), placed
         // among the others in item order
-        private ListViewItem Realize(
+        private ItemContainer Realize(
             int index)
         {
             if (this._realized.TryGetValue(index, out var container))
@@ -401,14 +401,14 @@ namespace XForms.Web.Renderers
                 return container;
             }
 
-            ListViewItem reuse = null;
+            ItemContainer reuse = null;
             if (this._recycled.Count > 0)
             {
                 reuse = this._recycled[this._recycled.Count - 1];
                 this._recycled.RemoveAt(this._recycled.Count - 1);
             }
 
-            container = this._source.GetItemContainer((ListView)this.Element, reuse, this._source[index]);
+            container = this._source.GetItemContainer((ItemsView)this.Element, reuse, this._source[index]);
             if ((null != reuse) && (reuse != container))
             {
                 this._recycled.Add(reuse);
@@ -515,7 +515,7 @@ namespace XForms.Web.Renderers
             if (refresh)
             {
                 this._isRefreshing = true;
-                ((ListView)this.Element).NotifyRefreshRequested();
+                ((ItemsView)this.Element).NotifyRefreshRequested();
             }
 
             this.PlaceIndicator(0);

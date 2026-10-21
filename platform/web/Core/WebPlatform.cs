@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Reflection;
 using System.Runtime.Versioning;
 using System.Threading;
@@ -37,7 +37,7 @@ namespace XForms.Web
 
         public IFrameRenderer CreateFrameRenderer(Frame frame) => new FrameRenderer(frame);
 
-        public IListViewRenderer CreateListViewRenderer(ListView listView) => new ListViewRenderer(listView);
+        public IItemsViewRenderer CreateItemsViewRenderer(ItemsView listView) => new ItemsViewRenderer(listView);
 
         public ITextBoxRenderer CreateTextBoxRenderer(TextBox textEntry) => new TextBoxRenderer(textEntry);
 

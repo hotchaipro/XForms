@@ -58,10 +58,10 @@ namespace XForms.Android
             return new BitmapRenderer(this._androidApplication.ApplicationContext, bitmap);
         }
 
-        public IListViewRenderer CreateListViewRenderer(
-            ListView listView)
+        public IItemsViewRenderer CreateItemsViewRenderer(
+            ItemsView listView)
         {
-            return new ListViewRenderer(this._androidApplication.ApplicationContext, listView);
+            return new ItemsViewRenderer(this._androidApplication.ApplicationContext, listView);
         }
 
         public ITextBoxRenderer CreateTextBoxRenderer(
