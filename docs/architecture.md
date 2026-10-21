@@ -397,6 +397,11 @@ picker-specific code. Still to do:
   (it needs a Mac). Its popups, in particular, are new and untested.
 - **Theming.** The toolkit's controls other than `Button` have no styles of
   their own.
+- **Layering.** The platforms use the framework's internals without a
+  contract, and the framework holds control behavior such as tap
+  recognition. Phases 19-22 of [alignment.md](alignment.md#layering) add a
+  platform contract, slim the framework, rename the toolkit to
+  `XForms.Controls` and plan themes, markup and WinUI compatibility.
 - **Web.** The browser backend (`platform/web`) has been tested in one
   browser (Chromium) without a screen reader or a touch screen.
 - **Known Win32 issue.** RichEdit's built-in spell checker can crash the
