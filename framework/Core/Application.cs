@@ -270,7 +270,7 @@ namespace XForms
         /// </summary>
         public async Task NavigateAsync(
             Page page,
-            PageTransition transition = PageTransition.Default)
+            PageTransition transition = null)
         {
             if (null == page)
             {

@@ -282,11 +282,11 @@ namespace XForms.iOS
             // uncover the content (rather than the content stretching)
             this._itemContainer.Arrange(new Rect(0, 0, (float)bounds.Width, requiredHeight));
 
-            // While a row closes, fill the gap with the item background
-            var theme = XForms.Application.Current?.Theme;
-            if (null != theme)
+            // While a row closes, fill the gap with the list's background
+            var itemsView = this._itemContainer.ItemsView;
+            if (null != itemsView)
             {
-                this.BackgroundColor = theme.Colors.Background.ToUIColor();
+                this.BackgroundColor = itemsView.BackgroundColor.ToUIColor();
             }
         }
 

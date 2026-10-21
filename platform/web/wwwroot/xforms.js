@@ -688,7 +688,7 @@ function focusedId() {
 export function listenKeyboard() {
     // A focus ring for elements that take focus from the keyboard
     const style = document.createElement('style');
-    style.textContent = '[data-xid]:focus { outline: none; } [data-xid][tabindex]:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; } @keyframes xforms-spin { to { transform: rotate(360deg); } }';
+    style.textContent = '[data-xid]:focus { outline: none; } [data-xid][tabindex]:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; } [data-xid]::placeholder { color: var(--xforms-placeholder); } @keyframes xforms-spin { to { transform: rotate(360deg); } }';
     document.head.appendChild(style);
 
     document.addEventListener('keydown', (e) => {

@@ -253,7 +253,10 @@ created:
   constructor.
 
 The framework gives its own animated views an animator: pages, and the
-children of panels with `ChildTransitions`. Each animator has its own
+children of panels with `ChildTransitions`. A `Frame` moves pages in and
+out with a `PageTransition`: the built-in `Slide` (the default), `SlideUp`,
+`Fade` and `None`, or a subclass that overrides `PlayAsync` and animates
+the page through the `PageTransitionContext` it's given. Each animator has its own
 native layer, nested: the app's outside, a control's own inside it, with
 the view's content and children innermost. The animators' `To` and `From`
 methods (translate, scale, rotate, fade, reveal) run on the platform's
@@ -356,8 +359,11 @@ reports the system's mode, accent and contrast colors, and their changes.
 Any view can set `Theme` for itself and its descendants; `ActualTheme` is the
 effective one. An element hears its theme in `OnThemeChanged`, once it's
 attached and whenever the theme changes. The framework's primitives use the
-theme's colors by default (text, page and list backgrounds, text boxes), and
-the controls draw from its tokens.
+theme's colors by default, as properties an app or control library can
+set (`TextBox.BackgroundColor`, `ForegroundColor`, `PlaceholderColor` and
+`AccentColor`; `ItemsView.BackgroundColor` and `AccentColor`); the renderers
+take those colors and never read the theme. The controls draw from its
+tokens.
 
 ## Popups and light dismiss
 
@@ -394,7 +400,9 @@ the controls draw from its tokens.
 `ItemsViewSource` provides the items and their views. Each item view lives in
 an `ItemContainer`, which the platform recycles as items scroll in and out of
 view. When a container's height changes, the platform animates it. That is
-how a list item can reveal more content.
+how a list item can reveal more content. `Padding` puts space around the
+items inside the scrolling area, so the last item can scroll clear of a bar
+floating over the list.
 
 XForms.Controls' `ListView` adds selection and clicks, with `ListViewItem`
 as its container. Control libraries customize every item by subclassing the

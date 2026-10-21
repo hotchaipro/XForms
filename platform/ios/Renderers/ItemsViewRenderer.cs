@@ -20,7 +20,7 @@ namespace XForms.iOS.Renderers
         private NativeCollectionView _collectionView;
         private NativeCollectionViewSource _collectionSource;
         private ItemsViewSource _source;
-        private float _footerHeight;
+        private Thickness _padding;
         private bool _isRefreshEnabled;
 
         public ItemsViewRenderer(
@@ -56,19 +56,20 @@ namespace XForms.iOS.Renderers
             }
         }
 
-        public float FooterHeight
+        public Thickness Padding
         {
-            get
-            {
-                return this._footerHeight;
-            }
-
             set
             {
-                this._footerHeight = value;
-                var inset = this.ScrollView.ContentInset;
-                inset.Bottom = value;
-                this.ScrollView.ContentInset = inset;
+                this._padding = value;
+                this.ScrollView.ContentInset = new UIEdgeInsets(value.Top, value.Left, value.Bottom, value.Right);
+            }
+        }
+
+        public Color AccentColor
+        {
+            set
+            {
+                this._refreshControl.TintColor = value.ToUIColor();
             }
         }
 
@@ -126,7 +127,7 @@ namespace XForms.iOS.Renderers
             }
 
             this._host.ScrollView = this.ScrollView;
-            this.FooterHeight = this._footerHeight;
+            this.Padding = this._padding;
             this.IsRefreshEnabled = this._isRefreshEnabled;
         }
 

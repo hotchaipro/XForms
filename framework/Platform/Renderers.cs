@@ -167,6 +167,22 @@ namespace XForms.Platform
     public interface ITextBoxRenderer : IViewRenderer
     {
         Color BackgroundColor { get; set; }
+
+        /// <summary>
+        /// The text's color.
+        /// </summary>
+        Color ForegroundColor { set; }
+
+        /// <summary>
+        /// The placeholder text's color.
+        /// </summary>
+        Color PlaceholderColor { set; }
+
+        /// <summary>
+        /// The caret's (and, where the platform has one, the selection's)
+        /// color.
+        /// </summary>
+        Color AccentColor { set; }
         string Text { get; set; }
         string PlaceholderText { get; set; }
         bool Multiline { get; set; }
@@ -239,7 +255,18 @@ namespace XForms.Platform
     public interface IItemsViewRenderer : IElementRenderer
     {
         Color BackgroundColor { get; set; }
-        float FooterHeight { get; set; }
+
+        /// <summary>
+        /// The refresh indicator's color.
+        /// </summary>
+        Color AccentColor { set; }
+
+        /// <summary>
+        /// Space around the items, inside the scrolling area: the items start
+        /// after the leading padding, and the last can scroll clear of
+        /// whatever covers the trailing edge.
+        /// </summary>
+        Thickness Padding { set; }
 
         void Bind(ItemsViewSource source);
 

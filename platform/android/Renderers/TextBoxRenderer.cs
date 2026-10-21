@@ -191,13 +191,37 @@ namespace XForms.Android.Renderers
             this._nativeTextEntry.SetSelection(start, Math.Min(textLength, start + length));
         }
 
-        public override void OnThemeChanged(
-            Theme theme)
+        public Color ForegroundColor
         {
-            base.OnThemeChanged(theme);
+            set
+            {
+                this._nativeTextEntry.SetTextColor(value.ToAndroidColor());
+            }
+        }
 
-            this._nativeTextEntry.SetTextColor(theme.Colors.OnSurface.ToAndroidColor());
-            this._nativeTextEntry.SetHintTextColor(theme.Colors.SubtleForeground.ToAndroidColor());
+        public Color PlaceholderColor
+        {
+            set
+            {
+                this._nativeTextEntry.SetHintTextColor(value.ToAndroidColor());
+            }
+        }
+
+        public Color AccentColor
+        {
+            set
+            {
+                // NOTE: Before Android 10, the caret is the app theme's accent color
+                if (OperatingSystem.IsAndroidVersionAtLeast(29))
+                {
+                    var cursor = this._nativeTextEntry.TextCursorDrawable?.Mutate();
+                    if (null != cursor)
+                    {
+                        cursor.SetTint(value.ToAndroidColor());
+                        this._nativeTextEntry.TextCursorDrawable = cursor;
+                    }
+                }
+            }
         }
 
         public void Focus()

@@ -25,7 +25,7 @@ namespace XForms.Android.Renderers
         private RecyclerView _recyclerView;
         private ListLayout _layout = ListLayout.Vertical;
         private ItemsViewSource _source;
-        private float _footerHeight;
+        private Thickness _padding;
 
         public ItemsViewRenderer(
             global::Android.Content.Context context,
@@ -46,18 +46,24 @@ namespace XForms.Android.Renderers
             this.SetNativeElement(this._refreshLayout);
         }
 
-        public float FooterHeight
+        public Thickness Padding
         {
-            get
-            {
-                return this._footerHeight;
-            }
-
             set
             {
-                this._footerHeight = value;
-                var list = this.List;
-                list.SetPadding(list.PaddingLeft, list.PaddingTop, list.PaddingRight, (int)this.DevicePixelsToPixels(value));
+                this._padding = value;
+                this.List.SetPadding(
+                    (int)this.DevicePixelsToPixels(value.Left),
+                    (int)this.DevicePixelsToPixels(value.Top),
+                    (int)this.DevicePixelsToPixels(value.Right),
+                    (int)this.DevicePixelsToPixels(value.Bottom));
+            }
+        }
+
+        public Color AccentColor
+        {
+            set
+            {
+                this._refreshLayout.SetColorSchemeColors(value.ToAndroidColor().ToArgb());
             }
         }
 
@@ -152,7 +158,7 @@ namespace XForms.Android.Renderers
 
             list.SetClipToPadding(false);
             this._listFrame.AddView(list);
-            this.FooterHeight = this._footerHeight;
+            this.Padding = this._padding;
         }
 
         private RecyclerView.LayoutManager CreateLayoutManager()

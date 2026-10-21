@@ -30,14 +30,82 @@ namespace XForms.Primitives
             }
         }
 
+        private Color? _backgroundColor;
+        private Color? _foregroundColor;
+        private Color? _placeholderColor;
+        private Color? _accentColor;
+
         /// <summary>
-        /// The text box's background: the theme's surface color.
+        /// The text box's background: by default, the theme's surface color.
         /// </summary>
         public Color BackgroundColor
         {
             get
             {
-                return this.ActualTheme.Colors.Surface;
+                return this._backgroundColor ?? this.ActualTheme.Colors.Surface;
+            }
+
+            set
+            {
+                this._backgroundColor = value;
+                this.ApplyColors();
+                this.OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// The text's color: by default, the theme's color for text on its
+        /// surface.
+        /// </summary>
+        public Color ForegroundColor
+        {
+            get
+            {
+                return this._foregroundColor ?? this.ActualTheme.Colors.OnSurface;
+            }
+
+            set
+            {
+                this._foregroundColor = value;
+                this.ApplyColors();
+                this.OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// The placeholder text's color: by default, the theme's subtle
+        /// foreground color.
+        /// </summary>
+        public Color PlaceholderColor
+        {
+            get
+            {
+                return this._placeholderColor ?? this.ActualTheme.Colors.SubtleForeground;
+            }
+
+            set
+            {
+                this._placeholderColor = value;
+                this.ApplyColors();
+                this.OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// The caret's color: by default, the theme's accent color.
+        /// </summary>
+        public Color AccentColor
+        {
+            get
+            {
+                return this._accentColor ?? this.ActualTheme.Colors.Accent;
+            }
+
+            set
+            {
+                this._accentColor = value;
+                this.ApplyColors();
+                this.OnPropertyChanged();
             }
         }
 
@@ -384,7 +452,19 @@ namespace XForms.Primitives
             Theme theme)
         {
             base.OnThemeChanged(theme);
-            this.Native?.BackgroundColor = this.BackgroundColor;
+            this.ApplyColors();
+        }
+
+        private void ApplyColors()
+        {
+            var native = this.Native;
+            if (null != native)
+            {
+                native.BackgroundColor = this.BackgroundColor;
+                native.ForegroundColor = this.ForegroundColor;
+                native.PlaceholderColor = this.PlaceholderColor;
+                native.AccentColor = this.AccentColor;
+            }
         }
 
         internal override void OnRendererCreated()
@@ -392,7 +472,7 @@ namespace XForms.Primitives
             base.OnRendererCreated();
 
             var native = this.Native;
-            native.BackgroundColor = this.BackgroundColor;
+            this.ApplyColors();
             this._isApplyingValues = true;
             try
             {

@@ -162,7 +162,6 @@ namespace XForms.Web.Renderers
         private bool _isRefreshing;
         private float _pullDistance;
         private int _indicatorId;
-        private Theme _theme;
 
         public ItemsViewRenderer(
             ItemsView listView)
@@ -177,11 +176,50 @@ namespace XForms.Web.Renderers
             Js.Insert(this.Id, this._sizerId, -1);
         }
 
-        public float FooterHeight
+        private Thickness _padding;
+        private Color _accentColor;
+
+        public Thickness Padding
         {
-            get;
-            set;
+            set
+            {
+                this._padding = value;
+                this.Realize();
+            }
         }
+
+        public Color AccentColor
+        {
+            set
+            {
+                this._accentColor = value;
+                this.ApplyIndicatorColors();
+            }
+        }
+
+        public override Color BackgroundColor
+        {
+            get
+            {
+                return base.BackgroundColor;
+            }
+
+            set
+            {
+                base.BackgroundColor = value;
+                this.ApplyIndicatorColors();
+            }
+        }
+
+        // The padding before the first line, after the last, and either side
+        // across the lines
+        private float LeadingPadding => this.IsHorizontal ? this._padding.Left : this._padding.Top;
+
+        private float TrailingPadding => this.IsHorizontal ? this._padding.Right : this._padding.Bottom;
+
+        private float CrossStartPadding => this.IsHorizontal ? this._padding.Top : this._padding.Left;
+
+        private float CrossPadding => this.IsHorizontal ? this._padding.Vertical : this._padding.Horizontal;
 
         public ListLayout Layout
         {
@@ -314,7 +352,7 @@ namespace XForms.Web.Renderers
             // Lines leaving the range give up their containers first, for
             // the lines coming into it to reuse
             var needed = new HashSet<int>();
-            float position = 0;
+            float position = this.LeadingPadding;
             for (int line = 0; line < lines; line += 1)
             {
                 float extent = this.LineExtent(line, estimate);
@@ -334,11 +372,12 @@ namespace XForms.Web.Renderers
                 }
             }
 
-            float crossSize = this.IsHorizontal ? this._viewport.Height : this._viewport.Width;
+            float crossSize = Math.Max(0, (this.IsHorizontal ? this._viewport.Height : this._viewport.Width) - this.CrossPadding);
+            float crossStart = this.CrossStartPadding;
             float cellSize = crossSize / span;
             int count = this._source?.Count ?? 0;
             var kept = new HashSet<int>();
-            position = 0;
+            position = this.LeadingPadding;
             for (int line = 0; line < lines; line += 1)
             {
                 float extent = this.LineExtent(line, estimate);
@@ -362,8 +401,8 @@ namespace XForms.Web.Renderers
                     {
                         int column = index - first;
                         this._realized[index].Arrange(this.IsHorizontal
-                            ? new Rect(position, column * cellSize, extent, cellSize)
-                            : new Rect(column * cellSize, position, cellSize, extent));
+                            ? new Rect(position, crossStart + (column * cellSize), extent, cellSize)
+                            : new Rect(crossStart + (column * cellSize), position, cellSize, extent));
                     }
 
                     this._lineExtents[line] = extent;
@@ -380,7 +419,7 @@ namespace XForms.Web.Renderers
                 }
             }
 
-            position += this.FooterHeight;
+            position += this.TrailingPadding;
             if (this.IsHorizontal)
             {
                 Js.SetBounds(this._sizerId, 0, 0, position, 1);
@@ -447,6 +486,7 @@ namespace XForms.Web.Renderers
                 return;
             }
 
+            // The item scrolls to just after the leading padding
             float estimate = this.EstimatedExtent;
             float position = 0;
             for (int line = 0; line < index / this._layout.Columns; line += 1)
@@ -547,7 +587,7 @@ namespace XForms.Web.Renderers
                 Js.SetStyle(this._indicatorId, "z-index", "1");
                 Js.SetAttribute(this._indicatorId, "aria-hidden", "true");
                 Js.Insert(this.Id, this._indicatorId, -1);
-                this.ApplyIndicatorTheme();
+                this.ApplyIndicatorColors();
             }
 
             float travel = this._isRefreshing ? RefreshDistance : Math.Min(distance, RefreshDistance * 1.5f);
@@ -560,25 +600,16 @@ namespace XForms.Web.Renderers
             Js.SetStyle(this._indicatorId, "transform", this._isRefreshing ? null : $"rotate({(int)(distance * 3)}deg)");
         }
 
-        private void ApplyIndicatorTheme()
+        private void ApplyIndicatorColors()
         {
-            var theme = this._theme;
-            if ((0 == this._indicatorId) || (null == theme))
+            if (0 == this._indicatorId)
             {
                 return;
             }
 
-            Js.SetStyle(this._indicatorId, "background", Css(theme.Colors.Surface));
-            Js.SetStyle(this._indicatorId, "border-color", Css(theme.Colors.Accent));
+            Js.SetStyle(this._indicatorId, "background", Css(this.BackgroundColor));
+            Js.SetStyle(this._indicatorId, "border-color", Css(this._accentColor));
             Js.SetStyle(this._indicatorId, "border-top-color", "transparent");
-        }
-
-        public override void OnThemeChanged(
-            Theme theme)
-        {
-            base.OnThemeChanged(theme);
-            this._theme = theme;
-            this.ApplyIndicatorTheme();
         }
 
         #endregion Pull to refresh
@@ -602,7 +633,9 @@ namespace XForms.Web.Renderers
         private int _maxLength;
         private string _placeholder;
         private KeyboardOptions _keyboardOptions = KeyboardOptions.All;
-        private Theme _theme;
+        private Color _foregroundColor;
+        private Color _placeholderColor;
+        private Color _accentColor;
 
         public TextBoxRenderer(
             TextBox textBox)
@@ -660,7 +693,7 @@ namespace XForms.Web.Renderers
             Js.SetAttribute(id, "maxlength", (this._maxLength > 0) ? this._maxLength.ToString(System.Globalization.CultureInfo.InvariantCulture) : null);
             Js.SetAttribute(id, "readonly", this._isReadOnly ? string.Empty : null);
             this.ApplyKeyboardOptions();
-            this.ApplyTheme();
+            this.ApplyColors();
 
             Js.Insert(this.Id, id, -1);
             Js.SetValue(id, text ?? string.Empty);
@@ -810,25 +843,60 @@ namespace XForms.Web.Renderers
                 (float)Math.Ceiling(((ascent + descent) * 1.2f * lines) + (2 * Padding)));
         }
 
-        public override void OnThemeChanged(
-            Theme theme)
+        public override Color BackgroundColor
         {
-            base.OnThemeChanged(theme);
-            this._theme = theme;
-            this.ApplyTheme();
+            get
+            {
+                return base.BackgroundColor;
+            }
+
+            set
+            {
+                base.BackgroundColor = value;
+                this.ApplyColors();
+            }
         }
 
-        private void ApplyTheme()
+        public Color ForegroundColor
         {
-            var theme = this._theme;
-            if (null == theme)
+            set
+            {
+                this._foregroundColor = value;
+                this.ApplyColors();
+            }
+        }
+
+        public Color PlaceholderColor
+        {
+            set
+            {
+                this._placeholderColor = value;
+                this.ApplyColors();
+            }
+        }
+
+        public Color AccentColor
+        {
+            set
+            {
+                this._accentColor = value;
+                this.ApplyColors();
+            }
+        }
+
+        private void ApplyColors()
+        {
+            if (0 == this._inputId)
             {
                 return;
             }
 
-            Js.SetStyle(this._inputId, "color", Css(theme.Colors.Foreground));
-            Js.SetStyle(this._inputId, "background", Css(theme.Colors.Surface));
-            Js.SetStyle(this._inputId, "caret-color", Css(theme.Colors.Accent));
+            Js.SetStyle(this._inputId, "color", Css(this._foregroundColor));
+            Js.SetStyle(this._inputId, "background", Css(this.BackgroundColor));
+            Js.SetStyle(this._inputId, "caret-color", Css(this._accentColor));
+
+            // The page's style sheet colors the placeholder from this
+            Js.SetStyle(this._inputId, "--xforms-placeholder", Css(this._placeholderColor));
         }
     }
 

@@ -69,7 +69,9 @@ namespace XForms.Primitives
     /// </remarks>
     public class ItemsView : View
     {
-        private float? _footerHeight;
+        private Thickness _padding;
+        private Color? _backgroundColor;
+        private Color? _accentColor;
         private ItemsViewSource _source;
         private object _pendingScrollItem;
         private ListLayout _layout = ListLayout.Vertical;
@@ -226,7 +228,17 @@ namespace XForms.Primitives
             Theme theme)
         {
             base.OnThemeChanged(theme);
-            this.Native?.BackgroundColor = this.BackgroundColor;
+            this.ApplyColors();
+        }
+
+        private void ApplyColors()
+        {
+            var native = this.Native;
+            if (null != native)
+            {
+                native.BackgroundColor = this.BackgroundColor;
+                native.AccentColor = this.AccentColor;
+            }
         }
 
         internal override void OnRendererCreated()
@@ -234,10 +246,10 @@ namespace XForms.Primitives
             base.OnRendererCreated();
 
             var native = this.Native;
-            native.BackgroundColor = this.BackgroundColor;
-            if (this._footerHeight.HasValue)
+            this.ApplyColors();
+            if (!this._padding.Equals(Thickness.Zero))
             {
-                native.FooterHeight = this._footerHeight.Value;
+                native.Padding = this._padding;
             }
 
             if (this._layout != ListLayout.Vertical)
@@ -268,27 +280,58 @@ namespace XForms.Primitives
         }
 
         /// <summary>
-        /// The view's background: the theme's surface color.
+        /// The view's background: by default, the theme's surface color.
         /// </summary>
         public Color BackgroundColor
         {
             get
             {
-                return this.ActualTheme.Colors.Surface;
-            }
-        }
-
-        public float FooterHeight
-        {
-            get
-            {
-                return this._footerHeight ?? this.Native?.FooterHeight ?? 0;
+                return this._backgroundColor ?? this.ActualTheme.Colors.Surface;
             }
 
             set
             {
-                this._footerHeight = value;
-                this.Native?.FooterHeight = value;
+                this._backgroundColor = value;
+                this.ApplyColors();
+                this.OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// The refresh indicator's color: by default, the theme's accent color.
+        /// </summary>
+        public Color AccentColor
+        {
+            get
+            {
+                return this._accentColor ?? this.ActualTheme.Colors.Accent;
+            }
+
+            set
+            {
+                this._accentColor = value;
+                this.ApplyColors();
+                this.OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Space around the items, inside the scrolling area: the items start
+        /// after the leading padding, and the last can scroll clear of
+        /// whatever covers the trailing edge (such as a floating bar).
+        /// </summary>
+        public Thickness Padding
+        {
+            get
+            {
+                return this._padding;
+            }
+
+            set
+            {
+                this._padding = value;
+                this.Native?.Padding = value;
+                this.OnPropertyChanged();
             }
         }
 

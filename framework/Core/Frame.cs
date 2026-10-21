@@ -6,27 +6,6 @@ using XForms.Platform;
 namespace XForms
 {
     /// <summary>
-    /// How a page arrives or leaves.
-    /// </summary>
-    public enum PageTransition
-    {
-        /// <summary>The platform's usual transition: a slide.</summary>
-        Default,
-
-        /// <summary>Slides in from the side, and back out.</summary>
-        Slide,
-
-        /// <summary>Slides up from the bottom, and back down (modal pages).</summary>
-        SlideUp,
-
-        /// <summary>Fades in, and out.</summary>
-        Fade,
-
-        /// <summary>Shows at once.</summary>
-        None,
-    }
-
-    /// <summary>
     /// Shows one page at a time, with a back stack. Navigation is
     /// asynchronous: each method completes when its transition has.
     /// </summary>
@@ -113,7 +92,7 @@ namespace XForms
         /// </summary>
         public virtual async Task NavigateAsync(
             Page page,
-            PageTransition transition = PageTransition.Default)
+            PageTransition transition = null)
         {
             if (null == page)
             {
@@ -141,7 +120,7 @@ namespace XForms
         public virtual async Task ReplaceAsync(
             Page page,
             NavigationMode mode = NavigationMode.Forward,
-            PageTransition transition = PageTransition.Default)
+            PageTransition transition = null)
         {
             if (null == page)
             {
@@ -167,7 +146,7 @@ namespace XForms
         /// none, or the current page cancels.
         /// </summary>
         public virtual async Task<bool> GoBackAsync(
-            PageTransition transition = PageTransition.Default)
+            PageTransition transition = null)
         {
             if (!this.CanGoBack)
             {
@@ -216,7 +195,8 @@ namespace XForms
 
             if ((null != leaving) && (transition != PageTransition.None))
             {
-                await this.PlayAsync(isBack ? leaving : arriving, isBack, transition, slideFromStart);
+                var context = new PageTransitionContext(isBack ? leaving : arriving, isBack, slideFromStart, this.Bounds.Size, this.TransitionDuration);
+                await (transition ?? PageTransition.Slide).PlayAsync(context);
             }
 
             if ((null != leaving) && (leaving != this._currentPage))
@@ -229,69 +209,14 @@ namespace XForms
             }
         }
 
-        private static readonly EasingFunction DecelerateEasing = new CubicEase(EasingMode.EaseOut);
-        private static readonly EasingFunction AccelerateEasing = new CubicEase(EasingMode.EaseIn);
-
         /// <summary>
-        /// How long a page takes to slide or fade in or out.
+        /// How long a page takes to arrive or leave (see <see cref="PageTransition"/>).
         /// </summary>
         public TimeSpan TransitionDuration
         {
             get;
             set;
         } = TimeSpan.FromMilliseconds(250);
-
-        // Moves the page in (arriving) or out (going back) as the transition says
-        private async Task PlayAsync(
-            Page page,
-            bool isBack,
-            PageTransition transition,
-            bool slideFromStart)
-        {
-            var animator = page.GetOrCreateAnimator();
-            var duration = this.TransitionDuration;
-            var easing = isBack ? AccelerateEasing : DecelerateEasing;
-            var size = this.Bounds.Size;
-
-            Point offset;
-            switch (transition)
-            {
-                case PageTransition.Fade:
-                    animator.Translation = Point.Zero;
-                    if (isBack)
-                    {
-                        await animator.FadeTo(0, duration, easing);
-                    }
-                    else
-                    {
-                        await animator.FadeFrom(0, duration, easing);
-                    }
-
-                    animator.Opacity = 1;
-                    return;
-
-                case PageTransition.SlideUp:
-                    offset = new Point(0, size.Height);
-                    break;
-
-                default:
-                    offset = new Point(slideFromStart ? -size.Width : size.Width, 0);
-                    break;
-            }
-
-            animator.Opacity = 1;
-            if (isBack)
-            {
-                animator.Translation = Point.Zero;
-                await animator.TranslateTo(offset, duration, easing);
-                animator.Translation = Point.Zero;
-            }
-            else
-            {
-                animator.Translation = offset;
-                await animator.TranslateTo(Point.Zero, duration, easing);
-            }
-        }
 
         private void Attach(
             Page page)

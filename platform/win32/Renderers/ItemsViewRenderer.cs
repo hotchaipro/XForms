@@ -87,11 +87,34 @@ namespace XForms.Win32.Renderers
             }
         }
 
-        public float FooterHeight
+        private Thickness _padding;
+
+        public Thickness Padding
         {
-            get;
+            set
+            {
+                this._padding = value;
+                this._crossSize = 0;
+                this._areLineStartsValid = false;
+                this.Host.RequestLayout();
+            }
+        }
+
+        public Color AccentColor
+        {
+            private get;
             set;
         }
+
+        // The padding before the first line, after the last, and either side
+        // across the lines
+        private float LeadingPadding => this.IsHorizontal ? this._padding.Left : this._padding.Top;
+
+        private float TrailingPadding => this.IsHorizontal ? this._padding.Right : this._padding.Bottom;
+
+        private float CrossStartPadding => this.IsHorizontal ? this._padding.Top : this._padding.Left;
+
+        private float CrossPadding => this.IsHorizontal ? this._padding.Vertical : this._padding.Horizontal;
 
         private int Span
         {
@@ -171,7 +194,7 @@ namespace XForms.Win32.Renderers
                 this.EnsureLineStarts();
                 int count = this._lineExtents.Count;
                 float linesExtent = (count > 0) ? this._lineStarts[count - 1] + this._lineExtents[count - 1] : 0;
-                return linesExtent + (this.IsHorizontal ? 0 : this.FooterHeight);
+                return ((count > 0) ? linesExtent : this.LeadingPadding) + this.TrailingPadding;
             }
         }
 
@@ -306,7 +329,7 @@ namespace XForms.Win32.Renderers
                 this._lineStarts = new float[Math.Max(count, this._lineStarts.Length * 2)];
             }
 
-            float start = 0;
+            float start = this.LeadingPadding;
             for (int i = 0; i < count; i += 1)
             {
                 this._lineStarts[i] = start;
@@ -476,6 +499,7 @@ namespace XForms.Win32.Renderers
 
             int span = this.Span;
             float cellWidth = this._crossSize / span;
+            float crossStart = this.CrossStartPadding;
             foreach (var pair in this._realizedItems)
             {
                 int line = pair.Key / span;
@@ -484,11 +508,11 @@ namespace XForms.Win32.Renderers
 
                 if (this.IsHorizontal)
                 {
-                    pair.Value.Arrange(new Rect(start, 0, extent, this._crossSize));
+                    pair.Value.Arrange(new Rect(start, crossStart, extent, this._crossSize));
                 }
                 else
                 {
-                    pair.Value.Arrange(new Rect((pair.Key % span) * cellWidth, start, cellWidth, extent));
+                    pair.Value.Arrange(new Rect(crossStart + ((pair.Key % span) * cellWidth), start, cellWidth, extent));
                 }
             }
         }
@@ -507,11 +531,13 @@ namespace XForms.Win32.Renderers
             float start = this._lineStarts[line];
             float end = start + this._lineExtents[line];
             float offset = this._scroller.TargetOffset;
-            float visibleExtent = this.ViewportHeight - (this.IsHorizontal ? 0 : this.FooterHeight);
+            // The item scrolls clear of the padding on either side
+            start -= this.LeadingPadding;
+            float visibleExtent = this.ViewportHeight - this.TrailingPadding;
 
             if (start < offset)
             {
-                this._scroller.ScrollTo(start, animated: true);
+                this._scroller.ScrollTo(Math.Max(0, start), animated: true);
             }
             else if (end > offset + visibleExtent)
             {
@@ -543,7 +569,7 @@ namespace XForms.Win32.Renderers
             this.Visual->SetClip(new D2D_RECT_F() { left = 0, top = 0, right = frame.Width * scale, bottom = frame.Height * scale });
 
             // A new size across can rewrap every item
-            float crossSize = this.IsHorizontal ? frame.Height : frame.Width;
+            float crossSize = Math.Max(0, (this.IsHorizontal ? frame.Height : frame.Width) - this.CrossPadding);
             if (crossSize != this._crossSize)
             {
                 this._crossSize = crossSize;
@@ -708,14 +734,15 @@ namespace XForms.Win32.Renderers
                 });
 
                 // A disc with an arc in the accent color, as on Android
-                var colors = this.Element.ActualTheme.Colors;
+                var accent = this.AccentColor;
+                var outline = Color.FromArgb(0x40, accent.R, accent.G, accent.B);
                 var drawContext = new DrawContext(context, new Rect(0, 0, 0, 0));
                 drawContext.Clear(Colors.Transparent);
                 float radius = IndicatorSize / 2;
                 var center = new Point(radius, radius);
-                drawContext.FillEllipse(center, radius - 1, radius - 1, colors.Surface);
-                drawContext.DrawEllipse(center, radius - 1, radius - 1, colors.Outline, 1);
-                drawContext.DrawArc(center, radius - 10, 0, 270, colors.Accent, 3);
+                drawContext.FillEllipse(center, radius - 1, radius - 1, this.BackgroundColor);
+                drawContext.DrawEllipse(center, radius - 1, radius - 1, outline, 1);
+                drawContext.DrawArc(center, radius - 10, 0, 270, accent, 3);
                 drawContext.Release();
             }
             finally

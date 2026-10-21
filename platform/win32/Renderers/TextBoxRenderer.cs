@@ -406,11 +406,50 @@ namespace XForms.Win32.Renderers
         {
             base.OnThemeChanged(theme);
 
-            this._textColor = theme.Colors.OnSurface;
-            this._fieldColor = theme.Colors.Surface;
-            this._placeholderColor = theme.Colors.SubtleForeground;
+            // The text scale may have changed
             this.ApplyFormat();
             this.InvalidateRender();
+        }
+
+        public override Color BackgroundColor
+        {
+            get
+            {
+                return base.BackgroundColor;
+            }
+
+            set
+            {
+                base.BackgroundColor = value;
+                this._fieldColor = value;
+                this.ApplyFormat();
+            }
+        }
+
+        public Color ForegroundColor
+        {
+            set
+            {
+                this._textColor = value;
+                this.ApplyFormat();
+            }
+        }
+
+        public Color PlaceholderColor
+        {
+            set
+            {
+                this._placeholderColor = value;
+                this.InvalidateRender();
+            }
+        }
+
+        // NOTE: RichEdit draws its caret in the text color
+        public Color AccentColor
+        {
+            set
+            {
+            }
         }
 
         public override Size MeasureNative(

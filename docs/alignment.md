@@ -2139,6 +2139,28 @@ Win32, Android and the browser, as before.
     - **Not done:** a press on a list's blank space (below its last row)
       doesn't reach the framework on Android, so it doesn't close an open
       flyout. That was already so before this phase.
+    - **Then, the last control-specific pieces:**
+      - **`ItemsView.Padding`** (a `Thickness`, inside the scrolling area)
+        replaces `FooterHeight`, which only SoonerOrLater's floating menu
+        bar needed.
+      - **Colors as properties:** `TextBox` has `BackgroundColor`,
+        `ForegroundColor`, `PlaceholderColor` and `AccentColor` (the
+        caret), and `ItemsView` a settable `BackgroundColor` and an
+        `AccentColor` (the refresh indicator), each defaulting from the
+        theme. The platforms' renderers take them and no longer read the
+        theme's colors.
+      - **Pluggable page transitions:** `PageTransition` is an abstract
+        class rather than an enum. The built-in `Slide` (the default),
+        `SlideUp`, `Fade` and `None` are instances; a control library or
+        app subclasses it and animates the page in `PlayAsync` through a
+        `PageTransitionContext` (the page, whether it arrives or leaves,
+        the side, the frame's size and `TransitionDuration`).
+      - **Verified:** Win32 lists, text boxes, pickers and panels pixel for
+        pixel against before (apart from a status label and the spinning
+        ring); a padded list with its own background on Win32, Android and
+        the browser; slide, fade, back and the modal slide-up with its
+        result on Win32 and the browser; the browser's text box colors,
+        including the placeholder's. iOS builds only.
 
 23. **Themes.** A control says what it does and what state it's in; a
     theme says how it looks. The controls' current look becomes the first
