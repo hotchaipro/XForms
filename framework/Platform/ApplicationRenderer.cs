@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using XForms.Controls;
+using XForms.Primitives;
 
 namespace XForms.Platform
 {

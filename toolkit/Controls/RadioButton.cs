@@ -2,6 +2,7 @@
 using System.Windows.Input;
 using XForms.Input;
 using XForms.Controls;
+using XForms.Primitives;
 
 namespace XForms.Toolkit
 {

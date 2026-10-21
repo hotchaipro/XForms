@@ -4,6 +4,7 @@ using System.Windows.Input;
 using XForms.Controls;
 using XForms.Input;
 using XForms.Layouts;
+using XForms.Primitives;
 
 namespace XForms.Xaml
 {

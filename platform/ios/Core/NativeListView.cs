@@ -3,7 +3,7 @@ using System.Collections.Specialized;
 using CoreGraphics;
 using Foundation;
 using UIKit;
-using XForms.Controls;
+using XForms.Primitives;
 
 namespace XForms.iOS
 {

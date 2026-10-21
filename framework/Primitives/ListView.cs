@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using XForms.Layouts;
 using XForms.Platform;
 
-namespace XForms.Controls
+namespace XForms.Primitives
 {
     /// <summary>
     /// How a list lays its items out: in a vertical or horizontal line, or a

@@ -1,6 +1,6 @@
 using System;
 using System.Runtime.Versioning;
-using XForms.Controls;
+using XForms.Primitives;
 using XForms.Platform;
 
 namespace XForms.Web.Renderers

@@ -1,7 +1,6 @@
 ﻿using System;
 using XForms.Android.Renderers;
-using XForms.Controls;
-using XForms.Layouts;
+using XForms.Primitives;
 using XForms.Platform;
 
 namespace XForms.Android

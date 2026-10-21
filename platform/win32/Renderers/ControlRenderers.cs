@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using Windows.Win32.Graphics.Direct2D;
 using Windows.Win32.Graphics.DirectComposition;
-using XForms.Controls;
+using XForms.Primitives;
 using XForms.Platform;
 
 namespace XForms.Win32.Renderers
@@ -19,7 +19,7 @@ namespace XForms.Win32.Renderers
         private Color _tint = Colors.Transparent;
 
         public ImageRenderer(
-            XForms.Controls.Image image)
+            XForms.Primitives.Image image)
             : base(image, isContainer: false)
         {
         }

@@ -2,7 +2,7 @@
 using Android.Graphics.Drawables;
 using Android.Views;
 using AndroidPopupWindow = global::Android.Widget.PopupWindow;
-using XForms.Controls;
+using XForms.Primitives;
 using XForms.Platform;
 
 namespace XForms.Android.Renderers

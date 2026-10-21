@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 
-namespace XForms.Controls
+namespace XForms.Primitives
 {
     /// <summary>
     /// How a list makes item views and shows an item in one. A list creates a

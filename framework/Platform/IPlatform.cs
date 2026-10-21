@@ -1,6 +1,5 @@
 ﻿using System;
-using XForms.Controls;
-using XForms.Layouts;
+using XForms.Primitives;
 
 namespace XForms.Platform
 {

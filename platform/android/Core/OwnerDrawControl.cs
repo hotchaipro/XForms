@@ -1,6 +1,6 @@
 ﻿using System;
 using Android.Graphics;
-using XForms.Controls;
+using XForms.Primitives;
 using XForms.Platform;
 
 namespace XForms.Android

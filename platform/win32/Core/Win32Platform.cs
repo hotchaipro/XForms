@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Reflection;
 using Windows.Win32;
-using XForms.Controls;
+using XForms.Primitives;
 using XForms.Platform;
 using XForms.Win32.Renderers;
 

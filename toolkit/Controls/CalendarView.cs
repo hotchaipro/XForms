@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using XForms.Controls;
+using XForms.Primitives;
 
 namespace XForms.Toolkit
 {

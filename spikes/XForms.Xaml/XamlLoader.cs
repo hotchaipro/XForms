@@ -8,6 +8,7 @@ using System.Windows.Input;
 using System.Xml.Linq;
 using XForms.Controls;
 using XForms.Layouts;
+using XForms.Primitives;
 
 namespace XForms.Xaml
 {

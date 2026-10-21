@@ -2,8 +2,7 @@
 using System.Collections.Specialized;
 using AndroidX.RecyclerView.Widget;
 using AndroidX.SwipeRefreshLayout.Widget;
-using XForms.Controls;
-using XForms.Layouts;
+using XForms.Primitives;
 using XForms.Platform;
 using AndroidListView = global::Android.Widget.ListView;
 using AndroidView = global::Android.Views.View;

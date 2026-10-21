@@ -1,7 +1,7 @@
 ﻿using System;
 using XForms.Platform;
 
-namespace XForms.Controls
+namespace XForms.Primitives
 {
     public class Image : View
     {

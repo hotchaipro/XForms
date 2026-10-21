@@ -1,5 +1,5 @@
 ﻿using System;
-using XForms.Controls;
+using XForms.Primitives;
 using XForms.Platform;
 using AndroidTextEntry = global::Android.Widget.EditText;
 

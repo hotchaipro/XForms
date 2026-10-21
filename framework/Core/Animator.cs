@@ -323,7 +323,7 @@ namespace XForms
         /// Animates the translation from an offset back to where it's heading,
         /// continuing from where it is now, for a layout change.
         /// </summary>
-        internal AnimationHandle TranslateByOffset(Point offset, TimeSpan duration, EasingFunction easing)
+        public AnimationHandle TranslateByOffset(Point offset, TimeSpan duration, EasingFunction easing = null)
         {
             var timing = Timing(duration, easing, default, false, false);
             float toX = this._values[(int)AnimationChannel.TranslationX];

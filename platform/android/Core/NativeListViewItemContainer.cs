@@ -1,7 +1,7 @@
 ﻿using System;
 using Android.Animation;
 using Android.Views.Animations;
-using XForms.Controls;
+using XForms.Primitives;
 
 namespace XForms.Android
 {

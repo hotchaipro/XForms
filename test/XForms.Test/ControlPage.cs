@@ -1,5 +1,6 @@
 ﻿using System;
 using XForms.Controls;
+using XForms.Primitives;
 using XForms.Toolkit;
 using XForms.Input;
 using XForms.Layouts;

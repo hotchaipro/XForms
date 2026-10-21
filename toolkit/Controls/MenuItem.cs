@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Input;
 using XForms.Controls;
+using XForms.Primitives;
 
 namespace XForms.Toolkit
 {

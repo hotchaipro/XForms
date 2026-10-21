@@ -2,6 +2,7 @@ using System;
 using XForms.Controls;
 using XForms.Input;
 using XForms.Layouts;
+using XForms.Primitives;
 
 namespace XForms.Test
 {

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Specialized;
-using XForms.Controls;
+using XForms.Primitives;
 using Android.Views;
 
 namespace XForms.Android

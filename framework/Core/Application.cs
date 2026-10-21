@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using XForms.Controls;
+using XForms.Primitives;
 using XForms.Platform;
 
 namespace XForms
@@ -694,7 +694,7 @@ namespace XForms
         /// <summary>
         /// Registers a font file bundled with the app (TrueType or OpenType)
         /// under a family name, for <see cref="TextFormat.FontFamily"/> and
-        /// <see cref="Controls.TextBlock.FontFamily"/>. The file is next to the
+        /// <see cref="Primitives.TextBlock.FontFamily"/>. The file is next to the
         /// app on Windows, in its assets on Android, and in its bundle on iOS.
         /// </summary>
         public void RegisterFont(

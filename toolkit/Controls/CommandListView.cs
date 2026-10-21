@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using XForms.Controls;
 using XForms.Input;
 using XForms.Layouts;
+using XForms.Primitives;
 
 namespace XForms.Toolkit
 {
@@ -193,7 +194,7 @@ namespace XForms.Toolkit
                 VerticalAlignment = VerticalAlignment.Stretch,
                 IconSize = new Size(30, 30),
             };
-            this.Children.Add(this._swipeItem, Dock.CenterOverlay);
+            this.AddVisualChild(this._swipeItem);
 
             this._contentLayout = new DockPanel()
             {
@@ -201,7 +202,7 @@ namespace XForms.Toolkit
                 VerticalAlignment = VerticalAlignment.Stretch,
                 HorizontalAlignment = HorizontalAlignment.Stretch,
             };
-            this.Children.Add(this._contentLayout, Dock.CenterOverlay);
+            this.AddVisualChild(this._contentLayout);
 
             this._commandBar = new CommandBar()
             {

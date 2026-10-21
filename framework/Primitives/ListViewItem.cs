@@ -1,8 +1,7 @@
 ﻿using System;
 using XForms.Input;
-using XForms.Layouts;
 
-namespace XForms.Controls
+namespace XForms.Primitives
 {
     /// <summary>
     /// A list's container for one item: it holds the item's view (any view),
@@ -16,9 +15,8 @@ namespace XForms.Controls
     /// <remarks>
     /// The container, as WinUI's and Avalonia's <c>ListViewItem</c>.
     /// </remarks>
-    public class ListViewItem : DockPanel, ITapGestureDelegate
+    public class ListViewItem : View, ITapGestureDelegate
     {
-        private readonly RowBackground _background;
         private View _content;
         private bool _isSelected;
 
@@ -27,12 +25,8 @@ namespace XForms.Controls
             this.VerticalAlignment = VerticalAlignment.Stretch;
             this.GestureRecognizer = new TapGestureRecognizer(this);
 
-            this._background = new RowBackground(this)
-            {
-                HorizontalAlignment = HorizontalAlignment.Stretch,
-                VerticalAlignment = VerticalAlignment.Stretch,
-            };
-            this.Children.Add(this._background, Dock.CenterOverlay);
+            // The container draws the row's background, beneath its children
+            this.DrawsContent = true;
         }
 
         protected override AccessibilityRole DefaultAccessibilityRole
@@ -102,7 +96,7 @@ namespace XForms.Controls
                 if (value != this._isSelected)
                 {
                     this._isSelected = value;
-                    this._background.InvalidateVisual();
+                    this.InvalidateVisual();
                     this.OnIsSelectedChanged();
                     this.NotifyAccessibilityStateChanged();
                 }
@@ -149,12 +143,12 @@ namespace XForms.Controls
 
         /// <summary>
         /// Places the item's view in the container. By default it fills the
-        /// container.
+        /// container (children overlap, each in the whole area).
         /// </summary>
         protected virtual void AddContent(
             View content)
         {
-            this.Children.Add(content, Dock.CenterOverlay);
+            this.AddVisualChild(content);
         }
 
         /// <summary>
@@ -163,7 +157,7 @@ namespace XForms.Controls
         protected virtual void RemoveContent(
             View content)
         {
-            this.Children.Remove(content);
+            this.RemoveVisualChild(content);
         }
 
         internal void Bind(
@@ -245,34 +239,15 @@ namespace XForms.Controls
         }
 
         // The row's background, tinted with the accent while selected
-        private sealed class RowBackground : UserControl
+        protected override void Render(
+            DrawingContext drawingContext)
         {
-            private readonly ListViewItem _container;
-
-            public RowBackground(
-                ListViewItem container)
+            var colors = this.ActualTheme.Colors;
+            var bounds = new Rect(0, 0, this.Bounds.Width, this.Bounds.Height);
+            drawingContext.FillRectangle(bounds, colors.Background);
+            if (this._isSelected)
             {
-                this._container = container;
-            }
-
-            public override Color BackgroundColor
-            {
-                get
-                {
-                    return Colors.Transparent;
-                }
-            }
-
-            protected override void Render(
-                DrawingContext drawingContext)
-            {
-                var colors = this.ActualTheme.Colors;
-                var bounds = new Rect(0, 0, this.Bounds.Width, this.Bounds.Height);
-                drawingContext.FillRectangle(bounds, colors.Background);
-                if (this._container._isSelected)
-                {
-                    drawingContext.FillRectangle(bounds, colors.Accent.MultiplyAlpha(0.18f));
-                }
+                drawingContext.FillRectangle(bounds, colors.Accent.MultiplyAlpha(0.18f));
             }
         }
     }

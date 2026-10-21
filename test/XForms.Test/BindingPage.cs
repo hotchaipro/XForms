@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using XForms.Controls;
 using XForms.Layouts;
+using XForms.Primitives;
 using XForms.Toolkit;
 
 namespace XForms.Test

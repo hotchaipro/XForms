@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Specialized;
 
-namespace XForms.Controls
+namespace XForms.Primitives
 {
     public abstract class ListViewSource : IEnumerable, INotifyCollectionChanged
     {

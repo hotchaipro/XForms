@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using XForms.Platform;
 
-namespace XForms.Controls
+namespace XForms.Primitives
 {
     public class ScrollViewer : View
     {

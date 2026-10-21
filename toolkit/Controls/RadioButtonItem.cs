@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using XForms.Controls;
+using XForms.Primitives;
 
 namespace XForms.Toolkit
 {

@@ -2,7 +2,7 @@
 using CoreGraphics;
 using Foundation;
 using UIKit;
-using XForms.Controls;
+using XForms.Primitives;
 
 using XForms.iOS.Renderers;
 

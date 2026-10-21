@@ -4,7 +4,7 @@ using Windows.Win32.Foundation;
 using Windows.Win32.UI.Controls;
 using Windows.Win32.UI.Controls.RichEdit;
 using Windows.Win32.UI.WindowsAndMessaging;
-using XForms.Controls;
+using XForms.Primitives;
 using XForms.Platform;
 
 namespace XForms.Win32.Renderers

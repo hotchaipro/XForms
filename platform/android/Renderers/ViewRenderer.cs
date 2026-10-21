@@ -301,7 +301,7 @@ namespace XForms.Android.Renderers
                 newElement.FocusChange += Element_FocusChange;
 
                 // Text boxes handle their own keys
-                if (!(this.Element is XForms.Controls.TextBox))
+                if (!(this.Element is XForms.Primitives.TextBox))
                 {
                     newElement.KeyPress += Element_KeyPress;
 

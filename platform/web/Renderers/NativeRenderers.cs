@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Globalization;
 using System.Runtime.Versioning;
-using XForms.Controls;
-using XForms.Layouts;
+using XForms.Primitives;
 using XForms.Platform;
 
 namespace XForms.Web.Renderers

@@ -1,8 +1,7 @@
 using System;
 using Foundation;
 using UIKit;
-using XForms.Controls;
-using XForms.Layouts;
+using XForms.Primitives;
 using XForms.Platform;
 
 namespace XForms.iOS.Renderers

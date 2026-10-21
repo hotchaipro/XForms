@@ -2,14 +2,7 @@ using System;
 
 namespace XForms.Layouts
 {
-    /// <summary>
-    /// The direction a panel stacks or wraps its children in.
-    /// </summary>
-    public enum Orientation
-    {
-        Horizontal = 0,
-        Vertical = 1,
-    }
+
 
     /// <summary>
     /// Stacks its children vertically (the default) or horizontally, with

@@ -6,8 +6,7 @@ using Windows.Win32.Graphics.Direct2D;
 using Windows.Win32.Graphics.Direct2D.Common;
 using Windows.Win32.Graphics.DirectComposition;
 using Windows.Win32.Graphics.Dxgi.Common;
-using XForms.Controls;
-using XForms.Layouts;
+using XForms.Primitives;
 using XForms.Platform;
 
 namespace XForms.Win32.Renderers

@@ -1243,7 +1243,7 @@ namespace XForms
                     continue;
                 }
 
-                if (child.Focusable || (child is Controls.TextBox))
+                if (child.Focusable || (child is Primitives.TextBox))
                 {
                     result.Add(child);
                 }
