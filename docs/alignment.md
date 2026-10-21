@@ -1677,6 +1677,35 @@ Android and, from phase 17, the browser.
       `IsRefreshing`).
     - Horizontal lists and grids (`ListView.Orientation`, and a grid layout
       with a column count or item width).
+
+    **Status: done.**
+    - **Layouts:** `ListView.Layout` is `ListLayout.Vertical` (the default),
+      `ListLayout.Horizontal`, or `ListLayout.Grid(columns)` (columns of
+      equal width, scrolling vertically). A horizontal list's items are as
+      tall as the list. Groups only show in a vertical list. Each platform
+      uses its own list:
+      - Win32: the virtualized list now realizes lines (an item, or a row of
+        a grid) on either axis; the compositor scrolls sideways for a
+        horizontal list, and drags and the wheel follow the axis.
+      - Android: `ListView` for a vertical list, and AndroidX `RecyclerView`
+        (with a linear or grid layout manager) otherwise, with the same
+        native item containers.
+      - iOS: `UITableView` for a vertical list, and `UICollectionView` with a
+        flow layout otherwise, with cells sized by measuring their content.
+    - **Pull-to-refresh:** `IsRefreshEnabled`, `RefreshRequested`,
+      `IsRefreshing` and `RequestRefresh()`. Win32 draws its own indicator
+      (it follows a touch pull past the top, then spins while refreshing);
+      Android uses AndroidX `SwipeRefreshLayout`, iOS `UIRefreshControl`.
+    - **Fixed on the way:** Android disposed a list's old adapter before
+      replacing it, while the list could still call it, which crashed when
+      a list was bound again.
+    - **Verified:**
+      - Win32: horizontal and grid layouts, and a refresh (the indicator and
+        the new item) through `RequestRefresh`.
+      - Android: pulling to refresh, horizontal (and scrolling it) and grid
+        layouts, and SoonerOrLater's list (a row swiped away and undone).
+      - Not verified: the touch pull and a horizontal wheel on Win32 (no
+        touch or mouse input was sent), and iOS, which is only built.
 16. **Win32 surfaces and windows.**
     - Tiled surfaces for tall layers, so a long scrolled page doesn't need one
       surface the size of all its content.

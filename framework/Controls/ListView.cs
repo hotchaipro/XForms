@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using XForms.Layouts;
 
 namespace XForms.Controls
 {
@@ -10,6 +11,75 @@ namespace XForms.Controls
         void Bind(ListViewSource source);
 
         void ScrollToItem(object item);
+
+        /// <summary>
+        /// Lays the items out in a vertical list (the default), a horizontal
+        /// one, or a grid.
+        /// </summary>
+        ListLayout Layout { set; }
+
+        /// <summary>
+        /// Whether pulling the list down past its top asks for a refresh. The
+        /// platform calls <see cref="ListView.NotifyRefreshRequested"/>.
+        /// </summary>
+        bool IsRefreshEnabled { set; }
+
+        /// <summary>
+        /// Whether the refresh indicator shows.
+        /// </summary>
+        bool IsRefreshing { set; }
+    }
+
+    /// <summary>
+    /// How a list lays its items out: in a vertical or horizontal line, or a
+    /// grid of columns that scrolls vertically.
+    /// </summary>
+    public sealed class ListLayout
+    {
+        private ListLayout(
+            Orientation orientation,
+            int columns)
+        {
+            this.Orientation = orientation;
+            this.Columns = columns;
+        }
+
+        public static ListLayout Vertical { get; } = new ListLayout(Orientation.Vertical, 1);
+
+        public static ListLayout Horizontal { get; } = new ListLayout(Orientation.Horizontal, 1);
+
+        /// <summary>
+        /// A grid with the number of items across, each as wide as the list
+        /// over the columns.
+        /// </summary>
+        public static ListLayout Grid(
+            int columns)
+        {
+            if (columns < 1)
+            {
+                throw new ArgumentOutOfRangeException(nameof(columns));
+            }
+
+            return new ListLayout(Orientation.Vertical, columns);
+        }
+
+        /// <summary>
+        /// The direction the list scrolls.
+        /// </summary>
+        public Orientation Orientation { get; }
+
+        /// <summary>
+        /// The number of items across: 1 for a list.
+        /// </summary>
+        public int Columns { get; }
+
+        public bool IsGrid
+        {
+            get
+            {
+                return this.Columns > 1;
+            }
+        }
     }
 
     /// <summary>
@@ -144,6 +214,102 @@ namespace XForms.Controls
         private float? _footerHeight;
         private ListViewSource _source;
         private object _pendingScrollItem;
+        private ListLayout _layout = ListLayout.Vertical;
+        private bool _isRefreshEnabled;
+        private bool _isRefreshing;
+
+        /// <summary>
+        /// Raised when the user pulls the list down past its top (with
+        /// <see cref="IsRefreshEnabled"/> set). <see cref="IsRefreshing"/> is
+        /// true until the app sets it back to false when it's done.
+        /// </summary>
+        public event EventHandler RefreshRequested;
+
+        /// <summary>
+        /// How the items are laid out: a vertical list (the default), a
+        /// horizontal one, or a grid.
+        /// </summary>
+        public ListLayout Layout
+        {
+            get
+            {
+                return this._layout;
+            }
+
+            set
+            {
+                this._layout = value ?? throw new ArgumentNullException(nameof(value));
+                this.Native?.Layout = value;
+                this.OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Whether pulling the list down past its top refreshes it (with touch;
+        /// apps can also call <see cref="RequestRefresh"/>).
+        /// </summary>
+        public bool IsRefreshEnabled
+        {
+            get
+            {
+                return this._isRefreshEnabled;
+            }
+
+            set
+            {
+                this._isRefreshEnabled = value;
+                this.Native?.IsRefreshEnabled = value;
+                this.OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Whether a refresh is under way, which shows the refresh indicator.
+        /// </summary>
+        public bool IsRefreshing
+        {
+            get
+            {
+                return this._isRefreshing;
+            }
+
+            set
+            {
+                if (value != this._isRefreshing)
+                {
+                    this._isRefreshing = value;
+                    this.Native?.IsRefreshing = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Refreshes as a pull would: shows the indicator and raises
+        /// <see cref="RefreshRequested"/>.
+        /// </summary>
+        public void RequestRefresh()
+        {
+            if (!this._isRefreshing)
+            {
+                this.IsRefreshing = true;
+                this.RefreshRequested?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        /// <summary>
+        /// Called by the platform when the user pulls to refresh (its indicator
+        /// already shows).
+        /// </summary>
+        internal void NotifyRefreshRequested()
+        {
+            if (!this._isRefreshing)
+            {
+                this._isRefreshing = true;
+                this.OnPropertyChanged(nameof(this.IsRefreshing));
+                this.RefreshRequested?.Invoke(this, EventArgs.Empty);
+            }
+        }
 
         internal new IListViewRenderer Renderer
         {
@@ -169,6 +335,21 @@ namespace XForms.Controls
             if (this._footerHeight.HasValue)
             {
                 native.FooterHeight = this._footerHeight.Value;
+            }
+
+            if (this._layout != ListLayout.Vertical)
+            {
+                native.Layout = this._layout;
+            }
+
+            if (this._isRefreshEnabled)
+            {
+                native.IsRefreshEnabled = true;
+            }
+
+            if (this._isRefreshing)
+            {
+                native.IsRefreshing = true;
             }
 
             if (null != this._source)

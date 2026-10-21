@@ -13,6 +13,8 @@ namespace XForms.Win32.Renderers
         // Scrolled-out content takes no input
         protected override bool ClipsHitTesting => true;
 
+        public bool IsHorizontal => false;
+
         private readonly IDCompositionVisual2* _contentVisual;
         private readonly ScrollController _scroller;
         private View _content;

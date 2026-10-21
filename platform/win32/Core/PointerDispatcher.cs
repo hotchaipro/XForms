@@ -44,6 +44,7 @@ namespace XForms.Win32
         private Point _captureOrigin;
         private IScrollableRenderer _scrollable;
         private bool _isDragScrolling;
+        private bool _isPulling;
         private Point _dragStart;
         private float _dragStartOffset;
 
@@ -175,9 +176,18 @@ namespace XForms.Win32
 
             if (this._isDragScrolling)
             {
-                float offset = this._dragStartOffset - (point.Y - this._dragStart.Y);
+                bool isHorizontal = this._scrollable.Scroller.IsHorizontal;
+                float offset = this._dragStartOffset - (isHorizontal ? (point.X - this._dragStart.X) : (point.Y - this._dragStart.Y));
                 this._scrollable.Scroller.SetOffset(offset);
                 this.AddSample(offset);
+
+                // Pulling a list down past its top refreshes it
+                if ((this._scrollable is IPullToRefresh pullable) && (this._isPulling || pullable.IsPullEnabled))
+                {
+                    this._isPulling = offset < 0;
+                    pullable.OnPull(Math.Max(0, -offset));
+                }
+
                 return;
             }
 
@@ -190,11 +200,16 @@ namespace XForms.Win32
                 isClaimed = Deliver(capture, local, PointerInputState.Moved, this._pointerId, this._deviceType);
             }
 
-            // An unclaimed, mostly vertical drag past the slop scrolls the content
+            // An unclaimed drag past the slop, mostly along the content's axis,
+            // scrolls the content
             if ((!isClaimed) && this._isDirect && (null != this._scrollable))
             {
                 float dx = point.X - this._dragStart.X;
                 float dy = point.Y - this._dragStart.Y;
+                if (this._scrollable.Scroller.IsHorizontal)
+                {
+                    (dx, dy) = (dy, dx);
+                }
 
                 if ((Math.Abs(dy) > DragSlop) && (Math.Abs(dy) > Math.Abs(dx)))
                 {
@@ -221,7 +236,15 @@ namespace XForms.Win32
 
             if (this._isDragScrolling)
             {
-                this._scrollable.Scroller.Fling(this.Velocity());
+                if (this._isPulling && (this._scrollable is IPullToRefresh pullable))
+                {
+                    pullable.OnPullReleased();
+                    this._scrollable.Scroller.Fling(0);
+                }
+                else
+                {
+                    this._scrollable.Scroller.Fling(this.Velocity());
+                }
             }
             else
             {
@@ -318,6 +341,7 @@ namespace XForms.Win32
             Point point)
         {
             this._isDragScrolling = true;
+            this._isPulling = false;
             this._dragStart = point;
             this._dragStartOffset = this._scrollable.Scroller.Offset;
             this.AddSample(this._dragStartOffset);
