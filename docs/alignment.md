@@ -1862,7 +1862,7 @@ to go:
 | Assembly | Layer | Builds on |
 |---|---|---|
 | `XForms.Framework` (+ `.Win32`, `.Android`, `.iOS`, `.Web`) | The platform contract: elements, layout, drawing, raw input, and the views the platforms render | — |
-| `XForms.Controls` | Functional controls: what they do, not how they look; panels and gestures | Framework |
+| `XForms.Controls` | Functional controls (what they do, not how they look) and their base classes; panels and gestures | Framework |
 | `XForms.Themes.<Name>` | How the controls look: `Simple` first | Controls |
 | `XForms.Xaml` | Markup | Framework, Controls |
 | `XForms.Compat.WinUI` | WinUI's API over XForms' controls | Controls, Xaml |
@@ -1921,11 +1921,39 @@ Win32, Android and the browser, as before.
 
 20. **Slim the framework.** With the contract explicit, move out what isn't
     needed to serve it.
+    - **One container primitive.** Today the platforms render five kinds
+      of container that differ only in API shape:
+
+      | Type | Adds | Platform renderer |
+      |---|---|---|
+      | `Control` | a background, its own animator | `IControlRenderer` |
+      | `ContentControl` | one child, padding | `IContentControlRenderer` |
+      | `UserControl` | one child, padding, and drawing | `IUserControlRenderer` |
+      | `Page` | a layout panel, a background | `IPageRenderer` |
+      | `Panel` | any number of children | `IPanelRenderer` |
+
+      They're all a view that has children and may draw, so `View` becomes
+      that primitive, as `FrameworkElement` is in WPF and `Visual` in
+      Avalonia:
+      - `View` gets protected visual children, opt-in drawing (`Render`,
+        `InvalidateVisual` and drawn animations, from `UserControl`), a
+        background, and `CreateOwnAnimator`.
+      - The platforms implement one container renderer instead of five.
+        (The web platform's panel, content and page renderers are already
+        thin wrappers over one.)
+      - `Control`, `ContentControl`, `UserControl` and `Border` move to the
+        toolkit, and so does `Panel` as the public base class for panels,
+        built on `View`'s children. `ContentControl` and `UserControl`
+        share their content and padding code, which is duplicated today.
+      - `Page` stays, since navigation, windows and the safe area are built
+        on it, but it's a plain container with no renderer of its own.
+        `Frame` stays a native view, since its renderer runs page
+        transitions.
     - **Namespaces:** `XForms.Controls` in the framework becomes
-      `XForms.Primitives`: the views the platforms render (`TextBlock`,
-      `TextBox`, `Image`, `ScrollViewer`, `Popup`) and the base classes
-      (`Control`, `ContentControl`, `UserControl`). That frees
-      `XForms.Controls` for the controls assembly.
+      `XForms.Primitives`, holding only the views the platforms implement
+      natively: `TextBlock`, `TextBox`, `Image`, `ScrollViewer`, the items
+      view below and `Popup`. That frees `XForms.Controls` for the controls
+      assembly.
     - **Gestures** move to the toolkit (renamed in phase 21):
       - Tap, double tap and hold become recognizers, replacing `View`'s
         `Tapped`, `DoubleTapped` and `Holding` and `TapGestureRecognizer`.
@@ -1943,9 +1971,8 @@ Win32, Android and the browser, as before.
         name here.
       - `ListView` in the toolkit adds selection and taps.
       - `ListViewItem` no longer derives from `DockPanel`.
-    - **Panels and `Border`** move to the toolkit: `Grid`, `StackPanel`,
-      `DockPanel`, `WrapPanel`, `UniformGrid` and `Canvas`. The `Panel` base
-      class stays, since the platforms render it.
+    - **Panels** move to the toolkit with their base class: `Grid`,
+      `StackPanel`, `DockPanel`, `WrapPanel`, `UniformGrid` and `Canvas`.
     - The toolkit's controls, the test apps and SoonerOrLater move to the
       new gestures and pressed state.
 
