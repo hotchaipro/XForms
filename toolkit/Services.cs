@@ -199,7 +199,7 @@ namespace XForms
     }
 
     /// <summary>
-    /// The platform's services, from <see cref="Application.Services"/>. Each
+    /// The platform's services, from <see cref="Current"/> (or <c>Application.Services</c>). Each
     /// is an interface, so an app can substitute its own (in tests, say).
     /// </summary>
     /// <remarks>
@@ -208,6 +208,15 @@ namespace XForms
     /// </remarks>
     public sealed class PlatformServices
     {
+        /// <summary>
+        /// The running platform's services, which the platform sets as it
+        /// starts (an app or test can replace them).
+        /// </summary>
+        public static PlatformServices Current
+        {
+            get;
+            set;
+        }
         public IClipboard Clipboard { get; set; }
 
         public ILauncher Launcher { get; set; }
@@ -259,6 +268,18 @@ namespace XForms
             where T : IConvertible
         {
             preferences.Set(key, value.ToString(CultureInfo.InvariantCulture));
+        }
+    }
+
+    /// <summary>
+    /// The platform's services, from the application: the same as
+    /// <see cref="PlatformServices.Current"/>.
+    /// </summary>
+    public static class ApplicationServicesExtensions
+    {
+        extension(Application application)
+        {
+            public PlatformServices Services => PlatformServices.Current;
         }
     }
 }

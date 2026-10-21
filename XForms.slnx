@@ -8,6 +8,9 @@
     <Project Path="platform/web/XForms.Framework.Web.csproj" />
     <Project Path="platform/win32/XForms.Framework.Win32.csproj" />
   </Folder>
+  <Folder Name="/toolkit/">
+    <Project Path="toolkit/XForms.Toolkit.csproj" />
+  </Folder>
   <Folder Name="/controls/">
     <Project Path="controls/XForms.Controls.csproj" />
   </Folder>

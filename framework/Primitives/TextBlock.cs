@@ -52,11 +52,6 @@ namespace XForms.Primitives
             }
         }
 
-        public static readonly ViewProperty<TextBlock, string> TextProperty = new(nameof(Text), v => v.Text, (v, x) => v.Text = x);
-        public static readonly ViewProperty<TextBlock, Color> ForegroundProperty = new(nameof(Foreground), v => v.Foreground, (v, x) => v.Foreground = x);
-        public static readonly ViewProperty<TextBlock, float> FontSizeProperty = new(nameof(FontSize), v => v.FontSize, (v, x) => v.FontSize = x);
-        public static readonly ViewProperty<TextBlock, FontWeight> FontWeightProperty = new(nameof(FontWeight), v => v.FontWeight, (v, x) => v.FontWeight = x);
-        public static readonly ViewProperty<TextBlock, bool> StrikethroughProperty = new(nameof(Strikethrough), v => v.Strikethrough, (v, x) => v.Strikethrough = x);
         // Values the app set; the rest keep the platform's defaults
         private string _text;
         private TextAlignment? _textAlignment;

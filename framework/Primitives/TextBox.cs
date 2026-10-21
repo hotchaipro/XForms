@@ -14,8 +14,6 @@ namespace XForms.Primitives
 
     public class TextBox : View, ITextBoxDelegate
     {
-        public static readonly ViewProperty<TextBox, string> TextProperty = new(nameof(Text), v => v.Text, (v, x) => v.Text = x);
-        public static readonly ViewProperty<TextBox, string> PlaceholderTextProperty = new(nameof(PlaceholderText), v => v.PlaceholderText, (v, x) => v.PlaceholderText = x);
         protected override AccessibilityRole DefaultAccessibilityRole
         {
             get

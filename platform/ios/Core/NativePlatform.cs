@@ -19,6 +19,9 @@ namespace XForms.iOS
             }
 
             this._nativeApplication = nativeApplication;
+
+            // The app's services are this platform's
+            PlatformServices.Current = IosServices.Create(nativeApplication);
         }
 
         public bool UsesLightweightRenderers => true;
@@ -98,11 +101,6 @@ namespace XForms.iOS
             string fileName)
         {
             Fonts.Register(familyName, fileName);
-        }
-
-        public PlatformServices CreateServices()
-        {
-            return IosServices.Create(this._nativeApplication);
         }
 
         public void NavigateToUri(

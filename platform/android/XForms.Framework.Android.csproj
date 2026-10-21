@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\framework\XForms.Framework.csproj" />
+    <ProjectReference Include="..\..\toolkit\XForms.Toolkit.csproj" />
   </ItemGroup>
 
   <!-- Horizontal lists and grids, and pull-to-refresh -->

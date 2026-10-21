@@ -18,6 +18,9 @@ namespace XForms.Web
             WebHost host)
         {
             this._host = host;
+
+            // The app's services are this platform's
+            PlatformServices.Current = WebServices.Create();
         }
 
         public bool UsesLightweightRenderers => true;
@@ -54,7 +57,6 @@ namespace XForms.Web
             }
         }
 
-        public PlatformServices CreateServices() => WebServices.Create();
 
         public ITextLayoutRenderer CreateTextLayout(TextLayout layout) => new WebTextLayout(layout);
 

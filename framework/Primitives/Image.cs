@@ -5,8 +5,6 @@ namespace XForms.Primitives
 {
     public class Image : View
     {
-        public static readonly ViewProperty<Image, ImageSource> SourceProperty = new(nameof(Source), v => v.Source, (v, x) => v.Source = x);
-        public static readonly ViewProperty<Image, Color> TintProperty = new(nameof(Tint), v => v.Tint, (v, x) => v.Tint = x);
         protected override AccessibilityRole DefaultAccessibilityRole
         {
             get

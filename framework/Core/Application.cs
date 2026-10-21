@@ -51,7 +51,6 @@ namespace XForms
 
             this._rootFrame = new Frame();
             this.Dispatcher = new Dispatcher(this.Renderer);
-            this.Services = this._platform.CreateServices();
             this.MainWindow = new Window(this.Renderer);
             this._textScale = this.Renderer.SystemTextScale;
 
@@ -644,15 +643,6 @@ namespace XForms
             }
 
             this.TextScaleChanged?.Invoke(this, EventArgs.Empty);
-        }
-
-        /// <summary>
-        /// The platform's services. Each can be replaced, for example with a
-        /// fake in tests.
-        /// </summary>
-        public PlatformServices Services
-        {
-            get;
         }
 
         private List<Action<TimeSpan>> _frameCallbacks = new List<Action<TimeSpan>>();

@@ -72,7 +72,7 @@ namespace XForms
                 view.PropertyChanged += this.View_PropertyChanged;
             }
 
-            view.AddBinding(this);
+            Bindings.Add(view, this);
             this.Refresh();
         }
 
@@ -126,7 +126,7 @@ namespace XForms
             if (this._view.TryGetTarget(out var view))
             {
                 view.PropertyChanged -= this.View_PropertyChanged;
-                view.RemoveBinding(this);
+                Bindings.Remove(view, this);
             }
         }
 
@@ -228,6 +228,30 @@ namespace XForms
             }
 
             return new Binding<TView, TValue, TSource>(view, property, source, getValue, setValue);
+        }
+    }
+
+    // The bindings of each view, which live as long as the view: sources
+    // refer to them weakly
+    internal static class Bindings
+    {
+        private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<View, List<Binding>> ByView = new();
+
+        public static void Add(
+            View view,
+            Binding binding)
+        {
+            ByView.GetOrCreateValue(view).Add(binding);
+        }
+
+        public static void Remove(
+            View view,
+            Binding binding)
+        {
+            if (ByView.TryGetValue(view, out var bindings))
+            {
+                bindings.Remove(binding);
+            }
         }
     }
 }

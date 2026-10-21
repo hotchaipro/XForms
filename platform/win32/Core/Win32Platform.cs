@@ -19,6 +19,9 @@ namespace XForms.Win32
             Win32Host host)
         {
             this._host = host ?? throw new ArgumentNullException(nameof(host));
+
+            // The app's services are this platform's
+            PlatformServices.Current = Win32Services.Create();
         }
 
         // NOTE: Win32 draws lightweight views itself, in its composition tree
@@ -48,11 +51,6 @@ namespace XForms.Win32
             Uri uri)
         {
             Process.Start(new ProcessStartInfo(uri.AbsoluteUri) { UseShellExecute = true });
-        }
-
-        public PlatformServices CreateServices()
-        {
-            return Win32Services.Create();
         }
 
         public ITextLayoutRenderer CreateTextLayout(

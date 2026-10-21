@@ -9,13 +9,6 @@ namespace XForms
 {
     public abstract class View : Element, INotifyPropertyChanged
     {
-        public static readonly ViewProperty<View, bool> IsVisibleProperty = new(nameof(IsVisible), v => v.IsVisible, (v, x) => v.IsVisible = x);
-        public static readonly ViewProperty<View, bool> IsHitTestVisibleProperty = new(nameof(IsHitTestVisible), v => v.IsHitTestVisible, (v, x) => v.IsHitTestVisible = x);
-        public static readonly ViewProperty<View, float> WidthProperty = new(nameof(Width), v => v.Width, (v, x) => v.Width = x);
-        public static readonly ViewProperty<View, float> HeightProperty = new(nameof(Height), v => v.Height, (v, x) => v.Height = x);
-        public static readonly ViewProperty<View, Thickness> MarginProperty = new(nameof(Margin), v => v.Margin, (v, x) => v.Margin = x);
-        public static readonly ViewProperty<View, string> AccessibilityLabelProperty = new(nameof(AccessibilityLabel), v => v.AccessibilityLabel, (v, x) => v.AccessibilityLabel = x);
-
         private bool _isVisible = true;
         private bool _isHitTestVisible = true;
         private Animator _animator;
@@ -156,8 +149,6 @@ namespace XForms
 
         #region Property changes and bindings
 
-        private List<Binding> _bindings;
-
         /// <summary>
         /// Raised when a property of the view changes, whether code or the user
         /// (typing, toggling, choosing) changed it.
@@ -187,20 +178,6 @@ namespace XForms
             field = value;
             this.OnPropertyChanged(propertyName);
             return true;
-        }
-
-        // The view keeps its bindings alive; sources refer to them weakly
-        internal void AddBinding(
-            Binding binding)
-        {
-            this._bindings ??= new List<Binding>();
-            this._bindings.Add(binding);
-        }
-
-        internal void RemoveBinding(
-            Binding binding)
-        {
-            this._bindings?.Remove(binding);
         }
 
         #endregion Property changes and bindings

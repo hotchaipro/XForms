@@ -18,6 +18,9 @@ namespace XForms.Android
             }
 
             this._androidApplication = androidApplication;
+
+            // The app's services are this platform's
+            PlatformServices.Current = AndroidServices.Create(androidApplication);
         }
 
         public bool UsesLightweightRenderers => true;
@@ -103,11 +106,6 @@ namespace XForms.Android
             string fileName)
         {
             Fonts.Register(this._androidApplication.ApplicationContext, familyName, fileName);
-        }
-
-        public PlatformServices CreateServices()
-        {
-            return AndroidServices.Create(this._androidApplication);
         }
 
         public void NavigateToUri(
