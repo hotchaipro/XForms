@@ -368,9 +368,9 @@ namespace XForms
         private void OnRootSizeChanged(
             Size size)
         {
-            if ((this is Frame) && (null == this.Parent))
+            if ((this is Frame frame) && (null == this.Parent))
             {
-                this.Application.MainWindow.OnSizeChanged(size);
+                (frame.Window ?? this.Application.MainWindow).OnSizeChanged(size);
             }
         }
 

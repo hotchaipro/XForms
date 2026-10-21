@@ -144,6 +144,9 @@ namespace XForms.Win32.Renderers
             set;
         }
 
+        // The window the popup opened in
+        private Win32Host _openHost;
+
         ViewRenderer IOverlay.Renderer
         {
             get
@@ -160,7 +163,8 @@ namespace XForms.Win32.Renderers
             }
 
             this._isOpen = true;
-            Win32Host.Current.Overlays.Show(this);
+            this._openHost = (this.PlacementTarget?.Renderer as ViewRenderer)?.WindowHost ?? Win32Host.Current;
+            this._openHost.Overlays.Show(this);
         }
 
         public void Close()
@@ -171,7 +175,7 @@ namespace XForms.Win32.Renderers
             }
 
             this._isOpen = false;
-            Win32Host.Current.Overlays.Close(this);
+            (this._openHost ?? Win32Host.Current).Overlays.Close(this);
             ((IPopupDelegate)this.Element).NotifyClosed();
         }
 

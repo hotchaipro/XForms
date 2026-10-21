@@ -72,7 +72,23 @@ namespace XForms.Win32.Renderers
             : base(textEntry, isContainer: false)
         {
             this.CreateEditWindow(string.Empty);
-            this.Host.RegisterTextBox(this);
+            this._registeredHost = this.Host;
+            this._registeredHost.RegisterTextBox(this);
+        }
+
+        // The window the edit window is in
+        private Win32Host _registeredHost;
+
+        private void MoveToWindow()
+        {
+            var host = this.Host;
+            if (host != this._registeredHost)
+            {
+                this._registeredHost.UnregisterTextBox(this);
+                PInvoke.SetParent(this._hwnd, host.Hwnd);
+                host.RegisterTextBox(this);
+                this._registeredHost = host;
+            }
         }
 
         public HWND Hwnd
@@ -413,6 +429,7 @@ namespace XForms.Win32.Renderers
             bool isWidthChanged = (frame.Width != this.Frame.Width);
 
             base.ArrangeNative(frame);
+            this.MoveToWindow();
 
             this.UpdateWindowPosition();
 
@@ -428,6 +445,7 @@ namespace XForms.Win32.Renderers
         /// </summary>
         public void UpdateWindowPosition()
         {
+            this.MoveToWindow();
             float scale = this.Host.Scale;
             var origin = this.AbsoluteOrigin();
             var frame = this.Frame;

@@ -149,6 +149,18 @@ namespace XForms.Android.Renderers
 
         public bool CanResizeWindow => false;
 
+        // A phone shows one window
+        public bool CanOpenWindows => false;
+
+        public IWindowRenderer OpenWindow(
+            Window window,
+            Frame frame,
+            string title,
+            Size size)
+        {
+            throw new PlatformNotSupportedException("This platform shows one window.");
+        }
+
         public bool ExtendsIntoSafeArea
         {
             set

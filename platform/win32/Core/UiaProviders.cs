@@ -22,21 +22,28 @@ namespace XForms.Win32.Automation
         private static int _nextRuntimeId;
         private static RootProvider _root;
 
-        public static RootProvider Root
-        {
-            get
-            {
-                if (null == _root)
-                {
-                    _root = new RootProvider(Win32Host.Current);
+        private static readonly Dictionary<Win32Host, RootProvider> Roots = new Dictionary<Win32Host, RootProvider>();
 
+        /// <summary>
+        /// The automation element for a window's client area.
+        /// </summary>
+        public static RootProvider RootFor(
+            Win32Host host)
+        {
+            if (!Roots.TryGetValue(host, out var root))
+            {
+                if (0 == Roots.Count)
+                {
                     // Once a client has asked for the tree, views tell it when
                     // their states change
                     View.AccessibilityStateChanged += RaiseStateChanged;
                 }
 
-                return _root;
+                root = new RootProvider(host);
+                Roots[host] = root;
             }
+
+            return root;
         }
 
         public static ElementProvider GetElement(
@@ -78,14 +85,15 @@ namespace XForms.Win32.Automation
         /// The accessible children of an element (or of the window, for null).
         /// </summary>
         public static List<ViewRenderer> GetChildren(
-            ViewRenderer parent)
+            ViewRenderer parent,
+            Win32Host window = null)
         {
             var children = new List<ViewRenderer>();
 
             if (null == parent)
             {
                 // The window holds the page, then any popups above it
-                var host = Win32Host.Current;
+                var host = window ?? Win32Host.Current;
                 if (null != host.Root)
                 {
                     CollectAccessible(host.Root, children);
@@ -146,9 +154,10 @@ namespace XForms.Win32.Automation
         }
 
         public static ViewRenderer AccessibleAt(
+            Win32Host host,
             Point point)
         {
-            Win32Host.Current.HitTest(point, out var hit);
+            host.HitTest(point, out var hit);
             for (var renderer = hit; null != renderer; renderer = renderer.ParentRenderer)
             {
                 if (IsAccessible(renderer))
@@ -230,13 +239,13 @@ namespace XForms.Win32.Automation
                         var parent = GetParent(element);
                         return (null != parent)
                             ? GetInterface<IRawElementProviderFragment>(GetElement(parent))
-                            : GetInterface<IRawElementProviderFragment>(Root);
+                            : GetInterface<IRawElementProviderFragment>(RootFor(element.WindowHost));
                     }
 
                 case UiaConstants.NextSibling:
                 case UiaConstants.PreviousSibling:
                     {
-                        var siblings = GetChildren(GetParent(element));
+                        var siblings = GetChildren(GetParent(element), element.WindowHost);
                         int index = siblings.IndexOf(element) + ((direction == UiaConstants.NextSibling) ? 1 : -1);
                         return ((index >= 0) && (index < siblings.Count))
                             ? GetInterface<IRawElementProviderFragment>(GetElement(siblings[index]))
@@ -291,9 +300,10 @@ namespace XForms.Win32.Automation
 
         public static UiaRect ScreenBounds(
             Point origin,
-            Size size)
+            Size size,
+            Win32Host host = null)
         {
-            var host = Win32Host.Current;
+            host ??= Win32Host.Current;
             var screen = host.ClientToScreen(origin);
 
             return new UiaRect()
@@ -492,7 +502,7 @@ namespace XForms.Win32.Automation
                         break;
 
                     case UiaConstants.HasKeyboardFocusPropertyId:
-                        result = Variant.FromBool(Win32Host.Current.Focus.Focused == renderer);
+                        result = Variant.FromBool(renderer.WindowHost.Focus.Focused == renderer);
                         break;
 
                     case UiaConstants.IsEnabledPropertyId:
@@ -587,7 +597,7 @@ namespace XForms.Win32.Automation
             var result = new UiaRect();
             int hr = this.OnUIThread((renderer) =>
             {
-                result = AutomationTree.ScreenBounds(renderer.AbsoluteOrigin(), renderer.Frame.Size);
+                result = AutomationTree.ScreenBounds(renderer.AbsoluteOrigin(), renderer.Frame.Size, renderer.WindowHost);
                 return 0;
             });
 
@@ -605,14 +615,25 @@ namespace XForms.Win32.Automation
         {
             return this.OnUIThread((renderer) =>
             {
-                Win32Host.Current.Focus.SetFocus(renderer, showRing: true);
+                renderer.WindowHost.Focus.SetFocus(renderer, showRing: true);
                 return 0;
             });
         }
 
         public int GetFragmentRoot(out nint root)
         {
-            root = AutomationTree.GetInterface<IRawElementProviderFragmentRoot>(AutomationTree.Root);
+            nint result = 0;
+            int hr = this.OnUIThread((renderer) =>
+            {
+                result = AutomationTree.GetInterface<IRawElementProviderFragmentRoot>(AutomationTree.RootFor(renderer.WindowHost));
+                return 0;
+            });
+
+            root = result;
+            if (hr != 0)
+            {
+                return hr;
+            }
             return 0;
         }
 
@@ -801,7 +822,7 @@ namespace XForms.Win32.Automation
             {
                 if ((direction == UiaConstants.FirstChild) || (direction == UiaConstants.LastChild))
                 {
-                    var children = AutomationTree.GetChildren(null);
+                    var children = AutomationTree.GetChildren(null, this._host);
                     if (children.Count > 0)
                     {
                         var child = (direction == UiaConstants.FirstChild) ? children[0] : children[children.Count - 1];
@@ -852,7 +873,7 @@ namespace XForms.Win32.Automation
             nint result = 0;
             this._host.InvokeSync(() =>
             {
-                var element = AutomationTree.AccessibleAt(this._host.ScreenToClient(x, y));
+                var element = AutomationTree.AccessibleAt(this._host, this._host.ScreenToClient(x, y));
                 result = (null != element)
                     ? AutomationTree.GetInterface<IRawElementProviderFragment>(AutomationTree.GetElement(element))
                     : AutomationTree.GetInterface<IRawElementProviderFragment>(this);

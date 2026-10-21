@@ -82,6 +82,18 @@ namespace XForms.Test
                 this.Application.MainWindow.Resize(new Size(900, 700));
                 this.ShowWindow();
             }));
+            window.Children.Add(this.CreateButton("New window", async () =>
+            {
+                if (!this.Application.CanOpenWindows)
+                {
+                    this.Show("This platform shows one window");
+                    return;
+                }
+
+                var opened = await this.Application.OpenWindowAsync(new AppLayerPage(depth + 1), $"XForms Test, window {this.Application.Windows.Count + 1}", new Size(520, 420));
+                opened.Closed += (sender, e) => this.Show($"A window closed; {this.Application.Windows.Count} open");
+                this.Show($"{this.Application.Windows.Count} windows open");
+            }));
             layout.Children.Add(window);
 
             // Connectivity, files and the safe area

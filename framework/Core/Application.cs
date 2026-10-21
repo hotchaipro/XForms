@@ -24,6 +24,24 @@ namespace XForms
         void NotifySafeAreaInsetsChanged(Thickness insets);
     }
 
+    /// <summary>
+    /// A window other than the main one (on the desktop).
+    /// </summary>
+    public interface IWindowRenderer
+    {
+        string Title { set; }
+
+        Size MinimumSize { set; }
+
+        void Resize(Size size);
+
+        /// <summary>
+        /// Closes the window; the platform then calls the window's
+        /// <c>OnClosed</c>.
+        /// </summary>
+        void Close();
+    }
+
     public interface IApplicationRenderer
     {
         void SetRootFrame(Frame frame);
@@ -81,6 +99,17 @@ namespace XForms
         /// platform keeps the page clear of them.
         /// </summary>
         bool ExtendsIntoSafeArea { set; }
+
+        /// <summary>
+        /// Whether the app can open windows besides its main one.
+        /// </summary>
+        bool CanOpenWindows { get; }
+
+        /// <summary>
+        /// Opens a window showing the frame. The platform reports its size and
+        /// its closing to the window (<c>OnSizeChanged</c>, <c>OnClosed</c>).
+        /// </summary>
+        IWindowRenderer OpenWindow(Window window, Frame frame, string title, Size size);
 
         Color? TitleBarAccentColor { get; set; }
 
@@ -306,6 +335,10 @@ namespace XForms
             this.OnThemeChanged(theme);
 
             this._rootFrame.UpdateTheme();
+            foreach (var window in this._windows)
+            {
+                window.Frame.UpdateTheme();
+            }
             foreach (var popup in this._openPopups)
             {
                 popup.UpdateTheme();
@@ -613,6 +646,70 @@ namespace XForms
             get;
         }
 
+        // The windows besides the main one
+        private readonly List<Window> _windows = new List<Window>();
+
+        /// <summary>
+        /// Whether the app can open windows besides its main one (on the
+        /// desktop).
+        /// </summary>
+        public bool CanOpenWindows
+        {
+            get
+            {
+                return this.Renderer.CanOpenWindows;
+            }
+        }
+
+        /// <summary>
+        /// The app's windows: the main one, then those it opened.
+        /// </summary>
+        public IReadOnlyList<Window> Windows
+        {
+            get
+            {
+                var windows = new List<Window>() { this.MainWindow };
+                windows.AddRange(this._windows);
+                return windows;
+            }
+        }
+
+        /// <summary>
+        /// Opens a window showing the page, in a frame of its own. Throws where
+        /// the platform has one window (see <see cref="CanOpenWindows"/>).
+        /// </summary>
+        public async Task<Window> OpenWindowAsync(
+            Page page,
+            string title = null,
+            Size? size = null)
+        {
+            if (null == page)
+            {
+                throw new ArgumentNullException(nameof(page));
+            }
+
+            if (!this.CanOpenWindows)
+            {
+                throw new PlatformNotSupportedException("This platform shows one window.");
+            }
+
+            var frame = new Frame();
+            var window = new Window(this, frame);
+            this._windows.Add(window);
+            window.Renderer = this.Renderer.OpenWindow(window, frame, title ?? string.Empty, size ?? new Size(640, 480));
+            window.Title = title;
+            frame.UpdateTheme();
+
+            await frame.NavigateAsync(page, PageTransition.None);
+            return window;
+        }
+
+        internal void OnWindowClosed(
+            Window window)
+        {
+            this._windows.Remove(window);
+        }
+
         /// <summary>
         /// The app's main window.
         /// </summary>
@@ -649,6 +746,10 @@ namespace XForms
 
             this._textScale = scale;
             this._rootFrame.OnTextScaleChanged();
+            foreach (var window in this._windows)
+            {
+                window.Frame.OnTextScaleChanged();
+            }
             foreach (var popup in this._openPopups)
             {
                 popup.OnTextScaleChanged();

@@ -24,6 +24,8 @@ GetWindowTextLength
 GetWindowText
 LoadLibrary
 SetFocus
+GetAncestor
+SetParent
 GetFocus
 SetCapture
 ReleaseCapture
@@ -50,6 +52,7 @@ IDCompositionTarget
 IDCompositionVisual2
 IDCompositionVisual3
 IDCompositionSurface
+IDCompositionVirtualSurface
 IDCompositionRectangleClip
 DWriteCreateFactory
 IDWriteFactory

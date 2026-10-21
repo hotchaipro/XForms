@@ -107,6 +107,62 @@ namespace XForms.Win32
 
         public bool CanResizeWindow => true;
 
+        public bool CanOpenWindows => true;
+
+        public IWindowRenderer OpenWindow(
+            Window window,
+            Frame frame,
+            string title,
+            Size size)
+        {
+            var host = Win32Host.OpenWindow(title, size);
+            host.Closed = window.OnClosed;
+            host.SetRoot((ViewRenderer)frame.Renderer);
+            SystemTheme.ApplyToWindow(host.Hwnd, Application.Current.Theme.Mode);
+            return new WindowRenderer(host);
+        }
+
+        /// <summary>
+        /// A window the app opened.
+        /// </summary>
+        private sealed class WindowRenderer : IWindowRenderer
+        {
+            private readonly Win32Host _host;
+
+            public WindowRenderer(
+                Win32Host host)
+            {
+                this._host = host;
+            }
+
+            public string Title
+            {
+                set
+                {
+                    PInvoke.SetWindowText(this._host.Hwnd, value ?? string.Empty);
+                }
+            }
+
+            public Size MinimumSize
+            {
+                set
+                {
+                    this._host.MinimumClientSize = value;
+                }
+            }
+
+            public void Resize(
+                Size size)
+            {
+                this._host.ResizeClient(size);
+            }
+
+            public void Close()
+            {
+                PInvoke.DestroyWindow(this._host.Hwnd);
+            }
+        }
+
         // A desktop window has no system bars over it
         public bool ExtendsIntoSafeArea
         {
@@ -168,7 +224,9 @@ namespace XForms.Win32
         public void ApplyTheme(
             Theme theme)
         {
+            // The main window, and those the app opened
             SystemTheme.ApplyToWindow(this._host.Hwnd, theme.Mode);
+            Win32Host.ApplyToOpenedWindows((hwnd) => SystemTheme.ApplyToWindow(hwnd, theme.Mode));
         }
 
         public Version GetVersion()

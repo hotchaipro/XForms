@@ -36,6 +36,16 @@ namespace XForms.Win32
 
         private static Win32Host _current;
 
+        // Every window, by handle: the main one and those the app opened
+        private static readonly Dictionary<nint, Win32Host> Hosts = new Dictionary<nint, Win32Host>();
+
+        // The graphics devices every window shares
+        private static ID2D1Device* _d2dDevice;
+        private static ID2D1DeviceContext* _resourceContext;
+        private static IDCompositionDesktopDevice* _compositionDevice;
+        private static IDWriteFactory* _dwriteFactory;
+        private static IWICImagingFactory* _wicFactory;
+
         private readonly ConcurrentQueue<Action> _invokeQueue = new ConcurrentQueue<Action>();
         private readonly HashSet<ViewRenderer> _dirtyRenderers = new HashSet<ViewRenderer>();
         private readonly List<TextBoxRenderer> _textEntries = new List<TextBoxRenderer>();
@@ -174,15 +184,77 @@ namespace XForms.Win32
             private set;
         } = 1.0f;
 
-        public ID2D1Device* D2DDevice { get; private set; }
+        public ID2D1Device* D2DDevice => _d2dDevice;
 
-        public ID2D1DeviceContext* ResourceContext { get; private set; }
+        public ID2D1DeviceContext* ResourceContext => _resourceContext;
 
-        public IDCompositionDesktopDevice* CompositionDevice { get; private set; }
+        public IDCompositionDesktopDevice* CompositionDevice => _compositionDevice;
 
-        public IDWriteFactory* DWriteFactory { get; private set; }
+        public IDWriteFactory* DWriteFactory => _dwriteFactory;
 
-        public IWICImagingFactory* WicFactory { get; private set; }
+        public IWICImagingFactory* WicFactory => _wicFactory;
+
+        /// <summary>
+        /// Whether this is the app's main window (closing it ends the app).
+        /// </summary>
+        public bool IsMainWindow
+        {
+            get
+            {
+                return this == _current;
+            }
+        }
+
+        /// <summary>
+        /// Called when a window the app opened is closed.
+        /// </summary>
+        public Action Closed
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// The window holding a native window (such as a text entry's), or the
+        /// main window.
+        /// </summary>
+        public static Win32Host ForWindow(
+            HWND hwnd)
+        {
+            var root = PInvoke.GetAncestor(hwnd, GET_ANCESTOR_FLAGS.GA_ROOT);
+            return Hosts.TryGetValue((nint)root.Value, out var host) ? host : _current;
+        }
+
+        /// <summary>
+        /// Calls back with each window the app opened.
+        /// </summary>
+        public static void ApplyToOpenedWindows(
+            Action<HWND> action)
+        {
+            foreach (var host in Hosts.Values)
+            {
+                if (!host.IsMainWindow)
+                {
+                    action(host._hwnd);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Opens another window (owned by the main one), with the same graphics
+        /// devices and UI thread.
+        /// </summary>
+        public static Win32Host OpenWindow(
+            string title,
+            Size clientSize)
+        {
+            var host = new Win32Host();
+            host._uiThreadId = _current._uiThreadId;
+            host.CreateWindow(title, _current._hwnd);
+            host.ResizeClient(clientSize);
+            PInvoke.ShowWindow(host._hwnd, SHOW_WINDOW_CMD.SW_SHOWNORMAL);
+            return host;
+        }
 
         private IDCompositionTarget* _target;
         private IDCompositionTarget* _overlayTarget;
@@ -236,16 +308,17 @@ namespace XForms.Win32
             while (PInvoke.GetMessage(&msg, HWND.Null, 0, 0))
             {
                 // Focus, activation and back keys work wherever keyboard focus is
-                if (((msg.message == PInvoke.WM_KEYDOWN) || (msg.message == PInvoke.WM_SYSKEYDOWN)
-                        || (msg.message == PInvoke.WM_KEYUP) || (msg.message == PInvoke.WM_SYSKEYUP))
-                    && host._focus.PreviewKey(msg.message, (Windows.Win32.UI.Input.KeyboardAndMouse.VIRTUAL_KEY)msg.wParam.Value))
+                bool isKey = (msg.message == PInvoke.WM_KEYDOWN) || (msg.message == PInvoke.WM_SYSKEYDOWN)
+                    || (msg.message == PInvoke.WM_KEYUP) || (msg.message == PInvoke.WM_SYSKEYUP);
+                var keyHost = isKey ? ForWindow(msg.hwnd) : host;
+                if (isKey && keyHost._focus.PreviewKey(msg.message, (Windows.Win32.UI.Input.KeyboardAndMouse.VIRTUAL_KEY)msg.wParam.Value))
                 {
                     continue;
                 }
 
                 // Return submits a single-line text box
                 if ((msg.message == PInvoke.WM_KEYDOWN) && (msg.wParam.Value == (nuint)Windows.Win32.UI.Input.KeyboardAndMouse.VIRTUAL_KEY.VK_RETURN)
-                    && host.TryHandleTextBoxReturn(msg.hwnd))
+                    && keyHost.TryHandleTextBoxReturn(msg.hwnd))
                 {
                     continue;
                 }
@@ -261,16 +334,20 @@ namespace XForms.Win32
             PInvoke.SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT.DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
             PInvoke.CoInitializeEx(null, COINIT.COINIT_APARTMENTTHREADED).ThrowOnFailure();
 
-            this.CreateDevices();
+            CreateDevices();
 
             // RichEdit with DirectWrite rendering
             PInvoke.LoadLibrary("Msftedit.dll");
 
             // Mouse, touch and pen all arrive as pointer messages
             PInvoke.EnableMouseInPointer(true);
-            this._pointers = new PointerDispatcher(this);
-            this._focus = new FocusManager(this);
 
+            RegisterWindowClass();
+            this.CreateWindow(title, HWND.Null);
+        }
+
+        private static void RegisterWindowClass()
+        {
             var instance = PInvoke.GetModuleHandle((PCWSTR)null);
 
             fixed (char* className = "XFormsWin32Window")
@@ -288,7 +365,20 @@ namespace XForms.Win32
                     lpszClassName = className,
                 };
                 PInvoke.RegisterClassEx(&windowClass);
+            }
+        }
 
+        // The window, its composition targets and its input
+        private void CreateWindow(
+            string title,
+            HWND owner)
+        {
+            this._pointers = new PointerDispatcher(this);
+            this._focus = new FocusManager(this);
+
+            var instance = PInvoke.GetModuleHandle((PCWSTR)null);
+            fixed (char* className = "XFormsWin32Window")
+            {
                 fixed (char* windowTitle = title)
                 {
                     this._hwnd = PInvoke.CreateWindowEx(
@@ -302,13 +392,14 @@ namespace XForms.Win32
                         PInvoke.CW_USEDEFAULT,
                         1100,
                         800,
-                        HWND.Null,
+                        owner,
                         HMENU.Null,
                         (HINSTANCE)instance.Value,
                         null);
                 }
             }
 
+            Hosts[(nint)this._hwnd.Value] = this;
             this.Scale = PInvoke.GetDpiForWindow(this._hwnd) / 96.0f;
 
 
@@ -327,7 +418,7 @@ namespace XForms.Win32
             this._overlays = new OverlayLayer(this, overlayVisual);
         }
 
-        private void CreateDevices()
+        private static void CreateDevices()
         {
             // Direct3D device shared by Direct2D and DirectComposition
             ID3D11Device* d3dDevice;
@@ -352,20 +443,20 @@ namespace XForms.Win32
 
             ID2D1Device* d2dDevice;
             d2dFactory->CreateDevice(dxgiDevice, &d2dDevice);
-            this.D2DDevice = d2dDevice;
+            _d2dDevice = d2dDevice;
 
             ID2D1DeviceContext* resourceContext;
             d2dDevice->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS.D2D1_DEVICE_CONTEXT_OPTIONS_NONE, &resourceContext);
-            this.ResourceContext = resourceContext;
+            _resourceContext = resourceContext;
 
             PInvoke.DCompositionCreateDevice2((IUnknown*)d2dDevice, IDCompositionDesktopDevice.IID_Guid, out var compositionPointer).ThrowOnFailure();
-            this.CompositionDevice = (IDCompositionDesktopDevice*)compositionPointer;
+            _compositionDevice = (IDCompositionDesktopDevice*)compositionPointer;
 
             PInvoke.DWriteCreateFactory(DWRITE_FACTORY_TYPE.DWRITE_FACTORY_TYPE_SHARED, IDWriteFactory.IID_Guid, out var dwritePointer).ThrowOnFailure();
-            this.DWriteFactory = (IDWriteFactory*)dwritePointer;
+            _dwriteFactory = (IDWriteFactory*)dwritePointer;
 
             PInvoke.CoCreateInstance(PInvoke.CLSID_WICImagingFactory, null, CLSCTX.CLSCTX_INPROC_SERVER, IWICImagingFactory.IID_Guid, out var wicPointer).ThrowOnFailure();
-            this.WicFactory = (IWICImagingFactory*)wicPointer;
+            _wicFactory = (IWICImagingFactory*)wicPointer;
 
             dxgiDevice->Release();
             d3dDevice->Release();
@@ -375,6 +466,7 @@ namespace XForms.Win32
             ViewRenderer root)
         {
             this._root = root;
+            root.WindowHost = this;
             this._target->SetRoot((IDCompositionVisual*)root.RootVisual);
             this.RequestLayout();
         }
@@ -383,6 +475,12 @@ namespace XForms.Win32
             TextBoxRenderer textEntry)
         {
             this._textEntries.Add(textEntry);
+        }
+
+        public void UnregisterTextBox(
+            TextBoxRenderer textEntry)
+        {
+            this._textEntries.Remove(textEntry);
         }
 
         private bool TryHandleTextBoxReturn(
@@ -438,8 +536,9 @@ namespace XForms.Win32
         public void Post(
             Action action)
         {
-            this._invokeQueue.Enqueue(action);
-            PInvoke.PostMessage(this._hwnd, WM_APP_INVOKE, default, default);
+            var main = _current;
+            main._invokeQueue.Enqueue(action);
+            PInvoke.PostMessage(main._hwnd, WM_APP_INVOKE, default, default);
         }
 
         /// <summary>
@@ -472,7 +571,7 @@ namespace XForms.Win32
             var handle = GCHandle.Alloc(action);
             try
             {
-                PInvoke.SendMessage(this._hwnd, WM_APP_INVOKE_SYNC, default, (LPARAM)GCHandle.ToIntPtr(handle));
+                PInvoke.SendMessage(_current._hwnd, WM_APP_INVOKE_SYNC, default, (LPARAM)GCHandle.ToIntPtr(handle));
             }
             finally
             {
@@ -755,7 +854,12 @@ namespace XForms.Win32
             WPARAM wParam,
             LPARAM lParam)
         {
-            var host = _current;
+            // NOTE: Messages sent while a window is created come before it's
+            // in the table; they go to the default handling
+            if (!Hosts.TryGetValue((nint)hwnd.Value, out var host))
+            {
+                return PInvoke.DefWindowProc(hwnd, msg, wParam, lParam);
+            }
 
             try
             {
@@ -780,7 +884,7 @@ namespace XForms.Win32
                         if ((int)lParam.Value == Automation.UiaConstants.UiaRootObjectId)
                         {
                             // Screen readers ask the window for its UI Automation provider
-                            nint provider = Automation.AutomationTree.GetInterface<Automation.IRawElementProviderSimple>(Automation.AutomationTree.Root);
+                            nint provider = Automation.AutomationTree.GetInterface<Automation.IRawElementProviderSimple>(Automation.AutomationTree.RootFor(host));
                             nint result = Automation.UiaNative.UiaReturnRawElementProvider((nint)hwnd.Value, (nint)wParam.Value, lParam.Value, provider);
                             Marshal.Release(provider);
                             return (LRESULT)result;
@@ -804,12 +908,20 @@ namespace XForms.Win32
 
                         // Minimized, the app saves its state as a mobile app
                         // does in the background
-                        host.SetSuspended(wParam.Value == SIZE_MINIMIZED);
+                        if (host.IsMainWindow)
+                        {
+                            host.SetSuspended(wParam.Value == SIZE_MINIMIZED);
+                        }
+
                         break;
 
                     case PInvoke.WM_CLOSE:
                     case PInvoke.WM_QUERYENDSESSION:
-                        host.SetSuspended(true);
+                        if (host.IsMainWindow)
+                        {
+                            host.SetSuspended(true);
+                        }
+
                         break;
 
                     case PInvoke.WM_ERASEBKGND:
@@ -914,7 +1026,15 @@ namespace XForms.Win32
                         break;
 
                     case PInvoke.WM_DESTROY:
-                        PInvoke.PostQuitMessage(0);
+                        if (host.IsMainWindow)
+                        {
+                            PInvoke.PostQuitMessage(0);
+                        }
+                        else
+                        {
+                            host.OnDestroyed();
+                        }
+
                         return (LRESULT)0;
                 }
             }
@@ -928,6 +1048,18 @@ namespace XForms.Win32
             }
 
             return PInvoke.DefWindowProc(hwnd, msg, wParam, lParam);
+        }
+
+        // A window the app opened was closed: let its composition go
+        private void OnDestroyed()
+        {
+            Hosts.Remove((nint)this._hwnd.Value);
+            this._target->SetRoot(null);
+            this._target->Release();
+            this._overlayTarget->Release();
+            this._root = null;
+            CompositionDevice->Commit();
+            this.Closed?.Invoke();
         }
 
         private sealed class Win32SynchronizationContext : SynchronizationContext

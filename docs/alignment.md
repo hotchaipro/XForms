@@ -1710,6 +1710,32 @@ Android and, from phase 17, the browser.
     - Tiled surfaces for tall layers, so a long scrolled page doesn't need one
       surface the size of all its content.
     - Secondary windows (`Window` objects an app can open and close).
+
+    **Status: done.**
+    - **Tiled surfaces:** a layer taller than 4,096 device pixels draws into
+      a DirectComposition virtual surface: only a band around what's visible
+      (with a margin of 1,024 pixels, in 256-pixel rows) is drawn, and the
+      rest is trimmed. A scroll viewer has its content draw the range a
+      scroll is about to cover before it starts. On the views benchmark page
+      the app's GPU memory fell from 35.6 MB to 16.8 MB.
+    - **Windows:** `Application.OpenWindowAsync(page, title, size)` opens a
+      window with a frame of its own, `Application.Windows` lists the
+      windows, `CanOpenWindows` says whether the platform can (Win32 only),
+      and a `Window` the app opened has `Close()` and `Closed`. Themes and
+      the text size reach every window.
+      - Win32: each window has its own host (window, composition targets,
+        root, popups, focus, pointers, text entries and UI Automation root)
+        over shared graphics devices and one UI thread. Renderers find their
+        window through their root; a popup opens in its placement target's
+        window; a text entry's window moves into the window its view is in.
+        Opened windows are owned by the main one, and closing them doesn't
+        suspend the app.
+    - **Verified** on Win32: the views benchmark scrolled to its end, drawn
+      correctly, with the memory above; a second window opened, used (its
+      own UI Automation tree, focus ring and services) and closed, with the
+      main window told; every test page. Android's test pages still run.
+    - **Not done:** tiling on iOS (it's only built), and wide (rather than
+      tall) layers.
 17. **Web platform: host, layers and drawing.** .NET 10 on WebAssembly with
     `[JSImport]` and `[JSExport]`, in `platform/web`:
     - A layer is a DOM element positioned absolutely; lightweight views draw
