@@ -66,97 +66,10 @@ namespace XForms
     }
 
     /// <summary>
-    /// A text style in a theme's type scale.
-    /// </summary>
-    public sealed record TextStyle
-    {
-        public string FontFamily { get; init; } = FontFamilies.SansSerif;
-
-        public float FontSize { get; init; } = 15;
-
-        public FontWeight FontWeight { get; init; } = FontWeight.Normal;
-
-        /// <summary>
-        /// A new text format with the style's family, size and weight.
-        /// </summary>
-        public TextFormat ToTextFormat()
-        {
-            return new TextFormat()
-            {
-                FontFamily = this.FontFamily,
-                FontSize = this.FontSize,
-                FontWeight = this.FontWeight,
-            };
-        }
-    }
-
-    /// <summary>
-    /// A theme's type scale.
-    /// </summary>
-    public sealed record Typography
-    {
-        /// <summary>Large numbers and headlines.</summary>
-        public TextStyle Display { get; init; } = new TextStyle() { FontSize = 34, FontWeight = FontWeight.Light };
-
-        /// <summary>Page and section titles.</summary>
-        public TextStyle Title { get; init; } = new TextStyle() { FontSize = 20, FontWeight = FontWeight.SemiBold };
-
-        /// <summary>Body text.</summary>
-        public TextStyle Body { get; init; } = new TextStyle() { FontSize = 15 };
-
-        /// <summary>Text in controls: buttons, tabs, fields.</summary>
-        public TextStyle Label { get; init; } = new TextStyle() { FontSize = 14 };
-
-        /// <summary>Small supporting text.</summary>
-        public TextStyle Caption { get; init; } = new TextStyle() { FontSize = 12 };
-    }
-
-    /// <summary>
-    /// A theme's corner radii.
-    /// </summary>
-    public sealed record Shapes
-    {
-        /// <summary>Small controls: chips, check boxes, text boxes.</summary>
-        public float SmallCornerRadius { get; init; } = 4;
-
-        /// <summary>Buttons, cards and popups.</summary>
-        public float MediumCornerRadius { get; init; } = 8;
-
-        /// <summary>Sheets and dialogs.</summary>
-        public float LargeCornerRadius { get; init; } = 16;
-    }
-
-    /// <summary>
-    /// A theme's animation durations and easings.
-    /// </summary>
-    public sealed record Motion
-    {
-        /// <summary>Press feedback.</summary>
-        public TimeSpan Short { get; init; } = TimeSpan.FromMilliseconds(100);
-
-        /// <summary>Most transitions.</summary>
-        public TimeSpan Medium { get; init; } = TimeSpan.FromMilliseconds(250);
-
-        /// <summary>Large movements, such as pages and sheets.</summary>
-        public TimeSpan Long { get; init; } = TimeSpan.FromMilliseconds(400);
-
-        /// <summary>Things that move from one place to another.</summary>
-        public EasingFunction Standard { get; init; } = new CubicEase(EasingMode.EaseInOut);
-
-        /// <summary>Things that arrive.</summary>
-        public EasingFunction Decelerate { get; init; } = new CubicEase(EasingMode.EaseOut);
-
-        /// <summary>Things that leave.</summary>
-        public EasingFunction Accelerate { get; init; } = new CubicEase(EasingMode.EaseIn);
-
-        /// <summary>Playful arrivals that overshoot and settle.</summary>
-        public EasingFunction Spring { get; init; } = new SpringEase(EasingMode.EaseOut);
-    }
-
-    /// <summary>
-    /// A theme: typed design tokens for a mode (colors, type, shapes and
-    /// motion), and default styles for controls. Set one on the application,
-    /// or on any view for it and its descendants.
+    /// A theme: the mode and colors for it, and whatever else a control
+    /// library keeps in it (its type scale, shapes, motion, control styles)
+    /// as extensions. Set one on the application, or on any view for it and
+    /// its descendants.
     /// </summary>
     /// <remarks>
     /// The same idea as Flutter's <c>ThemeData</c> and Compose's
@@ -175,36 +88,36 @@ namespace XForms
 
         public ColorScheme Colors { get; init; }
 
-        public Typography Typography { get; init; } = new Typography();
-
-        public Shapes Shapes { get; init; } = new Shapes();
-
-        public Motion Motion { get; init; } = new Motion();
+        /// <summary>
+        /// What control libraries keep in the theme, by type: a type scale,
+        /// shapes, motion, default styles for controls (see
+        /// <see cref="GetExtension{TExtension}"/>).
+        /// </summary>
+        /// <remarks>
+        /// Flutter's <c>ThemeExtension</c> is the same idea: the framework
+        /// knows only colors; each control library adds its own tokens.
+        /// </remarks>
+        public ImmutableDictionary<Type, object> Extensions { get; init; } = ImmutableDictionary<Type, object>.Empty;
 
         /// <summary>
-        /// Default styles for controls, by style type (see
-        /// <see cref="GetStyle{TStyle}"/>).
+        /// The theme's extension of a type (such as XForms.Controls'
+        /// <c>Typography</c> or <c>ButtonStyle</c>), or null.
         /// </summary>
-        public ImmutableDictionary<Type, object> Styles { get; init; } = ImmutableDictionary<Type, object>.Empty;
-
-        /// <summary>
-        /// The theme's default style of a type (such as a toolkit control's
-        /// <c>ButtonStyle</c>), or null for the control's own defaults.
-        /// </summary>
-        public TStyle GetStyle<TStyle>()
-            where TStyle : class
+        public TExtension GetExtension<TExtension>()
+            where TExtension : class
         {
-            return this.Styles.TryGetValue(typeof(TStyle), out var style) ? (TStyle)style : null;
+            return this.Extensions.TryGetValue(typeof(TExtension), out var extension) ? (TExtension)extension : null;
         }
 
         /// <summary>
-        /// The theme with a default style for controls that use its type.
+        /// The theme with an extension of a type (replacing any it had), or
+        /// without one, for null.
         /// </summary>
-        public Theme WithStyle<TStyle>(
-            TStyle style)
-            where TStyle : class
+        public Theme WithExtension<TExtension>(
+            TExtension extension)
+            where TExtension : class
         {
-            return this with { Styles = (null == style) ? this.Styles.Remove(typeof(TStyle)) : this.Styles.SetItem(typeof(TStyle), style) };
+            return this with { Extensions = (null == extension) ? this.Extensions.Remove(typeof(TExtension)) : this.Extensions.SetItem(typeof(TExtension), extension) };
         }
 
         /// <summary>

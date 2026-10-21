@@ -229,6 +229,18 @@ namespace XForms
             }
         }
 
+        private static readonly EasingFunction DecelerateEasing = new CubicEase(EasingMode.EaseOut);
+        private static readonly EasingFunction AccelerateEasing = new CubicEase(EasingMode.EaseIn);
+
+        /// <summary>
+        /// How long a page takes to slide or fade in or out.
+        /// </summary>
+        public TimeSpan TransitionDuration
+        {
+            get;
+            set;
+        } = TimeSpan.FromMilliseconds(250);
+
         // Moves the page in (arriving) or out (going back) as the transition says
         private async Task PlayAsync(
             Page page,
@@ -237,8 +249,8 @@ namespace XForms
             bool slideFromStart)
         {
             var animator = page.GetOrCreateAnimator();
-            var motion = page.ActualTheme.Motion;
-            var easing = isBack ? motion.Accelerate : motion.Decelerate;
+            var duration = this.TransitionDuration;
+            var easing = isBack ? AccelerateEasing : DecelerateEasing;
             var size = this.Bounds.Size;
 
             Point offset;
@@ -248,11 +260,11 @@ namespace XForms
                     animator.Translation = Point.Zero;
                     if (isBack)
                     {
-                        await animator.FadeTo(0, motion.Medium, easing);
+                        await animator.FadeTo(0, duration, easing);
                     }
                     else
                     {
-                        await animator.FadeFrom(0, motion.Medium, easing);
+                        await animator.FadeFrom(0, duration, easing);
                     }
 
                     animator.Opacity = 1;
@@ -271,13 +283,13 @@ namespace XForms
             if (isBack)
             {
                 animator.Translation = Point.Zero;
-                await animator.TranslateTo(offset, motion.Medium, easing);
+                await animator.TranslateTo(offset, duration, easing);
                 animator.Translation = Point.Zero;
             }
             else
             {
                 animator.Translation = offset;
-                await animator.TranslateTo(Point.Zero, motion.Medium, easing);
+                await animator.TranslateTo(Point.Zero, duration, easing);
             }
         }
 

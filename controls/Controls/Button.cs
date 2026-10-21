@@ -206,7 +206,7 @@ namespace XForms.Controls
                     TextStyle = theme.Typography.Label,
                 };
 
-                return (this._style ?? new ButtonStyle()).Over(theme.GetStyle<ButtonStyle>()).Over(defaults);
+                return (this._style ?? new ButtonStyle()).Over(theme.GetExtension<ButtonStyle>()).Over(defaults);
             }
         }
 

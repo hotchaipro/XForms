@@ -4,7 +4,7 @@ namespace XForms.Controls
 {
     /// <summary>
     /// How a <see cref="Button"/> looks. Unset values come from the theme's
-    /// default <c>ButtonStyle</c> (<see cref="Theme.GetStyle{TStyle}"/>), and
+    /// default <c>ButtonStyle</c> (<see cref="Theme.GetExtension{TExtension}"/>), and
     /// then from the theme's tokens.
     /// </summary>
     /// <example>
@@ -13,7 +13,7 @@ namespace XForms.Controls
     /// new Button { Text = "Delete", Style = new ButtonStyle { Background = Colors.Red } };
     ///
     /// // Every button under a view
-    /// view.Theme = theme.WithStyle(new ButtonStyle { CornerRadius = 20 });
+    /// view.Theme = theme.WithExtension(new ButtonStyle { CornerRadius = 20 });
     /// </code>
     /// </example>
     public sealed record ButtonStyle
