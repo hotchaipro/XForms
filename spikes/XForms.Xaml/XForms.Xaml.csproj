@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    THROWAWAY SPIKE: a minimal XAML layer built only on the public XForms
+    framework API, to find out which framework APIs a XAML layer needs (see
+    docs/alignment.md, "Could other UI frameworks be built on XForms?").
+    It references only XForms.Framework, so the compiler blocks framework
+    internals and platform code.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>XForms.Xaml</RootNamespace>
+    <AssemblyName>XForms.Xaml</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\framework\XForms.Framework.csproj" />
+  </ItemGroup>
+
+</Project>

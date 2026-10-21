@@ -9,12 +9,26 @@
     <Import_RootNamespace>XForms.Test</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AccessibilityPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AppLayerPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AnimationPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BenchmarkPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ControlPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ListsPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MarginPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TabbedPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TestApp.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DockLayoutPage.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DistributedStackLayoutPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TextAndListPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TextEntryPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ThemePage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)XamlPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PickersPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PanelsPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BindingPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InputPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DrawingPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DockPanelPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UniformGridPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ThemeManager.cs" />
   </ItemGroup>
 </Project>

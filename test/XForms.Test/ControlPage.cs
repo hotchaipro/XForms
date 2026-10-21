@@ -1,5 +1,6 @@
 ﻿using System;
 using XForms.Controls;
+using XForms.Toolkit;
 using XForms.Input;
 using XForms.Layouts;
 
@@ -9,101 +10,101 @@ namespace XForms.Test
     {
         public ControlPage()
         {
-            var pageLayout = new DockLayout()
+            var pageLayout = new DockPanel()
             {
             };
 
-            var contentLayout = new DockLayout()
+            var contentLayout = new DockPanel()
             {
             };
 
             contentLayout.Children.Add(
-                new TextView()
+                new TextBlock()
                 {
                     Text = "TOP1",
-                    ForegroundColor = Colors.Red,
-                    HorizontalAlignment = LayoutAlignment.Fill,
-                    VerticalAlignment = LayoutAlignment.Start,
-                    HorizontalTextAlignment = TextAlignment.Start,
+                    Foreground = Colors.Red,
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    VerticalAlignment = VerticalAlignment.Top,
+                    TextAlignment = TextAlignment.Start,
                 },
-                DockRegion.Top);
+                Dock.Top);
 
             contentLayout.Children.Add(
-                new TextEntry()
+                new TextBox()
                 {
                     PlaceholderText = "Placeholder",
-                    HorizontalAlignment = LayoutAlignment.Fill,
-                    VerticalAlignment = LayoutAlignment.Start,
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    VerticalAlignment = VerticalAlignment.Top,
                     //Text = "Hello, TextEntry",
                     //Size = new Size(200, 60),
                 },
-                DockRegion.Top);
+                Dock.Top);
 
             contentLayout.Children.Add(
                 new DaysOfWeekPicker()
                 {
-                    HorizontalAlignment = LayoutAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Center,
                 },
-                DockRegion.Top);
+                Dock.Top);
 
             contentLayout.Children.Add(
                 new ProgressRing()
                 {
                 },
-                DockRegion.Top);
+                Dock.Top);
 
-            var listPicker = new ListPicker();
-            listPicker.Items.Add(new ListPickerItem("Item One"));
-            listPicker.Items.Add(new ListPickerItem("Item Two"));
-            listPicker.Items.Add(new ListPickerItem("Item Three"));
-            contentLayout.Children.Add(listPicker, DockRegion.Top);
+            var listPicker = new ComboBox();
+            listPicker.Items.Add(new ComboBoxItem("Item One"));
+            listPicker.Items.Add(new ComboBoxItem("Item Two"));
+            listPicker.Items.Add(new ComboBoxItem("Item Three"));
+            contentLayout.Children.Add(listPicker, Dock.Top);
 
             contentLayout.Children.Add(
-                new CalendarControl()
+                new CalendarView()
                 {
                 },
-                DockRegion.Top);
+                Dock.Top);
 
             contentLayout.Children.Add(
                 new CalendarDatePicker()
                 {
                 },
-                DockRegion.Top);
+                Dock.Top);
 
             contentLayout.Children.Add(
-                new TextView()
+                new TextBlock()
                 {
                     Text = "TOP2",
-                    ForegroundColor = Colors.Red,
-                    HorizontalAlignment = LayoutAlignment.Fill,
-                    VerticalAlignment = LayoutAlignment.Start,
-                    HorizontalTextAlignment = TextAlignment.Start,
+                    Foreground = Colors.Red,
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    VerticalAlignment = VerticalAlignment.Top,
+                    TextAlignment = TextAlignment.Start,
                 },
-                DockRegion.Top);
+                Dock.Top);
 
             for (int i = 0; i < 50; i++)
             {
                 contentLayout.Children.Add(
-                    new TextView()
+                    new TextBlock()
                     {
                         Text = "MORE",
-                        ForegroundColor = Colors.Red,
-                        HorizontalAlignment = LayoutAlignment.Fill,
-                        VerticalAlignment = LayoutAlignment.Start,
-                        HorizontalTextAlignment = TextAlignment.Start,
+                        Foreground = Colors.Red,
+                        HorizontalAlignment = HorizontalAlignment.Stretch,
+                        VerticalAlignment = VerticalAlignment.Top,
+                        TextAlignment = TextAlignment.Start,
                     },
-                    DockRegion.Top);
+                    Dock.Top);
             }
 
-            var scrollView = new ScrollView()
+            var scrollView = new ScrollViewer()
             {
                 IsHorizontalScrollingEnabled = false,
                 IsVerticalScrollingEnabled = true,
             };
             scrollView.Content = contentLayout;
-            pageLayout.Children.Add(scrollView, DockRegion.CenterOverlay);
+            pageLayout.Children.Add(scrollView, Dock.CenterOverlay);
 
-            this.Layout = pageLayout;
+            this.Content = pageLayout;
         }
 
         void ITapGestureDelegate.OnTapBegan()

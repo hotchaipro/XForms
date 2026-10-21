@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    The XForms framework on Windows, without XAML or the Windows App SDK: Win32
+    windows, DirectComposition visuals, Direct2D and DirectWrite drawing, and
+    RichEdit text entry, all through source-generated interop (no runtime
+    interop assemblies).
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <RootNamespace>XForms.Win32</RootNamespace>
+    <AssemblyName>XForms.Framework.Win32</AssemblyName>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <IsTrimmable>true</IsTrimmable>
+    <IsAotCompatible>true</IsAotCompatible>
+    <PlatformTarget>x64</PlatformTarget>
+    <!-- Needs Windows 10 1703 or later; targeting a Windows 10 TFM would also pull
+         in the WinRT projection assembly, which this backend doesn't use -->
+    <NoWarn>$(NoWarn);CA1416</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="NativeMethods.txt" />
+    <AdditionalFiles Include="NativeMethods.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.269" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\framework\XForms.Framework.csproj" />
+  </ItemGroup>
+
+</Project>
