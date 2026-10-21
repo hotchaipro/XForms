@@ -12,13 +12,13 @@ namespace XForms.iOS
     /// </summary>
     internal sealed class OwnerDrawControl : NativeLayoutView
     {
-        private UserControl _drawDelegate;
+        private View _drawDelegate;
 
         internal OwnerDrawControl(
-            UserControl userControl)
-            : base(userControl)
+            View view)
+            : base(view)
         {
-            this._drawDelegate = userControl;
+            this._drawDelegate = view;
 
             this.Opaque = false;
             this.BackgroundColor = UIColor.Clear;

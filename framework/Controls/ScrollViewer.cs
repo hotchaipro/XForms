@@ -131,6 +131,15 @@ namespace XForms.Controls
             }
         }
 
+        // The platforms render it natively
+        internal override bool IsLightweightType
+        {
+            get
+            {
+                return false;
+            }
+        }
+
         internal override void OnRendererCreated()
         {
             base.OnRendererCreated();

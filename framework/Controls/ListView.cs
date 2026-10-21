@@ -152,7 +152,7 @@ namespace XForms.Controls
         }
     }
 
-    public class ListView : Control
+    public class ListView : View
     {
         // Its content is a layer of its own
         internal override bool RequiresNativeChildren
@@ -304,11 +304,28 @@ namespace XForms.Controls
             }
         }
 
+        // The platforms render it natively
+        internal override bool IsLightweightType
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        protected override void OnThemeChanged(
+            Theme theme)
+        {
+            base.OnThemeChanged(theme);
+            this.Native?.BackgroundColor = this.BackgroundColor;
+        }
+
         internal override void OnRendererCreated()
         {
             base.OnRendererCreated();
 
             var native = this.Native;
+            native.BackgroundColor = this.BackgroundColor;
             if (this._footerHeight.HasValue)
             {
                 native.FooterHeight = this._footerHeight.Value;
@@ -341,7 +358,10 @@ namespace XForms.Controls
             }
         }
 
-        public override Color BackgroundColor
+        /// <summary>
+        /// The list's background: the theme's surface color.
+        /// </summary>
+        public Color BackgroundColor
         {
             get
             {

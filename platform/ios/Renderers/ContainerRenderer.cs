@@ -1,26 +1,60 @@
-﻿using System;
+using System;
 using UIKit;
 using XForms.Platform;
 
 namespace XForms.iOS.Renderers
 {
     /// <summary>
-    /// Renderer for every XForms layout: the layout itself positions its
-    /// children, so the platform only keeps the native child list.
+    /// The renderer of every view that holds children (panels, content and
+    /// owner-drawn controls, pages): the view positions its children, so the
+    /// platform only keeps the native child list, and draws a view that draws
+    /// itself beneath it.
     /// </summary>
-    internal class PanelRenderer : ViewRenderer<NativeLayoutView>, IPanelRenderer
+    internal class ContainerRenderer : ViewRenderer<NativeLayoutView>, IContainerRenderer
     {
-        public PanelRenderer(
-            Panel layout)
-            : base(layout)
-        {
-            this.SetNativeElement(new NativeLayoutView(layout));
-        }
+        private readonly bool _drawsContent;
 
         // The children in drawing order. Lightweight children have no native
         // view, and views hosted for lightweight descendants come after these.
         private readonly System.Collections.Generic.List<IViewRenderer> _children = new System.Collections.Generic.List<IViewRenderer>();
 
+        public ContainerRenderer(
+            View view)
+            : base(view)
+        {
+            this._drawsContent = LayerHost.For(view).DrawsContent;
+            var native = this._drawsContent ? new OwnerDrawControl(view) : new NativeLayoutView(view);
+
+            // A page's background fills the screen; its content stays clear of
+            // the status bar, notch and home indicator
+            native.RespectsSafeArea = view is Page;
+            this.SetNativeElement(native);
+        }
+
+        public override Color BackgroundColor
+        {
+            get
+            {
+                return base.BackgroundColor;
+            }
+
+            set
+            {
+                // NOTE: A view that draws itself paints its own background, so
+                // the native view stays transparent
+                if (!this._drawsContent)
+                {
+                    base.BackgroundColor = value;
+                }
+            }
+        }
+
+        public void Invalidate()
+        {
+            this.NativeElement.SetNeedsDisplay();
+        }
+
+        // Where a child at the index goes among the native views
         private int NativeIndex(
             int index)
         {
@@ -45,12 +79,6 @@ namespace XForms.iOS.Renderers
 
             this._children.Clear();
             this.NativeElement.SetNeedsDisplay();
-        }
-
-        public void AddChild(
-            IViewRenderer childRenderer)
-        {
-            this.InsertChild(this._children.Count, childRenderer);
         }
 
         public void InsertChild(
@@ -82,14 +110,6 @@ namespace XForms.iOS.Renderers
             {
                 this.NativeElement.SetNeedsDisplay();
             }
-        }
-
-        public void ReplaceChild(
-            int index,
-            IViewRenderer childRenderer)
-        {
-            this.RemoveChildAt(index);
-            this.InsertChild(index, childRenderer);
         }
     }
 }

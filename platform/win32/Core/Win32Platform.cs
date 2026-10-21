@@ -26,13 +26,9 @@ namespace XForms.Win32
 
         public IApplicationRenderer CreateApplicationRenderer(Application application) => new ApplicationRenderer(this._host, application);
 
-        public IPageRenderer CreatePageRenderer(Page page) => new PageRenderer(page);
-
-        public IPanelRenderer CreatePanelRenderer(Panel layout) => new PanelRenderer(layout);
+        public IContainerRenderer CreateContainerRenderer(View view) => new ContainerRenderer(view);
 
         public ITextBlockRenderer CreateTextBlockRenderer(TextBlock label) => new TextBlockRenderer(label);
-
-        public IContentControlRenderer CreateContentControlRenderer(ContentControl customControl) => new ContentControlRenderer(customControl);
 
         public IBitmapRenderer CreateBitmapRenderer(Bitmap bitmap) => new BitmapRenderer(bitmap);
 
@@ -41,8 +37,6 @@ namespace XForms.Win32
         public IListViewRenderer CreateListViewRenderer(ListView listView) => new ListViewRenderer(listView);
 
         public ITextBoxRenderer CreateTextBoxRenderer(TextBox textEntry) => new TextBoxRenderer(textEntry);
-
-        public IUserControlRenderer CreateUserControlRenderer(UserControl userControl) => new UserControlRenderer(userControl);
 
         public IImageRenderer CreateImageRenderer(Image image) => new ImageRenderer(image);
 

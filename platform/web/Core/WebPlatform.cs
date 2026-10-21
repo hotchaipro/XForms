@@ -24,26 +24,11 @@ namespace XForms.Web
 
         public IApplicationRenderer CreateApplicationRenderer(Application application) => new ApplicationRenderer(this._host, application);
 
-        public IPageRenderer CreatePageRenderer(Page page) => new PageRenderer(page);
-
-        public IPanelRenderer CreatePanelRenderer(Panel layout)
-        {
-            return new PanelRenderer(layout);
-        }
+        public IContainerRenderer CreateContainerRenderer(View view) => new ContainerRenderer(view);
 
         public ITextBlockRenderer CreateTextBlockRenderer(TextBlock label)
         {
             return new TextBlockRenderer(label);
-        }
-
-        public IContentControlRenderer CreateContentControlRenderer(ContentControl customControl)
-        {
-            return new ContentControlRenderer(customControl);
-        }
-
-        public IUserControlRenderer CreateUserControlRenderer(UserControl userControl)
-        {
-            return new UserControlRenderer(userControl);
         }
 
         public IImageRenderer CreateImageRenderer(Image image) => new ImageRenderer(image);

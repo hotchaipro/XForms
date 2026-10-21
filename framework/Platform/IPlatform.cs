@@ -15,17 +15,21 @@ namespace XForms.Platform
         bool UsesLightweightRenderers { get; }
 
         IApplicationRenderer CreateApplicationRenderer(Application application);
-        IPageRenderer CreatePageRenderer(Page page);
-        IPanelRenderer CreatePanelRenderer(Panel layout);
+
+        /// <summary>
+        /// The renderer of a view that holds children (any view the platform
+        /// doesn't render natively).
+        /// </summary>
+        IContainerRenderer CreateContainerRenderer(View view);
         ITextBlockRenderer CreateTextBlockRenderer(TextBlock label);
-        IContentControlRenderer CreateContentControlRenderer(ContentControl customControl);
+
         IImageRenderer CreateImageRenderer(Image image);
         IBitmapRenderer CreateBitmapRenderer(Bitmap bitmap);
         IFrameRenderer CreateFrameRenderer(Frame frame);
         IListViewRenderer CreateListViewRenderer(ListView listView);
         ITextBoxRenderer CreateTextBoxRenderer(TextBox textEntry);
         IScrollViewerRenderer CreateScrollViewerRenderer(ScrollViewer scrollView);
-        IUserControlRenderer CreateUserControlRenderer(UserControl userControl);
+
         IPopupRenderer CreatePopupRenderer(Popup popup);
         void NavigateToUri(Uri uri);
 

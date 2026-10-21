@@ -24,6 +24,12 @@ namespace XForms.iOS
 
         public bool UsesLightweightRenderers => true;
 
+        public IContainerRenderer CreateContainerRenderer(
+            View view)
+        {
+            return new ContainerRenderer(view);
+        }
+
         public IApplicationRenderer CreateApplicationRenderer(
             Application application)
         {
@@ -36,28 +42,10 @@ namespace XForms.iOS
             return new FrameRenderer(frame);
         }
 
-        public IPageRenderer CreatePageRenderer(
-            Page page)
-        {
-            return new PageRenderer(page);
-        }
-
         public ITextBlockRenderer CreateTextBlockRenderer(
             TextBlock textView)
         {
             return new TextBlockRenderer(textView);
-        }
-
-        public IPanelRenderer CreatePanelRenderer(
-            Panel layout)
-        {
-            return new PanelRenderer(layout);
-        }
-
-        public IContentControlRenderer CreateContentControlRenderer(
-            ContentControl xControl)
-        {
-            return new ContentControlRenderer(xControl);
         }
 
         public IImageRenderer CreateImageRenderer(
@@ -90,12 +78,6 @@ namespace XForms.iOS
             ScrollViewer scrollView)
         {
             return new ScrollViewerRenderer(scrollView);
-        }
-
-        public IUserControlRenderer CreateUserControlRenderer(
-            UserControl userControl)
-        {
-            return new UserControlRenderer(userControl);
         }
 
         public IPopupRenderer CreatePopupRenderer(

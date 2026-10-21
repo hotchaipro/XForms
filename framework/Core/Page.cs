@@ -9,7 +9,7 @@ namespace XForms
 
     public class Page : View
     {
-        private Panel _layout;
+        private View _content;
         private Color? _backgroundColor;
         private bool _usesSafeArea = true;
 
@@ -17,31 +17,17 @@ namespace XForms
         {
         }
 
-        protected override void OnThemeChanged(
-            Theme theme)
+        protected override Color GetBackgroundColor()
         {
-            base.OnThemeChanged(theme);
-
-            if (!this._backgroundColor.HasValue)
-            {
-                this.Native?.BackgroundColor = theme.Colors.Background;
-            }
+            return this.BackgroundColor;
         }
 
-        [PlatformContract]
-        internal new IPageRenderer Renderer
+        // Pages are views the platforms don't render natively
+        internal override bool IsLightweightType
         {
             get
             {
-                return (IPageRenderer)base.Renderer;
-            }
-        }
-
-        private IPageRenderer Native
-        {
-            get
-            {
-                return (IPageRenderer)this.CreatedRenderer;
+                return false;
             }
         }
 
@@ -59,7 +45,7 @@ namespace XForms
             set
             {
                 this._backgroundColor = value;
-                this.Native?.BackgroundColor = value;
+                this.InvalidateBackground();
             }
         }
 
@@ -91,30 +77,33 @@ namespace XForms
             }
         }
 
-        public Panel Content
+        /// <summary>
+        /// The page's content, which fills it.
+        /// </summary>
+        public View Content
         {
             get
             {
-                return this._layout;
+                return this._content;
             }
 
             set
             {
-                if (null != this._layout)
+                if (value == this._content)
                 {
-                    throw new NotSupportedException();
+                    return;
                 }
 
-                this._layout = value;
-
-                var native = this.Native;
-                if (null != native)
+                if (null != this._content)
                 {
-                    native.SetLayout((IPanelRenderer)value.AttachTo(this));
-                    value.NotifyAttached();
+                    this.RemoveVisualChild(this._content);
                 }
 
-                this.InvalidateMeasure();
+                this._content = value;
+                if (null != value)
+                {
+                    this.AddVisualChild(value);
+                }
             }
         }
 
@@ -127,25 +116,7 @@ namespace XForms
             }
         }
 
-        internal override void OnRendererCreated()
-        {
-            base.OnRendererCreated();
 
-            var native = this.Native;
-            native.BackgroundColor = this.BackgroundColor;
-
-            var layout = this._layout;
-            if (null != layout)
-            {
-                native.SetLayout((IPanelRenderer)layout.AttachTo(this));
-                layout.NotifyAttached();
-            }
-        }
-
-        protected override IElementRenderer CreateRenderer()
-        {
-            return this.Application.Platform.CreatePageRenderer(this);
-        }
 
         /// <summary>
         /// Closes the page, when it's shown with
@@ -181,32 +152,6 @@ namespace XForms
             return this.Application.FilterPointerInput(this, e) || base.DispatchPointerEvent(e);
         }
 
-        protected override Size MeasureOverride(
-            Size availableSize)
-        {
-            var content = this._layout;
-            if (null == content)
-            {
-                return Size.Empty;
-            }
 
-            content.Measure(availableSize);
-            return content.DesiredSize;
-        }
-
-        protected override void ArrangeOverride(
-            Size finalSize)
-        {
-            this._layout?.Arrange(new Rect(0, 0, finalSize.Width, finalSize.Height));
-        }
-
-        internal override IEnumerable<Element> GetChildElements()
-        {
-            var layout = this._layout;
-            if (null != layout)
-            {
-                yield return layout;
-            }
-        }
     }
 }

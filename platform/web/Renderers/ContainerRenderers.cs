@@ -5,118 +5,28 @@ using XForms.Platform;
 
 namespace XForms.Web.Renderers
 {
-    [SupportedOSPlatform("browser")]
-    internal sealed class PanelRenderer : ViewRenderer, IPanelRenderer
-    {
-        public PanelRenderer(
-            Panel layout)
-            : base(layout, "div", isContainer: true)
-        {
-        }
-
-        void IPanelRenderer.ClearChildren()
-        {
-            this.ClearChildren();
-        }
-
-        void IPanelRenderer.AddChild(
-            IViewRenderer childRenderer)
-        {
-            this.AddChild(childRenderer);
-        }
-
-        void IPanelRenderer.InsertChild(
-            int index,
-            IViewRenderer childRenderer)
-        {
-            this.InsertChild(index, childRenderer);
-        }
-
-        void IPanelRenderer.RemoveChildAt(
-            int index)
-        {
-            this.RemoveChildAt(index);
-        }
-
-        void IPanelRenderer.ReplaceChild(
-            int index,
-            IViewRenderer childRenderer)
-        {
-            this.RemoveChildAt(index);
-            this.InsertChild(index, childRenderer);
-        }
-    }
-
-    [SupportedOSPlatform("browser")]
-    internal sealed class PageRenderer : ViewRenderer, IPageRenderer
-    {
-        public PageRenderer(
-            Page page)
-            : base(page, "div", isContainer: true)
-        {
-        }
-
-        public void SetLayout(
-            IPanelRenderer layoutRenderer)
-        {
-            this.ClearChildren();
-            this.AddChild(layoutRenderer);
-        }
-    }
-
-    [SupportedOSPlatform("browser")]
-    internal sealed class ContentControlRenderer : ViewRenderer, IContentControlRenderer
-    {
-        public ContentControlRenderer(
-            ContentControl contentControl)
-            : base(contentControl, "div", isContainer: true)
-        {
-        }
-
-        public void SetContent(
-            IViewRenderer content)
-        {
-            this.ClearChildren();
-            if (null != content)
-            {
-                this.AddChild(content);
-            }
-        }
-    }
-
     /// <summary>
-    /// An owner-drawn control: it draws into its canvas, beneath its content.
+    /// The renderer of every view that holds children (panels, content and
+    /// owner-drawn controls, pages): the view positions its children, and a
+    /// view that draws itself draws into its canvas, beneath them.
     /// </summary>
     [SupportedOSPlatform("browser")]
-    internal sealed class UserControlRenderer : ViewRenderer, IUserControlRenderer
+    internal sealed class ContainerRenderer : ViewRenderer, IContainerRenderer
     {
-        private readonly UserControl _drawDelegate;
+        private readonly bool _drawsContent;
 
-        public UserControlRenderer(
-            UserControl userControl)
-            : base(userControl, "div", isContainer: true)
+        public ContainerRenderer(
+            View view)
+            : base(view, "div", isContainer: true)
         {
-            this._drawDelegate = userControl;
+            this._drawsContent = LayerHost.For(view).DrawsContent;
         }
 
         protected override bool HasContent
         {
             get
             {
-                return true;
-            }
-        }
-
-        public override Color BackgroundColor
-        {
-            get
-            {
-                return Colors.Transparent;
-            }
-
-            set
-            {
-                // NOTE: The control paints its own background when it draws
+                return this._drawsContent;
             }
         }
 
@@ -125,20 +35,31 @@ namespace XForms.Web.Renderers
             this.InvalidateRender();
         }
 
-        public void SetContent(
-            IViewRenderer content)
+        void IContainerRenderer.ClearChildren()
         {
             this.ClearChildren();
-            if (null != content)
-            {
-                this.AddChild(content);
-            }
+        }
+
+        void IContainerRenderer.InsertChild(
+            int index,
+            IViewRenderer childRenderer)
+        {
+            this.InsertChild(index, childRenderer);
+        }
+
+        void IContainerRenderer.RemoveChildAt(
+            int index)
+        {
+            this.RemoveChildAt(index);
         }
 
         protected override void DrawContent(
             DrawContext drawContext)
         {
-            LayerHost.For(this._drawDelegate).Render(drawContext, new Rect(0, 0, this.Frame.Width, this.Frame.Height));
+            if (this._drawsContent)
+            {
+                LayerHost.For(this.View).Render(drawContext, new Rect(0, 0, this.Frame.Width, this.Frame.Height));
+            }
         }
     }
 

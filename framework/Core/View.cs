@@ -101,6 +101,10 @@ namespace XForms
             }
 
             this.CreateAnimationLayers(native);
+
+            // A container gets its children and background
+            this.AttachVisualChildren();
+            this.InvalidateBackground();
         }
 
         // One native layer per animator: the app's (or the framework's) outside,
@@ -146,7 +150,7 @@ namespace XForms
         {
             get
             {
-                return (this.Parent is Panel panel) && (null != panel.ChildTransitions);
+                return (this.Parent is View parent) && parent.AnimatesChildren;
             }
         }
 
@@ -312,20 +316,429 @@ namespace XForms
         internal override void OnTextScaleChangedCore()
         {
             this.InvalidateMeasure();
+            if (this._drawsContent)
+            {
+                this.InvalidateVisual();
+            }
         }
+
+        #region Children
+
+        // The children in the order they were added (layout order), and in
+        // drawing order (by ZIndex, then layout order), which the native
+        // children follow; null until the first child
+        private List<View> _children;
+        private List<View> _drawingOrder;
+
+        /// <summary>
+        /// The view's children, in the order they were added. A view with
+        /// children is a container on every platform: a native view, or a
+        /// lightweight one drawn into its layer.
+        /// </summary>
+        protected IReadOnlyList<View> VisualChildren
+        {
+            get
+            {
+                return (IReadOnlyList<View>)this._children ?? Array.Empty<View>();
+            }
+        }
+
+        private IContainerRenderer Container
+        {
+            get
+            {
+                return this.CreatedRenderer as IContainerRenderer;
+            }
+        }
+
+        /// <summary>
+        /// Adds a child after the others.
+        /// </summary>
+        protected void AddVisualChild(
+            View child)
+        {
+            this.InsertVisualChild(this.VisualChildren.Count, child);
+        }
+
+        /// <summary>
+        /// Inserts a child at the index, in layout order.
+        /// </summary>
+        protected void InsertVisualChild(
+            int index,
+            View child)
+        {
+            ArgumentNullException.ThrowIfNull(child);
+            this._children ??= new List<View>();
+            if (this._children.Contains(child))
+            {
+                throw new InvalidOperationException("The view is already a child of this view.");
+            }
+
+            this._children.Insert(index, child);
+            this.AddToDrawingOrder(child);
+            this.InvalidateMeasure();
+        }
+
+        /// <summary>
+        /// Removes the child at the index, in layout order.
+        /// </summary>
+        protected void RemoveVisualChildAt(
+            int index)
+        {
+            var child = this._children[index];
+            this.RemoveFromDrawingOrder(child);
+            this._children.RemoveAt(index);
+            this.InvalidateMeasure();
+        }
+
+        /// <summary>
+        /// Removes the child. Returns whether it was a child.
+        /// </summary>
+        protected bool RemoveVisualChild(
+            View child)
+        {
+            int index = this._children?.IndexOf(child) ?? -1;
+            if (index < 0)
+            {
+                return false;
+            }
+
+            this.RemoveVisualChildAt(index);
+            return true;
+        }
+
+        /// <summary>
+        /// Replaces the child at the index with another.
+        /// </summary>
+        protected void ReplaceVisualChild(
+            int index,
+            View child)
+        {
+            ArgumentNullException.ThrowIfNull(child);
+            var oldChild = this._children[index];
+            this.RemoveFromDrawingOrder(oldChild);
+            this._children[index] = child;
+            this.AddToDrawingOrder(child);
+            this.InvalidateMeasure();
+        }
+
+        /// <summary>
+        /// Removes every child.
+        /// </summary>
+        protected void ClearVisualChildren()
+        {
+            if ((null == this._children) || (0 == this._children.Count))
+            {
+                return;
+            }
+
+            var oldChildren = this._children.ToArray();
+            this._children.Clear();
+            this._drawingOrder.Clear();
+
+            var container = this.Container;
+            if (null != container)
+            {
+                container.ClearChildren();
+                foreach (var child in oldChildren)
+                {
+                    child.NotifyDetached();
+                }
+            }
+
+            this.InvalidateMeasure();
+        }
+
+        // Where the child goes in drawing order: after every sibling with a lower
+        // ZIndex, or the same ZIndex and an earlier place in layout order
+        private int DrawingInsertIndex(
+            View child)
+        {
+            int zIndex = child.ZIndex;
+            int layoutIndex = this._children.IndexOf(child);
+
+            int index = 0;
+            foreach (var sibling in this._drawingOrder)
+            {
+                if ((sibling.ZIndex < zIndex)
+                    || ((sibling.ZIndex == zIndex) && (this._children.IndexOf(sibling) < layoutIndex)))
+                {
+                    index += 1;
+                }
+            }
+
+            return index;
+        }
+
+        private void AddToDrawingOrder(
+            View child)
+        {
+            this._drawingOrder ??= new List<View>();
+            int index = this.DrawingInsertIndex(child);
+            this._drawingOrder.Insert(index, child);
+
+            var container = this.Container;
+            if (null != container)
+            {
+                container.InsertChild(index, child.AttachTo(this));
+                child.NotifyAttached();
+            }
+        }
+
+        private void RemoveFromDrawingOrder(
+            View child)
+        {
+            int index = this._drawingOrder.IndexOf(child);
+            this._drawingOrder.RemoveAt(index);
+
+            var container = this.Container;
+            if (null != container)
+            {
+                container.RemoveChildAt(index);
+                child.NotifyDetached();
+            }
+        }
+
+        internal void OnChildZIndexChanged(
+            View child)
+        {
+            if (null == this._drawingOrder)
+            {
+                return;
+            }
+
+            int oldIndex = this._drawingOrder.IndexOf(child);
+            if (oldIndex < 0)
+            {
+                return;
+            }
+
+            this._drawingOrder.RemoveAt(oldIndex);
+            int newIndex = this.DrawingInsertIndex(child);
+            this._drawingOrder.Insert(newIndex, child);
+
+            var container = this.Container;
+            if ((null != container) && (newIndex != oldIndex))
+            {
+                // Move the native child without detaching the view
+                container.RemoveChildAt(oldIndex);
+                container.InsertChild(newIndex, child.Renderer);
+            }
+        }
+
+        // Once the container exists, it gets the children's renderers
+        private void AttachVisualChildren()
+        {
+            var container = this.Container;
+            if ((null == container) || (null == this._drawingOrder))
+            {
+                return;
+            }
+
+            for (int i = 0; i < this._drawingOrder.Count; i += 1)
+            {
+                container.InsertChild(i, this._drawingOrder[i].AttachTo(this));
+            }
+
+            foreach (var child in this._children)
+            {
+                child.NotifyAttached();
+            }
+        }
+
+        /// <summary>
+        /// Whether the framework animates the children's moves (a panel with
+        /// layout transitions), so each needs an animator layer.
+        /// </summary>
+        protected virtual bool AnimatesChildren
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        #endregion Children
+
+        #region Drawing
+
+        private bool _drawsContent;
+        private List<DrawnAnimator> _drawnAnimators;
+
+        internal bool DrawsContentInternal
+        {
+            get
+            {
+                return this._drawsContent;
+            }
+        }
+
+        /// <summary>
+        /// Whether the view draws its own content, in <see cref="Render"/>,
+        /// beneath its children. Set it in the constructor.
+        /// </summary>
+        protected bool DrawsContent
+        {
+            get
+            {
+                return this._drawsContent;
+            }
+
+            set
+            {
+                if (this.HasRenderer)
+                {
+                    throw new InvalidOperationException("Set DrawsContent before the view is attached.");
+                }
+
+                this._drawsContent = value;
+            }
+        }
+
+        /// <summary>
+        /// The color the view is filled with beneath its children, when it
+        /// doesn't draw itself: transparent unless a subclass says otherwise.
+        /// Call <see cref="InvalidateBackground"/> when it changes.
+        /// </summary>
+        protected virtual Color GetBackgroundColor()
+        {
+            return Colors.Transparent;
+        }
+
+        /// <summary>
+        /// Applies a change to <see cref="GetBackgroundColor"/> (or draws a view
+        /// that draws itself again).
+        /// </summary>
+        protected void InvalidateBackground()
+        {
+            var container = this.Container;
+            if (null == container)
+            {
+                return;
+            }
+
+            if (this._drawsContent)
+            {
+                container.BackgroundColor = Colors.Transparent;
+                container.Invalidate();
+            }
+            else
+            {
+                container.BackgroundColor = this.GetBackgroundColor();
+            }
+        }
+
+        /// <summary>
+        /// Draws the view, within its bounds (from 0, 0), when it
+        /// <see cref="DrawsContent"/>. By default it fills the view with its
+        /// background color. Call <see cref="InvalidateVisual"/> to draw again.
+        /// </summary>
+        protected virtual void Render(
+            DrawingContext drawingContext)
+        {
+            drawingContext.Clear(this.GetBackgroundColor());
+        }
+
+        /// <summary>
+        /// Draws the view again.
+        /// </summary>
+        public virtual void InvalidateVisual()
+        {
+            this.Container?.Invalidate();
+        }
+
+        /// <summary>
+        /// Creates a scale and opacity the view applies to its own drawing,
+        /// animated without a native layer (see <see cref="DrawnAnimator"/>).
+        /// For small effects, such as press feedback, that shouldn't cost the
+        /// view a layer of its own, as an <see cref="Animator"/> would.
+        /// </summary>
+        protected DrawnAnimator CreateDrawnAnimator()
+        {
+            var animator = new DrawnAnimator(this.InvalidateVisual);
+            this._drawnAnimators ??= new List<DrawnAnimator>();
+            this._drawnAnimators.Add(animator);
+            return animator;
+        }
+
+        /// <summary>
+        /// Creates an animator that the view keeps privately, in its own field,
+        /// to animate its own content (such as a spinning ring). Call it from
+        /// the view's constructor: it throws once the view has been attached.
+        /// Each call creates another animator, so a subclass can add its own.
+        /// The public <see cref="Animator"/> always belongs to the app.
+        /// </summary>
+        protected Animator CreateOwnAnimator()
+        {
+            return this.CreateOwnAnimatorCore();
+        }
+
+        // Draws the view's own content (with its drawn animations), for the
+        // platform or the lightweight painter
+        internal void RenderContent(
+            DrawingContext context,
+            Rect bounds)
+        {
+            var animators = this._drawnAnimators;
+            if (null == animators)
+            {
+                this.Render(context);
+                return;
+            }
+
+            var scopes = new DrawnAnimator.Scope[animators.Count];
+            for (int i = 0; i < animators.Count; i += 1)
+            {
+                scopes[i] = animators[i].Apply(context, bounds);
+            }
+
+            try
+            {
+                this.Render(context);
+            }
+            finally
+            {
+                for (int i = animators.Count - 1; i >= 0; i -= 1)
+                {
+                    scopes[i].Dispose();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Creates the view's renderer: by default a container, which holds the
+        /// view's children (and draws it, if it <see cref="DrawsContent"/>).
+        /// Views the platforms render natively override it.
+        /// </summary>
+        protected override IElementRenderer CreateRenderer()
+        {
+            var platform = this.Application.Platform;
+            return (platform.UsesLightweightRenderers && this.CanBeLightweight)
+                ? new LightweightContainerRenderer(this)
+                : platform.CreateContainerRenderer(this);
+        }
+
+        protected override void OnThemeChanged(
+            Theme theme)
+        {
+            base.OnThemeChanged(theme);
+            this.InvalidateBackground();
+        }
+
+        #endregion Drawing
 
         #region Lightweight views
 
         /// <summary>
-        /// Whether views of this type can be lightweight: they draw themselves
-        /// or only lay out children (owner-drawn and content controls, panels,
-        /// text blocks).
+        /// Whether views of this type can be lightweight: containers (which
+        /// draw themselves or only lay out children) and text blocks. Views
+        /// the platforms render natively override it.
         /// </summary>
         internal virtual bool IsLightweightType
         {
             get
             {
-                return false;
+                return true;
             }
         }
 
@@ -384,6 +797,11 @@ namespace XForms
         {
             get
             {
+                if (null != this._drawingOrder)
+                {
+                    return this._drawingOrder;
+                }
+
                 List<View> children = null;
                 foreach (var child in this.GetChildElements())
                 {
@@ -962,7 +1380,7 @@ namespace XForms
         /// Creates one of a control's own animators (see
         /// <see cref="Controls.Control.CreateOwnAnimator"/>).
         /// </summary>
-        internal Animator CreateOwnAnimatorCore()
+        private Animator CreateOwnAnimatorCore()
         {
             if (this.HasRenderer)
             {
@@ -1455,7 +1873,7 @@ namespace XForms
         /// Space between the view's edges and its children. Containers expose
         /// it as <c>Padding</c>.
         /// </summary>
-        private protected Thickness ContentPadding
+        protected Thickness ContentPadding
         {
             get
             {
@@ -1542,7 +1960,7 @@ namespace XForms
                 if (value != this._zIndex)
                 {
                     this._zIndex = value;
-                    (this.Parent as Panel)?.OnChildZIndexChanged(this);
+                    (this.Parent as View)?.OnChildZIndexChanged(this);
                 }
 
                 this.OnPropertyChanged();
@@ -1781,7 +2199,16 @@ namespace XForms
         protected virtual Size MeasureOverride(
             Size availableSize)
         {
-            return Size.Empty;
+            // By default the children overlap, each in the whole area
+            float width = 0, height = 0;
+            foreach (var child in this.VisualChildren)
+            {
+                child.Measure(availableSize);
+                width = Math.Max(width, child.DesiredSize.Width);
+                height = Math.Max(height, child.DesiredSize.Height);
+            }
+
+            return new Size(width, height);
         }
 
         /// <summary>
@@ -1792,6 +2219,10 @@ namespace XForms
         protected virtual void ArrangeOverride(
             Size finalSize)
         {
+            foreach (var child in this.VisualChildren)
+            {
+                child.Arrange(new Rect(0, 0, finalSize.Width, finalSize.Height));
+            }
         }
 
         // The alignment enums share these values: start (left or top), center,
@@ -2658,7 +3089,13 @@ namespace XForms
 
         internal override IEnumerable<Element> GetChildElements()
         {
-            yield break;
+            if (null != this._children)
+            {
+                foreach (var child in this._children)
+                {
+                    yield return child;
+                }
+            }
         }
     }
 }

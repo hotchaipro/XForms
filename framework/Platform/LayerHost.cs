@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using XForms.Controls;
 
 namespace XForms.Platform
 {
@@ -127,14 +126,26 @@ namespace XForms.Platform
         // ── Drawing ────────────────────────────────────────────────────────
 
         /// <summary>
-        /// Draws an owner-drawn view's own content (its <c>Render</c>) within
-        /// the bounds.
+        /// Whether the view draws its own content (in <see cref="Render"/>),
+        /// beneath its children. A platform makes a drawing surface for it.
+        /// </summary>
+        public bool DrawsContent
+        {
+            get
+            {
+                return this._view.DrawsContentInternal;
+            }
+        }
+
+        /// <summary>
+        /// Draws a view that draws itself (its <c>Render</c>, with its drawn
+        /// animations) within the bounds.
         /// </summary>
         public void Render(
             DrawingContext context,
             Rect bounds)
         {
-            ((IDrawDelegate)this._view).InvokeRender(context, bounds);
+            this._view.RenderContent(context, bounds);
         }
 
         /// <summary>

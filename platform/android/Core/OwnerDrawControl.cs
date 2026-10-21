@@ -7,14 +7,14 @@ namespace XForms.Android
 {
     public sealed class OwnerDrawControl : NativeLayoutView
     {
-        private UserControl _drawDelegate;
+        private View _drawDelegate;
 
         internal OwnerDrawControl(
             global::Android.Content.Context context,
-            UserControl userControl)
-            : base(context, userControl)
+            View view)
+            : base(context, view)
         {
-            this._drawDelegate = userControl;
+            this._drawDelegate = view;
 
             // A view group skips its own drawing unless told otherwise
             this.SetWillNotDraw(false);

@@ -5,7 +5,7 @@ using AndroidTextEntry = global::Android.Widget.EditText;
 
 namespace XForms.Android.Renderers
 {
-    public class TextBoxRenderer : ControlRenderer<AndroidTextEntry>, ITextBoxRenderer
+    public class TextBoxRenderer : ViewRenderer<AndroidTextEntry>, ITextBoxRenderer
     {
         private NativeEditText _nativeTextEntry;
         private bool _multiline;

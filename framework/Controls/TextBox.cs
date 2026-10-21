@@ -12,7 +12,7 @@ namespace XForms.Controls
         All = SpellCheck | Suggestions,
     }
 
-    public class TextBox : Control, ITextBoxDelegate
+    public class TextBox : View, ITextBoxDelegate
     {
         public static readonly ViewProperty<TextBox, string> TextProperty = new(nameof(Text), v => v.Text, (v, x) => v.Text = x);
         public static readonly ViewProperty<TextBox, string> PlaceholderTextProperty = new(nameof(PlaceholderText), v => v.PlaceholderText, (v, x) => v.PlaceholderText = x);
@@ -32,7 +32,10 @@ namespace XForms.Controls
             }
         }
 
-        public override Color BackgroundColor
+        /// <summary>
+        /// The text box's background: the theme's surface color.
+        /// </summary>
+        public Color BackgroundColor
         {
             get
             {
@@ -370,11 +373,28 @@ namespace XForms.Controls
             }
         }
 
+        // The platforms render it natively
+        internal override bool IsLightweightType
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        protected override void OnThemeChanged(
+            Theme theme)
+        {
+            base.OnThemeChanged(theme);
+            this.Native?.BackgroundColor = this.BackgroundColor;
+        }
+
         internal override void OnRendererCreated()
         {
             base.OnRendererCreated();
 
             var native = this.Native;
+            native.BackgroundColor = this.BackgroundColor;
             this._isApplyingValues = true;
             try
             {

@@ -93,6 +93,15 @@ namespace XForms
             this.Attach(page);
         }
 
+        // The platforms render it natively
+        internal override bool IsLightweightType
+        {
+            get
+            {
+                return false;
+            }
+        }
+
         protected override IElementRenderer CreateRenderer()
         {
             return this.Application.Platform.CreateFrameRenderer(this);

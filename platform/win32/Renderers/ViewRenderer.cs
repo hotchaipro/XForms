@@ -50,7 +50,7 @@ namespace XForms.Win32.Renderers
     /// A view backed by a DirectComposition visual. Views that draw (labels,
     /// owner-drawn controls, backgrounds) render into a composition surface.
     /// </summary>
-    internal unsafe class ViewRenderer : ElementRenderer, IViewRenderer, IControlRenderer
+    internal unsafe class ViewRenderer : ElementRenderer, IViewRenderer
     {
         private readonly bool _isContainer;
         private readonly bool _isLightweight;

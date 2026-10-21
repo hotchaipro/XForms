@@ -84,45 +84,36 @@ namespace XForms.Platform
         bool Focus();
     }
 
-    public interface IControlRenderer : IViewRenderer
+    /// <summary>
+    /// A view that holds children: every view the platform doesn't render
+    /// natively (panels, content and owner-drawn controls, pages). The view
+    /// lays its children out; the platform keeps their native views in drawing
+    /// order, fills the view's background, and draws a view that
+    /// <see cref="LayerHost.DrawsContent"/> (through
+    /// <see cref="LayerHost.Render"/>) beneath its children.
+    /// </summary>
+    public interface IContainerRenderer : IViewRenderer
     {
+        /// <summary>
+        /// Fills the view beneath its children (transparent when the view draws
+        /// itself).
+        /// </summary>
         Color BackgroundColor { get; set; }
-    }
 
-    public interface IContentControlRenderer : IControlRenderer
-    {
-        void SetContent(IViewRenderer content);
-    }
-
-    public interface IUserControlRenderer : IControlRenderer
-    {
+        /// <summary>
+        /// Draws a view that draws itself again.
+        /// </summary>
         void Invalidate();
 
-        void SetContent(IViewRenderer content);
-    }
-
-    /// <summary>
-    /// Hosts the native views of a layout's children. Positioning is done in
-    /// Core by the layout itself; the platform only keeps the native child list.
-    /// </summary>
-    public interface IPanelRenderer : IViewRenderer
-    {
-        void ClearChildren();
-
-        void AddChild(IViewRenderer childRenderer);
-
+        /// <summary>
+        /// Inserts a child's native view at the index in drawing order (a
+        /// lightweight child has none; it's drawn into the layer).
+        /// </summary>
         void InsertChild(int index, IViewRenderer childRenderer);
 
         void RemoveChildAt(int index);
 
-        void ReplaceChild(int index, IViewRenderer childRenderer);
-    }
-
-    public interface IPageRenderer : IViewRenderer
-    {
-        void SetLayout(IPanelRenderer layoutRenderer);
-
-        Color BackgroundColor { get; set; }
+        void ClearChildren();
     }
 
     public interface IFrameRenderer : IViewRenderer
@@ -173,8 +164,9 @@ namespace XForms.Platform
         IReadOnlyList<TextSpan> Spans { set; }
     }
 
-    public interface ITextBoxRenderer : IControlRenderer
+    public interface ITextBoxRenderer : IViewRenderer
     {
+        Color BackgroundColor { get; set; }
         string Text { get; set; }
         string PlaceholderText { get; set; }
         bool Multiline { get; set; }
@@ -246,6 +238,7 @@ namespace XForms.Platform
 
     public interface IListViewRenderer : IElementRenderer
     {
+        Color BackgroundColor { get; set; }
         float FooterHeight { get; set; }
 
         void Bind(ListViewSource source);

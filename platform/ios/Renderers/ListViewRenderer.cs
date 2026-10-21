@@ -11,7 +11,7 @@ namespace XForms.iOS.Renderers
     /// A table view for a vertical list, and a collection view for a
     /// horizontal list or a grid, with a refresh control for pull-to-refresh.
     /// </summary>
-    internal class ListViewRenderer : ControlRenderer<NativeListHost>, IListViewRenderer
+    internal class ListViewRenderer : ViewRenderer<NativeListHost>, IListViewRenderer
     {
         private readonly NativeListHost _host;
         private readonly UIRefreshControl _refreshControl = new UIRefreshControl();

@@ -38,7 +38,7 @@ namespace XForms.Web.Renderers
     /// descendants into a canvas beneath its child elements.
     /// </summary>
     [SupportedOSPlatform("browser")]
-    internal class ViewRenderer : ElementRenderer, IViewRenderer, IControlRenderer
+    internal class ViewRenderer : ElementRenderer, IViewRenderer
     {
         private readonly bool _isContainer;
 

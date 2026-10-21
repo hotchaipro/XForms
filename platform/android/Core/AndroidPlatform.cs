@@ -23,6 +23,12 @@ namespace XForms.Android
 
         public bool UsesLightweightRenderers => true;
 
+        public IContainerRenderer CreateContainerRenderer(
+            View view)
+        {
+            return new ContainerRenderer(this._androidApplication.ApplicationContext, view);
+        }
+
         public IApplicationRenderer CreateApplicationRenderer(
             Application application)
         {
@@ -35,28 +41,10 @@ namespace XForms.Android
             return new FrameRenderer(this._androidApplication.ApplicationContext, frame);
         }
 
-        public IPageRenderer CreatePageRenderer(
-            Page page)
-        {
-            return new PageRenderer(this._androidApplication.ApplicationContext, page);
-        }
-
         public ITextBlockRenderer CreateTextBlockRenderer(
             TextBlock textView)
         {
             return new TextBlockRenderer(this._androidApplication.ApplicationContext, textView);
-        }
-
-        public IPanelRenderer CreatePanelRenderer(
-            Panel layout)
-        {
-            return new PanelRenderer(this._androidApplication.ApplicationContext, layout);
-        }
-
-        public IContentControlRenderer CreateContentControlRenderer(
-            ContentControl xControl)
-        {
-            return new ContentControlRenderer(this._androidApplication.ApplicationContext, xControl);
         }
 
         public IImageRenderer CreateImageRenderer(
@@ -95,12 +83,6 @@ namespace XForms.Android
             ScrollViewer scrollView)
         {
             return new ScrollViewerRenderer(this._androidApplication.ApplicationContext, scrollView);
-        }
-
-        public IUserControlRenderer CreateUserControlRenderer(
-            UserControl userControl)
-        {
-            return new UserControlRenderer(this._androidApplication.ApplicationContext, userControl);
         }
 
         public IPopupRenderer CreatePopupRenderer(

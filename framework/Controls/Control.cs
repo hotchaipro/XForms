@@ -1,29 +1,14 @@
 ﻿using System;
-using XForms.Platform;
 
 namespace XForms.Controls
 {
+    /// <summary>
+    /// Base for controls: a view with a background.
+    /// </summary>
     public abstract class Control : View
     {
         protected Control()
         {
-        }
-
-        [PlatformContract]
-        internal new IControlRenderer Renderer
-        {
-            get
-            {
-                return (IControlRenderer)base.Renderer;
-            }
-        }
-
-        private IControlRenderer Native
-        {
-            get
-            {
-                return (IControlRenderer)this.CreatedRenderer;
-            }
         }
 
         /// <summary>
@@ -38,32 +23,9 @@ namespace XForms.Controls
             }
         }
 
-        /// <summary>
-        /// Creates an animator that the control keeps privately, in its own
-        /// field, to animate its own content (such as a spinning ring). Call it
-        /// from the control's constructor: it throws once the view has been
-        /// attached. Each call creates another animator, so a subclass can add
-        /// its own. The public <see cref="View.Animator"/> always belongs to the
-        /// app.
-        /// </summary>
-        protected Animator CreateOwnAnimator()
+        protected override Color GetBackgroundColor()
         {
-            return this.CreateOwnAnimatorCore();
-        }
-
-        internal override void OnRendererCreated()
-        {
-            base.OnRendererCreated();
-
-            this.Native.BackgroundColor = this.BackgroundColor;
-        }
-
-        protected override void OnThemeChanged(
-            Theme theme)
-        {
-            base.OnThemeChanged(theme);
-
-            this.Native?.BackgroundColor = this.BackgroundColor;
+            return this.BackgroundColor;
         }
     }
 }

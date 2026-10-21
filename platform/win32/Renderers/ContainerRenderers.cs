@@ -10,8 +10,22 @@ using XForms.Platform;
 
 namespace XForms.Win32.Renderers
 {
-    internal sealed class PanelRenderer : ViewRenderer, IPanelRenderer
+    /// <summary>
+    /// The renderer of every view that holds children (panels, content and
+    /// owner-drawn controls, pages): the view positions its children, and a
+    /// view that draws itself draws beneath them.
+    /// </summary>
+    internal sealed class ContainerRenderer : ViewRenderer, IContainerRenderer
     {
+        private readonly bool _drawsContent;
+
+        public ContainerRenderer(
+            View view)
+            : base(view, isContainer: true)
+        {
+            this._drawsContent = LayerHost.For(view).DrawsContent;
+        }
+
         protected override bool SupportsLightweight
         {
             get
@@ -20,21 +34,22 @@ namespace XForms.Win32.Renderers
             }
         }
 
-        public PanelRenderer(
-            Panel layout)
-            : base(layout, isContainer: true)
+        protected override bool HasContent
         {
+            get
+            {
+                return this._drawsContent;
+            }
         }
 
-        void IPanelRenderer.ClearChildren()
+        public void Invalidate()
+        {
+            this.InvalidateRender();
+        }
+
+        void IContainerRenderer.ClearChildren()
         {
             this.ClearChildren();
-        }
-
-        public void AddChild(
-            IViewRenderer childRenderer)
-        {
-            base.AddChild((ViewRenderer)childRenderer);
         }
 
         public void InsertChild(
@@ -50,122 +65,13 @@ namespace XForms.Win32.Renderers
             this.RemoveChild(this.Children[index]);
         }
 
-        public void ReplaceChild(
-            int index,
-            IViewRenderer childRenderer)
-        {
-            this.RemoveChild(this.Children[index]);
-            base.InsertChild(index, (ViewRenderer)childRenderer);
-        }
-    }
-
-    internal sealed class PageRenderer : ViewRenderer, IPageRenderer
-    {
-        public PageRenderer(
-            Page page)
-            : base(page, isContainer: true)
-        {
-        }
-
-        public void SetLayout(
-            IPanelRenderer layoutRenderer)
-        {
-            this.ClearChildren();
-            this.AddChild((ViewRenderer)layoutRenderer);
-        }
-    }
-
-    internal sealed class ContentControlRenderer : ViewRenderer, IContentControlRenderer
-    {
-        protected override bool SupportsLightweight
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public ContentControlRenderer(
-            ContentControl contentControl)
-            : base(contentControl, isContainer: true)
-        {
-        }
-
-        public void SetContent(
-            IViewRenderer content)
-        {
-            this.ClearChildren();
-
-            if (content is ViewRenderer child)
-            {
-                this.AddChild(child);
-            }
-        }
-    }
-
-    /// <summary>
-    /// Owner-drawn control: draws through the control's <see cref="IDrawDelegate"/>.
-    /// </summary>
-    internal sealed class UserControlRenderer : ViewRenderer, IUserControlRenderer
-    {
-        protected override bool SupportsLightweight
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        private readonly UserControl _drawDelegate;
-
-        public UserControlRenderer(
-            UserControl userControl)
-            : base(userControl, isContainer: true)
-        {
-            this._drawDelegate = userControl;
-        }
-
-        protected override bool HasContent
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public override Color BackgroundColor
-        {
-            get
-            {
-                return Colors.Transparent;
-            }
-
-            set
-            {
-                // NOTE: The control paints its own background in DrawBackground
-            }
-        }
-
-        public void Invalidate()
-        {
-            this.InvalidateRender();
-        }
-
-        public void SetContent(
-            IViewRenderer content)
-        {
-            this.ClearChildren();
-
-            if (content is ViewRenderer child)
-            {
-                this.AddChild(child);
-            }
-        }
-
         protected override void DrawContent(
             DrawContext drawContext)
         {
-            LayerHost.For(this._drawDelegate).Render(drawContext, new Rect(0, 0, this.Frame.Width, this.Frame.Height));
+            if (this._drawsContent)
+            {
+                LayerHost.For((View)this.Element).Render(drawContext, new Rect(0, 0, this.Frame.Width, this.Frame.Height));
+            }
         }
     }
 
