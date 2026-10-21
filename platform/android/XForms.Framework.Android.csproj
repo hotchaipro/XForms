@@ -12,4 +12,10 @@
     <ProjectReference Include="..\..\framework\XForms.Framework.csproj" />
   </ItemGroup>
 
+  <!-- Horizontal lists and grids, and pull-to-refresh -->
+  <ItemGroup>
+    <PackageReference Include="Xamarin.AndroidX.RecyclerView" Version="1.4.0.6" />
+    <PackageReference Include="Xamarin.AndroidX.SwipeRefreshLayout" Version="1.2.0.3" />
+  </ItemGroup>
+
 </Project>

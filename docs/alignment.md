@@ -1587,3 +1587,264 @@ Neither changed the order of the phases. Both added items, which are below.
       - Collapsed flyout buttons and a hidden (scaled to zero) button are
         still exposed, since they're visible to the framework.
       - Expand and collapse (for pickers), ranges (sliders) and headings.
+
+### After the plan
+
+These phases fill the gaps the phases above left, then add a web platform.
+Each is committed when it's built for every platform and verified on Win32,
+Android and, from phase 17, the browser.
+
+13. **Hover and accessibility gaps.**
+    - `PointerEntered` and `PointerExited` (hover tracking) on Win32, Android
+      (hover events from a mouse or stylus) and iOS (`UIHoverGestureRecognizer`).
+    - Accessibility: a `Heading` role, expand and collapse for pickers (UI
+      Automation's ExpandCollapse pattern, Android's expand and collapse
+      actions), and not exposing views that are scaled to nothing.
+
+    **Status: done.**
+    - **Hover:** `PointerEntered`, `PointerExited` and `IsPointerOver`. The
+      framework keeps the path of views under a hovering pointer and raises
+      exits deepest first and entries outermost first, as WPF does; the
+      platforms only report the deepest view under the pointer (lightweight
+      views are found by the framework), or none when it leaves. Win32 uses
+      hover pointer messages and `WM_POINTERLEAVE`; Android the native view's
+      hover events; iOS `UIHoverGestureRecognizer`. Android and iOS wait a
+      turn before treating an exit as leaving the window, since moving into
+      a child or neighbor exits the view first.
+    - **Accessibility:** the `Heading` role (UI Automation's heading level,
+      Android's heading flag, iOS's header trait); `AccessibilityIsExpanded`
+      with expand and collapse actions, which pickers implement (the
+      ExpandCollapse pattern on Win32, expand and collapse actions on
+      Android); and views hidden, or scaled or faded to nothing by an
+      animator, are left out on every platform.
+    - **Flyout buttons** are hidden once collapsed, so they take no input and
+      aren't exposed.
+    - **Verified:**
+      - Win32: hover entering and leaving a button (with a position local to
+        it), and with a UI Automation client, the heading level and a
+        picker's expand and collapse.
+      - Android and Win32: SoonerOrLater exposes only Add and Menu until the
+        flyout opens, then Settings and About, and Settings opens.
+      - Not verified: hover on Android and iOS (the emulator's input tool
+        can't send hover events), and Android's heading flag and expand
+        actions (UI Automator's dump doesn't show them). iOS is only built.
+14. **Platform services and the window.**
+    - Safe-area insets as a framework value (`Page.SafeAreaInsets`), so apps
+      can lay out around notches and system bars themselves.
+    - Connectivity (`IConnectivity`: whether there's a network, and a change
+      event).
+    - File pickers (`IFilePicker`: open one or more files, and save a file).
+
+    **Status: done.**
+    - **Safe area:** `Window.SafeAreaInsets` (and `SafeAreaInsetsChanged`)
+      reports what system bars, a display cutout or the soft keyboard cover.
+      Pages are still kept clear of them by the platform (Android pads the
+      root view; iOS pages lay out in the safe area), unless the current page
+      sets `UsesSafeArea = false` to draw under them. The soft keyboard still
+      pushes such a page up on Android.
+    - **Connectivity:** `IConnectivity.NetworkAccess` (none, local or
+      internet) and `ConnectivityChanged`, on the UI thread. Win32 reads the
+      network interfaces (one that's up with a gateway counts as the
+      internet); Android uses the default network's callback (a network the
+      system validated reaches the internet), declaring the network-state
+      permission from the platform assembly; iOS uses `NWPathMonitor`. Each
+      listens to the system only while the app listens.
+    - **File pickers:** `IFilePicker.PickAsync` (one or more files, filtered
+      by extension) returns `PickedFile`s read with `OpenReadAsync`, since
+      mobile platforms grant access to a file rather than a path;
+      `SaveAsync` lets the user choose where, then writes with a callback.
+      Win32 uses the common file dialogs, Android the Storage Access
+      Framework (with activity results on the activity), iOS the document
+      picker.
+    - **Fixed on the way:**
+      - UI Automation actions ran synchronously on the UI thread, so an
+        action that opened a modal dialog blocked the screen reader (and
+        every later call) until it closed. They now return at once, as UI
+        Automation requires.
+      - `Thickness` prints its values.
+    - **Verified:**
+      - Win32: the network status; opening a scratch text file through the
+        Open dialog (its contents shown) and cancelling it.
+      - Android: the network status, and going offline and back with
+        airplane mode; a page drawing under the status bar and back, with
+        the insets reported.
+      - Not verified: saving through the Save dialog on Win32 (its file-name
+        field couldn't be reached from automation, so the dialog was
+        cancelled), the Android document picker (system UI), and all of iOS,
+        which is only built.
+15. **Lists.**
+    - Pull-to-refresh (`ListView.IsRefreshEnabled`, `RefreshRequested`,
+      `IsRefreshing`).
+    - Horizontal lists and grids (`ListView.Orientation`, and a grid layout
+      with a column count or item width).
+
+    **Status: done.**
+    - **Layouts:** `ListView.Layout` is `ListLayout.Vertical` (the default),
+      `ListLayout.Horizontal`, or `ListLayout.Grid(columns)` (columns of
+      equal width, scrolling vertically). A horizontal list's items are as
+      tall as the list. Groups only show in a vertical list. Each platform
+      uses its own list:
+      - Win32: the virtualized list now realizes lines (an item, or a row of
+        a grid) on either axis; the compositor scrolls sideways for a
+        horizontal list, and drags and the wheel follow the axis.
+      - Android: `ListView` for a vertical list, and AndroidX `RecyclerView`
+        (with a linear or grid layout manager) otherwise, with the same
+        native item containers.
+      - iOS: `UITableView` for a vertical list, and `UICollectionView` with a
+        flow layout otherwise, with cells sized by measuring their content.
+    - **Pull-to-refresh:** `IsRefreshEnabled`, `RefreshRequested`,
+      `IsRefreshing` and `RequestRefresh()`. Win32 draws its own indicator
+      (it follows a touch pull past the top, then spins while refreshing);
+      Android uses AndroidX `SwipeRefreshLayout`, iOS `UIRefreshControl`.
+    - **Fixed on the way:** Android disposed a list's old adapter before
+      replacing it, while the list could still call it, which crashed when
+      a list was bound again.
+    - **Verified:**
+      - Win32: horizontal and grid layouts, and a refresh (the indicator and
+        the new item) through `RequestRefresh`.
+      - Android: pulling to refresh, horizontal (and scrolling it) and grid
+        layouts, and SoonerOrLater's list (a row swiped away and undone).
+      - Not verified: the touch pull and a horizontal wheel on Win32 (no
+        touch or mouse input was sent), and iOS, which is only built.
+16. **Win32 surfaces and windows.**
+    - Tiled surfaces for tall layers, so a long scrolled page doesn't need one
+      surface the size of all its content.
+    - Secondary windows (`Window` objects an app can open and close).
+
+    **Status: done.**
+    - **Tiled surfaces:** a layer taller than 4,096 device pixels draws into
+      a DirectComposition virtual surface: only a band around what's visible
+      (with a margin of 1,024 pixels, in 256-pixel rows) is drawn, and the
+      rest is trimmed. A scroll viewer has its content draw the range a
+      scroll is about to cover before it starts. On the views benchmark page
+      the app's GPU memory fell from 35.6 MB to 16.8 MB.
+    - **Windows:** `Application.OpenWindowAsync(page, title, size)` opens a
+      window with a frame of its own, `Application.Windows` lists the
+      windows, `CanOpenWindows` says whether the platform can (Win32 only),
+      and a `Window` the app opened has `Close()` and `Closed`. Themes and
+      the text size reach every window.
+      - Win32: each window has its own host (window, composition targets,
+        root, popups, focus, pointers, text entries and UI Automation root)
+        over shared graphics devices and one UI thread. Renderers find their
+        window through their root; a popup opens in its placement target's
+        window; a text entry's window moves into the window its view is in.
+        Opened windows are owned by the main one, and closing them doesn't
+        suspend the app.
+    - **Verified** on Win32: the views benchmark scrolled to its end, drawn
+      correctly, with the memory above; a second window opened, used (its
+      own UI Automation tree, focus ring and services) and closed, with the
+      main window told; every test page. Android's test pages still run.
+    - **Not done:** tiling on iOS (it's only built), and wide (rather than
+      tall) layers.
+17. **Web platform: host, layers and drawing.** .NET 10 on WebAssembly with
+    `[JSImport]` and `[JSExport]`, in `platform/web`:
+    - A layer is a DOM element positioned absolutely; lightweight views draw
+      into a `<canvas>` per layer, as on the other platforms.
+    - Text is drawn and measured with the canvas (`fillText`,
+      `measureText`).
+    - Images, theming (`prefers-color-scheme`, `prefers-contrast`), the
+      dispatcher (the browser's event loop) and pointer input (Pointer
+      Events).
+    - A test host page and a web build of the test app.
+
+    **Status: done.**
+    - **`platform/web`** (`XForms.Framework.Web`): .NET 10 on WebAssembly,
+      with `[JSImport]` and `[JSExport]` and one script, `xforms.js`
+      (served to apps as `_content/XForms.Framework.Web/`). Apps call
+      `WebApplication.RunAsync(title, createApp)`.
+    - **Layers and drawing:** each layer is an absolutely positioned element.
+      Lightweight views and owner-drawn controls draw into a `<canvas>` under
+      the layer's child elements, as on Android. Drawing is recorded in .NET
+      as one command list per layer and replayed by the script: one call
+      into JavaScript per layer, not per shape. Shapes, paths, gradients,
+      shadows, images (tinted through an offscreen canvas), clips,
+      transforms and opacity are supported.
+    - **Layout:** the framework lays the root out to the viewport on
+      animation frames, as Win32's host does; elements get their bounds in
+      CSS pixels (XForms' DIPs), and canvases draw at the device pixel
+      ratio.
+    - **Text:** measured with the canvas and broken into lines in .NET, so
+      drawn text and text elements break alike; a text block is an element
+      showing those lines (styled runs as spans). Generic families (serif,
+      monospace) and fonts from files (`FontFace`) work.
+    - **Input:** Pointer Events go to the element under the pointer, then its
+      ancestors, until one takes the press, which then gets the pointer's
+      moves and release (with pointer capture); hover, leaving the page and
+      the wheel are routed too. Touch pans only scroll views (the page
+      itself doesn't pan or zoom).
+    - **Also:** theming from `prefers-color-scheme` (live) and forced colors;
+      a dispatcher on the browser's event loop; animation layers composed
+      into CSS transforms and stepped on animation frames; images from the
+      app's `Content` folder; the services (clipboard, launcher,
+      preferences and secure storage in local storage, `navigator.share`,
+      vibration, `navigator.onLine`, file inputs and downloads); suspend
+      when the page is hidden.
+    - **Basic versions, finished in phase 18:** text boxes (`<input>` and
+      `<textarea>`), scroll views (native overflow), lists (every item, not
+      yet virtualized; no pull-to-refresh), popups (over a backdrop that
+      dismisses them).
+    - **Test app:** `test/XForms.Test.Web`, with `?page=` picking the page.
+      `dotnet publish` it and serve `wwwroot` (the SDK's development server
+      didn't serve the app's files here).
+    - **Verified** in the browser: the default, accessibility, drawing,
+      animation, app layer and lists pages; clicks on buttons, toggles,
+      radio buttons and list rows; a drop-down; navigating forward and
+      back; preferences and the network status; dark mode switching live;
+      list grids; native scrolling.
+    - **Fixed on the way:** none in the framework; the web platform's own
+      first-run bugs (a native panel given lightweight children, generic
+      font names quoted in CSS, line limits without ellipses) are fixed.
+18. **Web platform: controls, animation and app layer.**
+    - Native primitives: `<input>` and `<textarea>` for text boxes, a
+      scrolling `<div>` for scroll views, virtualized lists, and popups.
+    - Animation layers with the Web Animations API.
+    - Keyboard focus, and accessibility through ARIA: DOM elements carry
+      roles and states, and lightweight views get hidden accessible elements
+      (as Flutter's semantics tree does).
+    - Navigation with the browser's history and Back button, and services
+      (clipboard, local storage for preferences, `navigator.share`).
+    - SoonerOrLater in the browser.
+
+    **Status: done.**
+    - **Keyboard:** focusable views' elements take focus with Tab
+      (`tabindex`); keys go to the focused element's view, or move focus
+      from the root when nothing is focused. Lightweight focus and its ring
+      work as on the other platforms, and Escape goes back.
+    - **Accessibility:** elements carry ARIA roles and states (button,
+      checkbox, radio, tab, listbox and option, combobox with
+      `aria-expanded`, heading, image; checked, selected, disabled, hidden),
+      updated as views' states change. A layer's accessible lightweight
+      views get invisible elements over them, placed among the native
+      elements in the views' order (only those elements move, so native
+      scroll positions and focus aren't disturbed); a click on one, as a
+      screen reader sends, performs the view's default action.
+    - **History:** a history entry stands for the app's back stack, so the
+      browser's Back goes back in the app; it's taken away when the app goes
+      back to its first page on its own.
+    - **Lists:** virtualized by lines (an item, or a grid's row or column):
+      only those near the viewport have containers, recycled as it scrolls,
+      with unmeasured lines estimated and a sizer giving the scroll extent.
+      Pull-to-refresh follows touches (which go on while the list scrolls)
+      and mouse drags from the top, with a spinning indicator while the list
+      refreshes.
+    - **Images** start loading when first drawn, and their layer draws again
+      once they have, so apps needn't wait for bitmaps (the browser has one
+      thread to wait on).
+    - **Files:** .NET's file system in the browser is in memory, and the app
+      data folders are empty paths there. The files the app writes (outside
+      the runtime's folders) are restored from local storage before the app
+      starts and saved there after it suspends.
+    - **Animation** stays as phase 17 left it: layers composed into CSS
+      transforms on animation frames, rather than the Web Animations API.
+    - **SoonerOrLater:** `SoonerOrLater.XForms.Web`. Its model uses an
+      `AppFileStore` (isolated storage, or a folder in the browser, which
+      has no isolated storage), and it loads bitmaps without waiting in the
+      browser.
+    - **Verified** in the browser: Tab focus with the ring, Space toggling a
+      focused toggle; the accessibility tree's roles, names and order;
+      navigating and the browser's Back; list virtualization in list, row
+      and grid layouts; pull-to-refresh (with synthetic pointer events).
+      SoonerOrLater: adding a task, swiping it done, the menu, Settings
+      (dark theme, accent color), and its tasks and settings kept across
+      reloads.
+    - **Not verified:** a screen reader; touch pulls on a real touch screen.

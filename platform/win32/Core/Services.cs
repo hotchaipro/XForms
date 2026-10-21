@@ -26,6 +26,8 @@ namespace XForms.Win32
                 SecureStorage = new ProtectedStorage(Path.Combine(AppDataFolder, "secure.json")),
                 Share = new ClipboardShare(),
                 HapticFeedback = new NoHapticFeedback(),
+                Connectivity = new NetworkConnectivity(),
+                FilePicker = new CommonFileDialogs(Win32Host.Current),
             };
         }
 

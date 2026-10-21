@@ -22,21 +22,28 @@ namespace XForms.Win32.Automation
         private static int _nextRuntimeId;
         private static RootProvider _root;
 
-        public static RootProvider Root
-        {
-            get
-            {
-                if (null == _root)
-                {
-                    _root = new RootProvider(Win32Host.Current);
+        private static readonly Dictionary<Win32Host, RootProvider> Roots = new Dictionary<Win32Host, RootProvider>();
 
+        /// <summary>
+        /// The automation element for a window's client area.
+        /// </summary>
+        public static RootProvider RootFor(
+            Win32Host host)
+        {
+            if (!Roots.TryGetValue(host, out var root))
+            {
+                if (0 == Roots.Count)
+                {
                     // Once a client has asked for the tree, views tell it when
                     // their states change
                     View.AccessibilityStateChanged += RaiseStateChanged;
                 }
 
-                return _root;
+                root = new RootProvider(host);
+                Roots[host] = root;
             }
+
+            return root;
         }
 
         public static ElementProvider GetElement(
@@ -65,7 +72,7 @@ namespace XForms.Win32.Automation
         public static bool IsAccessible(
             ViewRenderer renderer)
         {
-            if (!(renderer.Element is View view) || (view.AccessibilityRole == AccessibilityRole.None) || !renderer.IsShownOnScreen)
+            if (!(renderer.Element is View view) || (view.AccessibilityRole == AccessibilityRole.None) || !renderer.IsShownOnScreen || view.IsHiddenFromAccessibility)
             {
                 return false;
             }
@@ -78,14 +85,15 @@ namespace XForms.Win32.Automation
         /// The accessible children of an element (or of the window, for null).
         /// </summary>
         public static List<ViewRenderer> GetChildren(
-            ViewRenderer parent)
+            ViewRenderer parent,
+            Win32Host window = null)
         {
             var children = new List<ViewRenderer>();
 
             if (null == parent)
             {
                 // The window holds the page, then any popups above it
-                var host = Win32Host.Current;
+                var host = window ?? Win32Host.Current;
                 if (null != host.Root)
                 {
                     CollectAccessible(host.Root, children);
@@ -111,7 +119,7 @@ namespace XForms.Win32.Automation
             ViewRenderer renderer,
             List<ViewRenderer> result)
         {
-            if (!renderer.IsShownOnScreen)
+            if (!renderer.IsShownOnScreen || ((renderer.Element is View view) && view.IsHiddenFromAccessibility))
             {
                 return;
             }
@@ -146,9 +154,10 @@ namespace XForms.Win32.Automation
         }
 
         public static ViewRenderer AccessibleAt(
+            Win32Host host,
             Point point)
         {
-            Win32Host.Current.HitTest(point, out var hit);
+            host.HitTest(point, out var hit);
             for (var renderer = hit; null != renderer; renderer = renderer.ParentRenderer)
             {
                 if (IsAccessible(renderer))
@@ -204,6 +213,11 @@ namespace XForms.Win32.Automation
                 }
             }
 
+            if (view.AccessibilityIsExpanded is bool isExpanded)
+            {
+                UiaNative.UiaRaiseAutomationPropertyChangedEvent(provider, UiaConstants.ExpandCollapseExpandCollapseStatePropertyId, empty, Variant.FromInt(isExpanded ? UiaConstants.Expanded : UiaConstants.Collapsed));
+            }
+
             if (null != view.AccessibilityValue)
             {
                 var value = Variant.FromString(view.AccessibilityValue);
@@ -225,13 +239,13 @@ namespace XForms.Win32.Automation
                         var parent = GetParent(element);
                         return (null != parent)
                             ? GetInterface<IRawElementProviderFragment>(GetElement(parent))
-                            : GetInterface<IRawElementProviderFragment>(Root);
+                            : GetInterface<IRawElementProviderFragment>(RootFor(element.WindowHost));
                     }
 
                 case UiaConstants.NextSibling:
                 case UiaConstants.PreviousSibling:
                     {
-                        var siblings = GetChildren(GetParent(element));
+                        var siblings = GetChildren(GetParent(element), element.WindowHost);
                         int index = siblings.IndexOf(element) + ((direction == UiaConstants.NextSibling) ? 1 : -1);
                         return ((index >= 0) && (index < siblings.Count))
                             ? GetInterface<IRawElementProviderFragment>(GetElement(siblings[index]))
@@ -286,9 +300,10 @@ namespace XForms.Win32.Automation
 
         public static UiaRect ScreenBounds(
             Point origin,
-            Size size)
+            Size size,
+            Win32Host host = null)
         {
-            var host = Win32Host.Current;
+            host ??= Win32Host.Current;
             var screen = host.ClientToScreen(origin);
 
             return new UiaRect()
@@ -305,7 +320,7 @@ namespace XForms.Win32.Automation
     /// An automation element for one accessible view.
     /// </summary>
     [GeneratedComClass]
-    internal sealed unsafe partial class ElementProvider : IRawElementProviderSimple, IRawElementProviderFragment, IInvokeProvider, IToggleProvider, ISelectionItemProvider, IValueProvider
+    internal sealed unsafe partial class ElementProvider : IRawElementProviderSimple, IRawElementProviderFragment, IInvokeProvider, IToggleProvider, ISelectionItemProvider, IValueProvider, IExpandCollapseProvider
     {
         private readonly WeakReference<ViewRenderer> _renderer;
         private readonly int _runtimeId;
@@ -441,6 +456,14 @@ namespace XForms.Win32.Automation
 
                         break;
 
+                    case UiaConstants.ExpandCollapsePatternId:
+                        if (view.IsAccessibilityActionSupported(AccessibilityAction.Expand))
+                        {
+                            result = AutomationTree.GetInterface<IExpandCollapseProvider>(this);
+                        }
+
+                        break;
+
                     case UiaConstants.ValuePatternId:
                         if (null != view.AccessibilityValue)
                         {
@@ -479,7 +502,7 @@ namespace XForms.Win32.Automation
                         break;
 
                     case UiaConstants.HasKeyboardFocusPropertyId:
-                        result = Variant.FromBool(Win32Host.Current.Focus.Focused == renderer);
+                        result = Variant.FromBool(renderer.WindowHost.Focus.Focused == renderer);
                         break;
 
                     case UiaConstants.IsEnabledPropertyId:
@@ -503,6 +526,22 @@ namespace XForms.Win32.Automation
                         if (view.AccessibilityIsChecked is bool isChecked)
                         {
                             result = Variant.FromInt(isChecked ? UiaConstants.ToggleStateOn : UiaConstants.ToggleStateOff);
+                        }
+
+                        break;
+
+                    case UiaConstants.ExpandCollapseExpandCollapseStatePropertyId:
+                        if (view.AccessibilityIsExpanded is bool isExpanded)
+                        {
+                            result = Variant.FromInt(isExpanded ? UiaConstants.Expanded : UiaConstants.Collapsed);
+                        }
+
+                        break;
+
+                    case UiaConstants.HeadingLevelPropertyId:
+                        if (view.AccessibilityRole == AccessibilityRole.Heading)
+                        {
+                            result = Variant.FromInt(UiaConstants.HeadingLevel1);
                         }
 
                         break;
@@ -558,7 +597,7 @@ namespace XForms.Win32.Automation
             var result = new UiaRect();
             int hr = this.OnUIThread((renderer) =>
             {
-                result = AutomationTree.ScreenBounds(renderer.AbsoluteOrigin(), renderer.Frame.Size);
+                result = AutomationTree.ScreenBounds(renderer.AbsoluteOrigin(), renderer.Frame.Size, renderer.WindowHost);
                 return 0;
             });
 
@@ -576,14 +615,25 @@ namespace XForms.Win32.Automation
         {
             return this.OnUIThread((renderer) =>
             {
-                Win32Host.Current.Focus.SetFocus(renderer, showRing: true);
+                renderer.WindowHost.Focus.SetFocus(renderer, showRing: true);
                 return 0;
             });
         }
 
         public int GetFragmentRoot(out nint root)
         {
-            root = AutomationTree.GetInterface<IRawElementProviderFragmentRoot>(AutomationTree.Root);
+            nint result = 0;
+            int hr = this.OnUIThread((renderer) =>
+            {
+                result = AutomationTree.GetInterface<IRawElementProviderFragmentRoot>(AutomationTree.RootFor(renderer.WindowHost));
+                return 0;
+            });
+
+            root = result;
+            if (hr != 0)
+            {
+                return hr;
+            }
             return 0;
         }
 
@@ -593,7 +643,19 @@ namespace XForms.Win32.Automation
         private int Perform(
             AccessibilityAction action)
         {
-            return this.OnUIThread((renderer) => ((View)renderer.Element).PerformAccessibilityAction(action) ? 0 : E_FAIL);
+            // NOTE: Actions must return right away: one may open a modal dialog,
+            // which would block the client (and every later call) until closed
+            return this.OnUIThread((renderer) =>
+            {
+                var view = (View)renderer.Element;
+                if (!view.IsAccessibilityActionSupported(action))
+                {
+                    return E_FAIL;
+                }
+
+                Win32Host.Current.Post(() => view.PerformAccessibilityAction(action));
+                return 0;
+            });
         }
 
         public int Invoke()
@@ -612,6 +674,29 @@ namespace XForms.Win32.Automation
             int hr = this.OnUIThread((renderer) =>
             {
                 result = (((View)renderer.Element).AccessibilityIsChecked == true) ? UiaConstants.ToggleStateOn : UiaConstants.ToggleStateOff;
+                return 0;
+            });
+
+            state = result;
+            return hr;
+        }
+
+        public int Expand()
+        {
+            return this.Perform(AccessibilityAction.Expand);
+        }
+
+        public int Collapse()
+        {
+            return this.Perform(AccessibilityAction.Collapse);
+        }
+
+        public int get_ExpandCollapseState(out int state)
+        {
+            int result = 0;
+            int hr = this.OnUIThread((renderer) =>
+            {
+                result = (((View)renderer.Element).AccessibilityIsExpanded == true) ? UiaConstants.Expanded : UiaConstants.Collapsed;
                 return 0;
             });
 
@@ -737,7 +822,7 @@ namespace XForms.Win32.Automation
             {
                 if ((direction == UiaConstants.FirstChild) || (direction == UiaConstants.LastChild))
                 {
-                    var children = AutomationTree.GetChildren(null);
+                    var children = AutomationTree.GetChildren(null, this._host);
                     if (children.Count > 0)
                     {
                         var child = (direction == UiaConstants.FirstChild) ? children[0] : children[children.Count - 1];
@@ -788,7 +873,7 @@ namespace XForms.Win32.Automation
             nint result = 0;
             this._host.InvokeSync(() =>
             {
-                var element = AutomationTree.AccessibleAt(this._host.ScreenToClient(x, y));
+                var element = AutomationTree.AccessibleAt(this._host, this._host.ScreenToClient(x, y));
                 result = (null != element)
                     ? AutomationTree.GetInterface<IRawElementProviderFragment>(AutomationTree.GetElement(element))
                     : AutomationTree.GetInterface<IRawElementProviderFragment>(this);

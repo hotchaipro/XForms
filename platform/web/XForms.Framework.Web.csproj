@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <!-- The XForms framework on the web: .NET on WebAssembly, with DOM
+       elements for layers and native primitives, and canvases for drawing.
+       wwwroot/xforms.js is served to apps as _content/XForms.Framework.Web/. -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>XForms.Web</RootNamespace>
+    <AssemblyName>XForms.Framework.Web</AssemblyName>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\framework\XForms.Framework.csproj" />
+  </ItemGroup>
+
+</Project>

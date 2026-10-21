@@ -42,6 +42,15 @@ namespace XForms.Test
             modes.Children.Add(this.CreateButton("Add", this.AddFruit));
             modes.Children.Add(this.CreateButton("Remove selected", this.RemoveSelected));
             header.Children.Add(modes);
+
+            // Layouts: a list, a row and a grid (without groups, which only
+            // a vertical list shows)
+            var layouts = new WrapPanel() { ItemSpacing = 8, LineSpacing = 8 };
+            layouts.Children.Add(this.CreateButton("List", () => this.SetLayout(ListLayout.Vertical)));
+            layouts.Children.Add(this.CreateButton("Row", () => this.SetLayout(ListLayout.Horizontal)));
+            layouts.Children.Add(this.CreateButton("Grid", () => this.SetLayout(ListLayout.Grid(3))));
+            layouts.Children.Add(this.CreateButton("Refresh", () => this._list.RequestRefresh()));
+            header.Children.Add(layouts);
             page.Children.Add(header, Dock.Top);
 
             // Grouped by first letter, under a header for each
@@ -55,6 +64,17 @@ namespace XForms.Test
             };
             this._list.ItemClick += (sender, e) => { this._lastClick = (string)e.ClickedItem; this.UpdateStatus(); };
             this._list.SelectionChanged += (sender, e) => this.UpdateStatus();
+
+            // Pulling down refreshes: a moment later, a new fruit is at the top
+            this._list.IsRefreshEnabled = true;
+            this._list.RefreshRequested += async (sender, e) =>
+            {
+                this._status.Text = "Refreshing...";
+                await System.Threading.Tasks.Task.Delay(1500);
+                this._fruits.Insert(0, $"Fresh fruit {++this._added}");
+                this._list.IsRefreshing = false;
+                this._status.Text = "Refreshed";
+            };
             page.Children.Add(this._list, Dock.CenterOverlay);
 
             this.Content = page;
@@ -90,6 +110,14 @@ namespace XForms.Test
             {
                 this._fruits.Remove(fruit);
             }
+        }
+
+        private void SetLayout(
+            ListLayout layout)
+        {
+            this._list.GroupKeySelector = (layout == ListLayout.Vertical) ? (fruit) => fruit.Substring(0, 1) : null;
+            this._list.Layout = layout;
+            this._status.Text = $"Layout: {layout.Orientation}, {layout.Columns} across";
         }
 
         private void UpdateStatus()

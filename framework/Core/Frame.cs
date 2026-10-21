@@ -51,6 +51,16 @@ namespace XForms
         private readonly Stack<Page> _backStack = new Stack<Page>();
         private Page _currentPage;
 
+        /// <summary>
+        /// The window a root frame shows in, for a window the app opened; null
+        /// for the main window's.
+        /// </summary>
+        internal Window Window
+        {
+            get;
+            set;
+        }
+
         public Frame()
         {
         }
@@ -202,6 +212,10 @@ namespace XForms
 
             arriving.IsVisible = true;
             this._currentPage = arriving;
+            if (null == this.Window)
+            {
+                this.Application.UpdateSafeAreaUse();
+            }
 
             leaving?.OnNavigatedFrom(new NavigationEventArgs(mode));
             arriving.OnNavigatedTo(new NavigationEventArgs(mode));

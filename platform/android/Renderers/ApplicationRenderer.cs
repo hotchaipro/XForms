@@ -29,6 +29,7 @@ namespace XForms.Android.Renderers
             androidApplication.Suspending += Application_Suspending;
             androidApplication.Resuming += Application_Resuming;
             androidApplication.ConfigurationChanged += (sender, e) => this._applicationDelegate.NotifySystemThemeChanged();
+            androidApplication.SafeAreaInsetsChanged += (insets) => this._applicationDelegate.NotifySafeAreaInsetsChanged(insets);
         }
 
         public AndroidApplicationActivity Activity
@@ -147,6 +148,26 @@ namespace XForms.Android.Renderers
         }
 
         public bool CanResizeWindow => false;
+
+        // A phone shows one window
+        public bool CanOpenWindows => false;
+
+        public IWindowRenderer OpenWindow(
+            Window window,
+            Frame frame,
+            string title,
+            Size size)
+        {
+            throw new PlatformNotSupportedException("This platform shows one window.");
+        }
+
+        public bool ExtendsIntoSafeArea
+        {
+            set
+            {
+                this._androidApplication.ExtendsIntoSafeArea = value;
+            }
+        }
 
         public Size MinimumWindowSize
         {

@@ -15,6 +15,12 @@ namespace XForms.Win32
         /// </summary>
         IDCompositionVisual2* ContentVisual { get; }
 
+        /// <summary>
+        /// Whether the content scrolls sideways. The viewport and content
+        /// "heights" are then widths.
+        /// </summary>
+        bool IsHorizontal { get; }
+
         float ViewportHeight { get; }
 
         float ContentHeight { get; }
@@ -32,7 +38,22 @@ namespace XForms.Win32
     }
 
     /// <summary>
-    /// Vertical scrolling that runs on the compositor: wheel and touchpad steps
+    /// Content that refreshes when pulled down past its top (with touch).
+    /// </summary>
+    internal interface IPullToRefresh
+    {
+        bool IsPullEnabled { get; }
+
+        /// <summary>
+        /// The content is pulled this far (in DIPs) past its top.
+        /// </summary>
+        void OnPull(float distance);
+
+        void OnPullReleased();
+    }
+
+    /// <summary>
+    /// Scrolling (vertical, or horizontal) that runs on the compositor: wheel and touchpad steps
     /// glide, drags track the finger, and flings decelerate. The offset is
     /// evaluated from the same curve the compositor runs, so hit testing and
     /// realization stay in step with what is on screen.
@@ -70,6 +91,14 @@ namespace XForms.Win32
             get
             {
                 return Math.Max(0, this._content.ContentHeight - this._content.ViewportHeight);
+            }
+        }
+
+        public bool IsHorizontal
+        {
+            get
+            {
+                return this._content.IsHorizontal;
             }
         }
 
@@ -213,7 +242,14 @@ namespace XForms.Win32
             host.CompositionDevice->CreateAnimation(&animation);
             animation->AddCubic(0, start, 3 * delta / t, -3 * delta / (t * t), delta / (t * t * t));
             animation->End(duration, start + delta);
-            this._content.ContentVisual->SetOffsetY(animation);
+            if (this._content.IsHorizontal)
+            {
+                this._content.ContentVisual->SetOffsetX(animation);
+            }
+            else
+            {
+                this._content.ContentVisual->SetOffsetY(animation);
+            }
             animation->Release();
 
             host.Flush();
@@ -234,7 +270,16 @@ namespace XForms.Win32
         private void ApplyStaticOffset()
         {
             var host = Win32Host.Current;
-            this._content.ContentVisual->SetOffsetY((float)Math.Round(-this._to * host.Scale));
+            float offset = (float)Math.Round(-this._to * host.Scale);
+            if (this._content.IsHorizontal)
+            {
+                this._content.ContentVisual->SetOffsetX(offset);
+            }
+            else
+            {
+                this._content.ContentVisual->SetOffsetY(offset);
+            }
+
             host.Flush();
         }
 

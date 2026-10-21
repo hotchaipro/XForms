@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk.WebAssembly">
+
+  <!-- The XForms test app in the browser: ?page=lists picks a page, as
+       XFORMS_TEST_PAGE does on Win32 -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>XForms.Test.Web</RootNamespace>
+    <AssemblyName>XForms.Test.Web</AssemblyName>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <StaticWebAssetFingerprintPattern Include="JS" Pattern="*.js" Expression="#[.{fingerprint}]!" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\XForms.Test\*.cs" LinkBase="Shared" />
+  </ItemGroup>
+
+  <!-- Images are served from Content, as on Win32 -->
+  <ItemGroup>
+    <Content Include="..\Content\**\*" Link="wwwroot\Content\%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\framework\XForms.Framework.csproj" />
+    <ProjectReference Include="..\..\platform\web\XForms.Framework.Web.csproj" />
+    <ProjectReference Include="..\..\toolkit\XForms.Toolkit.csproj" />
+    <ProjectReference Include="..\..\spikes\XForms.Xaml\XForms.Xaml.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Direct2D;
@@ -58,6 +58,20 @@ namespace XForms.Win32.Renderers
         // The visual this view's root visual was added to: its layer's
         private IDCompositionVisual2* _hostedIn;
         private IDCompositionSurface* _surface;
+
+        // A layer taller than this (in device pixels) draws only a band around
+        // what's visible, into a virtual surface: one surface for all of a long
+        // page would take a lot of memory, and can be larger than the GPU allows
+        private const int TiledThreshold = 4096;
+
+        // How far beyond the range it must show a tiled layer draws (in device
+        // pixels), so short scrolls need no drawing
+        private const int TiledMargin = 1024;
+
+        private IDCompositionVirtualSurface* _virtualSurface;
+
+        // The rows of a tiled layer that are drawn (in device pixels), or none
+        private int _drawnTop, _drawnBottom;
         private AnimationLayer[] _layers;
         private int _surfaceWidth, _surfaceHeight;
         private Rect _frame;
@@ -164,7 +178,32 @@ namespace XForms.Win32.Renderers
         {
             get
             {
-                return Win32Host.Current;
+                return this.WindowHost;
+            }
+        }
+
+        private Win32Host _windowHost;
+
+        /// <summary>
+        /// The window the view is in: its root's (a window's root view, or a
+        /// popup's), or the main window before it's in one.
+        /// </summary>
+        public Win32Host WindowHost
+        {
+            get
+            {
+                var root = this;
+                while (null != root.ParentRenderer)
+                {
+                    root = root.ParentRenderer;
+                }
+
+                return root._windowHost ?? Win32Host.Current;
+            }
+
+            set
+            {
+                this._windowHost = value;
             }
         }
 
@@ -681,16 +720,21 @@ namespace XForms.Win32.Renderers
 
             if ((!(this.HasContent || this.HasLightweightChildren)) || (width <= 0) || (height <= 0))
             {
-                if (null != this._surface)
-                {
-                    this._visual->SetContent(null);
-                    this._surface->Release();
-                    this._surface = null;
-                    this._surfaceWidth = 0;
-                    this._surfaceHeight = 0;
-                }
-
+                this.ReleaseSurfaces();
                 return;
+            }
+
+            if (height > TiledThreshold)
+            {
+                // Its content changed: draw the band it needs again
+                this._drawnTop = this._drawnBottom = 0;
+                this.RenderTiled(width, height, this.VisibleRows(height));
+                return;
+            }
+
+            if (null != this._virtualSurface)
+            {
+                this.ReleaseSurfaces();
             }
 
             if ((null == this._surface) || (width != this._surfaceWidth) || (height != this._surfaceHeight))
@@ -745,6 +789,153 @@ namespace XForms.Win32.Renderers
                 this._surface->EndDraw();
                 context->Release();
             }
+        }
+
+        private void ReleaseSurfaces()
+        {
+            if ((null == this._surface) && (null == this._virtualSurface))
+            {
+                return;
+            }
+
+            this._visual->SetContent(null);
+            if (null != this._surface)
+            {
+                this._surface->Release();
+                this._surface = null;
+            }
+
+            if (null != this._virtualSurface)
+            {
+                this._virtualSurface->Release();
+                this._virtualSurface = null;
+            }
+
+            this._surfaceWidth = 0;
+            this._surfaceHeight = 0;
+            this._drawnTop = this._drawnBottom = 0;
+        }
+
+        // The rows of the layer (in device pixels) inside the window
+        private (int Top, int Bottom) VisibleRows(
+            int height)
+        {
+            float scale = this.Host.Scale;
+            float top = -this.AbsoluteOrigin().Y;
+            float bottom = top + this.Host.ClientSize.Height;
+            return (
+                Math.Clamp((int)Math.Floor(top * scale), 0, height),
+                Math.Clamp((int)Math.Ceiling(bottom * scale), 0, height));
+        }
+
+        /// <summary>
+        /// Makes sure a tiled layer has drawn the rows (in DIPs, in its own
+        /// coordinates) it's about to show, such as when its scroll viewer
+        /// starts to scroll across them.
+        /// </summary>
+        public void EnsureDrawn(
+            float top,
+            float bottom)
+        {
+            if ((null == this._virtualSurface) || this._isLightweight)
+            {
+                return;
+            }
+
+            float scale = this.Host.Scale;
+            int height = this._surfaceHeight;
+            int needTop = Math.Clamp((int)Math.Floor(top * scale), 0, height);
+            int needBottom = Math.Clamp((int)Math.Ceiling(bottom * scale), 0, height);
+            if ((needTop >= this._drawnTop) && (needBottom <= this._drawnBottom))
+            {
+                return;
+            }
+
+            this.RenderTiled(this._surfaceWidth, height, (needTop, needBottom));
+            this.Host.RequestCommit();
+        }
+
+        // Draws the band around the rows into the virtual surface, and lets the
+        // rest go
+        private void RenderTiled(
+            int width,
+            int height,
+            (int Top, int Bottom) rows)
+        {
+            if (null != this._surface)
+            {
+                this._surface->Release();
+                this._surface = null;
+            }
+
+            if (null == this._virtualSurface)
+            {
+                IDCompositionVirtualSurface* virtualSurface;
+                this.Host.CompositionDevice->CreateVirtualSurface(
+                    (uint)width,
+                    (uint)height,
+                    DXGI_FORMAT.DXGI_FORMAT_B8G8R8A8_UNORM,
+                    DXGI_ALPHA_MODE.DXGI_ALPHA_MODE_PREMULTIPLIED,
+                    &virtualSurface);
+                this._virtualSurface = virtualSurface;
+                this._visual->SetContent((IUnknown*)virtualSurface);
+            }
+            else if ((width != this._surfaceWidth) || (height != this._surfaceHeight))
+            {
+                this._virtualSurface->Resize((uint)width, (uint)height);
+            }
+
+            this._surfaceWidth = width;
+            this._surfaceHeight = height;
+
+            // Round the band out to whole tiles' worth of rows
+            const int Rows = 256;
+            int top = Math.Max(0, ((rows.Top - TiledMargin) / Rows) * Rows);
+            int bottom = Math.Min(height, (((rows.Bottom + TiledMargin) + Rows - 1) / Rows) * Rows);
+            if (bottom <= top)
+            {
+                return;
+            }
+
+            var band = new RECT() { left = 0, top = top, right = width, bottom = bottom };
+            this._virtualSurface->BeginDraw(band, ID2D1DeviceContext.IID_Guid, out var contextPointer, out var surfaceOffset);
+            var context = (ID2D1DeviceContext*)contextPointer;
+            try
+            {
+                float scale = this.Host.Scale;
+                context->SetDpi(96, 96);
+
+                // The band's top left is at the surface offset
+                context->SetTransform(new D2D_MATRIX_3X2_F()
+                {
+                    Anonymous = new D2D_MATRIX_3X2_F._Anonymous_e__Union()
+                    {
+                        Anonymous1 = new D2D_MATRIX_3X2_F._Anonymous_e__Union._Anonymous1_e__Struct()
+                        {
+                            m11 = scale,
+                            m22 = scale,
+                            dx = surfaceOffset.X,
+                            dy = surfaceOffset.Y - top,
+                        },
+                    },
+                });
+
+                var drawContext = new DrawContext(context, new Rect(0, 0, this._frame.Width, this._frame.Height));
+                drawContext.Clear(this._backgroundColor);
+                this.DrawContent(drawContext);
+                this.DrawLightweightChildren(drawContext);
+                drawContext.Release();
+            }
+            finally
+            {
+                this._virtualSurface->EndDraw();
+                context->Release();
+            }
+
+            // Keep only the band
+            this._virtualSurface->Trim(&band, 1);
+            this._drawnTop = top;
+            this._drawnBottom = bottom;
         }
 
         protected virtual void DrawContent(

@@ -22,6 +22,8 @@ namespace XForms.iOS
                 SecureStorage = new KeychainStorage(),
                 Share = new ActivityShare(application),
                 HapticFeedback = new GeneratorHapticFeedback(),
+                Connectivity = new PathConnectivity(),
+                FilePicker = new DocumentPicker(application),
             };
         }
     }

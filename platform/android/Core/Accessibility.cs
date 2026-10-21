@@ -51,6 +51,7 @@ namespace XForms.Android
                 case AccessibilityRole.List: return "android.widget.ListView";
                 case AccessibilityRole.Image: return "android.widget.ImageView";
                 case AccessibilityRole.TextBox: return "android.widget.EditText";
+                case AccessibilityRole.Heading: return "android.widget.TextView";
                 default: return "android.view.ViewGroup";
             }
         }
@@ -93,6 +94,16 @@ namespace XForms.Android
             if (view.IsAccessibilityActionSupported(AccessibilityAction.Select))
             {
                 info.Selected = view.AccessibilityIsSelected;
+            }
+
+            if (view.AccessibilityIsExpanded is bool isExpanded)
+            {
+                info.AddAction(isExpanded ? AccessibilityNodeInfo.AccessibilityAction.ActionCollapse : AccessibilityNodeInfo.AccessibilityAction.ActionExpand);
+            }
+
+            if ((role == AccessibilityRole.Heading) && OperatingSystem.IsAndroidVersionAtLeast(28))
+            {
+                info.Heading = true;
             }
 
             if (view.IsAccessibilityActionable)
@@ -144,6 +155,12 @@ namespace XForms.Android
         {
             base.OnInitializeAccessibilityNodeInfo(host, info);
 
+            if (this._view.TryGetTarget(out var hidden) && hidden.IsHiddenFromAccessibility)
+            {
+                info.VisibleToUser = false;
+                return;
+            }
+
             if (this._view.TryGetTarget(out var view) && (view.AccessibilityRole != AccessibilityRole.None))
             {
                 AndroidAccessibility.Populate(info, view);
@@ -164,6 +181,11 @@ namespace XForms.Android
                 }
 
                 return false;
+            }
+
+            if (((action == NodeAction.Expand) || (action == NodeAction.Collapse)) && this._view.TryGetTarget(out var expandable))
+            {
+                return expandable.PerformAccessibilityAction((action == NodeAction.Expand) ? AccessibilityAction.Expand : AccessibilityAction.Collapse);
             }
 
             return base.PerformAccessibilityAction(host, action, args);
@@ -258,7 +280,7 @@ namespace XForms.Android
             for (int i = 0; i < children.Count; i += 1)
             {
                 var child = children[i];
-                if (!child.IsVisible)
+                if (!child.IsVisible || child.IsHiddenFromAccessibility)
                 {
                     continue;
                 }
@@ -470,6 +492,12 @@ namespace XForms.Android
                     }
 
                     return false;
+
+                case NodeAction.Expand:
+                    return view.PerformAccessibilityAction(AccessibilityAction.Expand);
+
+                case NodeAction.Collapse:
+                    return view.PerformAccessibilityAction(AccessibilityAction.Collapse);
 
                 default:
                     return false;

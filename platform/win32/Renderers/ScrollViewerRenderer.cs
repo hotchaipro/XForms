@@ -13,6 +13,8 @@ namespace XForms.Win32.Renderers
         // Scrolled-out content takes no input
         protected override bool ClipsHitTesting => true;
 
+        public bool IsHorizontal => false;
+
         private readonly IDCompositionVisual2* _contentVisual;
         private readonly ScrollController _scroller;
         private View _content;
@@ -113,10 +115,14 @@ namespace XForms.Win32.Renderers
             float fromOffset,
             float toOffset)
         {
+            // A tall content layer draws what's about to come into view
+            (this._content?.Renderer as ViewRenderer)?.EnsureDrawn(fromOffset, toOffset + this.ViewportHeight);
         }
 
         public void OnScrollSettled()
         {
+            float offset = this._scroller.Offset;
+            (this._content?.Renderer as ViewRenderer)?.EnsureDrawn(offset, offset + this.ViewportHeight);
             this.Host.UpdateTextBoxPositions();
         }
 

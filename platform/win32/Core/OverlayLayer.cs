@@ -73,6 +73,7 @@ namespace XForms.Win32
 
             this._previousFocus.Add(this._host.Focus.Focused);
             this._overlays.Add(overlay);
+            overlay.Renderer.WindowHost = this._host;
 
             // NOTE: A null reference with insertAbove false places the visual on top
             this._visual->AddVisual((IDCompositionVisual*)overlay.Renderer.Visual, false, null);

@@ -16,6 +16,30 @@ namespace XForms
         /// color, high-contrast colors or text size.
         /// </summary>
         void NotifySystemThemeChanged();
+
+        /// <summary>
+        /// The parts of the window covered by system bars, a display cutout or
+        /// the soft keyboard changed (in DIPs).
+        /// </summary>
+        void NotifySafeAreaInsetsChanged(Thickness insets);
+    }
+
+    /// <summary>
+    /// A window other than the main one (on the desktop).
+    /// </summary>
+    public interface IWindowRenderer
+    {
+        string Title { set; }
+
+        Size MinimumSize { set; }
+
+        void Resize(Size size);
+
+        /// <summary>
+        /// Closes the window; the platform then calls the window's
+        /// <c>OnClosed</c>.
+        /// </summary>
+        void Close();
     }
 
     public interface IApplicationRenderer
@@ -68,6 +92,24 @@ namespace XForms
         Size MinimumWindowSize { set; }
 
         void ResizeWindow(Size size);
+
+        /// <summary>
+        /// Whether the current page draws under the system bars and display
+        /// cutout (its <see cref="Page.UsesSafeArea"/> is false). Otherwise the
+        /// platform keeps the page clear of them.
+        /// </summary>
+        bool ExtendsIntoSafeArea { set; }
+
+        /// <summary>
+        /// Whether the app can open windows besides its main one.
+        /// </summary>
+        bool CanOpenWindows { get; }
+
+        /// <summary>
+        /// Opens a window showing the frame. The platform reports its size and
+        /// its closing to the window (<c>OnSizeChanged</c>, <c>OnClosed</c>).
+        /// </summary>
+        IWindowRenderer OpenWindow(Window window, Frame frame, string title, Size size);
 
         Color? TitleBarAccentColor { get; set; }
 
@@ -293,6 +335,10 @@ namespace XForms
             this.OnThemeChanged(theme);
 
             this._rootFrame.UpdateTheme();
+            foreach (var window in this._windows)
+            {
+                window.Frame.UpdateTheme();
+            }
             foreach (var popup in this._openPopups)
             {
                 popup.UpdateTheme();
@@ -491,6 +537,60 @@ namespace XForms
         /// </summary>
         public event EventHandler<KeyEventArgs> PreviewKeyDown;
 
+        // The views under a hovering pointer, deepest first
+        private List<View> _pointerOverPath = new List<View>();
+        private int _pointerOverVersion;
+
+        /// <summary>
+        /// Counts changes to the views under the hovering pointer, so a
+        /// platform can tell whether the pointer moved on to another view after
+        /// it left one.
+        /// </summary>
+        internal int PointerOverVersion
+        {
+            get
+            {
+                return this._pointerOverVersion;
+            }
+        }
+
+        /// <summary>
+        /// A hovering pointer moved over a view (its deepest view, or null when
+        /// it left the window). Views it left get <see cref="View.PointerExited"/>,
+        /// deepest first; views it moved into get
+        /// <see cref="View.PointerEntered"/>, outermost first.
+        /// </summary>
+        internal void UpdatePointerOver(
+            View deepest,
+            PointerEventArgs e)
+        {
+            this._pointerOverVersion += 1;
+
+            var path = new List<View>();
+            for (var view = deepest; null != view; view = view.Parent as View)
+            {
+                path.Add(view);
+            }
+
+            foreach (var view in this._pointerOverPath)
+            {
+                if (!path.Contains(view))
+                {
+                    view.SetPointerOver(false, e);
+                }
+            }
+
+            for (int i = path.Count - 1; i >= 0; i -= 1)
+            {
+                if (!this._pointerOverPath.Contains(path[i]))
+                {
+                    path[i].SetPointerOver(true, e);
+                }
+            }
+
+            this._pointerOverPath = path;
+        }
+
         internal bool FilterPointerInput(
             View view,
             PointerEventArgs e)
@@ -546,6 +646,70 @@ namespace XForms
             get;
         }
 
+        // The windows besides the main one
+        private readonly List<Window> _windows = new List<Window>();
+
+        /// <summary>
+        /// Whether the app can open windows besides its main one (on the
+        /// desktop).
+        /// </summary>
+        public bool CanOpenWindows
+        {
+            get
+            {
+                return this.Renderer.CanOpenWindows;
+            }
+        }
+
+        /// <summary>
+        /// The app's windows: the main one, then those it opened.
+        /// </summary>
+        public IReadOnlyList<Window> Windows
+        {
+            get
+            {
+                var windows = new List<Window>() { this.MainWindow };
+                windows.AddRange(this._windows);
+                return windows;
+            }
+        }
+
+        /// <summary>
+        /// Opens a window showing the page, in a frame of its own. Throws where
+        /// the platform has one window (see <see cref="CanOpenWindows"/>).
+        /// </summary>
+        public async Task<Window> OpenWindowAsync(
+            Page page,
+            string title = null,
+            Size? size = null)
+        {
+            if (null == page)
+            {
+                throw new ArgumentNullException(nameof(page));
+            }
+
+            if (!this.CanOpenWindows)
+            {
+                throw new PlatformNotSupportedException("This platform shows one window.");
+            }
+
+            var frame = new Frame();
+            var window = new Window(this, frame);
+            this._windows.Add(window);
+            window.Renderer = this.Renderer.OpenWindow(window, frame, title ?? string.Empty, size ?? new Size(640, 480));
+            window.Title = title;
+            frame.UpdateTheme();
+
+            await frame.NavigateAsync(page, PageTransition.None);
+            return window;
+        }
+
+        internal void OnWindowClosed(
+            Window window)
+        {
+            this._windows.Remove(window);
+        }
+
         /// <summary>
         /// The app's main window.
         /// </summary>
@@ -582,6 +746,10 @@ namespace XForms
 
             this._textScale = scale;
             this._rootFrame.OnTextScaleChanged();
+            foreach (var window in this._windows)
+            {
+                window.Frame.OnTextScaleChanged();
+            }
             foreach (var popup in this._openPopups)
             {
                 popup.OnTextScaleChanged();
@@ -724,6 +892,20 @@ namespace XForms
 
         protected virtual void OnLoadResources()
         {
+        }
+
+        void IApplicationDelegate.NotifySafeAreaInsetsChanged(
+            Thickness insets)
+        {
+            this.MainWindow.OnSafeAreaInsetsChanged(insets);
+        }
+
+        /// <summary>
+        /// Keeps the current page clear of the system bars, or not, as it asks.
+        /// </summary>
+        internal void UpdateSafeAreaUse()
+        {
+            this.Renderer.ExtendsIntoSafeArea = !(this._rootFrame?.CurrentPage?.UsesSafeArea ?? true);
         }
 
         void IApplicationDelegate.NotifySuspend()

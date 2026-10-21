@@ -52,6 +52,11 @@ namespace XForms
             }
         }
 
+        public override string ToString()
+        {
+            return $"{this.Left:0.#},{this.Top:0.#},{this.Right:0.#},{this.Bottom:0.#}";
+        }
+
         public override bool Equals(
             object obj)
         {

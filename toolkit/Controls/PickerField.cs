@@ -30,6 +30,50 @@ namespace XForms.Toolkit
             }
         }
 
+        public override bool? AccessibilityIsExpanded
+        {
+            get
+            {
+                return this.IsPickerOpen;
+            }
+        }
+
+        public override bool PerformAccessibilityAction(
+            AccessibilityAction action)
+        {
+            if ((action == AccessibilityAction.Collapse) && this.IsPickerOpen)
+            {
+                this.ClosePicker();
+                return true;
+            }
+
+            if ((action == AccessibilityAction.Expand) && !this.IsPickerOpen)
+            {
+                this.OpenPicker();
+                return true;
+            }
+
+            return base.PerformAccessibilityAction(action);
+        }
+
+        /// <summary>
+        /// Whether the picker's popup is open.
+        /// </summary>
+        protected virtual bool IsPickerOpen
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Closes the picker's popup.
+        /// </summary>
+        protected virtual void ClosePicker()
+        {
+        }
+
         public override string AccessibilityValue
         {
             get
