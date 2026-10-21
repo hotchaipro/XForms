@@ -1,6 +1,7 @@
 ﻿using System;
 using UIKit;
-using XForms.Controls;
+using XForms.Primitives;
+using XForms.Platform;
 
 namespace XForms.iOS.Renderers
 {
@@ -9,7 +10,7 @@ namespace XForms.iOS.Renderers
     /// behavior: selection, loupe, autocorrect, dictation, text replacement and
     /// Dynamic Type. Single-line entry uses UITextField; multiline uses UITextView.
     /// </summary>
-    internal class TextBoxRenderer : ControlRenderer<TextBoxRenderer.NativeTextEntryView>, ITextBoxRenderer
+    internal class TextBoxRenderer : ViewRenderer<TextBoxRenderer.NativeTextEntryView>, ITextBoxRenderer
     {
         private readonly NativeTextEntryView _container;
         private readonly UILabel _placeholderLabel;

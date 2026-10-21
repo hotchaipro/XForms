@@ -1,7 +1,7 @@
 ﻿using System;
 using XForms.Android.Renderers;
-using XForms.Controls;
-using XForms.Layouts;
+using XForms.Primitives;
+using XForms.Platform;
 
 namespace XForms.Android
 {
@@ -20,6 +20,14 @@ namespace XForms.Android
             this._androidApplication = androidApplication;
         }
 
+        public bool UsesLightweightRenderers => true;
+
+        public IContainerRenderer CreateContainerRenderer(
+            View view)
+        {
+            return new ContainerRenderer(this._androidApplication.ApplicationContext, view);
+        }
+
         public IApplicationRenderer CreateApplicationRenderer(
             Application application)
         {
@@ -32,43 +40,10 @@ namespace XForms.Android
             return new FrameRenderer(this._androidApplication.ApplicationContext, frame);
         }
 
-        public IPageRenderer CreatePageRenderer(
-            Page page)
-        {
-            return new PageRenderer(this._androidApplication.ApplicationContext, page);
-        }
-
         public ITextBlockRenderer CreateTextBlockRenderer(
             TextBlock textView)
         {
-            if (textView.CanBeLightweight)
-            {
-                return new LightweightTextBlockRenderer(textView);
-            }
-
             return new TextBlockRenderer(this._androidApplication.ApplicationContext, textView);
-        }
-
-        public IPanelRenderer CreatePanelRenderer(
-            Panel layout)
-        {
-            if (layout.CanBeLightweight)
-            {
-                return new LightweightPanelRenderer(layout);
-            }
-
-            return new PanelRenderer(this._androidApplication.ApplicationContext, layout);
-        }
-
-        public IContentControlRenderer CreateContentControlRenderer(
-            ContentControl xControl)
-        {
-            if (xControl.CanBeLightweight)
-            {
-                return new LightweightControlRenderer(xControl);
-            }
-
-            return new ContentControlRenderer(this._androidApplication.ApplicationContext, xControl);
         }
 
         public IImageRenderer CreateImageRenderer(
@@ -83,10 +58,10 @@ namespace XForms.Android
             return new BitmapRenderer(this._androidApplication.ApplicationContext, bitmap);
         }
 
-        public IListViewRenderer CreateListViewRenderer(
-            ListView listView)
+        public IItemsViewRenderer CreateItemsViewRenderer(
+            ItemsView listView)
         {
-            return new ListViewRenderer(this._androidApplication.ApplicationContext, listView);
+            return new ItemsViewRenderer(this._androidApplication.ApplicationContext, listView);
         }
 
         public ITextBoxRenderer CreateTextBoxRenderer(
@@ -107,17 +82,6 @@ namespace XForms.Android
             ScrollViewer scrollView)
         {
             return new ScrollViewerRenderer(this._androidApplication.ApplicationContext, scrollView);
-        }
-
-        public IUserControlRenderer CreateUserControlRenderer(
-            UserControl userControl)
-        {
-            if (userControl.CanBeLightweight)
-            {
-                return new LightweightControlRenderer(userControl);
-            }
-
-            return new UserControlRenderer(this._androidApplication.ApplicationContext, userControl);
         }
 
         public IPopupRenderer CreatePopupRenderer(

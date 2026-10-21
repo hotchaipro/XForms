@@ -3,7 +3,8 @@ using CoreText;
 using Foundation;
 using UIKit;
 
-using XForms.Controls;
+using XForms.Primitives;
+using XForms.Platform;
 
 namespace XForms.iOS.Renderers
 {

@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Windows.Input;
 using XForms.Controls;
 using XForms.Layouts;
+using XForms.Primitives;
 using XForms.Xaml;
 
 namespace XForms.Test

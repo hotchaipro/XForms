@@ -4,6 +4,7 @@ using System.Windows.Input;
 using XForms.Controls;
 using XForms.Input;
 using XForms.Layouts;
+using XForms.Primitives;
 
 namespace XForms.Xaml
 {
@@ -54,7 +55,7 @@ namespace XForms.Xaml
 
         public Button()
         {
-            this.GestureRecognizer = new TapGestureRecognizer(this);
+            this.GestureRecognizers.Add(new TapGestureRecognizer(this));
         }
 
         public object ButtonContent { get; set; }

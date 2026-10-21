@@ -1,7 +1,7 @@
 ﻿using System;
 using Android.Animation;
 using Android.Views.Animations;
-using XForms.Controls;
+using XForms.Primitives;
 
 namespace XForms.Android
 {
@@ -15,7 +15,7 @@ namespace XForms.Android
     {
         private const long ResizeDurationMilliseconds = 250;
 
-        private ListViewItem _itemContainer;
+        private ItemContainer _itemContainer;
         private object _item;
         private object _measuredItem;
         private int _displayedHeight = -1;
@@ -34,7 +34,7 @@ namespace XForms.Android
             this.SetClipChildren(true);
         }
 
-        internal ListViewItem ItemContainer
+        internal ItemContainer ItemContainer
         {
             get
             {

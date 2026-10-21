@@ -3,7 +3,8 @@ using System.IO;
 using System.Threading.Tasks;
 using UIKit;
 
-using XForms.Controls;
+using XForms.Primitives;
+using XForms.Platform;
 
 namespace XForms.iOS.Renderers
 {

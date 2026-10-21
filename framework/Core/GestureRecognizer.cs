@@ -30,15 +30,21 @@ namespace XForms
     {
         private IGestureRecognizerDelegate _delegate;
 
-        public GestureRecognizer(
+        /// <summary>
+        /// A recognizer that reports through its own events.
+        /// </summary>
+        protected GestureRecognizer()
+        {
+            this.State = GestureState.Possible;
+        }
+
+        /// <summary>
+        /// A recognizer that reports to a delegate (the control it belongs to).
+        /// </summary>
+        protected GestureRecognizer(
             IGestureRecognizerDelegate gestureRecognizerDelegate)
         {
-            if (null == gestureRecognizerDelegate)
-            {
-                throw new ArgumentNullException(nameof(gestureRecognizerDelegate));
-            }
-
-            this._delegate = gestureRecognizerDelegate;
+            this._delegate = gestureRecognizerDelegate ?? throw new ArgumentNullException(nameof(gestureRecognizerDelegate));
             this.State = GestureState.Possible;
         }
 
@@ -59,6 +65,47 @@ namespace XForms
         public virtual void Reset()
         {
             this.State = GestureState.Possible;
+        }
+
+        /// <summary>
+        /// The view the recognizer is attached to, or null.
+        /// </summary>
+        protected View View
+        {
+            get;
+            private set;
+        }
+
+        internal void Attach(
+            View view)
+        {
+            this.View = view;
+            this.OnAttached(view);
+        }
+
+        internal void Detach(
+            View view)
+        {
+            this.OnDetached(view);
+            this.View = null;
+        }
+
+        /// <summary>
+        /// Called when the recognizer becomes a view's
+        /// <see cref="View.GestureRecognizer"/>.
+        /// </summary>
+        protected virtual void OnAttached(
+            View view)
+        {
+        }
+
+        /// <summary>
+        /// Called when the recognizer stops being a view's
+        /// <see cref="View.GestureRecognizer"/>.
+        /// </summary>
+        protected virtual void OnDetached(
+            View view)
+        {
         }
 
         private int? _pointerId;
@@ -104,15 +151,15 @@ namespace XForms
 
             if (inputEvent.State == PointerInputState.Began)
             {
-                this._delegate.OnTouchBegan();
+                this._delegate?.OnTouchBegan();
             }
             else if (inputEvent.State == PointerInputState.Ended)
             {
-                this._delegate.OnTouchEnded();
+                this._delegate?.OnTouchEnded();
             }
             else if (inputEvent.State == PointerInputState.Canceled)
             {
-                this._delegate.OnTouchCanceled();
+                this._delegate?.OnTouchCanceled();
             }
 
             this.OnPointerInput(inputEvent, ref result);
@@ -129,5 +176,56 @@ namespace XForms
         protected abstract void OnPointerInput(
             PointerEventArgs inputEvent,
             ref GestureEventResult result);
+    }
+
+    /// <summary>
+    /// A view's gesture recognizers: adding one attaches it to the view,
+    /// removing it detaches it.
+    /// </summary>
+    internal sealed class GestureRecognizerCollection : System.Collections.ObjectModel.Collection<GestureRecognizer>
+    {
+        private readonly View _view;
+
+        public GestureRecognizerCollection(
+            View view)
+        {
+            this._view = view;
+        }
+
+        protected override void InsertItem(
+            int index,
+            GestureRecognizer item)
+        {
+            ArgumentNullException.ThrowIfNull(item);
+            base.InsertItem(index, item);
+            item.Attach(this._view);
+        }
+
+        protected override void SetItem(
+            int index,
+            GestureRecognizer item)
+        {
+            ArgumentNullException.ThrowIfNull(item);
+            this[index].Detach(this._view);
+            base.SetItem(index, item);
+            item.Attach(this._view);
+        }
+
+        protected override void RemoveItem(
+            int index)
+        {
+            this[index].Detach(this._view);
+            base.RemoveItem(index);
+        }
+
+        protected override void ClearItems()
+        {
+            foreach (var item in this)
+            {
+                item.Detach(this._view);
+            }
+
+            base.ClearItems();
+        }
     }
 }

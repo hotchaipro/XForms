@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <!-- The platform implementations reach into framework internals; control
-       libraries (such as the toolkit) use only the public API -->
+       libraries (such as XForms.Controls) use only the public API -->
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
       <_Parameter1>XForms.Framework.Android</_Parameter1>

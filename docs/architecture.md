@@ -1,96 +1,115 @@
 # XForms architecture
 
-XForms is built in three layers. The **framework** contains everything
-platform-specific: hosting, native primitives, input and accessibility. The
-**toolkit** is a library of controls built only on the framework's public API.
-**Apps** use both.
+XForms is built in layers. The **framework** contains only what needs a
+platform: hosting, the views the platforms render natively, raw input,
+drawing, focus and accessibility. **XForms.Controls** is the controls, with
+the panels and gestures, built only on the framework's public API. **Apps**
+use both.
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
 │ App (for example SoonerOrLater)                              │
 ├──────────────────────────────────────────────────────────────┤
-│ Toolkit: XForms.Toolkit                                      │
-│   Buttons, tabs, menus, pickers, calendar, popovers, ...     │
+│ Controls: XForms.Controls                                    │
+│   Buttons, tabs, menus, pickers, calendar, lists, panels,    │
+│   gestures, and their base classes                           │
 │   Built only on the public framework API                     │
 ├──────────────────────────────────────────────────────────────┤
 │ Framework: XForms.Framework                                  │
-│   Application, pages, layout engine, input, accessibility,   │
-│   popups, native primitives, owner-drawn surface             │
-├───────────────────┬────────────────────┬─────────────────────┤
-│ XForms.Framework. │ XForms.Framework.  │ XForms.Framework.   │
-│ Android           │ iOS                │ Win32               │
-└───────────────────┴────────────────────┴─────────────────────┘
+│   Application, pages, views and layout, raw input, focus,    │
+│   accessibility, drawing, popups, native primitives          │
+├──────────────────────────────────────────────────────────────┤
+│ Platform contract: XForms.Platform                           │
+│   Renderer interfaces (implemented by the platforms) and     │
+│   hosts (ApplicationHost, LayerHost) they call               │
+├──────────────┬──────────────┬───────────────┬────────────────┤
+│ XForms.      │ XForms.      │ XForms.       │ XForms.        │
+│ Framework.   │ Framework.   │ Framework.    │ Framework.     │
+│ Android      │ iOS          │ Win32         │ Web            │
+└──────────────┴──────────────┴───────────────┴────────────────┘
 ```
 
 The goal is that any control library built on the framework runs on every
 supported platform with the same look and the same layout. All of the
-per-platform complexity stays inside the framework.
+per-platform complexity stays inside the framework and the platforms.
+
+Planned layers ([alignment.md](alignment.md#layering), phase 22): themes
+(`XForms.Themes.Simple` first) for how the controls look, `XForms.Xaml` for
+markup, and `XForms.Compat.WinUI` for WinUI's API.
 
 ## The rule for what goes where
 
-**Something belongs in the framework only if it needs platform-specific code.
-Everything else belongs in a control library such as the toolkit.**
+**Something belongs in the framework only if the platforms need it.
+Everything else belongs in a control library such as XForms.Controls.**
 
 The framework holds two kinds of things:
 
-- **Native primitives.** These use the platform's own implementation because
-  that's where the quality comes from:
-  - text rendering with the platform's fonts and shaping;
+- **Native primitives** (`XForms.Primitives`). These use the platform's own
+  implementation because that's where the quality comes from:
+  - text rendering with the platform's fonts and shaping (`TextBlock`);
   - text entry with the platform's IME, spell checking, selection and
-    accessibility;
-  - scrolling with the platform's physics;
-  - virtualized lists;
-  - images.
+    accessibility (`TextBox`);
+  - scrolling with the platform's physics (`ScrollViewer`);
+  - virtualized items (`ItemsView`, with `ItemContainer`);
+  - images (`Image`) and popups (`Popup`).
 - **Building blocks every control needs.** Each of these needs platform code:
-  - an owner-drawn surface;
-  - pointer and keyboard input;
+  - `View` as a container: children, an owner-drawn surface (`DrawsContent`,
+    `Render`), a background;
+  - raw pointer input, activation (`Activated`) and an extension point for
+    gestures (`GestureRecognizers`);
   - keyboard focus;
   - accessibility;
-  - popups;
   - compositor animations.
 
-A control is a toolkit control when it can be written once on top of those
-pieces. The toolkit's Button, for example, draws itself through `IDrawContext`
-and reacts to a `TapGestureRecognizer`. It contains no platform code and looks
-identical everywhere.
+A control belongs in XForms.Controls when it can be written once on top of
+those pieces. Its Button, for example, draws itself in `Render` and reacts to
+a `TapGestureRecognizer`. It contains no platform code and looks identical
+everywhere. Panels, `Control`, `ContentControl` and `UserControl`, and the
+gesture recognizers (tap, double tap and hold included), are built the same
+way.
 
 The same rule decides which layer owns a new feature. For example, a
 repeating animation needs the compositor, so it goes in the framework. A
-spinner built from that animation goes in the toolkit.
+spinner built from that animation goes in XForms.Controls.
 
 ## Repository layout
 
 | Folder | Project | Contents |
 |---|---|---|
-| `framework/` | `XForms.Framework` (net10.0) | The platform-neutral framework API |
-| `platform/android/` | `XForms.Framework.Android` | Android implementation (Views, ViewGroups, ListView) |
+| `framework/` | `XForms.Framework` (net10.0) | The platform-neutral framework: `Core`, `Primitives`, and the platform contract in `Platform` |
+| `platform/android/` | `XForms.Framework.Android` | Android implementation (Views, ViewGroups, RecyclerView) |
 | `platform/ios/` | `XForms.Framework.iOS` | iOS implementation (UIKit) |
 | `platform/win32/` | `XForms.Framework.Win32` | Windows implementation (Win32, DirectComposition, Direct2D, DirectWrite, RichEdit) |
 | `platform/web/` | `XForms.Framework.Web` | Browser implementation (.NET on WebAssembly, DOM elements and canvases) |
-| `toolkit/` | `XForms.Toolkit` (net10.0) | Cross-platform controls |
+| `controls/` | `XForms.Controls` (net10.0) | Controls, panels and gestures |
+| `analyzers/` | `XForms.Analyzers` | XF0001, which keeps the platforms to the platform contract |
 | `test/` | `XForms.Test.*` | Test apps (the pages are shared in `test/XForms.Test`) |
 
 The dependency rules:
 
-- **Platform projects** reference the framework and may use its internals
-  (`InternalsVisibleTo`).
-- **The toolkit**, and any other control library, references the framework
-  only. It uses **public API only**. This is enforced by the compiler: the
-  toolkit has no access to framework internals. Needing an internal is a
-  signal that the framework is missing a public API for control authors.
+- **Platform projects** reference the framework and use only the platform
+  contract: the `XForms.Platform` namespace (renderer interfaces,
+  `ApplicationHost`, `LayerHost`) and members marked `[PlatformContract]`.
+  The framework gives them its internals (`InternalsVisibleTo`), and the
+  XF0001 analyzer makes any other use a build error.
+- **XForms.Controls**, and any other control library, references the
+  framework only. It uses **public API only**. This is enforced by the
+  compiler: it has no access to framework internals. Needing an internal is
+  a signal that the framework is missing a public API for control authors.
 - **An app** references the framework, one platform project, and the control
   libraries it uses. Its startup code calls into the platform project, for
   example `Win32Application.Run` or an `AndroidApplicationActivity` subclass.
 
-Namespaces: the framework uses `XForms`, `XForms.Controls` (primitives),
-`XForms.Layouts` and `XForms.Input`. The toolkit uses `XForms.Toolkit`.
+Namespaces: the framework uses `XForms`, `XForms.Primitives` (the native
+primitives) and `XForms.Platform` (the contract). XForms.Controls uses
+`XForms.Controls` (controls, `Panel` and the base classes), `XForms.Layouts`
+(the panels) and `XForms.Input` (the gesture recognizers).
 
 ## Elements and renderers
 
 Every UI object is an `Element`. Elements that appear on screen are `View`s.
 An element doesn't talk to the platform directly. It asks the platform
-(`IPlatform`, internal) for a renderer, and the renderer wraps the native
-object:
+(`IPlatform`) for a renderer, and the renderer wraps the native object:
 
 ```
 TextBlock ──CreateRenderer()──► IPlatform.CreateTextBlockRenderer(...)
@@ -100,23 +119,30 @@ TextBlock ──CreateRenderer()──► IPlatform.CreateTextBlockRenderer(...)
             Win32:   TextBlockRenderer → DirectComposition visual + DirectWrite
 ```
 
+Every view the platform doesn't render natively (panels, content and
+owner-drawn controls, pages, list containers) is a **container**: it gets an
+`IContainerRenderer`, which keeps its children's native views in drawing
+order, fills its background, and draws it when it `DrawsContent`.
+
 **Lightweight views.** Most views have no native object of their own.
-Owner-drawn and content controls, panels and text blocks with no animator
-are lightweight: they draw into their nearest native ancestor, their layer.
-Pages, list rows, scrolled content, popup content, views with animators and
-native primitives (text boxes, images, lists, scroll views) are layers.
-- On Android and iOS, the framework provides lightweight renderers. A
+Containers and text blocks with no animator are lightweight: they draw into
+their nearest native ancestor, their layer. Pages, list containers, scrolled
+content, popup content, views with animators and native primitives (text
+boxes, images, items views, scroll views) are layers.
+- On Android, iOS and the web, the framework provides lightweight renderers
+  (the framework picks them; `IPlatform.UsesLightweightRenderers`). A
   layer's native view draws its lightweight descendants beneath its
-  subviews, and hosts the native views inside them. The framework hit-tests
-  lightweight views and routes their pointer input.
+  subviews, through `LayerHost`, and hosts the native views inside them.
+  The framework hit-tests lightweight views and routes their pointer input.
 - On Win32, lightweight renderers stay in the renderer tree (so hit testing,
   focus and UI Automation work as before) but have no visual: the layer draws
   them, and holds the visuals of native views inside them.
 
-Renderer interfaces (`IViewRenderer`, `ITextBoxRenderer`, `IListViewRenderer`,
-and so on) are the contract each platform implements. Control libraries don't
-create renderers. They build on the primitives, chiefly `UserControl` for
-owner-drawn controls and `ContentControl` for composition.
+Renderer interfaces (`IViewRenderer`, `IContainerRenderer`,
+`ITextBoxRenderer`, `IItemsViewRenderer`, and so on) are the contract each
+platform implements; `ApplicationHost` and `LayerHost` are the framework's
+side of it. Control libraries don't create renderers. They build on `View`
+(children, drawing, background) and the primitives.
 
 **Native objects are created when a view is attached.** A view keeps its
 property values itself, and its renderer is created the first time a parent
@@ -178,16 +204,17 @@ That keeps native performance and native animation behavior.
 
 ## Owner-drawn controls
 
-`UserControl` is the framework's owner-drawn surface. A control overrides
-`Render(DrawingContext)` and draws within its bounds. Each platform
-implements `DrawingContext`:
+Any view can draw itself: it sets `DrawsContent` in its constructor,
+overrides `Render(DrawingContext)` and draws within its bounds, beneath its
+children. XForms.Controls' `UserControl` is that with one child. Each
+platform implements `DrawingContext`:
 - Android: `Canvas`.
 - iOS: Core Graphics.
 - Win32: Direct2D, with DirectWrite for text.
 
-The control calls `InvalidateVisual()` to redraw. A `UserControl` can also host a
-child view through its `Content`, which is how controls combine drawing with
-native text.
+The view calls `InvalidateVisual()` to redraw. Its children (a
+`UserControl`'s `Content`) draw above its drawing, which is how controls
+combine drawing with native text.
 
 `DrawingContext` draws:
 - rectangles (also rounded), ellipses, lines and arcs, with round ends;
@@ -233,7 +260,7 @@ animation finished or was interrupted. `Application.RequestAnimationFrame`
 calls back before the display's next frame, for drawing that changes every
 frame.
 
-The toolkit's `ProgressRing` is an arc drawn once and spun by its own
+XForms.Controls' `ProgressRing` is an arc drawn once and spun by its own
 animator.
 
 ## Input
@@ -307,7 +334,7 @@ semantic colors (accent, background, surface and error, each with the color
 of content on it, plus subtle foreground, outline and disabled),
 `Typography`, `Shapes` and `Motion`, for a `ThemeMode` (light, dark or high
 contrast). It can also carry default styles for controls, such as the
-toolkit's `ButtonStyle`.
+XForms.Controls' `ButtonStyle`.
 
 The application builds its theme with `CreateTheme(mode, accent)` from the
 mode (the system's, unless the app sets `RequestedThemeMode`) and the accent
@@ -318,7 +345,7 @@ Any view can set `Theme` for itself and its descendants; `ActualTheme` is the
 effective one. An element hears its theme in `OnThemeChanged`, once it's
 attached and whenever the theme changes. The framework's primitives use the
 theme's colors by default (text, page and list backgrounds, text boxes), and
-the toolkit's controls draw from its tokens.
+the controls draw from its tokens.
 
 ## Popups and light dismiss
 
@@ -329,7 +356,7 @@ the toolkit's controls draw from its tokens.
   Clicking outside the popup, pressing Escape or going back closes it, and
   navigating closes every open popup. When focus moved into a popup, closing
   it returns focus to where it was.
-- **Popups draw nothing themselves.** The toolkit's `Popover` and pickers draw
+- **Popups draw nothing themselves.** XForms.Controls' `Flyout` and pickers draw
   their own frames, so popups look the same everywhere. The platforms differ
   in how they show popups:
   - Win32: a second, topmost composition target, so popups also cover native
@@ -347,19 +374,20 @@ the toolkit's controls draw from its tokens.
 
 ## Lists
 
-`ListView` is a native, virtualized list:
+`ItemsView` is a native, virtualized view of items:
 - Android: `ListView`.
 - iOS: `UITableView`.
 - Win32: a virtualized compositor list.
 
-`ListViewSource` provides the items and their views. Each item view lives in a
-`ListViewItemContainer`, which the platform recycles as items scroll in and
-out of view. When a container's height changes, the platform animates it.
-That is how a list item can reveal more content.
+`ItemsViewSource` provides the items and their views. Each item view lives in
+an `ItemContainer`, which the platform recycles as items scroll in and out of
+view. When a container's height changes, the platform animates it. That is
+how a list item can reveal more content.
 
-Control libraries customize every item by subclassing the container and
-overriding `ListView.CreateItemContainer`. The toolkit's `CommandListView`
-works this way: tapping an item reveals a command bar below it (one item at a
+XForms.Controls' `ListView` adds selection and clicks, with `ListViewItem`
+as its container. Control libraries customize every item by subclassing the
+container and overriding `CreateItemContainer`. Its `CommandListView` works
+this way: tapping an item reveals a command bar below it (one item at a
 time), and swiping an item runs a command.
 
 ## Threading
@@ -389,14 +417,17 @@ other threads.
 WinUI and Avalonia (and with MAUI for app services), and lists the gaps to
 fill.
 
-The split is in place: the toolkit, including its pickers, calendar and
-progress ring, builds against public API only, and no platform has
-picker-specific code. Still to do:
+The split is in place: XForms.Controls, including its pickers, calendar,
+progress ring, panels and gestures, builds against public API only, no
+platform has picker-specific code, and the platforms keep to the platform
+contract. Still to do:
 
 - **iOS testing.** iOS builds, but it hasn't been run since the restructure
   (it needs a Mac). Its popups, in particular, are new and untested.
-- **Theming.** The toolkit's controls other than `Button` have no styles of
-  their own.
+- **Themes.** The controls still draw themselves; phase 22 of
+  [alignment.md](alignment.md#layering) moves their drawing into themes
+  (`XForms.Themes.Simple` first), then adds markup and WinUI compatibility.
+  Controls other than `Button` have no styles of their own.
 - **Web.** The browser backend (`platform/web`) has been tested in one
   browser (Chromium) without a screen reader or a touch screen.
 - **Known Win32 issue.** RichEdit's built-in spell checker can crash the

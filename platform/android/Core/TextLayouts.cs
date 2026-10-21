@@ -4,6 +4,7 @@ using Android.Content;
 using Android.Graphics;
 using Android.Text;
 using Android.Text.Style;
+using XForms.Platform;
 
 namespace XForms.Android
 {

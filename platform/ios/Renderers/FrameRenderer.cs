@@ -1,5 +1,6 @@
 ﻿using System;
 using UIKit;
+using XForms.Platform;
 using NativeView = UIKit.UIView;
 
 namespace XForms.iOS.Renderers
@@ -37,7 +38,7 @@ namespace XForms.iOS.Renderers
             public override void LayoutSubviews()
             {
                 base.LayoutSubviews();
-                this._frame.NotifyRootSize(new Size((float)this.Bounds.Width, (float)this.Bounds.Height));
+                LayerHost.For(this._frame).NotifyRootSize(new Size((float)this.Bounds.Width, (float)this.Bounds.Height));
             }
         }
 

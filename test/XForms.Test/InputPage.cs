@@ -2,6 +2,7 @@ using System;
 using XForms.Controls;
 using XForms.Input;
 using XForms.Layouts;
+using XForms.Primitives;
 
 namespace XForms.Test
 {
@@ -29,9 +30,10 @@ namespace XForms.Test
 
             // Taps, double taps and holds
             var tapBox = Box("Tap, double tap or hold", Color.FromArgb(0xFF2196F3));
-            tapBox.Tapped += (s, e) => { this._taps += 1; this.UpdateGestures(); };
-            tapBox.DoubleTapped += (s, e) => { this._doubleTaps += 1; this.UpdateGestures(); };
-            tapBox.Holding += (s, e) => { this._holding = e.HoldingState.ToString(); this.UpdateGestures(); };
+            var tapGesture = Gestures.Tap(tapBox);
+            tapGesture.Tapped += (s, e) => { this._taps += 1; this.UpdateGestures(); };
+            tapGesture.DoubleTapped += (s, e) => { this._doubleTaps += 1; this.UpdateGestures(); };
+            tapGesture.Holding += (s, e) => { this._holding = e.HoldingState.ToString(); this.UpdateGestures(); };
             tapBox.PointerPressed += this.Log;
             tapBox.PointerReleased += this.Log;
             layout.Children.Add(tapBox);
@@ -119,7 +121,7 @@ namespace XForms.Test
                 this.Width = 120;
                 this.Height = 120;
                 this.Child = new TextBlock() { Text = "Pan me", Foreground = Colors.White, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
-                this.GestureRecognizer = new PanGestureRecognizer(this);
+                this.GestureRecognizers.Add(new PanGestureRecognizer(this));
             }
 
             public void OnPanStarted() => this._page.LogText("pan started");
@@ -159,7 +161,7 @@ namespace XForms.Test
                 this.Width = 120;
                 this.Height = 120;
                 this.Child = new TextBlock() { Text = "Pinch me", Foreground = Colors.White, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
-                this.GestureRecognizer = new PinchGestureRecognizer(this);
+                this.GestureRecognizers.Add(new PinchGestureRecognizer(this));
             }
 
             public void OnPinchStarted() => this._page.LogText("pinch started");
@@ -198,7 +200,7 @@ namespace XForms.Test
                 this.Focusable = true;
                 this._text = new TextBlock() { Text = "Tap here, then press keys", HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
                 this.Child = this._text;
-                this.Tapped += (s, e) => this.Focus();
+                Gestures.Tap(this).Tapped += (s, e) => this.Focus();
                 this.UpdateBorder();
             }
 

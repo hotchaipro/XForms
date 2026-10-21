@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using XForms.Platform;
 
 namespace XForms
 {
@@ -148,13 +149,6 @@ namespace XForms
         public bool Underline { get; }
 
         public bool Strikethrough { get; }
-    }
-
-    public interface ITextLayoutRenderer : IDisposable
-    {
-        Size Size { get; }
-
-        int LineCount { get; }
     }
 
     /// <summary>

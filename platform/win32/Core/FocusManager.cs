@@ -7,8 +7,8 @@ using Windows.Win32.Graphics.DirectComposition;
 using Windows.Win32.Graphics.Dxgi.Common;
 using Windows.Win32.System.Com;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
-using XForms.Input;
 using XForms.Win32.Renderers;
+using XForms.Platform;
 
 namespace XForms.Win32
 {
@@ -146,7 +146,7 @@ namespace XForms.Win32
             {
                 if (renderer.Element is View view)
                 {
-                    bool handled = isDown ? view.DispatchKeyDown(keyInputEvent) : view.DispatchKeyUp(keyInputEvent);
+                    bool handled = isDown ? LayerHost.For(view).DispatchKeyDown(keyInputEvent) : LayerHost.For(view).DispatchKeyUp(keyInputEvent);
                     if (handled)
                     {
                         return true;
@@ -247,7 +247,7 @@ namespace XForms.Win32
             var application = Application.Current;
             if ((null != application) && application.CanGoBack)
             {
-                application.OnBackRequested();
+                ApplicationHost.For(application).Back();
                 return true;
             }
 
@@ -391,7 +391,10 @@ namespace XForms.Win32
         public void Activate(
             ViewRenderer renderer)
         {
-            (renderer.Element as View)?.OnActivate();
+            if (renderer.Element is View view)
+            {
+                LayerHost.For(view).Activate();
+            }
         }
 
         private void HideRing()

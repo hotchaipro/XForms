@@ -1,7 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using XForms.Controls;
-using XForms.Toolkit;
+using XForms.Primitives;
 using XForms.Layouts;
 
 namespace XForms.Test

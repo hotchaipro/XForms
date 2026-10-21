@@ -1,7 +1,8 @@
 ﻿using System;
 using CoreGraphics;
 using UIKit;
-using XForms.Controls;
+using XForms.Primitives;
+using XForms.Platform;
 
 namespace XForms.iOS
 {
@@ -11,13 +12,13 @@ namespace XForms.iOS
     /// </summary>
     internal sealed class OwnerDrawControl : NativeLayoutView
     {
-        private IDrawDelegate _drawDelegate;
+        private View _drawDelegate;
 
         internal OwnerDrawControl(
-            UserControl userControl)
-            : base(userControl)
+            View view)
+            : base(view)
         {
-            this._drawDelegate = userControl;
+            this._drawDelegate = view;
 
             this.Opaque = false;
             this.BackgroundColor = UIColor.Clear;
@@ -34,7 +35,7 @@ namespace XForms.iOS
 
                 var drawContext = new DrawContext(graphicsContext, bounds);
 
-                this._drawDelegate.InvokeRender(drawContext, bounds.ToRectangle());
+                LayerHost.For(this._drawDelegate).Render(drawContext, bounds.ToRectangle());
             }
 
             // Lightweight content on top of the control's own drawing

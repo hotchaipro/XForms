@@ -1,4 +1,5 @@
 ﻿using System;
+using XForms.Platform;
 using XForms;
 
 namespace XForms.Test

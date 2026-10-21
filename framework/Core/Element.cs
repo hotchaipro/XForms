@@ -1,27 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using XForms.Platform;
 
 namespace XForms
 {
-    public interface IElementRenderer
-    {
-        Element Element
-        {
-            get;
-        }
-
-        object NativeElement
-        {
-            get;
-        }
-
-        /// <summary>
-        /// The element's effective theme, when its native object is created and
-        /// whenever the theme changes.
-        /// </summary>
-        void OnThemeChanged(Theme theme);
-    }
-
     public abstract class Element
     {
         public interface IAttachedProperty
@@ -136,6 +118,7 @@ namespace XForms
         /// the element is attached to a parent (or shown). Every constructor and
         /// object initializer has run by then.
         /// </summary>
+        [PlatformContract]
         internal IElementRenderer Renderer
         {
             get
@@ -153,6 +136,7 @@ namespace XForms
         /// The native object if it has been created, or null. Property setters
         /// push values to it; until it exists, the element keeps them.
         /// </summary>
+        [PlatformContract]
         internal IElementRenderer CreatedRenderer
         {
             get

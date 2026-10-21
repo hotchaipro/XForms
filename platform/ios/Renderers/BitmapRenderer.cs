@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using UIKit;
+using XForms.Platform;
 
 namespace XForms.iOS.Renderers
 {

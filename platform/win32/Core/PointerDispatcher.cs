@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using XForms.Win32.Renderers;
+using XForms.Platform;
 
 namespace XForms.Win32
 {
@@ -334,7 +335,7 @@ namespace XForms.Win32
             PointerDeviceType deviceType)
         {
             var e = new PointerEventArgs((int)pointerId, deviceType, local, state, true, FocusManager.CurrentModifiers());
-            return ((View)renderer.Element).DispatchPointerEvent(e);
+            return LayerHost.For(((View)renderer.Element)).DispatchPointer(e);
         }
 
         private void BeginDragScrolling(

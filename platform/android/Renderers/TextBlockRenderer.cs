@@ -1,7 +1,8 @@
 ﻿using System;
 using Android.Views;
 using AndroidTextView = Android.Widget.TextView;
-using XForms.Controls;
+using XForms.Primitives;
+using XForms.Platform;
 
 namespace XForms.Android.Renderers
 {

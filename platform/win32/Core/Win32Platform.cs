@@ -1,8 +1,9 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Reflection;
 using Windows.Win32;
-using XForms.Controls;
+using XForms.Primitives;
+using XForms.Platform;
 using XForms.Win32.Renderers;
 
 namespace XForms.Win32
@@ -20,25 +21,22 @@ namespace XForms.Win32
             this._host = host ?? throw new ArgumentNullException(nameof(host));
         }
 
+        // NOTE: Win32 draws lightweight views itself, in its composition tree
+        public bool UsesLightweightRenderers => false;
+
         public IApplicationRenderer CreateApplicationRenderer(Application application) => new ApplicationRenderer(this._host, application);
 
-        public IPageRenderer CreatePageRenderer(Page page) => new PageRenderer(page);
-
-        public IPanelRenderer CreatePanelRenderer(Panel layout) => new PanelRenderer(layout);
+        public IContainerRenderer CreateContainerRenderer(View view) => new ContainerRenderer(view);
 
         public ITextBlockRenderer CreateTextBlockRenderer(TextBlock label) => new TextBlockRenderer(label);
-
-        public IContentControlRenderer CreateContentControlRenderer(ContentControl customControl) => new ContentControlRenderer(customControl);
 
         public IBitmapRenderer CreateBitmapRenderer(Bitmap bitmap) => new BitmapRenderer(bitmap);
 
         public IFrameRenderer CreateFrameRenderer(Frame frame) => new FrameRenderer(frame);
 
-        public IListViewRenderer CreateListViewRenderer(ListView listView) => new ListViewRenderer(listView);
+        public IItemsViewRenderer CreateItemsViewRenderer(ItemsView listView) => new ItemsViewRenderer(listView);
 
         public ITextBoxRenderer CreateTextBoxRenderer(TextBox textEntry) => new TextBoxRenderer(textEntry);
-
-        public IUserControlRenderer CreateUserControlRenderer(UserControl userControl) => new UserControlRenderer(userControl);
 
         public IImageRenderer CreateImageRenderer(Image image) => new ImageRenderer(image);
 
@@ -77,12 +75,13 @@ namespace XForms.Win32
 
         public ApplicationRenderer(
             Win32Host host,
-            IApplicationDelegate application)
+            Application app)
         {
             this._host = host;
-            host.SystemThemeChanged += application.NotifySystemThemeChanged;
-            host.Suspending += application.NotifySuspend;
-            host.Resuming += application.NotifyResume;
+            var application = ApplicationHost.For(app);
+            host.SystemThemeChanged += application.SystemThemeChanged;
+            host.Suspending += application.Suspend;
+            host.Resuming += application.Resume;
         }
 
         public Color? TitleBarAccentColor { get; set; }
@@ -116,7 +115,7 @@ namespace XForms.Win32
             Size size)
         {
             var host = Win32Host.OpenWindow(title, size);
-            host.Closed = window.OnClosed;
+            host.Closed = () => ApplicationHost.Current.WindowClosed(window);
             host.SetRoot((ViewRenderer)frame.Renderer);
             SystemTheme.ApplyToWindow(host.Hwnd, Application.Current.Theme.Mode);
             return new WindowRenderer(host);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.Versioning;
 using System.Threading;
 using XForms.Web.Renderers;
+using XForms.Platform;
 
 namespace XForms.Web
 {
@@ -31,7 +32,7 @@ namespace XForms.Web
             Js.ListenVisibility();
             Js.ListenKeyboard();
             Js.ListenHistory();
-            View.AccessibilityStateChanged += this.OnAccessibilityStateChanged;
+            LayerHost.AccessibilityStateChanged += this.OnAccessibilityStateChanged;
         }
 
         public static WebHost Current
@@ -383,14 +384,14 @@ namespace XForms.Web
             bool isInContact,
             int modifiers)
         {
-            if (!this._renderers.TryGetValue(id, out var renderer) || !renderer.IsHitTestVisible || !(renderer.Element is IViewDelegate view))
+            if (!this._renderers.TryGetValue(id, out var renderer) || !renderer.IsHitTestVisible || !(renderer.Element is View view))
             {
                 return false;
             }
 
             bool result = false;
             var e = new PointerEventArgs(pointerId, (PointerDeviceType)deviceType, new Point(x, y), ToState(phase), isInContact, (KeyModifiers)modifiers);
-            Run(() => result = view.DispatchPointerEvent(e));
+            Run(() => result = LayerHost.For(view).DispatchPointer(e));
             return result;
         }
 
@@ -411,19 +412,19 @@ namespace XForms.Web
             {
                 // The deepest view under it, lightweight ones included
                 var point = new Point(x, y);
-                var deepest = view.HitTestPointerOver(point);
-                var offset = (deepest == view) ? default : deepest.OffsetInLayer;
-                Application.Current.UpdatePointerOver(deepest, new PointerEventArgs(pointerId, (PointerDeviceType)deviceType, new Point(x - offset.X, y - offset.Y), PointerInputState.Moved, false, (KeyModifiers)modifiers));
+                var deepest = LayerHost.For(view).HitTestPointerOver(point);
+                var offset = (deepest == view) ? default : LayerHost.For(deepest).OffsetInLayer;
+                ApplicationHost.For(Application.Current).PointerOver(deepest, new PointerEventArgs(pointerId, (PointerDeviceType)deviceType, new Point(x - offset.X, y - offset.Y), PointerInputState.Moved, false, (KeyModifiers)modifiers));
 
                 // Lightweight views see hover moves too
-                ((IViewDelegate)view).DispatchPointerEvent(new PointerEventArgs(pointerId, (PointerDeviceType)deviceType, point, PointerInputState.Moved, false, (KeyModifiers)modifiers));
+                LayerHost.For(view).DispatchPointer(new PointerEventArgs(pointerId, (PointerDeviceType)deviceType, point, PointerInputState.Moved, false, (KeyModifiers)modifiers));
             });
         }
 
         public void OnPointerLeave(
             int pointerId)
         {
-            Run(() => Application.Current?.UpdatePointerOver(null, new PointerEventArgs(pointerId, PointerDeviceType.Mouse, default, PointerInputState.Moved, false, KeyModifiers.None)));
+            Run(() => ApplicationHost.Current?.PointerOver(null, new PointerEventArgs(pointerId, PointerDeviceType.Mouse, default, PointerInputState.Moved, false, KeyModifiers.None)));
         }
 
         public bool OnWheel(
@@ -433,7 +434,7 @@ namespace XForms.Web
             float delta,
             int modifiers)
         {
-            if (!this._renderers.TryGetValue(id, out var renderer) || !(renderer.Element is IViewDelegate view))
+            if (!this._renderers.TryGetValue(id, out var renderer) || !(renderer.Element is View view))
             {
                 return false;
             }
@@ -441,7 +442,7 @@ namespace XForms.Web
             // One notch scrolls as far as on the other platforms
             bool result = false;
             var e = new PointerEventArgs(0, PointerDeviceType.Mouse, new Point(x, y), PointerInputState.Moved, false, (KeyModifiers)modifiers, delta * 48);
-            Run(() => result = view.DispatchPointerWheel(e));
+            Run(() => result = LayerHost.For(view).DispatchWheel(e));
             return result;
         }
 
@@ -480,17 +481,17 @@ namespace XForms.Web
                 if (null == renderer)
                 {
                     // Nothing focused: Tab starts at the first focusable view
-                    handled = isDown && (key == Key.Tab) && view.MoveFocus(!e.KeyModifiers.HasFlag(KeyModifiers.Shift));
+                    handled = isDown && (key == Key.Tab) && LayerHost.For(view).MoveFocus(!e.KeyModifiers.HasFlag(KeyModifiers.Shift));
                     return;
                 }
 
-                handled = isDown ? view.RouteLayerKeyDown(e) : view.RouteLayerKeyUp(e);
+                handled = isDown ? LayerHost.For(view).RouteKeyDown(e) : LayerHost.For(view).RouteKeyUp(e);
 
                 // Escape goes back, as on the desktop
                 var application = Application.Current;
                 if (!handled && isDown && (key == Key.Escape) && (null != application) && application.CanGoBack)
                 {
-                    application.OnBackRequested();
+                    ApplicationHost.For(application).Back();
                     handled = true;
                 }
             });
@@ -565,7 +566,7 @@ namespace XForms.Web
                 var application = Application.Current;
                 if ((null != application) && application.CanGoBack)
                 {
-                    application.OnBackRequested();
+                    ApplicationHost.For(application).Back();
                 }
             });
         }
@@ -589,9 +590,9 @@ namespace XForms.Web
         public void OnAccessibilityClick(
             int id)
         {
-            if (this._accessibleElements.TryGetValue(id, out var view) && view.IsAccessibilityActionable)
+            if (this._accessibleElements.TryGetValue(id, out var view) && LayerHost.For(view).IsAccessibilityActionable)
             {
-                Run(() => view.PerformDefaultAccessibilityAction());
+                Run(() => LayerHost.For(view).PerformDefaultAccessibilityAction());
             }
         }
 
@@ -602,9 +603,9 @@ namespace XForms.Web
         {
             Run(() =>
             {
-                if (view.IsLightweight)
+                if (LayerHost.For(view).IsLightweight)
                 {
-                    (view.FindLayer() as ViewRenderer)?.InvalidateRender();
+                    (LayerHost.For(view).Layer as ViewRenderer)?.InvalidateRender();
                 }
                 else if (view.Renderer is ViewRenderer renderer)
                 {

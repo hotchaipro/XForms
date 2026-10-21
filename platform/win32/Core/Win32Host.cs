@@ -18,6 +18,7 @@ using Windows.Win32.UI.Controls;
 using Windows.Win32.UI.HiDpi;
 using Windows.Win32.UI.Input.Pointer;
 using Windows.Win32.UI.WindowsAndMessaging;
+using XForms.Platform;
 using XForms.Win32.Renderers;
 
 namespace XForms.Win32
@@ -721,7 +722,7 @@ namespace XForms.Win32
                     var origin = renderer.AbsoluteOrigin();
                     var local = new Point(point.X - origin.X, point.Y - origin.Y);
                     var e = new PointerEventArgs(0, PointerDeviceType.Mouse, local, PointerInputState.Moved, false, FocusManager.CurrentModifiers(), delta);
-                    if (view.DispatchPointerWheel(e))
+                    if (LayerHost.For(view).DispatchWheel(e))
                     {
                         return;
                     }
@@ -768,7 +769,7 @@ namespace XForms.Win32
             if (msg == PInvoke.WM_POINTERLEAVE)
             {
                 // The hovering pointer left the window
-                Application.Current?.UpdatePointerOver(null, new PointerEventArgs((int)pointerId, PointerDeviceType.Mouse, default, PointerInputState.Moved, false, KeyModifiers.None));
+                ApplicationHost.Current?.PointerOver(null, new PointerEventArgs((int)pointerId, PointerDeviceType.Mouse, default, PointerInputState.Moved, false, KeyModifiers.None));
                 return true;
             }
 
@@ -836,7 +837,7 @@ namespace XForms.Win32
             this.HitTest(point, out var hit);
             var origin = hit?.AbsoluteOrigin() ?? default;
             var e = new PointerEventArgs((int)pointerId, deviceType, new Point(point.X - origin.X, point.Y - origin.Y), PointerInputState.Moved, false, KeyModifiers.None);
-            application.UpdatePointerOver(hit?.Element as View, e);
+            ApplicationHost.For(application).PointerOver(hit?.Element as View, e);
         }
 
         private Point PointFromLParam(

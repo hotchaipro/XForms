@@ -3,6 +3,7 @@ using System.IO;
 using System.Numerics;
 using XForms.Controls;
 using XForms.Layouts;
+using XForms.Primitives;
 
 namespace XForms.Test
 {

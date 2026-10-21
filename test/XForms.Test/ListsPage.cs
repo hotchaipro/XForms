@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using XForms.Controls;
 using XForms.Layouts;
-using XForms.Toolkit;
+using XForms.Primitives;
 
 namespace XForms.Test
 {

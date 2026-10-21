@@ -1,124 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using XForms.Controls;
+using XForms.Primitives;
+using XForms.Platform;
 
 namespace XForms
 {
-    public interface IApplicationDelegate
-    {
-        void NotifySuspend();
-
-        void NotifyResume();
-
-        /// <summary>
-        /// The system's appearance settings changed: its theme mode, accent
-        /// color, high-contrast colors or text size.
-        /// </summary>
-        void NotifySystemThemeChanged();
-
-        /// <summary>
-        /// The parts of the window covered by system bars, a display cutout or
-        /// the soft keyboard changed (in DIPs).
-        /// </summary>
-        void NotifySafeAreaInsetsChanged(Thickness insets);
-    }
-
-    /// <summary>
-    /// A window other than the main one (on the desktop).
-    /// </summary>
-    public interface IWindowRenderer
-    {
-        string Title { set; }
-
-        Size MinimumSize { set; }
-
-        void Resize(Size size);
-
-        /// <summary>
-        /// Closes the window; the platform then calls the window's
-        /// <c>OnClosed</c>.
-        /// </summary>
-        void Close();
-    }
-
-    public interface IApplicationRenderer
-    {
-        void SetRootFrame(Frame frame);
-
-        void OnNavigationComplete();
-
-        void InvokeOnUIThreadAsync(Action action);
-
-        /// <summary>
-        /// Calls back once, on the UI thread, when the display is about to show
-        /// its next frame, with the frame's time.
-        /// </summary>
-        void RequestFrame(Action<TimeSpan> onFrame);
-
-        void Exit();
-
-        /// <summary>
-        /// Styles the platform's own parts (title bar, system bars) for the
-        /// application's theme.
-        /// </summary>
-        void ApplyTheme(Theme theme);
-
-        /// <summary>
-        /// The system's theme mode: dark mode, or a high-contrast setting.
-        /// </summary>
-        ThemeMode SystemThemeMode { get; }
-
-        /// <summary>
-        /// The system's accent color, or null where there isn't one.
-        /// </summary>
-        Color? SystemAccentColor { get; }
-
-        /// <summary>
-        /// The system's high-contrast colors, or null to use XForms' own.
-        /// </summary>
-        ColorScheme SystemHighContrastColors { get; }
-
-        /// <summary>
-        /// The system's text size, as a scale (1 is the default). The platform
-        /// applies it to every font size, as Android's scaled pixels do.
-        /// </summary>
-        float SystemTextScale { get; }
-
-        string WindowTitle { set; }
-
-        bool CanResizeWindow { get; }
-
-        Size MinimumWindowSize { set; }
-
-        void ResizeWindow(Size size);
-
-        /// <summary>
-        /// Whether the current page draws under the system bars and display
-        /// cutout (its <see cref="Page.UsesSafeArea"/> is false). Otherwise the
-        /// platform keeps the page clear of them.
-        /// </summary>
-        bool ExtendsIntoSafeArea { set; }
-
-        /// <summary>
-        /// Whether the app can open windows besides its main one.
-        /// </summary>
-        bool CanOpenWindows { get; }
-
-        /// <summary>
-        /// Opens a window showing the frame. The platform reports its size and
-        /// its closing to the window (<c>OnSizeChanged</c>, <c>OnClosed</c>).
-        /// </summary>
-        IWindowRenderer OpenWindow(Window window, Frame frame, string title, Size size);
-
-        Color? TitleBarAccentColor { get; set; }
-
-        Color? TitleBarForegroundColor { get; set; }
-
-        Version GetVersion();
-    }
-
-    public abstract class Application : IApplicationDelegate
+    public abstract class Application
     {
         private static Application _CurrentApplication;
 
@@ -806,7 +694,7 @@ namespace XForms
         /// <summary>
         /// Registers a font file bundled with the app (TrueType or OpenType)
         /// under a family name, for <see cref="TextFormat.FontFamily"/> and
-        /// <see cref="Controls.TextBlock.FontFamily"/>. The file is next to the
+        /// <see cref="Primitives.TextBlock.FontFamily"/>. The file is next to the
         /// app on Windows, in its assets on Android, and in its bundle on iOS.
         /// </summary>
         public void RegisterFont(
@@ -894,11 +782,7 @@ namespace XForms
         {
         }
 
-        void IApplicationDelegate.NotifySafeAreaInsetsChanged(
-            Thickness insets)
-        {
-            this.MainWindow.OnSafeAreaInsetsChanged(insets);
-        }
+
 
         /// <summary>
         /// Keeps the current page clear of the system bars, or not, as it asks.
@@ -908,17 +792,17 @@ namespace XForms
             this.Renderer.ExtendsIntoSafeArea = !(this._rootFrame?.CurrentPage?.UsesSafeArea ?? true);
         }
 
-        void IApplicationDelegate.NotifySuspend()
+        /// <summary>
+        /// The platform's side of the contract for this app (see
+        /// <see cref="ApplicationHost.For"/>).
+        /// </summary>
+        internal ApplicationHost Host
         {
-            this.OnSuspend();
+            get;
+            set;
         }
 
-        void IApplicationDelegate.NotifyResume()
-        {
-            this.OnResume();
-        }
-
-        void IApplicationDelegate.NotifySystemThemeChanged()
+        internal void OnSystemThemeChanged()
         {
             this.UpdateTheme();
             this.UpdateTextScale();

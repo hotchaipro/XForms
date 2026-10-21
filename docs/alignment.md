@@ -722,6 +722,10 @@ from. Where XForms keeps its own name, the reason is in
 
 ### Toolkit
 
+The toolkit became `XForms.Controls` in phase 21, after taking the panels,
+gestures and controls' base classes from the framework in phase 20 (see
+[Layering](#layering)).
+
 | Current | Proposed | Familiar from | Notes |
 |---|---|---|---|
 | `Button`, `ToggleButton`, `RadioButton` | Keep | All | |
@@ -1848,3 +1852,263 @@ Android and, from phase 17, the browser.
       (dark theme, accent color), and its tasks and settings kept across
       reloads.
     - **Not verified:** a screen reader; touch pulls on a real touch screen.
+
+### Layering
+
+Phases 1-18 aligned the API and filled the platforms' gaps. These phases
+make the layers themselves clean, so that each one holds only what belongs
+to it, and later layers (themes, markup, compatibility) have a clear place
+to go:
+
+| Assembly | Layer | Builds on |
+|---|---|---|
+| `XForms.Framework` (+ `.Win32`, `.Android`, `.iOS`, `.Web`) | The platform contract: elements, layout, drawing, raw input, and the views the platforms render | — |
+| `XForms.Controls` | Functional controls (what they do, not how they look) and their base classes; panels and gestures | Framework |
+| `XForms.Themes.<Name>` | How the controls look: `Simple` first | Controls |
+| `XForms.Xaml` | Markup | Framework, Controls |
+| `XForms.Compat.WinUI` | WinUI's API over XForms' controls | Controls, Xaml |
+
+Two findings shaped the order:
+
+- **The framework holds control behavior.** Tap recognition (`View`'s
+  `Tapped`, `DoubleTapped` and `Holding`, and `TapGestureRecognizer`) is
+  gesture recognition, like pan and pinch, yet it's in the framework because
+  the framework leans on it: keyboard and screen reader activation fake a
+  pointer press (`OnActivate`), focusability and "actionable" are inferred
+  from tap handlers, and `ListViewItem` selects on a tap. The framework's
+  primitives should be raw pointer input and an extension point for
+  gestures.
+- **The platforms aren't held to a contract.** The framework gives all four
+  platforms its internals (`InternalsVisibleTo`), and they use about 35
+  internal members of `View` and `Application`: input dispatch, lightweight
+  views, focus, accessibility and lifecycle. `IApplicationDelegate` is a
+  partial gate, but nothing keeps the platforms to it. HotChai.Game solved
+  the same problem with `GameHost` and an analyzer; phase 19 does the same
+  here.
+
+Each phase is committed when it's built for every platform and verified on
+Win32, Android and the browser, as before.
+
+19. **Platform contract.** The platforms' side of the framework, made
+    explicit and enforced. No change to apps' API.
+    - **A contract namespace, `XForms.Platform`:** `IPlatform`, the renderer
+      interfaces (`IViewRenderer`, `IListViewRenderer` and the rest) and the
+      hosts below. The renderer interfaces become internal, visible only to
+      the platforms, since apps never use them.
+    - **`ApplicationHost`:** what a platform calls for the app as a whole:
+      start, suspend and resume, closing, Back, the system theme, safe area
+      insets, and windows. It replaces `IApplicationDelegate`, and calls
+      such as `OnBackRequested`, `OnResume` and `OnClosed`.
+    - **`LayerHost`:** one for each layer (a renderer with lightweight views
+      drawn into it). Most of what the platforms reach into `View` for is
+      work on a layer's lightweight views, and this exposes just that:
+      painting them (with the focus ring), hit testing, routing pointer, key
+      and wheel input, hover, moving focus, and the accessible elements with
+      their states and actions. The framework can then change how
+      lightweight views work without changing a platform.
+    - **Activation, focus and accessibility as declared facts:**
+      - Activation becomes its own primitive. A platform asks a layer to
+        activate a view (Enter or Space, a screen reader's activate command,
+        UI Automation's Invoke), and the view handles it in `OnActivate`,
+        which no longer fakes a pointer press.
+      - `Focusable` and the accessibility actions a view supports are set by
+        the view, not inferred from tap handlers.
+    - **An analyzer** (from HotChai.Game's HCG0002): in a platform assembly,
+      a framework internal outside `XForms.Platform`, and not marked
+      `[PlatformContract]`, is a build error.
+    - **Decide:** whether the renderer interfaces should stay public, so a
+      platform could live outside this repository. Making them internal is
+      simpler and can be undone.
+
+    **Status: done.**
+    - **The analyzer** (`analyzers/XForms.Analyzers`, rule XF0001) runs on
+      every `XForms.Framework.*` project. On the first build it found 50
+      framework internals the platforms used; none are left.
+    - **`XForms.Platform`** holds `IPlatform`, every renderer interface (and
+      the two callbacks the platforms make into views, `ITextBoxDelegate` and
+      `IPopupDelegate`), `PlatformContractAttribute` and the hosts, in
+      `framework/Platform`. The interfaces stay public: apps pass `IPlatform`
+      to their `Application`, which can't take an internal type. The hosts
+      are internal, since only the platforms use them.
+    - **`ApplicationHost`** replaces `IApplicationDelegate`: suspend and
+      resume, the system theme, the safe area, Back, hover and closing
+      windows. A platform gets it with `ApplicationHost.For(application)` or
+      `ApplicationHost.Current`.
+    - **`LayerHost`** (a struct over one view, from `LayerHost.For(view)`):
+      lightweight views (painting, hit testing, the focus ring), pointer,
+      wheel and key routing, focus, owner drawing, root sizes and
+      accessibility. It absorbed the internal `IViewDelegate`. Its pointer
+      and wheel dispatch go to the lightweight view under the pointer, as
+      the delegate's did, and fall through to the view itself on Win32.
+    - **The framework picks lightweight renderers:** `IPlatform` says
+      whether it uses them (`UsesLightweightRenderers`: true on Android,
+      iOS and the web; false on Win32, which draws lightweight views in its
+      own composition tree), and `TextBlock`, `Panel`, `ContentControl` and
+      `UserControl` create them. The platforms no longer each repeat the
+      check.
+    - **The element-to-renderer links** (`Renderer` and `CreatedRenderer`)
+      and `ListView.NotifyRefreshRequested` are marked `[PlatformContract]`.
+    - **Activation:** `View.Activated` is raised by the default
+      `OnActivate`, which no longer fakes a pointer press. Enter and Space,
+      a screen reader's activate command and UI Automation's patterns all
+      reach it. A view is focusable by default when something handles
+      `Activated`: `TapGestureRecognizer` and `SwipeGestureRecognizer`
+      handle it once attached to a view (recognizers now know their view),
+      and so does `View.Tapped`, as a tap at the view's center. Controls
+      that override `OnActivate` (the pickers, the calendar) are unchanged.
+    - **Verified:**
+      - Win32: clicks, Tab and Space, UI Automation's select, toggle and
+        list selection, Escape going back, and closing a second window.
+      - Android: taps, Tab and Space on a lightweight radio button (with its
+        focus ring), and the accessibility tree. In SoonerOrLater: opening a
+        task's commands with a tap, swiping a task done, and Undo.
+      - The browser: clicks, Tab and Space.
+    - **Fixed on the way:** Win32's focus manager called `OnActivate`
+      directly; it's `protected internal`, which the analyzer treats as
+      visible, so it goes through `LayerHost.Activate` now.
+
+20. **Slim the framework.** With the contract explicit, move out what isn't
+    needed to serve it.
+    - **One container primitive.** Today the platforms render five kinds
+      of container that differ only in API shape:
+
+      | Type | Adds | Platform renderer |
+      |---|---|---|
+      | `Control` | a background, its own animator | `IControlRenderer` |
+      | `ContentControl` | one child, padding | `IContentControlRenderer` |
+      | `UserControl` | one child, padding, and drawing | `IUserControlRenderer` |
+      | `Page` | a layout panel, a background | `IPageRenderer` |
+      | `Panel` | any number of children | `IPanelRenderer` |
+
+      They're all a view that has children and may draw, so `View` becomes
+      that primitive, as `FrameworkElement` is in WPF and `Visual` in
+      Avalonia:
+      - `View` gets protected visual children, opt-in drawing (`Render`,
+        `InvalidateVisual` and drawn animations, from `UserControl`), a
+        background, and `CreateOwnAnimator`.
+      - The platforms implement one container renderer instead of five.
+        (The web platform's panel, content and page renderers are already
+        thin wrappers over one.)
+      - `Control`, `ContentControl`, `UserControl` and `Border` move to the
+        toolkit, and so does `Panel` as the public base class for panels,
+        built on `View`'s children. `ContentControl` and `UserControl`
+        share their content and padding code, which is duplicated today.
+      - `Page` stays, since navigation, windows and the safe area are built
+        on it, but it's a plain container with no renderer of its own.
+        `Frame` stays a native view, since its renderer runs page
+        transitions.
+    - **Namespaces:** `XForms.Controls` in the framework becomes
+      `XForms.Primitives`, holding only the views the platforms implement
+      natively: `TextBlock`, `TextBox`, `Image`, `ScrollViewer`, the items
+      view below and `Popup`. That frees `XForms.Controls` for the controls
+      assembly.
+    - **Gestures** move to the toolkit (renamed in phase 21):
+      - Tap, double tap and hold become recognizers, replacing `View`'s
+        `Tapped`, `DoubleTapped` and `Holding` and `TapGestureRecognizer`.
+        Controls get a pressed state from them, alongside the framework's
+        `IsPointerOver`.
+      - `PanGestureRecognizer`, `PinchGestureRecognizer` and
+        `SwipeGestureRecognizer` move as they are.
+      - The framework keeps the `GestureRecognizer` base and the pointer
+        pipeline (pressed, moved, released, canceled, entered, exited, wheel
+        and capture).
+    - **Lists split in two:**
+      - The framework keeps a virtualizing items view: realizing and
+        recycling containers, layouts (a line, a row, a grid), scrolling and
+        pull-to-refresh. WinUI's `ItemsRepeater` is the model; settle the
+        name here.
+      - `ListView` in the toolkit adds selection and taps.
+      - `ListViewItem` no longer derives from `DockPanel`.
+    - **Panels** move to the toolkit with their base class: `Grid`,
+      `StackPanel`, `DockPanel`, `WrapPanel`, `UniformGrid` and `Canvas`.
+    - The toolkit's controls, the test apps and SoonerOrLater move to the
+      new gestures and pressed state.
+
+    **Status: done.** The framework is now `framework/Core`,
+    `framework/Platform` and `framework/Primitives`.
+    - **Containers:** `View` holds children (`AddVisualChild` and the rest,
+      in z-order), draws itself when it sets `DrawsContent` (`Render`,
+      `InvalidateVisual`, `CreateDrawnAnimator`), has a background
+      (`GetBackgroundColor`, `InvalidateBackground`) and `CreateOwnAnimator`,
+      and by default lays its children out over its whole area. The
+      platforms implement one `IContainerRenderer` (and the framework one
+      lightweight container) instead of five renderer kinds. `Page` is a
+      container; its `Content` is any view.
+    - **Moved to the toolkit:** `Control`, `ContentControl`, `UserControl`,
+      `Border`, `Panel`, the six panels, `ViewCollection` and
+      `LayoutTransition`, built only on public and protected API. Two
+      members became public for them: `Animator.TranslateByOffset` (layout
+      transitions) and `View.ContentPadding` (protected). `Orientation`
+      moved to the `XForms` namespace, since lists use it too.
+    - **`XForms.Primitives`:** `TextBlock`, `TextBox`, `Image`,
+      `ScrollViewer`, `Popup`, and the items view. `TextBox` derives from
+      `View` and sends its own background.
+    - **Lists:** the items view is `ItemsView`, with `ItemContainer` and
+      `ItemsViewSource` (was `ListViewSource`), as WinUI names its
+      `ItemsView`; the platforms render `IItemsViewRenderer`. The toolkit's
+      `ListView` adds selection, `ItemClick` and `SelectionChanged` (it's
+      told when a container is bound, through `OnContainerBound`), with
+      `ListView<T>` and `ListViewItem` (row background, selection, taps).
+    - **Gestures:** `View` keeps raw pointer input, activation and a
+      `GestureRecognizers` collection (as MAUI's), whose recognizers learn
+      their view. Its `Tapped`, `DoubleTapped` and `Holding` events and tap
+      tracking are gone: `TapGestureRecognizer`, in the toolkit with the
+      pan, pinch and swipe recognizers, now raises those events, reports
+      `IsPressed`, and takes an optional delegate.
+    - **Verified:**
+      - Win32: the panels, drawing and pickers pages; list selection;
+        taps, double taps, holds and pans; Tab and Space; UI Automation's
+        select, toggle and Invoke.
+      - Android: the panels page; SoonerOrLater's task commands, swipe and
+        Undo.
+      - The browser: the pickers page; clicks, Tab and Space.
+    - **Fixed on the way:** `CommandListViewItemContainer` added its swipe
+      recognizer beside `ListViewItem`'s tap recognizer once views had a
+      collection, so a tap was handled twice; it replaces it, as it did
+      when a view had one recognizer.
+    - **Not done:** pressed feedback still comes from each control's
+      delegate (`OnTapBegan`, `OnTapEnded`); themes will draw from
+      `IsPressed`.
+
+21. **Rename the toolkit to `XForms.Controls`.** The functional controls,
+    which say what a control does and leave how it looks to a theme.
+    - `toolkit/XForms.Toolkit` becomes `controls/XForms.Controls`, with the
+      namespace `XForms.Controls` (and `XForms.Layouts` and `XForms.Input`
+      for the panels and gestures it now holds).
+    - Update both solutions, the test apps, SoonerOrLater and the docs
+      (`architecture.md`'s layout and rules, this document's name mapping).
+
+    **Status: done.**
+    - `controls/XForms.Controls` (assembly and root namespace
+      `XForms.Controls`). The former `XForms.Toolkit` types are in
+      `XForms.Controls`, with `Control`, `ContentControl`, `UserControl`,
+      `Border` and now `Panel`, `ViewCollection` and `LayoutTransition`;
+      the panels stay in `XForms.Layouts` and the gesture recognizers in
+      `XForms.Input`.
+    - Both solutions, the test apps, the XAML spike and SoonerOrLater
+      reference it; `architecture.md` and the README describe the layers
+      as they are now.
+    - **Verified:** every project builds (the four platforms, the controls,
+      the four test apps and SoonerOrLater on Win32, Android and the web);
+      the rename changes no behavior that phases 19 and 20 verified.
+
+22. **Later: themes, markup and WinUI compatibility.** Each will be planned
+    in detail when it's next.
+    - **Themes:** a control's drawing moves behind an interface a theme
+      supplies, and the controls' current look becomes
+      `XForms.Themes.Simple`.
+      - A theme is chosen explicitly; there's no built-in fallback, so a
+        control without a theme draws nothing.
+      - `Theme` keeps its meaning (the colors, shapes and styles that vary
+        with the mode and accent color) and grows to carry a theme's
+        drawing, as Avalonia's themes do. `ThemeMode` stays the light or
+        dark variant.
+      - A theme should be expressible as data a markup layer can write
+        (tokens and parts), not only as code.
+    - **`XForms.Xaml`:** the proof of concept in `spikes/XForms.Xaml`
+      becomes a layer over the framework and controls.
+    - **`XForms.Compat.WinUI`:** adapters giving WinUI's names and
+      `DependencyProperty`-style API over XForms' controls, with XAML
+      namespace mappings so existing markup loads. It stays separate from
+      any Fluent theme, so neither requires the other, and keeps its types
+      in `XForms.Compat.WinUI` rather than Microsoft's namespaces.

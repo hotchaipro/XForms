@@ -1,7 +1,7 @@
 ﻿using System;
-using XForms.Controls;
-using XForms.Layouts;
+using XForms.Primitives;
 
+using XForms.Platform;
 using XForms.iOS.Renderers;
 
 namespace XForms.iOS
@@ -21,6 +21,14 @@ namespace XForms.iOS
             this._nativeApplication = nativeApplication;
         }
 
+        public bool UsesLightweightRenderers => true;
+
+        public IContainerRenderer CreateContainerRenderer(
+            View view)
+        {
+            return new ContainerRenderer(view);
+        }
+
         public IApplicationRenderer CreateApplicationRenderer(
             Application application)
         {
@@ -33,43 +41,10 @@ namespace XForms.iOS
             return new FrameRenderer(frame);
         }
 
-        public IPageRenderer CreatePageRenderer(
-            Page page)
-        {
-            return new PageRenderer(page);
-        }
-
         public ITextBlockRenderer CreateTextBlockRenderer(
             TextBlock textView)
         {
-            if (textView.CanBeLightweight)
-            {
-                return new LightweightTextBlockRenderer(textView);
-            }
-
             return new TextBlockRenderer(textView);
-        }
-
-        public IPanelRenderer CreatePanelRenderer(
-            Panel layout)
-        {
-            if (layout.CanBeLightweight)
-            {
-                return new LightweightPanelRenderer(layout);
-            }
-
-            return new PanelRenderer(layout);
-        }
-
-        public IContentControlRenderer CreateContentControlRenderer(
-            ContentControl xControl)
-        {
-            if (xControl.CanBeLightweight)
-            {
-                return new LightweightControlRenderer(xControl);
-            }
-
-            return new ContentControlRenderer(xControl);
         }
 
         public IImageRenderer CreateImageRenderer(
@@ -84,10 +59,10 @@ namespace XForms.iOS
             return new BitmapRenderer(bitmap);
         }
 
-        public IListViewRenderer CreateListViewRenderer(
-            ListView listView)
+        public IItemsViewRenderer CreateItemsViewRenderer(
+            ItemsView listView)
         {
-            return new ListViewRenderer(listView);
+            return new ItemsViewRenderer(listView);
         }
 
         public ITextBoxRenderer CreateTextBoxRenderer(
@@ -102,17 +77,6 @@ namespace XForms.iOS
             ScrollViewer scrollView)
         {
             return new ScrollViewerRenderer(scrollView);
-        }
-
-        public IUserControlRenderer CreateUserControlRenderer(
-            UserControl userControl)
-        {
-            if (userControl.CanBeLightweight)
-            {
-                return new LightweightControlRenderer(userControl);
-            }
-
-            return new UserControlRenderer(userControl);
         }
 
         public IPopupRenderer CreatePopupRenderer(

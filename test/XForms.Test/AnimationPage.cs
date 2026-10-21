@@ -1,7 +1,7 @@
 using System;
 using XForms.Controls;
 using XForms.Layouts;
-using XForms.Toolkit;
+using XForms.Primitives;
 
 namespace XForms.Test
 {
@@ -54,7 +54,7 @@ namespace XForms.Test
 
             // A spring: tap to grow from half size, overshooting
             var spring = new Box("Tap: spring", 0xFFE91E63) { Animator = new() };
-            spring.Tapped += async (sender, e) =>
+            Gestures.Tap(spring).Tapped += async (sender, e) =>
             {
                 this._status.Text = "Spring...";
                 bool finished = await spring.Animator.ScaleFrom(0.5f, TimeSpan.FromMilliseconds(1500), new SpringEase(EasingMode.EaseOut) { Oscillations = 2 });
@@ -64,7 +64,7 @@ namespace XForms.Test
 
             // A reveal: tap to uncover from the left edge
             var reveal = new Box("Tap: reveal", 0xFF009688) { Animator = new() };
-            reveal.Tapped += async (sender, e) =>
+            Gestures.Tap(reveal).Tapped += async (sender, e) =>
             {
                 this._status.Text = "Reveal...";
                 bool finished = await reveal.Animator.RevealFrom(new Rect(0, 0, 0, reveal.Bounds.Height), TimeSpan.FromMilliseconds(1500), new CubicEase(EasingMode.EaseOut));
@@ -74,7 +74,7 @@ namespace XForms.Test
 
             // Interrupt: a slow move, replaced by another before it finishes
             var mover = new Box("Tap: move", 0xFF795548) { Animator = new() };
-            mover.Tapped += async (sender, e) =>
+            Gestures.Tap(mover).Tapped += async (sender, e) =>
             {
                 var first = mover.Animator.TranslateTo(new Point(0, 60), TimeSpan.FromSeconds(2));
                 await System.Threading.Tasks.Task.Delay(300);
@@ -102,7 +102,7 @@ namespace XForms.Test
 
             var add = new Box("Tap: add", 0xFF607D8B) { Width = 120, Height = 40 };
             int next = 7;
-            add.Tapped += (sender, e) => chips.Children.Add(this.CreateChip(chips, next++));
+            Gestures.Tap(add).Tapped += (sender, e) => chips.Children.Add(this.CreateChip(chips, next++));
             layout.Children.Add(add);
             layout.Children.Add(chips);
 
@@ -144,7 +144,7 @@ namespace XForms.Test
             int number)
         {
             var chip = new Box($"Chip {number}", 0xFF3F51B5) { Width = 80, Height = 40 };
-            chip.Tapped += (sender, e) =>
+            Gestures.Tap(chip).Tapped += (sender, e) =>
             {
                 chips.Children.Remove(chip);
                 chips.Children.Insert(0, chip);

@@ -1,5 +1,6 @@
 ﻿using System;
 using Android.Views;
+using XForms.Platform;
 using AndroidFrameLayout = global::Android.Widget.FrameLayout;
 
 namespace XForms.Android.Renderers
@@ -23,7 +24,7 @@ namespace XForms.Android.Renderers
             this.SetNativeElement(this._nativeFrame);
 
             // The root frame is the window's content: report its size
-            this._nativeFrame.LayoutChange += (sender, e) => frame.NotifyRootSize(new Size(
+            this._nativeFrame.LayoutChange += (sender, e) => LayerHost.For(frame).NotifyRootSize(new Size(
                 this.PixelsToDevicePixels(e.Right - e.Left),
                 this.PixelsToDevicePixels(e.Bottom - e.Top)));
         }

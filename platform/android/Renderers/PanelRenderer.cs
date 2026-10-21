@@ -1,4 +1,5 @@
 ﻿using System;
+using XForms.Platform;
 using AndroidView = global::Android.Views.View;
 using AndroidViewGroup = global::Android.Views.ViewGroup;
 
@@ -122,21 +123,6 @@ namespace XForms.Android.Renderers
         {
             this.RemoveChildAt(index);
             this.InsertChild(index, childRenderer);
-        }
-    }
-
-    /// <summary>
-    /// Renderer for every XForms layout: the layout itself positions its
-    /// children, so the platform only needs a generic container.
-    /// </summary>
-    public class PanelRenderer : PanelRenderer<NativeLayoutView>, IPanelRenderer
-    {
-        public PanelRenderer(
-            global::Android.Content.Context context,
-            XForms.Panel layout)
-            : base(context, layout)
-        {
-            this.SetNativeElement(new NativeLayoutView(context, layout));
         }
     }
 }

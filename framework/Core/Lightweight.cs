@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
-using XForms.Controls;
+using XForms.Primitives;
+using XForms.Platform;
 
 namespace XForms
 {
@@ -14,7 +15,7 @@ namespace XForms
     /// Android and iOS use these. Win32 has its own lightweight renderers, in
     /// its renderer tree.
     /// </remarks>
-    internal abstract class LightweightRenderer : IViewRenderer, IControlRenderer
+    internal abstract class LightweightRenderer : IViewRenderer
     {
         private bool _isVisible = true;
         private Color _backgroundColor = Colors.Transparent;
@@ -189,52 +190,31 @@ namespace XForms
     }
 
     /// <summary>
-    /// A lightweight panel. The framework keeps its children; it only draws
-    /// them, in their drawing order.
+    /// A lightweight container. The framework keeps its children and draws
+    /// them, in their drawing order, above the view's own drawing (or its
+    /// background).
     /// </summary>
-    internal sealed class LightweightPanelRenderer : LightweightRenderer, IPanelRenderer
+    internal sealed class LightweightContainerRenderer : LightweightRenderer, IContainerRenderer
     {
-        public LightweightPanelRenderer(
-            Panel panel)
-            : base(panel)
+        public LightweightContainerRenderer(
+            View view)
+            : base(view)
         {
         }
 
         public void ClearChildren() => this.Invalidate();
 
-        public void AddChild(IViewRenderer childRenderer) => this.Invalidate();
-
         public void InsertChild(int index, IViewRenderer childRenderer) => this.Invalidate();
 
         public void RemoveChildAt(int index) => this.Invalidate();
 
-        public void ReplaceChild(int index, IViewRenderer childRenderer) => this.Invalidate();
-    }
-
-    /// <summary>
-    /// A lightweight owner-drawn or content control.
-    /// </summary>
-    internal sealed class LightweightControlRenderer : LightweightRenderer, IUserControlRenderer, IContentControlRenderer
-    {
-        public LightweightControlRenderer(
-            Control control)
-            : base(control)
-        {
-        }
-
-        void IUserControlRenderer.Invalidate() => this.Invalidate();
-
-        void IUserControlRenderer.SetContent(IViewRenderer content) => this.Invalidate();
-
-        void IContentControlRenderer.SetContent(IViewRenderer content) => this.Invalidate();
-
         public override void Paint(
             DrawingContext context)
         {
-            if (this.View is IDrawDelegate drawDelegate)
+            if (LayerHost.For(this.View).DrawsContent)
             {
-                // An owner-drawn control paints its own background
-                drawDelegate.InvokeRender(context, new Rect(0, 0, this.Frame.Width, this.Frame.Height));
+                // A view that draws itself paints its own background
+                this.View.RenderContent(context, new Rect(0, 0, this.Frame.Width, this.Frame.Height));
             }
             else
             {

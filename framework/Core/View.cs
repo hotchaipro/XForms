@@ -3,77 +3,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using XForms.Platform;
 
 namespace XForms
 {
-    internal interface IViewDelegate
-    {
-        bool DispatchPointerEvent(PointerEventArgs e);
-
-        bool DispatchPointerWheel(PointerEventArgs e);
-    }
-
-    public interface IViewRenderer : IElementRenderer
-    {
-        bool IsVisible { get; set; }
-
-        bool IsHitTestVisible { get; set; }
-
-        /// <summary>
-        /// Measures the native view within the available size (which excludes the
-        /// view's margin and may be infinite). A native container measures its
-        /// children by calling back into <see cref="View.MeasureContent"/>.
-        /// </summary>
-        Size MeasureNative(Size availableSize);
-
-        /// <summary>
-        /// Positions the native view at the frame, relative to its parent view. A
-        /// native container arranges its children by calling back into
-        /// <see cref="View.LayoutContent"/>.
-        /// </summary>
-        void ArrangeNative(Rect frame);
-
-        /// <summary>
-        /// Asks the platform to lay this view (and its ancestors) out again.
-        /// </summary>
-        void InvalidateMeasure();
-
-        /// <summary>
-        /// Whether the native view clips its children and drawing to its bounds.
-        /// </summary>
-        bool ClipToBounds { set; }
-
-        /// <summary>
-        /// Creates the view's animation layers, one per animator, outermost
-        /// first: each wraps the next, and the innermost wraps the view's own
-        /// content and children. Called once, when the native view is created,
-        /// and only for views with animators.
-        /// </summary>
-        IAnimationLayer[] CreateAnimationLayers(int count);
-
-        /// <summary>
-        /// Adds the native object of a view inside lightweight descendants of
-        /// this view, which have none of their own to add it to, at its place
-        /// in drawing order among the views it hosts. Hosted views are drawn
-        /// above the lightweight content and this view's own children.
-        /// </summary>
-        void AddHostedView(IViewRenderer child, int index);
-
-        void RemoveHostedView(IViewRenderer child);
-
-        /// <summary>
-        /// Draws the lightweight views inside this view again.
-        /// </summary>
-        void InvalidateLayerContent();
-
-        /// <summary>
-        /// Moves keyboard focus to the view. Returns false where the platform
-        /// has no keyboard focus for owner-drawn views.
-        /// </summary>
-        bool Focus();
-    }
-
-    public abstract class View : Element, IViewDelegate, INotifyPropertyChanged
+    public abstract class View : Element, INotifyPropertyChanged
     {
         public static readonly ViewProperty<View, bool> IsVisibleProperty = new(nameof(IsVisible), v => v.IsVisible, (v, x) => v.IsVisible = x);
         public static readonly ViewProperty<View, bool> IsHitTestVisibleProperty = new(nameof(IsHitTestVisible), v => v.IsHitTestVisible, (v, x) => v.IsHitTestVisible = x);
@@ -91,6 +25,7 @@ namespace XForms
         {
         }
 
+        [PlatformContract]
         internal new IViewRenderer Renderer
         {
             get
@@ -166,6 +101,10 @@ namespace XForms
             }
 
             this.CreateAnimationLayers(native);
+
+            // A container gets its children and background
+            this.AttachVisualChildren();
+            this.InvalidateBackground();
         }
 
         // One native layer per animator: the app's (or the framework's) outside,
@@ -211,7 +150,7 @@ namespace XForms
         {
             get
             {
-                return (this.Parent is Panel panel) && (null != panel.ChildTransitions);
+                return (this.Parent is View parent) && parent.AnimatesChildren;
             }
         }
 
@@ -377,20 +316,429 @@ namespace XForms
         internal override void OnTextScaleChangedCore()
         {
             this.InvalidateMeasure();
+            if (this._drawsContent)
+            {
+                this.InvalidateVisual();
+            }
         }
+
+        #region Children
+
+        // The children in the order they were added (layout order), and in
+        // drawing order (by ZIndex, then layout order), which the native
+        // children follow; null until the first child
+        private List<View> _children;
+        private List<View> _drawingOrder;
+
+        /// <summary>
+        /// The view's children, in the order they were added. A view with
+        /// children is a container on every platform: a native view, or a
+        /// lightweight one drawn into its layer.
+        /// </summary>
+        protected IReadOnlyList<View> VisualChildren
+        {
+            get
+            {
+                return (IReadOnlyList<View>)this._children ?? Array.Empty<View>();
+            }
+        }
+
+        private IContainerRenderer Container
+        {
+            get
+            {
+                return this.CreatedRenderer as IContainerRenderer;
+            }
+        }
+
+        /// <summary>
+        /// Adds a child after the others.
+        /// </summary>
+        protected void AddVisualChild(
+            View child)
+        {
+            this.InsertVisualChild(this.VisualChildren.Count, child);
+        }
+
+        /// <summary>
+        /// Inserts a child at the index, in layout order.
+        /// </summary>
+        protected void InsertVisualChild(
+            int index,
+            View child)
+        {
+            ArgumentNullException.ThrowIfNull(child);
+            this._children ??= new List<View>();
+            if (this._children.Contains(child))
+            {
+                throw new InvalidOperationException("The view is already a child of this view.");
+            }
+
+            this._children.Insert(index, child);
+            this.AddToDrawingOrder(child);
+            this.InvalidateMeasure();
+        }
+
+        /// <summary>
+        /// Removes the child at the index, in layout order.
+        /// </summary>
+        protected void RemoveVisualChildAt(
+            int index)
+        {
+            var child = this._children[index];
+            this.RemoveFromDrawingOrder(child);
+            this._children.RemoveAt(index);
+            this.InvalidateMeasure();
+        }
+
+        /// <summary>
+        /// Removes the child. Returns whether it was a child.
+        /// </summary>
+        protected bool RemoveVisualChild(
+            View child)
+        {
+            int index = this._children?.IndexOf(child) ?? -1;
+            if (index < 0)
+            {
+                return false;
+            }
+
+            this.RemoveVisualChildAt(index);
+            return true;
+        }
+
+        /// <summary>
+        /// Replaces the child at the index with another.
+        /// </summary>
+        protected void ReplaceVisualChild(
+            int index,
+            View child)
+        {
+            ArgumentNullException.ThrowIfNull(child);
+            var oldChild = this._children[index];
+            this.RemoveFromDrawingOrder(oldChild);
+            this._children[index] = child;
+            this.AddToDrawingOrder(child);
+            this.InvalidateMeasure();
+        }
+
+        /// <summary>
+        /// Removes every child.
+        /// </summary>
+        protected void ClearVisualChildren()
+        {
+            if ((null == this._children) || (0 == this._children.Count))
+            {
+                return;
+            }
+
+            var oldChildren = this._children.ToArray();
+            this._children.Clear();
+            this._drawingOrder.Clear();
+
+            var container = this.Container;
+            if (null != container)
+            {
+                container.ClearChildren();
+                foreach (var child in oldChildren)
+                {
+                    child.NotifyDetached();
+                }
+            }
+
+            this.InvalidateMeasure();
+        }
+
+        // Where the child goes in drawing order: after every sibling with a lower
+        // ZIndex, or the same ZIndex and an earlier place in layout order
+        private int DrawingInsertIndex(
+            View child)
+        {
+            int zIndex = child.ZIndex;
+            int layoutIndex = this._children.IndexOf(child);
+
+            int index = 0;
+            foreach (var sibling in this._drawingOrder)
+            {
+                if ((sibling.ZIndex < zIndex)
+                    || ((sibling.ZIndex == zIndex) && (this._children.IndexOf(sibling) < layoutIndex)))
+                {
+                    index += 1;
+                }
+            }
+
+            return index;
+        }
+
+        private void AddToDrawingOrder(
+            View child)
+        {
+            this._drawingOrder ??= new List<View>();
+            int index = this.DrawingInsertIndex(child);
+            this._drawingOrder.Insert(index, child);
+
+            var container = this.Container;
+            if (null != container)
+            {
+                container.InsertChild(index, child.AttachTo(this));
+                child.NotifyAttached();
+            }
+        }
+
+        private void RemoveFromDrawingOrder(
+            View child)
+        {
+            int index = this._drawingOrder.IndexOf(child);
+            this._drawingOrder.RemoveAt(index);
+
+            var container = this.Container;
+            if (null != container)
+            {
+                container.RemoveChildAt(index);
+                child.NotifyDetached();
+            }
+        }
+
+        internal void OnChildZIndexChanged(
+            View child)
+        {
+            if (null == this._drawingOrder)
+            {
+                return;
+            }
+
+            int oldIndex = this._drawingOrder.IndexOf(child);
+            if (oldIndex < 0)
+            {
+                return;
+            }
+
+            this._drawingOrder.RemoveAt(oldIndex);
+            int newIndex = this.DrawingInsertIndex(child);
+            this._drawingOrder.Insert(newIndex, child);
+
+            var container = this.Container;
+            if ((null != container) && (newIndex != oldIndex))
+            {
+                // Move the native child without detaching the view
+                container.RemoveChildAt(oldIndex);
+                container.InsertChild(newIndex, child.Renderer);
+            }
+        }
+
+        // Once the container exists, it gets the children's renderers
+        private void AttachVisualChildren()
+        {
+            var container = this.Container;
+            if ((null == container) || (null == this._drawingOrder))
+            {
+                return;
+            }
+
+            for (int i = 0; i < this._drawingOrder.Count; i += 1)
+            {
+                container.InsertChild(i, this._drawingOrder[i].AttachTo(this));
+            }
+
+            foreach (var child in this._children)
+            {
+                child.NotifyAttached();
+            }
+        }
+
+        /// <summary>
+        /// Whether the framework animates the children's moves (a panel with
+        /// layout transitions), so each needs an animator layer.
+        /// </summary>
+        protected virtual bool AnimatesChildren
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        #endregion Children
+
+        #region Drawing
+
+        private bool _drawsContent;
+        private List<DrawnAnimator> _drawnAnimators;
+
+        internal bool DrawsContentInternal
+        {
+            get
+            {
+                return this._drawsContent;
+            }
+        }
+
+        /// <summary>
+        /// Whether the view draws its own content, in <see cref="Render"/>,
+        /// beneath its children. Set it in the constructor.
+        /// </summary>
+        protected bool DrawsContent
+        {
+            get
+            {
+                return this._drawsContent;
+            }
+
+            set
+            {
+                if (this.HasRenderer)
+                {
+                    throw new InvalidOperationException("Set DrawsContent before the view is attached.");
+                }
+
+                this._drawsContent = value;
+            }
+        }
+
+        /// <summary>
+        /// The color the view is filled with beneath its children, when it
+        /// doesn't draw itself: transparent unless a subclass says otherwise.
+        /// Call <see cref="InvalidateBackground"/> when it changes.
+        /// </summary>
+        protected virtual Color GetBackgroundColor()
+        {
+            return Colors.Transparent;
+        }
+
+        /// <summary>
+        /// Applies a change to <see cref="GetBackgroundColor"/> (or draws a view
+        /// that draws itself again).
+        /// </summary>
+        protected void InvalidateBackground()
+        {
+            var container = this.Container;
+            if (null == container)
+            {
+                return;
+            }
+
+            if (this._drawsContent)
+            {
+                container.BackgroundColor = Colors.Transparent;
+                container.Invalidate();
+            }
+            else
+            {
+                container.BackgroundColor = this.GetBackgroundColor();
+            }
+        }
+
+        /// <summary>
+        /// Draws the view, within its bounds (from 0, 0), when it
+        /// <see cref="DrawsContent"/>. By default it fills the view with its
+        /// background color. Call <see cref="InvalidateVisual"/> to draw again.
+        /// </summary>
+        protected virtual void Render(
+            DrawingContext drawingContext)
+        {
+            drawingContext.Clear(this.GetBackgroundColor());
+        }
+
+        /// <summary>
+        /// Draws the view again.
+        /// </summary>
+        public virtual void InvalidateVisual()
+        {
+            this.Container?.Invalidate();
+        }
+
+        /// <summary>
+        /// Creates a scale and opacity the view applies to its own drawing,
+        /// animated without a native layer (see <see cref="DrawnAnimator"/>).
+        /// For small effects, such as press feedback, that shouldn't cost the
+        /// view a layer of its own, as an <see cref="Animator"/> would.
+        /// </summary>
+        protected DrawnAnimator CreateDrawnAnimator()
+        {
+            var animator = new DrawnAnimator(this.InvalidateVisual);
+            this._drawnAnimators ??= new List<DrawnAnimator>();
+            this._drawnAnimators.Add(animator);
+            return animator;
+        }
+
+        /// <summary>
+        /// Creates an animator that the view keeps privately, in its own field,
+        /// to animate its own content (such as a spinning ring). Call it from
+        /// the view's constructor: it throws once the view has been attached.
+        /// Each call creates another animator, so a subclass can add its own.
+        /// The public <see cref="Animator"/> always belongs to the app.
+        /// </summary>
+        protected Animator CreateOwnAnimator()
+        {
+            return this.CreateOwnAnimatorCore();
+        }
+
+        // Draws the view's own content (with its drawn animations), for the
+        // platform or the lightweight painter
+        internal void RenderContent(
+            DrawingContext context,
+            Rect bounds)
+        {
+            var animators = this._drawnAnimators;
+            if (null == animators)
+            {
+                this.Render(context);
+                return;
+            }
+
+            var scopes = new DrawnAnimator.Scope[animators.Count];
+            for (int i = 0; i < animators.Count; i += 1)
+            {
+                scopes[i] = animators[i].Apply(context, bounds);
+            }
+
+            try
+            {
+                this.Render(context);
+            }
+            finally
+            {
+                for (int i = animators.Count - 1; i >= 0; i -= 1)
+                {
+                    scopes[i].Dispose();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Creates the view's renderer: by default a container, which holds the
+        /// view's children (and draws it, if it <see cref="DrawsContent"/>).
+        /// Views the platforms render natively override it.
+        /// </summary>
+        protected override IElementRenderer CreateRenderer()
+        {
+            var platform = this.Application.Platform;
+            return (platform.UsesLightweightRenderers && this.CanBeLightweight)
+                ? new LightweightContainerRenderer(this)
+                : platform.CreateContainerRenderer(this);
+        }
+
+        protected override void OnThemeChanged(
+            Theme theme)
+        {
+            base.OnThemeChanged(theme);
+            this.InvalidateBackground();
+        }
+
+        #endregion Drawing
 
         #region Lightweight views
 
         /// <summary>
-        /// Whether views of this type can be lightweight: they draw themselves
-        /// or only lay out children (owner-drawn and content controls, panels,
-        /// text blocks).
+        /// Whether views of this type can be lightweight: containers (which
+        /// draw themselves or only lay out children) and text blocks. Views
+        /// the platforms render natively override it.
         /// </summary>
         internal virtual bool IsLightweightType
         {
             get
             {
-                return false;
+                return true;
             }
         }
 
@@ -449,6 +797,11 @@ namespace XForms
         {
             get
             {
+                if (null != this._drawingOrder)
+                {
+                    return this._drawingOrder;
+                }
+
                 List<View> children = null;
                 foreach (var child in this.GetChildElements())
                 {
@@ -890,7 +1243,7 @@ namespace XForms
                     continue;
                 }
 
-                if (child.Focusable || (child is Controls.TextBox))
+                if (child.Focusable || (child is Primitives.TextBox))
                 {
                     result.Add(child);
                 }
@@ -1027,7 +1380,7 @@ namespace XForms
         /// Creates one of a control's own animators (see
         /// <see cref="Controls.Control.CreateOwnAnimator"/>).
         /// </summary>
-        internal Animator CreateOwnAnimatorCore()
+        private Animator CreateOwnAnimatorCore()
         {
             if (this.HasRenderer)
             {
@@ -1520,7 +1873,7 @@ namespace XForms
         /// Space between the view's edges and its children. Containers expose
         /// it as <c>Padding</c>.
         /// </summary>
-        private protected Thickness ContentPadding
+        protected Thickness ContentPadding
         {
             get
             {
@@ -1607,7 +1960,7 @@ namespace XForms
                 if (value != this._zIndex)
                 {
                     this._zIndex = value;
-                    (this.Parent as Panel)?.OnChildZIndexChanged(this);
+                    (this.Parent as View)?.OnChildZIndexChanged(this);
                 }
 
                 this.OnPropertyChanged();
@@ -1846,7 +2199,16 @@ namespace XForms
         protected virtual Size MeasureOverride(
             Size availableSize)
         {
-            return Size.Empty;
+            // By default the children overlap, each in the whole area
+            float width = 0, height = 0;
+            foreach (var child in this.VisualChildren)
+            {
+                child.Measure(availableSize);
+                width = Math.Max(width, child.DesiredSize.Width);
+                height = Math.Max(height, child.DesiredSize.Height);
+            }
+
+            return new Size(width, height);
         }
 
         /// <summary>
@@ -1857,6 +2219,10 @@ namespace XForms
         protected virtual void ArrangeOverride(
             Size finalSize)
         {
+            foreach (var child in this.VisualChildren)
+            {
+                child.Arrange(new Rect(0, 0, finalSize.Width, finalSize.Height));
+            }
         }
 
         // The alignment enums share these values: start (left or top), center,
@@ -1936,19 +2302,24 @@ namespace XForms
 
         #endregion Layout
 
-        public GestureRecognizer GestureRecognizer
+        private GestureRecognizerCollection _gestureRecognizers;
+
+        /// <summary>
+        /// The gesture recognizers that interpret the view's pointer input
+        /// (taps, swipes, pans and so on), each given every pointer event in
+        /// turn.
+        /// </summary>
+        public IList<GestureRecognizer> GestureRecognizers
         {
-            get;
-            set;
+            get
+            {
+                return this._gestureRecognizers ??= new GestureRecognizerCollection(this);
+            }
         }
 
         #region Pointer input
 
         private HashSet<int> _capturedPointers;
-        private TapTracker _tapTracker;
-        private EventHandler<TappedEventArgs> _tapped;
-        private EventHandler<TappedEventArgs> _doubleTapped;
-        private EventHandler<HoldingEventArgs> _holding;
 
         public event EventHandler<PointerEventArgs> PointerPressed;
 
@@ -2031,36 +2402,6 @@ namespace XForms
             return (this.HasLightweightChildren ? this.HitTestLightweight(point) : null) ?? this;
         }
 
-        /// <summary>
-        /// Raised when a pointer is pressed and released over the view without
-        /// moving. Subscribing makes the view take the pointers pressed on it.
-        /// </summary>
-        public event EventHandler<TappedEventArgs> Tapped
-        {
-            add { this._tapped += value; this.EnsureTapTracker(); }
-            remove { this._tapped -= value; }
-        }
-
-        /// <summary>
-        /// Raised for a second tap soon after a first, close to it.
-        /// </summary>
-        public event EventHandler<TappedEventArgs> DoubleTapped
-        {
-            add { this._doubleTapped += value; this.EnsureTapTracker(); }
-            remove { this._doubleTapped -= value; }
-        }
-
-        /// <summary>
-        /// Raised when a pointer is held down on the view without moving
-        /// (<see cref="HoldingState.Started"/>), and again when it's released
-        /// or moves away. A held pointer doesn't also tap.
-        /// </summary>
-        public event EventHandler<HoldingEventArgs> Holding
-        {
-            add { this._holding += value; this.EnsureTapTracker(); }
-            remove { this._holding -= value; }
-        }
-
         protected virtual void OnPointerPressed(
             PointerEventArgs e)
         {
@@ -2124,11 +2465,6 @@ namespace XForms
             return this._capturedPointers?.Contains(pointerId) ?? false;
         }
 
-        private void EnsureTapTracker()
-        {
-            this._tapTracker ??= new TapTracker(this);
-        }
-
         /// <summary>
         /// Delivers a pointer event from the platform: the application's preview,
         /// then the overrides and events, then gestures. Returns whether the view
@@ -2167,14 +2503,17 @@ namespace XForms
                     break;
             }
 
-            bool takesPress = false;
-            if (null != this._tapTracker)
-            {
-                takesPress = this._tapTracker.OnPointer(e);
-            }
-
             var result = new GestureEventResult();
-            this.GestureRecognizer?.HandlePointerInput(e, ref result);
+            var recognizers = this._gestureRecognizers;
+            if (null != recognizers)
+            {
+                for (int i = 0; i < recognizers.Count; i += 1)
+                {
+                    var recognizerResult = new GestureEventResult();
+                    recognizers[i].HandlePointerInput(e, ref recognizerResult);
+                    result.DidHandleEvent |= recognizerResult.DidHandleEvent;
+                }
+            }
 
             bool isCaptured = this.HasPointerCapture(e.PointerId);
             if ((e.State == PointerInputState.Ended) || (e.State == PointerInputState.Canceled))
@@ -2184,8 +2523,7 @@ namespace XForms
 
             return e.Handled
                 || result.DidHandleEvent
-                || isCaptured
-                || ((e.State == PointerInputState.Began) && takesPress);
+                || isCaptured;
         }
 
         /// <summary>
@@ -2208,142 +2546,11 @@ namespace XForms
             return e.Handled;
         }
 
-        // Recognizes taps, double taps and holds of the view's first pointer
-        private sealed class TapTracker
-        {
-            private static readonly TimeSpan HoldTime = TimeSpan.FromMilliseconds(500);
-            private static readonly TimeSpan DoubleTapTime = TimeSpan.FromMilliseconds(500);
-
-            private readonly View _view;
-            private DispatcherTimer _holdTimer;
-            private int? _pointerId;
-            private PointerDeviceType _deviceType;
-            private Point _start;
-            private bool _isHolding;
-            private DateTime _lastTapTime;
-            private Point _lastTapPosition;
-
-            public TapTracker(
-                View view)
-            {
-                this._view = view;
-            }
-
-            // Returns whether the view takes a press
-            public bool OnPointer(
-                PointerEventArgs e)
-            {
-                switch (e.State)
-                {
-                    case PointerInputState.Began:
-                        if (null != this._pointerId)
-                        {
-                            // A second finger isn't a tap
-                            this.Cancel();
-                            return true;
-                        }
-
-                        this._pointerId = e.PointerId;
-                        this._deviceType = e.DeviceType;
-                        this._start = e.Position;
-                        this._isHolding = false;
-
-                        if (null != this._view._holding)
-                        {
-                            this._holdTimer ??= new DispatcherTimer(HoldTime, this.OnHoldTime);
-                            this._holdTimer.Start();
-                        }
-
-                        return true;
-
-                    case PointerInputState.Moved:
-                        if ((e.PointerId == this._pointerId) && (e.Position.DistanceTo(this._start) > Application.TouchSlop))
-                        {
-                            this.Cancel();
-                        }
-
-                        break;
-
-                    case PointerInputState.Ended:
-                        if (e.PointerId == this._pointerId)
-                        {
-                            this._holdTimer?.Stop();
-                            this._pointerId = null;
-
-                            if (this._isHolding)
-                            {
-                                this._isHolding = false;
-                                this._view._holding?.Invoke(this._view, new HoldingEventArgs(e.Position, HoldingState.Completed));
-                            }
-                            else if (e.Position.DistanceTo(this._start) <= Application.TouchSlop)
-                            {
-                                this.OnTap(e.Position);
-                            }
-                        }
-
-                        break;
-
-                    case PointerInputState.Canceled:
-                        if (e.PointerId == this._pointerId)
-                        {
-                            this.Cancel();
-                        }
-
-                        break;
-                }
-
-                return false;
-            }
-
-            private void OnTap(
-                Point position)
-            {
-                var now = DateTime.UtcNow;
-                bool isDouble = ((now - this._lastTapTime) <= DoubleTapTime)
-                    && (position.DistanceTo(this._lastTapPosition) <= 2 * Application.TouchSlop);
-
-                var args = new TappedEventArgs(position, this._deviceType);
-                this._view._tapped?.Invoke(this._view, args);
-
-                if (isDouble)
-                {
-                    // A third tap starts over
-                    this._lastTapTime = DateTime.MinValue;
-                    this._view._doubleTapped?.Invoke(this._view, args);
-                }
-                else
-                {
-                    this._lastTapTime = now;
-                    this._lastTapPosition = position;
-                }
-            }
-
-            private void OnHoldTime()
-            {
-                if (null == this._pointerId)
-                {
-                    return;
-                }
-
-                this._holdTimer.Stop();
-                this._isHolding = true;
-                this._view._holding?.Invoke(this._view, new HoldingEventArgs(this._start, HoldingState.Started));
-            }
-
-            private void Cancel()
-            {
-                this._holdTimer?.Stop();
-                this._pointerId = null;
-
-                if (this._isHolding)
-                {
-                    this._isHolding = false;
-                    this._view._holding?.Invoke(this._view, new HoldingEventArgs(this._start, HoldingState.Canceled));
-                }
-            }
-        }
-
-        bool IViewDelegate.DispatchPointerEvent(
+        /// <summary>
+        /// Delivers a pointer event from the platform to this view as a layer:
+        /// to the lightweight view under it (or holding it), or to this view.
+        /// </summary>
+        internal bool DispatchLayerPointerEvent(
             PointerEventArgs e)
         {
             if (this.HasLightweightChildren || (0 < (this._pointerOwners?.Count ?? 0)))
@@ -2354,7 +2561,11 @@ namespace XForms
             return this.DispatchPointerEvent(e);
         }
 
-        bool IViewDelegate.DispatchPointerWheel(
+        /// <summary>
+        /// Delivers a wheel event from the platform to this view as a layer: to
+        /// the lightweight view under it and its ancestors, then this view.
+        /// </summary>
+        internal bool DispatchLayerPointerWheel(
             PointerEventArgs e)
         {
             if (this.HasLightweightChildren)
@@ -2460,8 +2671,7 @@ namespace XForms
         {
             get
             {
-                return this._isKeyboardFocusable
-                    ?? ((this.GestureRecognizer is Input.TapGestureRecognizer) || (null != this._tapped));
+                return this._isKeyboardFocusable ?? (null != this._activated);
             }
 
             set
@@ -2616,23 +2826,68 @@ namespace XForms
             return false;
         }
 
+        private EventHandler _activated;
+
         /// <summary>
-        /// Does what a tap would: called for Enter or Space on a focused view,
-        /// and for a screen reader's activate command. By default this sends a
-        /// press and release to the center of the view.
+        /// Raised when the view is activated without a pointer: Enter or Space
+        /// while it has focus, or a screen reader's or UI Automation's activate
+        /// command. Handling it says the view does something when activated,
+        /// so it's focusable unless <see cref="Focusable"/> says otherwise.
+        /// Gestures that respond to taps handle it, as a tap.
+        /// </summary>
+        public event EventHandler Activated
+        {
+            add
+            {
+                bool wasFocusable = this.Focusable;
+                this._activated += value;
+                if (wasFocusable != this.Focusable)
+                {
+                    this.OnPropertyChanged(nameof(this.Focusable));
+                }
+            }
+
+            remove
+            {
+                bool wasFocusable = this.Focusable;
+                this._activated -= value;
+                if (wasFocusable != this.Focusable)
+                {
+                    this.OnPropertyChanged(nameof(this.Focusable));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Activates the view, as Enter or Space would while it has focus.
+        /// </summary>
+        internal void Activate()
+        {
+            this.OnActivate();
+        }
+
+        /// <summary>
+        /// Called for Enter or Space on a focused view, and for a screen
+        /// reader's activate command. By default this raises
+        /// <see cref="Activated"/>; a control that does something else
+        /// overrides it.
         /// </summary>
         protected internal virtual void OnActivate()
         {
-            var center = new Point(this.Bounds.Width / 2, this.Bounds.Height / 2);
-            this.DispatchPointerEvent(new PointerEventArgs(-1, PointerDeviceType.Mouse, center, PointerInputState.Began, true, KeyModifiers.None));
-            this.DispatchPointerEvent(new PointerEventArgs(-1, PointerDeviceType.Mouse, center, PointerInputState.Ended, true, KeyModifiers.None));
+            this._activated?.Invoke(this, EventArgs.Empty);
         }
 
         #endregion Keyboard
 
         internal override IEnumerable<Element> GetChildElements()
         {
-            yield break;
+            if (null != this._children)
+            {
+                foreach (var child in this._children)
+                {
+                    yield return child;
+                }
+            }
         }
     }
 }

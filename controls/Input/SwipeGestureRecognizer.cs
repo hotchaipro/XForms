@@ -1,0 +1,177 @@
+﻿using System;
+
+namespace XForms.Input
+{
+    public interface ISwipeGestureDelegate : ITapGestureDelegate
+    {
+        bool OnSwipeBegan(
+            int direction);
+
+        bool OnSwipeMoved(
+            int direction,
+            float dx);
+
+        bool OnSwipeEnded(
+            int direction,
+            float dx);
+
+        bool OnSwipeCanceled(
+            int direction);
+    }
+
+    public class SwipeGestureRecognizer : GestureRecognizer
+    {
+        private ISwipeGestureDelegate _delegate;
+        private int _swipeDirection;
+        private Point _gestureStart;
+
+        public SwipeGestureRecognizer(
+            ISwipeGestureDelegate swipeDelegate)
+            : base(swipeDelegate)
+        {
+            if (null == swipeDelegate)
+            {
+                throw new ArgumentNullException(nameof(swipeDelegate));
+            }
+
+            this._delegate = swipeDelegate;
+        }
+
+        public override void Reset()
+        {
+            base.Reset();
+
+            this._gestureStart = Point.Zero;
+        }
+
+        // Activation (Enter, Space, a screen reader) is a tap, which also
+        // makes the view focusable
+        protected override void OnAttached(
+            View view)
+        {
+            view.Activated += this.View_Activated;
+        }
+
+        protected override void OnDetached(
+            View view)
+        {
+            view.Activated -= this.View_Activated;
+        }
+
+        private void View_Activated(
+            object sender,
+            EventArgs e)
+        {
+            this._delegate.OnTapped();
+        }
+
+        protected override void OnPointerInput(
+            PointerEventArgs touch,
+            ref GestureEventResult result)
+        {
+            result.DidHandleEvent = true;
+
+            if (touch.State == PointerInputState.Began)
+            {
+                if (this.State == GestureState.Possible)
+                {
+                    this.State = GestureState.Began;
+
+                    this._swipeDirection = 0;
+                    this._gestureStart = touch.Position;
+
+                    this._delegate.OnTapBegan();
+                }
+            }
+            else if (this.State != GestureState.Possible)
+            {
+                float dx = (float)(touch.Position.X - this._gestureStart.X);
+
+                if (this._swipeDirection == 0)
+                {
+                    this._swipeDirection = Math.Sign(dx);
+                }
+
+                if (Math.Sign(dx) != this._swipeDirection)
+                {
+                    dx = 0;
+                }
+                else
+                {
+                    dx = Math.Abs(dx);
+                }
+
+                double dy = Math.Abs(touch.Position.Y - this._gestureStart.Y);
+
+                if (touch.State == PointerInputState.Moved)
+                {
+                    if (this.State == GestureState.Began)
+                    {
+                        if (dx >= Application.TouchSlop)
+                        {
+                            this._delegate.OnSwipeBegan(this._swipeDirection);
+
+                            this.State = GestureState.Changed;
+                        }
+                        else if (dy >= Application.TouchSlop)
+                        {
+                            this.State = GestureState.Failed;
+
+                            this._delegate.OnTapEnded();
+                        }
+                    }
+                    else if (this.State == GestureState.Changed)
+                    {
+                        this._delegate.OnSwipeMoved(this._swipeDirection, dx);
+                    }
+
+                    // NOTE: A handled move claims the pointer exclusively, so only
+                    // claim it once a swipe is under way; until then (and after a
+                    // vertical drag fails the swipe) a scrolling parent may take over
+                    result.DidHandleEvent = (this.State == GestureState.Changed);
+                }
+                else if (touch.State == PointerInputState.Ended)
+                {
+                    if (this.State == GestureState.Began)
+                    {
+                        this.State = GestureState.Recognized;
+
+                        this._delegate.OnTapped();
+
+                        this._delegate.OnTapEnded();
+                    }
+                    else if (this.State == GestureState.Changed)
+                    {
+                        this._delegate.OnSwipeEnded(this._swipeDirection, dx);
+
+                        this._delegate.OnTapEnded();
+
+                        this.State = GestureState.Recognized;
+                    }
+                    else
+                    {
+                        this.State = GestureState.Failed;
+                    }
+                }
+                else if (touch.State == PointerInputState.Canceled)
+                {
+                    if (this.State == GestureState.Began)
+                    {
+                        this._delegate.OnTapEnded();
+                    }
+                    else if (this.State == GestureState.Changed)
+                    {
+                        this._delegate.OnSwipeCanceled(this._swipeDirection);
+
+                        this._delegate.OnTapEnded();
+                    }
+
+                    if (this.State != GestureState.Possible)
+                    {
+                        this.State = GestureState.Canceled;
+                    }
+                }
+            }
+        }
+    }
+}
