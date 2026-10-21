@@ -2023,6 +2023,52 @@ Win32, Android and the browser, as before.
     - The toolkit's controls, the test apps and SoonerOrLater move to the
       new gestures and pressed state.
 
+    **Status: done.** The framework is now `framework/Core`,
+    `framework/Platform` and `framework/Primitives`.
+    - **Containers:** `View` holds children (`AddVisualChild` and the rest,
+      in z-order), draws itself when it sets `DrawsContent` (`Render`,
+      `InvalidateVisual`, `CreateDrawnAnimator`), has a background
+      (`GetBackgroundColor`, `InvalidateBackground`) and `CreateOwnAnimator`,
+      and by default lays its children out over its whole area. The
+      platforms implement one `IContainerRenderer` (and the framework one
+      lightweight container) instead of five renderer kinds. `Page` is a
+      container; its `Content` is any view.
+    - **Moved to the toolkit:** `Control`, `ContentControl`, `UserControl`,
+      `Border`, `Panel`, the six panels, `ViewCollection` and
+      `LayoutTransition`, built only on public and protected API. Two
+      members became public for them: `Animator.TranslateByOffset` (layout
+      transitions) and `View.ContentPadding` (protected). `Orientation`
+      moved to the `XForms` namespace, since lists use it too.
+    - **`XForms.Primitives`:** `TextBlock`, `TextBox`, `Image`,
+      `ScrollViewer`, `Popup`, and the items view. `TextBox` derives from
+      `View` and sends its own background.
+    - **Lists:** the items view is `ItemsView`, with `ItemContainer` and
+      `ItemsViewSource` (was `ListViewSource`), as WinUI names its
+      `ItemsView`; the platforms render `IItemsViewRenderer`. The toolkit's
+      `ListView` adds selection, `ItemClick` and `SelectionChanged` (it's
+      told when a container is bound, through `OnContainerBound`), with
+      `ListView<T>` and `ListViewItem` (row background, selection, taps).
+    - **Gestures:** `View` keeps raw pointer input, activation and a
+      `GestureRecognizers` collection (as MAUI's), whose recognizers learn
+      their view. Its `Tapped`, `DoubleTapped` and `Holding` events and tap
+      tracking are gone: `TapGestureRecognizer`, in the toolkit with the
+      pan, pinch and swipe recognizers, now raises those events, reports
+      `IsPressed`, and takes an optional delegate.
+    - **Verified:**
+      - Win32: the panels, drawing and pickers pages; list selection;
+        taps, double taps, holds and pans; Tab and Space; UI Automation's
+        select, toggle and Invoke.
+      - Android: the panels page; SoonerOrLater's task commands, swipe and
+        Undo.
+      - The browser: the pickers page; clicks, Tab and Space.
+    - **Fixed on the way:** `CommandListViewItemContainer` added its swipe
+      recognizer beside `ListViewItem`'s tap recognizer once views had a
+      collection, so a tap was handled twice; it replaces it, as it did
+      when a view had one recognizer.
+    - **Not done:** pressed feedback still comes from each control's
+      delegate (`OnTapBegan`, `OnTapEnded`); themes will draw from
+      `IsPressed`.
+
 21. **Rename the toolkit to `XForms.Controls`.** The functional controls,
     which say what a control does and leave how it looks to a theme.
     - `toolkit/XForms.Toolkit` becomes `controls/XForms.Controls`, with the
