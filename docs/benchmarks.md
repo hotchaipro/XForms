@@ -52,6 +52,37 @@ scroll gestures for the frame statistics:
 Emulator numbers are noisy, as the baseline's spread shows, but the
 difference between the variants was consistent across runs.
 
+### With lightweight views
+
+Measured again on 2026-10-20 after phase 8, which made the tiles (and their
+row layouts) lightweight. "Native" is the same build with lightweight views
+turned off (`XFORMS_LIGHTWEIGHT=0` on Win32, `--es lightweight off` on
+Android). The managed heap is measured after a full collection.
+
+**Win32**, three runs each:
+
+| | Lightweight | Native |
+|---|---|---|
+| Build the page | 20–41 ms | 26–30 ms |
+| First frame drawn | 331–383 ms | 639–1,019 ms |
+| Private memory | 24.3–24.6 MB | 29.4–29.5 MB |
+
+**Android** (Pixel 7 emulator, API 36), two runs each:
+
+| | Lightweight | Native | Drawn as one view |
+|---|---|---|---|
+| Native views | 63 | 1,164 | |
+| Memory (PSS) | 58.3–60.6 MB | 61.0–61.2 MB | 54.9 MB |
+| Managed heap | 5.2 MB | 6.9 MB | 4.5 MB |
+| First frame drawn | 1.5–3.9 s | 3.3–4.8 s | 1.2–2.4 s |
+
+The emulator's timings varied widely between sessions; within a session,
+lightweight views showed the page about twice as fast. The first Android
+runs also showed lightweight views using more memory: per-frame allocations
+(an Android `Matrix` per translation, and an iterator per child) inflated
+the heap with garbage. Translations now go straight to the canvas, and
+children are walked without allocating.
+
 ### Findings
 
 - **Android gains the most.** One native view per tile made the page take

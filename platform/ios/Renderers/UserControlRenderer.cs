@@ -39,16 +39,17 @@ namespace XForms.iOS.Renderers
         void IUserControlRenderer.SetContent(
             IViewRenderer content)
         {
-            foreach (var subview in this._nativeOwnerDrawControl.Subviews)
+            // NOTE: Leave views hosted for lightweight content in place
+            this._content?.RemoveFromSuperview();
+            this._content = (UIView)content?.NativeElement;
+            if (null != this._content)
             {
-                subview.RemoveFromSuperview();
+                this._nativeOwnerDrawControl.InsertSubview(this._content, 0);
             }
 
-            var nativeContent = (UIView)content?.NativeElement;
-            if (null != nativeContent)
-            {
-                this._nativeOwnerDrawControl.AddSubview(nativeContent);
-            }
+            this._nativeOwnerDrawControl.SetNeedsDisplay();
         }
+
+        private UIView _content;
     }
 }

@@ -26,6 +26,12 @@ namespace XForms.Test
                 TestApp.StartPage = this.Intent?.GetStringExtra("page");
                 TestApp.ThemeModeSwitches = this.Intent?.GetStringExtra("themes");
 
+                // For comparison: a native object for every view (--es lightweight off)
+                if (this.Intent?.GetStringExtra("lightweight") == "off")
+                {
+                    AppContext.SetSwitch("XForms.DisableLightweightViews", true);
+                }
+
                 var platform = new AndroidPlatform(this);
                 this._app = new TestApp(platform);
             }

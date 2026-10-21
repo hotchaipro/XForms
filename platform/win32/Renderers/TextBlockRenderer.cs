@@ -11,6 +11,14 @@ namespace XForms.Win32.Renderers
     /// </summary>
     internal sealed unsafe class TextBlockRenderer : ViewRenderer, ITextBlockRenderer
     {
+        protected override bool SupportsLightweight
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         private string _text = string.Empty;
         private TextAlignment _horizontalTextAlignment = TextAlignment.Start;
         private TextAlignment _verticalTextAlignment = TextAlignment.Start;

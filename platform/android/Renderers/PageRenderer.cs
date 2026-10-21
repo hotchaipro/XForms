@@ -8,6 +8,7 @@ namespace XForms.Android.Renderers
     public class PageRenderer : ViewRenderer<NativeLayoutView>, IPageRenderer
     {
         private NativeLayoutView _nativePage;
+        private global::Android.Views.View _layout;
 
         public PageRenderer(
             global::Android.Content.Context context,
@@ -29,8 +30,20 @@ namespace XForms.Android.Renderers
         public void SetLayout(
             IPanelRenderer layoutRenderer)
         {
-            this._nativePage.RemoveAllViews();
-            this._nativePage.AddView((global::Android.Views.View)layoutRenderer.NativeElement);
+            // NOTE: A lightweight layout has no native view; the page draws it
+            // and hosts the native views inside it
+            if (null != this._layout)
+            {
+                this._nativePage.RemoveView(this._layout);
+            }
+
+            this._layout = (global::Android.Views.View)layoutRenderer.NativeElement;
+            if (null != this._layout)
+            {
+                this._nativePage.AddView(this._layout, 0);
+            }
+
+            this._nativePage.Invalidate();
         }
     }
 }

@@ -66,6 +66,22 @@ namespace XForms.Controls
 
     public class TextBlock : View
     {
+        internal override bool IsLightweightType
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        internal override IReadOnlyList<View> DrawingOrderChildren
+        {
+            get
+            {
+                return Array.Empty<View>();
+            }
+        }
+
         public static readonly ViewProperty<TextBlock, string> TextProperty = new(nameof(Text), v => v.Text, (v, x) => v.Text = x);
         public static readonly ViewProperty<TextBlock, Color> ForegroundProperty = new(nameof(Foreground), v => v.Foreground, (v, x) => v.Foreground = x);
         public static readonly ViewProperty<TextBlock, float> FontSizeProperty = new(nameof(FontSize), v => v.FontSize, (v, x) => v.FontSize = x);

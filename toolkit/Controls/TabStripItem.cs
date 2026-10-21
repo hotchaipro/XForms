@@ -7,7 +7,7 @@ namespace XForms.Toolkit
     public class TabStripItem : UserControl, ITapGestureDelegate
     {
         // Animates the control itself (press feedback, spinning)
-        private readonly Animator _ownAnimator;
+        private readonly DrawnAnimator _ownAnimator;
 
         protected override AccessibilityRole DefaultAccessibilityRole
         {
@@ -38,7 +38,7 @@ namespace XForms.Toolkit
 
         public TabStripItem()
         {
-            this._ownAnimator = this.CreateOwnAnimator();
+            this._ownAnimator = this.CreateDrawnAnimator();
 
             this._textFormat = new TextFormat()
             {

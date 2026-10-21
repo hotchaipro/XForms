@@ -8,8 +8,40 @@ namespace XForms
     /// </summary>
     public abstract class DrawingContext
     {
-        public abstract void Clear(
+        /// <summary>
+        /// Fills the view's area with the color. Transparent clears it.
+        /// </summary>
+        public void Clear(
+            Color color)
+        {
+            var bounds = this.LightweightBounds;
+            if (bounds.HasValue)
+            {
+                // A lightweight view shares its layer's surface: fill only its
+                // own area, and leave what's beneath it
+                if (!color.IsTransparent)
+                {
+                    this.FillRectangle(bounds.Value, color);
+                }
+
+                return;
+            }
+
+            this.ClearCore(color);
+        }
+
+        protected abstract void ClearCore(
             Color color);
+
+        /// <summary>
+        /// While a lightweight view draws, its area (in its own coordinates):
+        /// <see cref="Clear"/> fills only that.
+        /// </summary>
+        internal Rect? LightweightBounds
+        {
+            get;
+            set;
+        }
 
         public abstract void DrawRectangle(
             Rect rectangle,

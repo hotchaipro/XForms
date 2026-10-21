@@ -60,6 +60,20 @@ namespace XForms.Android
                 NativeConversions.PixelsToDevicePixels(this.Context, bottom - top)));
         }
 
+        protected override void DispatchDraw(
+            global::Android.Graphics.Canvas canvas)
+        {
+            // Lightweight descendants draw into this view, beneath its native
+            // children
+            if (this._owner.HasLightweightChildren)
+            {
+                var drawContext = new DrawContext(this.Context, canvas);
+                LightweightPainter.PaintDescendants(this._owner, drawContext);
+            }
+
+            base.DispatchDraw(canvas);
+        }
+
         public override bool ShouldDelayChildPressedState()
         {
             return false;

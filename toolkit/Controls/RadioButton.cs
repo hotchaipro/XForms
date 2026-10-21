@@ -8,7 +8,7 @@ namespace XForms.Toolkit
     internal sealed class RadioButton : UserControl, ITapGestureDelegate
     {
         // Animates the control itself (press feedback, spinning)
-        private readonly Animator _ownAnimator;
+        private readonly DrawnAnimator _ownAnimator;
 
         private const float TouchDownScaleDelta = 0.05f;
         private const float IsUncheckedScale = 0.8f;
@@ -23,7 +23,7 @@ namespace XForms.Toolkit
             RadioButtons radioButtonGroup,
             RadioButtonItem radioButtonItem)
         {
-            this._ownAnimator = this.CreateOwnAnimator();
+            this._ownAnimator = this.CreateDrawnAnimator();
 
             if (null == radioButtonGroup)
             {

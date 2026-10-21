@@ -7,7 +7,7 @@ namespace XForms.Toolkit
     internal sealed class MenuButton : UserControl, ITapGestureDelegate
     {
         // Animates the control itself (press feedback, spinning)
-        private readonly Animator _ownAnimator;
+        private readonly DrawnAnimator _ownAnimator;
 
         private const float TouchDownScale = 0.9f;
 
@@ -17,7 +17,7 @@ namespace XForms.Toolkit
             MenuBar menuBar,
             MenuItem menuItem)
         {
-            this._ownAnimator = this.CreateOwnAnimator();
+            this._ownAnimator = this.CreateDrawnAnimator();
 
             if (null == menuBar)
             {

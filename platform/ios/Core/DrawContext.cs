@@ -202,7 +202,7 @@ namespace XForms.iOS
 
         #endregion Brushes, paths and pushes
 
-        public override void Clear(
+        protected override void ClearCore(
             Color color)
         {
             this._graphicsContext.ClearRect(this._bounds);

@@ -11,6 +11,14 @@ namespace XForms.Win32.Renderers
 {
     internal sealed class PanelRenderer : ViewRenderer, IPanelRenderer
     {
+        protected override bool SupportsLightweight
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public PanelRenderer(
             Panel layout)
             : base(layout, isContainer: true)
@@ -68,6 +76,14 @@ namespace XForms.Win32.Renderers
 
     internal sealed class ContentControlRenderer : ViewRenderer, IContentControlRenderer
     {
+        protected override bool SupportsLightweight
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public ContentControlRenderer(
             ContentControl contentControl)
             : base(contentControl, isContainer: true)
@@ -91,6 +107,14 @@ namespace XForms.Win32.Renderers
     /// </summary>
     internal sealed class UserControlRenderer : ViewRenderer, IUserControlRenderer
     {
+        protected override bool SupportsLightweight
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         private readonly IDrawDelegate _drawDelegate;
 
         public UserControlRenderer(

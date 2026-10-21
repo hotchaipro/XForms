@@ -210,10 +210,19 @@ namespace XForms
                 this.OnThemeChanged(theme);
             }
 
-            foreach (var child in this.GetChildElements())
+            foreach (var child in this.GetThemedChildElements())
             {
                 child.UpdateTheme();
             }
+        }
+
+        /// <summary>
+        /// The children that follow the element's theme: its children, and
+        /// any it keeps without showing (such as a frame's back stack).
+        /// </summary>
+        internal virtual IEnumerable<Element> GetThemedChildElements()
+        {
+            return this.GetChildElements();
         }
 
         /// <summary>

@@ -20,16 +20,17 @@ namespace XForms.iOS.Renderers
         void IContentControlRenderer.SetContent(
             IViewRenderer content)
         {
-            foreach (var subview in this._nativeContentControl.Subviews)
+            // NOTE: Leave views hosted for lightweight content in place
+            this._content?.RemoveFromSuperview();
+            this._content = (UIView)content?.NativeElement;
+            if (null != this._content)
             {
-                subview.RemoveFromSuperview();
+                this._nativeContentControl.InsertSubview(this._content, 0);
             }
 
-            var nativeContent = (UIView)content?.NativeElement;
-            if (null != nativeContent)
-            {
-                this._nativeContentControl.AddSubview(nativeContent);
-            }
+            this._nativeContentControl.SetNeedsDisplay();
         }
+
+        private UIView _content;
     }
 }

@@ -209,6 +209,15 @@ namespace XForms.Android
         {
             this._canvas.Save();
 
+            // A translation (the common case, such as lightweight views'
+            // positions) needs no matrix
+            if ((transform.M11 == 1) && (transform.M22 == 1) && (transform.M12 == 0) && (transform.M21 == 0))
+            {
+                this._canvas.Translate(this.Px(transform.M31), this.Px(transform.M32));
+                this._pushCount += 1;
+                return;
+            }
+
             // The transform is in dips; the canvas is in pixels, so only the
             // translation scales
             var matrix = new global::Android.Graphics.Matrix();
@@ -243,7 +252,7 @@ namespace XForms.Android
 
         #endregion Brushes, paths and pushes
 
-        public override void Clear(
+        protected override void ClearCore(
             Color color)
         {
             // NOTE: A view's drawing starts empty, so clearing to transparent

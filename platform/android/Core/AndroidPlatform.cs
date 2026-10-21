@@ -41,18 +41,33 @@ namespace XForms.Android
         public ITextBlockRenderer CreateTextBlockRenderer(
             TextBlock textView)
         {
+            if (textView.CanBeLightweight)
+            {
+                return new LightweightTextBlockRenderer(textView);
+            }
+
             return new TextBlockRenderer(this._androidApplication.ApplicationContext, textView);
         }
 
         public IPanelRenderer CreatePanelRenderer(
             Panel layout)
         {
+            if (layout.CanBeLightweight)
+            {
+                return new LightweightPanelRenderer(layout);
+            }
+
             return new PanelRenderer(this._androidApplication.ApplicationContext, layout);
         }
 
         public IContentControlRenderer CreateContentControlRenderer(
             ContentControl xControl)
         {
+            if (xControl.CanBeLightweight)
+            {
+                return new LightweightControlRenderer(xControl);
+            }
+
             return new ContentControlRenderer(this._androidApplication.ApplicationContext, xControl);
         }
 
@@ -97,6 +112,11 @@ namespace XForms.Android
         public IUserControlRenderer CreateUserControlRenderer(
             UserControl userControl)
         {
+            if (userControl.CanBeLightweight)
+            {
+                return new LightweightControlRenderer(userControl);
+            }
+
             return new UserControlRenderer(this._androidApplication.ApplicationContext, userControl);
         }
 

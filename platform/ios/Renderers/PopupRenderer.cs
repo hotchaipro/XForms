@@ -44,6 +44,31 @@ namespace XForms.iOS.Renderers
             }
         }
 
+        // The placement target's frame in the window: its native view's, or
+        // for a lightweight target, its place in its layer's view
+        private bool TryGetAnchorFrame(
+            UIWindow window,
+            out CoreGraphics.CGRect anchorFrame)
+        {
+            var target = this.PlacementTarget;
+            if (target?.Renderer.NativeElement is UIView anchor)
+            {
+                anchorFrame = anchor.ConvertRectToView(anchor.Bounds, window);
+                return true;
+            }
+
+            if ((null != target) && (target.FindLayer()?.NativeElement is UIView layer))
+            {
+                var offset = target.OffsetInLayer;
+                var local = new CoreGraphics.CGRect(offset.X, offset.Y, target.Bounds.Width, target.Bounds.Height);
+                anchorFrame = layer.ConvertRectToView(local, window);
+                return true;
+            }
+
+            anchorFrame = default;
+            return false;
+        }
+
         public View PlacementTarget
         {
             get;
@@ -84,9 +109,8 @@ namespace XForms.iOS.Renderers
             var windowSize = new Size((float)safeFrame.Width, (float)safeFrame.Height);
 
             Rect frame;
-            if (this.PlacementTarget?.Renderer.NativeElement is UIView anchor)
+            if (this.TryGetAnchorFrame(window, out var anchorFrame))
             {
-                var anchorFrame = anchor.ConvertRectToView(anchor.Bounds, window);
                 float top = (float)(anchorFrame.Top - safeFrame.Top);
                 float bottom = (float)(anchorFrame.Bottom - safeFrame.Top);
 

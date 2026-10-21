@@ -69,6 +69,15 @@ namespace XForms.Controls
 
     public class ListView : Control
     {
+        // Its content is a layer of its own
+        internal override bool RequiresNativeChildren
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         protected override AccessibilityRole DefaultAccessibilityRole
         {
             get
@@ -235,9 +244,21 @@ namespace XForms.Controls
             set;
         }
 
-        //internal override IEnumerable<Element> GetChildElements()
-        //{
-        //    //TODO: Return list items and containers
-        //}
+        // The rows the platform has made, which it recycles
+        private readonly HashSet<ListViewItemContainer> _realizedContainers = new HashSet<ListViewItemContainer>();
+
+        internal void AddRealizedContainer(
+            ListViewItemContainer container)
+        {
+            if (this._realizedContainers.Add(container))
+            {
+                container.UpdateTheme();
+            }
+        }
+
+        internal override IEnumerable<Element> GetChildElements()
+        {
+            return this._realizedContainers;
+        }
     }
 }

@@ -20,6 +20,12 @@ namespace XForms.Test.Win32
             TestApp.StartPage = Environment.GetEnvironmentVariable("XFORMS_TEST_PAGE");
             TestApp.ThemeModeSwitches = Environment.GetEnvironmentVariable("XFORMS_THEME_SWITCHES");
 
+            // For comparison: a native object for every view
+            if (Environment.GetEnvironmentVariable("XFORMS_LIGHTWEIGHT") == "0")
+            {
+                AppContext.SetSwitch("XForms.DisableLightweightViews", true);
+            }
+
             Win32Application.Run("XForms Test (Win32)", (platform) => new TestApp(platform));
         }
     }

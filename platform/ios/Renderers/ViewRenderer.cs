@@ -222,6 +222,30 @@ namespace XForms.iOS.Renderers
             }
         }
 
+        // Views hosted for lightweight descendants, after the view's own subviews
+        private int _hostedCount;
+
+        public void AddHostedView(
+            IViewRenderer child,
+            int index)
+        {
+            var subviews = this._nativeView.Subviews;
+            this._nativeView.InsertSubview((UIView)child.NativeElement, subviews.Length - this._hostedCount + index);
+            this._hostedCount += 1;
+        }
+
+        public void RemoveHostedView(
+            IViewRenderer child)
+        {
+            ((UIView)child.NativeElement).RemoveFromSuperview();
+            this._hostedCount -= 1;
+        }
+
+        public void InvalidateLayerContent()
+        {
+            this._nativeView?.SetNeedsDisplay();
+        }
+
         public bool Focus()
         {
             // NOTE: Only native views that can become first responder take focus

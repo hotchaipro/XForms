@@ -10,6 +10,36 @@ namespace XForms.Controls
 
     public abstract class ContentControl : Control
     {
+        internal override bool IsLightweightType
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        // The content as a list, made again only when the content changes
+        private View[] _contentList;
+
+        internal override IReadOnlyList<View> DrawingOrderChildren
+        {
+            get
+            {
+                var content = this._content;
+                if (null == content)
+                {
+                    return Array.Empty<View>();
+                }
+
+                if ((null == this._contentList) || (this._contentList[0] != content))
+                {
+                    this._contentList = new[] { content };
+                }
+
+                return this._contentList;
+            }
+        }
+
         private View _content;
 
         public ContentControl()

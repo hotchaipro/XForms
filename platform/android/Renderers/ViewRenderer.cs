@@ -228,6 +228,30 @@ namespace XForms.Android.Renderers
             return this._layers.Layers;
         }
 
+        // Views hosted for lightweight descendants, after the view's own children
+        private int _hostedCount;
+
+        public void AddHostedView(
+            IViewRenderer child,
+            int index)
+        {
+            var group = (global::Android.Views.ViewGroup)this._nativeView;
+            group.AddView((AndroidView)child.NativeElement, group.ChildCount - this._hostedCount + index);
+            this._hostedCount += 1;
+        }
+
+        public void RemoveHostedView(
+            IViewRenderer child)
+        {
+            ((global::Android.Views.ViewGroup)this._nativeView).RemoveView((AndroidView)child.NativeElement);
+            this._hostedCount -= 1;
+        }
+
+        public void InvalidateLayerContent()
+        {
+            this._nativeView?.Invalidate();
+        }
+
         public bool Focus()
         {
             var nativeView = this._nativeView;

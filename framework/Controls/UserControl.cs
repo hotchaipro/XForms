@@ -21,6 +21,36 @@ namespace XForms.Controls
     // TODO: Use IsDrawEnabled to optionally create the native Win2D canvas control
     public abstract class UserControl : Control, IDrawDelegate
     {
+        internal override bool IsLightweightType
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        // The content as a list, made again only when the content changes
+        private View[] _contentList;
+
+        internal override IReadOnlyList<View> DrawingOrderChildren
+        {
+            get
+            {
+                var content = this._content;
+                if (null == content)
+                {
+                    return Array.Empty<View>();
+                }
+
+                if ((null == this._contentList) || (this._contentList[0] != content))
+                {
+                    this._contentList = new[] { content };
+                }
+
+                return this._contentList;
+            }
+        }
+
         private View _content;
 
         public UserControl()
@@ -124,11 +154,50 @@ namespace XForms.Controls
             drawingContext.Clear(this.BackgroundColor);
         }
 
+        private System.Collections.Generic.List<DrawnAnimator> _drawnAnimators;
+
+        /// <summary>
+        /// Creates a scale and opacity the control applies to its own drawing,
+        /// animated without a native layer (see <see cref="DrawnAnimator"/>).
+        /// For small effects, such as press feedback, that shouldn't cost the
+        /// control a layer of its own, as an <see cref="Animator"/> would.
+        /// </summary>
+        protected DrawnAnimator CreateDrawnAnimator()
+        {
+            var animator = new DrawnAnimator(this.InvalidateVisual);
+            this._drawnAnimators ??= new System.Collections.Generic.List<DrawnAnimator>();
+            this._drawnAnimators.Add(animator);
+            return animator;
+        }
+
         void IDrawDelegate.InvokeRender(
             DrawingContext drawContext,
             Rect bounds)
         {
-            this.Render(drawContext);
+            var animators = this._drawnAnimators;
+            if (null == animators)
+            {
+                this.Render(drawContext);
+                return;
+            }
+
+            var scopes = new DrawnAnimator.Scope[animators.Count];
+            for (int i = 0; i < animators.Count; i += 1)
+            {
+                scopes[i] = animators[i].Apply(drawContext, bounds);
+            }
+
+            try
+            {
+                this.Render(drawContext);
+            }
+            finally
+            {
+                for (int i = animators.Count - 1; i >= 0; i -= 1)
+                {
+                    scopes[i].Dispose();
+                }
+            }
         }
 
         protected override Size MeasureOverride(

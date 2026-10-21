@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace XForms.Controls
 {
@@ -17,6 +18,15 @@ namespace XForms.Controls
 
     public class ScrollViewer : View
     {
+        // Its content is a layer of its own
+        internal override bool RequiresNativeChildren
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public ScrollViewer()
         {
             this.HorizontalAlignment = HorizontalAlignment.Stretch;
@@ -158,6 +168,15 @@ namespace XForms.Controls
         protected override IElementRenderer CreateRenderer()
         {
             return this.Application.Platform.CreateScrollViewerRenderer(this);
+        }
+
+        internal override IEnumerable<Element> GetChildElements()
+        {
+            var content = this._content;
+            if (null != content)
+            {
+                yield return content;
+            }
         }
     }
 }

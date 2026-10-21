@@ -671,6 +671,7 @@ from. Where XForms keeps its own name, the reason is in
 | `GestureRecognizer`, `TapGestureRecognizer`, `SwipeGestureRecognizer` | Keep | MAUI | Plus `Tapped`, `DoubleTapped` and `Holding` events on views |
 | `AccessibilityRole` | Keep | SwiftUI, Flutter, React Native | Plain view property |
 | `AppTheme`, `LightTheme`, `DarkTheme`, `ThemeColor` | `Theme` (design tokens: `ColorScheme`, `Typography`, `Shapes`, `Motion`), and `ThemeMode` (`Light`, `Dark`, `HighContrast`) | Flutter (`ThemeData`), Compose (`MaterialTheme`); MAUI's `AppTheme` is the mode | Typed tokens, scoped to any view, not resource dictionaries. **Done** |
+| (new) | `UserControl.CreateDrawnAnimator()`, `DrawnAnimator` (scale and opacity of a control's own drawing) | WPF (`RenderTransform`, drawn) | For small effects that shouldn't cost a layer |
 | `OnApplyTheme(AppTheme)` | `OnThemeChanged(Theme)` | | Runs after attach and on changes, never from a constructor. **Done** |
 | `Application.Theme` (set), `AccentColor` (`ThemeColor`) | `Application.RequestedThemeMode` (null follows the system), `AccentColor` (null for the system's), `Theme` (read), `CreateTheme` | MAUI (`UserAppTheme`), WinUI (`RequestedTheme`) | **Done** |
 | `ICommand` | `System.Windows.Input.ICommand` | All | Use the standard interface |
@@ -1351,6 +1352,67 @@ Neither changed the order of the phases. Both added items, which are below.
    - Expose lightweight controls through virtual accessibility nodes on every
      platform.
    - Rerun the benchmark to confirm the gain.
+
+   **Status: done**, except accessibility on Android and iOS.
+   - **Which views are lightweight** is decided when a view's renderer is
+     created: owner-drawn and content controls, panels and text blocks, with
+     no animator, whose parent allows it. Pages, list rows, scroll views'
+     content and popups' content are layers; so are views with animators,
+     and native primitives (text boxes, images, lists, scroll views). An
+     `AppContext` switch (`XForms.DisableLightweightViews`) turns lightweight
+     views off, for comparison.
+   - **Android and iOS** use the framework's lightweight renderers:
+     - The layer's native view draws its lightweight descendants beneath its
+       subviews, each translated to its place (and clipped, with
+       `ClipToBounds`).
+     - Native views inside lightweight ones are hosted by the layer, in
+       drawing order. Their frames are offset by the lightweight ancestors'
+       positions.
+     - The framework hit-tests lightweight views and routes pointers: the
+       deepest view under a press first, then its ancestors. The view that
+       takes a press gets the pointer's moves and release.
+     - Panels map their children to native indices, skipping lightweight
+       ones.
+   - **Win32** keeps every view in its renderer tree, so its hit testing,
+     focus, scrolling and UI Automation are unchanged. A lightweight renderer
+     has no visual or surface: its layer draws it, and the visuals of native
+     views inside it go in the layer's visual.
+   - **`DrawnAnimator`**, from `UserControl.CreateDrawnAnimator()`: a scale
+     and opacity a control applies to its own drawing, animated frame by
+     frame. The toolkit's buttons, tabs, toggles and radio buttons use it for
+     press feedback, so they're lightweight too. Animations that move a view
+     (the flyout, swipes) or run on the compositor (the progress ring) keep
+     their animators.
+   - **Benchmark** (1,000 tiles; see [benchmarks.md](benchmarks.md)):
+     - Win32: about 24 MB of private memory instead of 29.5 MB, and the first
+       frame in about 0.35 s instead of 0.6 to 1 s.
+     - Android: 63 native views instead of 1,164, less managed memory
+       (5.2 MB instead of 6.9 MB) and a faster first frame.
+     - SoonerOrLater's main page has 32 native views on Android.
+   - **Fixed on the way:**
+     - On Android, views moved outside their parent's bounds couldn't be
+       tapped. A lightweight container's native children are hosted by the
+       layer, so SoonerOrLater's flyout menu (and its Settings page) works.
+     - Theme changes didn't reach a scroll view's content, list rows, or
+       pages in a frame's back stack.
+     - A popup's content never had its own `Bounds`, so drop-downs drew no
+       frame.
+     - `RadioButtons` compared values with `==` on `object`, which failed for
+       value types such as enums.
+     - Android popups anchor to a lightweight target's place in its layer.
+   - **Verified** on Win32 and Android: every test page, input (taps, holds,
+     pans, keys and focus on Win32), drop-downs and the date picker, theme
+     switching, and SoonerOrLater (tabs, swipes, the flyout menu, Settings,
+     dark mode). iOS is only built.
+   - **Not done:**
+     - On Android and iOS, lightweight views have no keyboard focus or
+       accessibility nodes. Virtual accessibility nodes belong with
+       accessibility (phase 12).
+     - Lightweight views draw within their layer's surface: what they draw
+       outside it is clipped, and a native view inside a hidden or clipping
+       lightweight view is hidden but not clipped.
+     - Large layers still need tiled or virtual surfaces on Win32 and iOS
+       (the benchmark's scrolled content is one tall surface).
 9. **Text entry.** Add `TextChanged`, a submitted event, password mode,
    maximum length, read-only and a selection API.
 10. **Lists.** Add `ListView<T>` with typed item sources and item views that

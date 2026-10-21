@@ -187,5 +187,21 @@ namespace XForms
                 yield return currentPage;
             }
         }
+
+        // Pages in the back stack keep their native objects, so they restyle
+        // too, and are ready when they come back
+        internal override IEnumerable<Element> GetThemedChildElements()
+        {
+            foreach (var page in this._backStack)
+            {
+                yield return page;
+            }
+
+            var currentPage = this._currentPage;
+            if (null != currentPage)
+            {
+                yield return currentPage;
+            }
+        }
     }
 }

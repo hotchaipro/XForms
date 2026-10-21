@@ -5,6 +5,15 @@ namespace XForms.Controls
 {
     public class ListViewItem : ContentControl
     {
+        // A list row is a layer: the list's native container
+        internal override bool IsLightweightType
+        {
+            get
+            {
+                return false;
+            }
+        }
+
         private object _item;
 
         public ListViewItem()

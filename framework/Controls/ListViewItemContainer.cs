@@ -92,8 +92,18 @@ namespace XForms.Controls
             object item)
         {
             this.ListView = listView ?? throw new ArgumentNullException(nameof(listView));
+            listView.AddRealizedContainer(this);
             this.Item = item;
             this.OnBind();
+        }
+
+        // A row isn't attached to its list, but looks like it
+        internal override Element ParentElement
+        {
+            get
+            {
+                return this.ListView;
+            }
         }
 
         /// <summary>

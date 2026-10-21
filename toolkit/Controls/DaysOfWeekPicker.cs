@@ -86,7 +86,7 @@ namespace XForms.Toolkit
     internal sealed class DayOfWeekToggleButton : UserControl, ITapGestureDelegate
     {
         // Animates the control itself (press feedback, spinning)
-        private readonly Animator _ownAnimator;
+        private readonly DrawnAnimator _ownAnimator;
 
         private const float TouchDownScaleDelta = 0.05f;
         private const float IsUncheckedScale = 0.8f;
@@ -101,7 +101,7 @@ namespace XForms.Toolkit
         internal DayOfWeekToggleButton(
             DaysOfWeekPicker parent)
         {
-            this._ownAnimator = this.CreateOwnAnimator();
+            this._ownAnimator = this.CreateDrawnAnimator();
 
             if (null == parent)
             {

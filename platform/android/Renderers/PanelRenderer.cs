@@ -46,36 +46,82 @@ namespace XForms.Android.Renderers
             }
         }
 
+        // The children in drawing order. Lightweight children have no native
+        // view, and views hosted for lightweight descendants come after these.
+        private readonly System.Collections.Generic.List<IViewRenderer> _children = new System.Collections.Generic.List<IViewRenderer>();
+
+        // Where a child at the index goes among the native views
+        private int NativeIndex(
+            int index)
+        {
+            int nativeIndex = 0;
+            for (int i = 0; i < index; i += 1)
+            {
+                if (null != this._children[i].NativeElement)
+                {
+                    nativeIndex += 1;
+                }
+            }
+
+            return nativeIndex;
+        }
+
         public virtual void ClearChildren()
         {
-            this.NativeElement.RemoveViews(0, this.NativeElement.ChildCount);
+            foreach (var child in this._children)
+            {
+                if (child.NativeElement is AndroidView nativeChild)
+                {
+                    this.NativeElement.RemoveView(nativeChild);
+                }
+            }
+
+            this._children.Clear();
         }
 
         public virtual void AddChild(
             IViewRenderer childRenderer)
         {
-            this.NativeElement.AddView((AndroidView)childRenderer.NativeElement);
+            this.InsertChild(this._children.Count, childRenderer);
         }
 
         public virtual void InsertChild(
             int index,
             IViewRenderer childRenderer)
         {
-            this.NativeElement.AddView((AndroidView)childRenderer.NativeElement, index);
+            int nativeIndex = this.NativeIndex(index);
+            this._children.Insert(index, childRenderer);
+            if (childRenderer.NativeElement is AndroidView nativeChild)
+            {
+                this.NativeElement.AddView(nativeChild, nativeIndex);
+            }
+            else
+            {
+                this.NativeElement.Invalidate();
+            }
         }
 
         public virtual void RemoveChildAt(
             int index)
         {
-            this.NativeElement.RemoveViewAt(index);
+            var child = this._children[index];
+            this._children.RemoveAt(index);
+            if (child.NativeElement is AndroidView nativeChild)
+            {
+                this.NativeElement.RemoveView(nativeChild);
+            }
+            else
+            {
+                this.NativeElement.Invalidate();
+            }
         }
 
         public virtual void ReplaceChild(
             int index,
             IViewRenderer childRenderer)
         {
-            this.NativeElement.RemoveViewAt(index);
-            this.NativeElement.AddView((AndroidView)childRenderer.NativeElement, index);
+            this.RemoveChildAt(index);
+            this.InsertChild(index, childRenderer);
         }
     }
 

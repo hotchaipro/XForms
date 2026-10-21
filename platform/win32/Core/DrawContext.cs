@@ -321,7 +321,7 @@ namespace XForms.Win32
 
         #endregion Brushes, paths and pushes
 
-        public override void Clear(
+        protected override void ClearCore(
             Color color)
         {
             this._context->Clear(color.ToD2DColor());

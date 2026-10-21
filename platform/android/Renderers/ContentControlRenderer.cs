@@ -6,6 +6,7 @@ namespace XForms.Android.Renderers
     public class ContentControlRenderer : ControlRenderer<NativeLayoutView>, IContentControlRenderer
     {
         private NativeLayoutView _nativeContentControl;
+        private global::Android.Views.View _content;
 
         public ContentControlRenderer(
             global::Android.Content.Context context,
@@ -25,13 +26,19 @@ namespace XForms.Android.Renderers
         void IContentControlRenderer.SetContent(
             IViewRenderer content)
         {
-            this._nativeContentControl.RemoveAllViews();
-
-            var nativeChildView = (global::Android.Views.View)content?.NativeElement;
-            if (null != nativeChildView)
+            // NOTE: Leave views hosted for lightweight content in place
+            if (null != this._content)
             {
-                this._nativeContentControl.AddView(nativeChildView);
+                this._nativeContentControl.RemoveView(this._content);
             }
+
+            this._content = (global::Android.Views.View)content?.NativeElement;
+            if (null != this._content)
+            {
+                this._nativeContentControl.AddView(this._content, 0);
+            }
+
+            this._nativeContentControl.Invalidate();
         }
     }
 }

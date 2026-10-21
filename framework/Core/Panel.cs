@@ -328,6 +328,22 @@ namespace XForms
             return this.Application.Platform.CreatePanelRenderer(this);
         }
 
+        internal override bool IsLightweightType
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        internal override IReadOnlyList<View> DrawingOrderChildren
+        {
+            get
+            {
+                return this._nativeOrder;
+            }
+        }
+
         internal override IEnumerable<Element> GetChildElements()
         {
             foreach (var child in this._children)

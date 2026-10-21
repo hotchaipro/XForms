@@ -40,7 +40,7 @@ namespace XForms.Toolkit
                 object oldSelectedItem = this._selectedValue;
                 object newSelectedItem = value;
 
-                if (oldSelectedItem == newSelectedItem)
+                if (Equals(oldSelectedItem, newSelectedItem))
                 {
                     return;
                 }
@@ -49,7 +49,7 @@ namespace XForms.Toolkit
                 bool isValidValue = false;
                 foreach (RadioButton button in this._buttonsLayout.Children)
                 {
-                    if (button.RadioButtonItem.Value == newSelectedItem)
+                    if (Equals(button.RadioButtonItem.Value, newSelectedItem))
                     {
                         button.IsChecked = true;
                         isValidValue = true;
@@ -64,7 +64,7 @@ namespace XForms.Toolkit
                 {
                     this._selectedValue = newSelectedItem;
 
-                    if (newSelectedItem != oldSelectedItem)
+                    if (!Equals(newSelectedItem, oldSelectedItem))
                     {
                         this.SelectionChanged?.Invoke(this, new SelectionChangedEventArgs(oldSelectedItem, newSelectedItem));
                     }

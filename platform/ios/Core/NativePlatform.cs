@@ -42,18 +42,33 @@ namespace XForms.iOS
         public ITextBlockRenderer CreateTextBlockRenderer(
             TextBlock textView)
         {
+            if (textView.CanBeLightweight)
+            {
+                return new LightweightTextBlockRenderer(textView);
+            }
+
             return new TextBlockRenderer(textView);
         }
 
         public IPanelRenderer CreatePanelRenderer(
             Panel layout)
         {
+            if (layout.CanBeLightweight)
+            {
+                return new LightweightPanelRenderer(layout);
+            }
+
             return new PanelRenderer(layout);
         }
 
         public IContentControlRenderer CreateContentControlRenderer(
             ContentControl xControl)
         {
+            if (xControl.CanBeLightweight)
+            {
+                return new LightweightControlRenderer(xControl);
+            }
+
             return new ContentControlRenderer(xControl);
         }
 
@@ -92,6 +107,11 @@ namespace XForms.iOS
         public IUserControlRenderer CreateUserControlRenderer(
             UserControl userControl)
         {
+            if (userControl.CanBeLightweight)
+            {
+                return new LightweightControlRenderer(userControl);
+            }
+
             return new UserControlRenderer(userControl);
         }
 

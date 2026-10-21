@@ -67,15 +67,62 @@ namespace XForms.Android.Renderers
 
         public void Show()
         {
-            if (this.PlacementTarget?.Renderer.NativeElement is global::Android.Views.View anchor)
+            var target = this.PlacementTarget;
+            int gap = (int)NativeConversions.DevicePixelsToPixels(this.NativeContext, AnchorGap);
+            if (target?.Renderer.NativeElement is global::Android.Views.View anchor)
             {
-                int gap = (int)NativeConversions.DevicePixelsToPixels(this.NativeContext, AnchorGap);
                 this._nativePopup.ShowAsDropDown(anchor, 0, gap);
+                return;
+            }
+
+            // A lightweight target has no native view: place the popup below its
+            // place in its layer's view (or above, with more room there)
+            if ((null != target) && (null != this._content) && (target.FindLayer()?.NativeElement is global::Android.Views.View layer))
+            {
+                this.ShowAt(layer, target);
                 return;
             }
 
             var parentView = ((ApplicationRenderer)XForms.Application.Current.Renderer).Activity.Window.DecorView.RootView;
             this._nativePopup.ShowAtLocation(parentView, GravityFlags.Center, 0, 0);
+        }
+
+        private void ShowAt(
+            global::Android.Views.View layer,
+            View target)
+        {
+            var context = this.NativeContext;
+            float Dips(float pixels) => NativeConversions.PixelsToDevicePixels(context, pixels);
+            int Pixels(float dips) => (int)Math.Round(NativeConversions.DevicePixelsToPixels(context, dips));
+
+            var root = ((ApplicationRenderer)XForms.Application.Current.Renderer).Activity.Window.DecorView.RootView;
+            var layerLocation = new int[2];
+            layer.GetLocationInWindow(layerLocation);
+
+            var offset = target.OffsetInLayer;
+            float left = Dips(layerLocation[0]) + offset.X;
+            float top = Dips(layerLocation[1]) + offset.Y;
+            float bottom = top + target.Bounds.Height;
+            float windowWidth = Dips(root.Width);
+            float windowHeight = Dips(root.Height);
+
+            float below = Math.Max(0, windowHeight - bottom - AnchorGap);
+            float above = Math.Max(0, top - AnchorGap);
+
+            this._content.Measure(new Size(windowWidth, below));
+            var size = this._content.DesiredSize;
+            float y = bottom + AnchorGap;
+            if ((size.Height > below) && (above > below))
+            {
+                this._content.Measure(new Size(windowWidth, above));
+                size = this._content.DesiredSize;
+                y = top - AnchorGap - size.Height;
+            }
+
+            float x = Math.Max(0, Math.Min(left, windowWidth - size.Width));
+            this._nativePopup.Width = Pixels(size.Width);
+            this._nativePopup.Height = Pixels(size.Height);
+            this._nativePopup.ShowAtLocation(root, GravityFlags.Top | GravityFlags.Left, Pixels(x), Pixels(y));
         }
 
         public void Close()

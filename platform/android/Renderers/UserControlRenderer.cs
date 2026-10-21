@@ -6,6 +6,7 @@ namespace XForms.Android.Renderers
     public class UserControlRenderer : ControlRenderer<OwnerDrawControl>, IUserControlRenderer
     {
         private OwnerDrawControl _nativeOwnerDrawControl;
+        private global::Android.Views.View _content;
 
         public UserControlRenderer(
             global::Android.Content.Context context,
@@ -39,13 +40,19 @@ namespace XForms.Android.Renderers
         void IUserControlRenderer.SetContent(
             IViewRenderer content)
         {
-            this._nativeOwnerDrawControl.RemoveAllViews();
-
-            var nativeContent = (global::Android.Views.View)content?.NativeElement;
-            if (null != nativeContent)
+            // NOTE: Leave views hosted for lightweight content in place
+            if (null != this._content)
             {
-                this._nativeOwnerDrawControl.AddView(nativeContent);
+                this._nativeOwnerDrawControl.RemoveView(this._content);
             }
+
+            this._content = (global::Android.Views.View)content?.NativeElement;
+            if (null != this._content)
+            {
+                this._nativeOwnerDrawControl.AddView(this._content, 0);
+            }
+
+            this._nativeOwnerDrawControl.Invalidate();
         }
     }
 }

@@ -36,6 +36,19 @@ namespace XForms.iOS
         }
 
         /// <summary>
+        /// Draws the lightweight views inside this view, beneath its subviews.
+        /// </summary>
+        public override void Draw(
+            CoreGraphics.CGRect area)
+        {
+            if (this._owner.HasLightweightChildren)
+            {
+                var drawContext = new DrawContext(UIGraphics.GetCurrentContext(), this.Bounds);
+                LightweightPainter.PaintDescendants(this._owner, drawContext);
+            }
+        }
+
+        /// <summary>
         /// Keeps the content clear of the status bar, notch and home indicator.
         /// </summary>
         public bool RespectsSafeArea

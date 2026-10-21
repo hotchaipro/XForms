@@ -107,7 +107,14 @@ namespace XForms.Test
             {
                 double built = this._builtTicks * 1000.0 / Stopwatch.Frequency;
                 double drawn = _lastFirstDrawTicks * 1000.0 / Stopwatch.Frequency;
-                string message = $"built {built:F0} ms, first frame drawn {drawn:F0} ms";
+
+                // Live managed objects, without garbage
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                GC.Collect();
+                double managed = GC.GetTotalMemory(true) / (1024.0 * 1024.0);
+
+                string message = $"built {built:F0} ms, first frame drawn {drawn:F0} ms, managed heap {managed:F1} MB";
                 this._status.Text = message;
                 Console.WriteLine("XFORMS_BENCHMARK " + message);
             });

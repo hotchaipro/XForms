@@ -52,6 +52,21 @@ namespace XForms
         IAnimationLayer[] CreateAnimationLayers(int count);
 
         /// <summary>
+        /// Adds the native object of a view inside lightweight descendants of
+        /// this view, which have none of their own to add it to, at its place
+        /// in drawing order among the views it hosts. Hosted views are drawn
+        /// above the lightweight content and this view's own children.
+        /// </summary>
+        void AddHostedView(IViewRenderer child, int index);
+
+        void RemoveHostedView(IViewRenderer child);
+
+        /// <summary>
+        /// Draws the lightweight views inside this view again.
+        /// </summary>
+        void InvalidateLayerContent();
+
+        /// <summary>
         /// Moves keyboard focus to the view. Returns false where the platform
         /// has no keyboard focus for owner-drawn views.
         /// </summary>
@@ -104,7 +119,7 @@ namespace XForms
                 if (value != this._isVisible)
                 {
                     this._isVisible = value;
-                    this.Native?.IsVisible = value;
+                    this.Native?.IsVisible = value && this.AreLightweightAncestorsVisible;
 
                     // A hidden view takes no space, so its parent must lay out again
                     this.InvalidateMeasure();
@@ -292,6 +307,14 @@ namespace XForms
             // A view that moved may now inherit a different theme
             this.UpdateTheme();
 
+            // Lightweight views have no native object for their native
+            // descendants to go in; their layer hosts them
+            this.HostNativeDescendants();
+            if (this.IsLightweight)
+            {
+                this.FindLayer()?.InvalidateLayerContent();
+            }
+
             this.OnAttached();
             this.Attached?.Invoke(this, EventArgs.Empty);
         }
@@ -305,6 +328,13 @@ namespace XForms
             {
                 return;
             }
+
+            if (this.IsLightweight)
+            {
+                this.FindLayer()?.InvalidateLayerContent();
+            }
+
+            this.UnhostNativeDescendants();
 
             this.Parent = null;
             this.OnDetached();
@@ -320,6 +350,306 @@ namespace XForms
         }
 
         #endregion Attach
+
+        #region Lightweight views
+
+        /// <summary>
+        /// Whether views of this type can be lightweight: they draw themselves
+        /// or only lay out children (owner-drawn and content controls, panels,
+        /// text blocks).
+        /// </summary>
+        internal virtual bool IsLightweightType
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Whether the view's children must have native objects: a scrolling
+        /// view's content, for example, is a layer of its own.
+        /// </summary>
+        internal virtual bool RequiresNativeChildren
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Whether the view is lightweight when its renderer is created: a
+        /// lightweight type, with no animator, inside a parent that allows it.
+        /// Platforms check this when they create the view's renderer.
+        /// </summary>
+        internal bool CanBeLightweight
+        {
+            get
+            {
+                if (AppContext.TryGetSwitch("XForms.DisableLightweightViews", out bool isDisabled) && isDisabled)
+                {
+                    return false;
+                }
+
+                if (!this.IsLightweightType || (null != this._animator) || (null != this._ownAnimators) || this.HasFrameworkAnimator)
+                {
+                    return false;
+                }
+
+                return (this.Parent is View parent) && !parent.RequiresNativeChildren;
+            }
+        }
+
+        /// <summary>
+        /// Whether the view is lightweight: it has no native object, and draws
+        /// into its layer.
+        /// </summary>
+        internal bool IsLightweight
+        {
+            get
+            {
+                return this.CreatedRenderer is LightweightRenderer;
+            }
+        }
+
+        /// <summary>
+        /// The view's children in drawing order. Lightweight drawing walks
+        /// these every frame, so they're lists (indexed without allocating).
+        /// </summary>
+        internal virtual IReadOnlyList<View> DrawingOrderChildren
+        {
+            get
+            {
+                List<View> children = null;
+                foreach (var child in this.GetChildElements())
+                {
+                    if (child is View view)
+                    {
+                        children ??= new List<View>();
+                        children.Add(view);
+                    }
+                }
+
+                return (IReadOnlyList<View>)children ?? Array.Empty<View>();
+            }
+        }
+
+        internal bool HasLightweightChildren
+        {
+            get
+            {
+                var children = this.DrawingOrderChildren;
+                for (int i = 0; i < children.Count; i += 1)
+                {
+                    if (children[i].IsLightweight)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// The native renderer a lightweight view draws into (or that hosts a
+        /// native view inside lightweight ancestors): the nearest ancestor with
+        /// a native object, or null before the view is attached to one.
+        /// </summary>
+        internal IViewRenderer FindLayer()
+        {
+            for (var parent = this.Parent as View; null != parent; parent = parent.Parent as View)
+            {
+                if (!parent.HasRenderer)
+                {
+                    return null;
+                }
+
+                if (!parent.IsLightweight)
+                {
+                    return (IViewRenderer)parent.CreatedRenderer;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Where a lightweight view's origin is in its layer's coordinates.
+        /// </summary>
+        internal Point OffsetInLayer
+        {
+            get
+            {
+                float x = 0, y = 0;
+                for (var view = this; (null != view) && view.IsLightweight; view = view.Parent as View)
+                {
+                    x += view._frame.X;
+                    y += view._frame.Y;
+                }
+
+                return new Point(x, y);
+            }
+        }
+
+        // Whether every lightweight ancestor up to the layer is visible (a
+        // hidden lightweight view can't hide the native views inside it)
+        internal bool AreLightweightAncestorsVisible
+        {
+            get
+            {
+                for (var parent = this.Parent as View; (null != parent) && parent.IsLightweight; parent = parent.Parent as View)
+                {
+                    if (!parent._isVisible)
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        }
+
+        // The layer hosting this native view, if its parent is lightweight
+        private IViewRenderer _hostLayer;
+
+        private void HostNativeDescendants()
+        {
+            if (!this.HasRenderer)
+            {
+                return;
+            }
+
+            if (!this.IsLightweight)
+            {
+                if ((this.Parent is View parent) && parent.IsLightweight)
+                {
+                    var layer = this.FindLayer();
+                    if ((null != layer) && (layer != this._hostLayer))
+                    {
+                        this._hostLayer?.RemoveHostedView(this.Native);
+                        this._hostLayer = null;
+
+                        int index = 0;
+                        ((View)layer.Element).CountHostedBefore(this, layer, ref index);
+                        layer.AddHostedView(this.Native, index);
+                        this._hostLayer = layer;
+                        this.Native.IsVisible = this._isVisible && this.AreLightweightAncestorsVisible;
+                    }
+                }
+
+                return;
+            }
+
+            var children = this.DrawingOrderChildren;
+            for (int i = 0; i < children.Count; i += 1)
+            {
+                var child = children[i];
+                child.HostNativeDescendants();
+            }
+        }
+
+        // Counts the views the layer hosts that come before the view in drawing
+        // order (a depth-first walk through lightweight views). Returns whether
+        // it found the view.
+        private bool CountHostedBefore(
+            View view,
+            IViewRenderer layer,
+            ref int count)
+        {
+            var children = this.DrawingOrderChildren;
+            for (int i = 0; i < children.Count; i += 1)
+            {
+                var child = children[i];
+                if (child == view)
+                {
+                    return true;
+                }
+
+                if (child._hostLayer == layer)
+                {
+                    count += 1;
+                }
+                else if (child.IsLightweight && child.CountHostedBefore(view, layer, ref count))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private void UnhostNativeDescendants()
+        {
+            if (null != this._hostLayer)
+            {
+                this._hostLayer.RemoveHostedView(this.Native);
+                this._hostLayer = null;
+                return;
+            }
+
+            if (this.IsLightweight)
+            {
+                var children = this.DrawingOrderChildren;
+                for (int i = 0; i < children.Count; i += 1)
+                {
+                    var child = children[i];
+                    child.UnhostNativeDescendants();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Shows or hides the native views inside a lightweight view whose
+        /// visibility changed.
+        /// </summary>
+        internal void UpdateHostedVisibility()
+        {
+            var children = this.DrawingOrderChildren;
+            for (int i = 0; i < children.Count; i += 1)
+            {
+                var child = children[i];
+                if (child.IsLightweight)
+                {
+                    child.UpdateHostedVisibility();
+                }
+                else if (null != child._hostLayer)
+                {
+                    child.Native.IsVisible = child._isVisible && child.AreLightweightAncestorsVisible;
+                }
+            }
+        }
+
+        /// <summary>
+        /// The deepest visible, hit-testable lightweight view under the point
+        /// (in this view's coordinates), or null.
+        /// </summary>
+        internal View HitTestLightweight(
+            Point point)
+        {
+            View hit = null;
+            var children = this.DrawingOrderChildren;
+            for (int i = 0; i < children.Count; i += 1)
+            {
+                var child = children[i];
+                // The last match is on top
+                if (!child.IsLightweight || !child._isVisible || !child._isHitTestVisible)
+                {
+                    continue;
+                }
+
+                var frame = child._frame;
+                if ((point.X >= frame.X) && (point.Y >= frame.Y) && (point.X < frame.Right) && (point.Y < frame.Bottom))
+                {
+                    hit = child.HitTestLightweight(new Point(point.X - frame.X, point.Y - frame.Y)) ?? child;
+                }
+            }
+
+            return hit;
+        }
+
+        #endregion Lightweight views
 
         #region Theme
 
@@ -888,7 +1218,16 @@ namespace XForms
 
             this._frame = new Rect(x, y, width, height);
 
-            this.Renderer.ArrangeNative(this._frame);
+            // A native view inside lightweight ancestors is positioned in their
+            // layer
+            var nativeFrame = this._frame;
+            if ((this.Parent is View host) && host.IsLightweight && !this.IsLightweight)
+            {
+                var offset = host.OffsetInLayer;
+                nativeFrame = new Rect(nativeFrame.X + offset.X, nativeFrame.Y + offset.Y, nativeFrame.Width, nativeFrame.Height);
+            }
+
+            this.Renderer.ArrangeNative(nativeFrame);
         }
 
         /// <summary>
@@ -920,6 +1259,13 @@ namespace XForms
         public void LayoutContent(
             Size size)
         {
+            // A root view (a popup's content, say) has no parent to arrange it:
+            // its size is its native view's
+            if (!(this.Parent is View))
+            {
+                this._frame = new Rect(this._frame.X, this._frame.Y, size.Width, size.Height);
+            }
+
             if (size != this._contentMeasureSize)
             {
                 this.MeasureContent(size);
@@ -1381,13 +1727,95 @@ namespace XForms
         bool IViewDelegate.DispatchPointerEvent(
             PointerEventArgs e)
         {
+            if (this.HasLightweightChildren || (0 < (this._pointerOwners?.Count ?? 0)))
+            {
+                return this.DispatchToLightweight(e);
+            }
+
             return this.DispatchPointerEvent(e);
         }
 
         bool IViewDelegate.DispatchPointerWheel(
             PointerEventArgs e)
         {
+            if (this.HasLightweightChildren)
+            {
+                // The deepest lightweight view under the pointer, then its
+                // ancestors, then this view
+                for (var view = this.HitTestLightweight(e.Position); (null != view) && (view != this); view = view.Parent as View)
+                {
+                    if (view.DispatchPointerWheel(this.ToLocal(view, e)))
+                    {
+                        return true;
+                    }
+                }
+            }
+
             return this.DispatchPointerWheel(e);
+        }
+
+        // The lightweight views that took pointers pressed on this layer
+        private Dictionary<int, View> _pointerOwners;
+
+        // Routes a pointer event from the platform, which delivered it to this
+        // layer, to the lightweight view under it: the deepest one, then its
+        // ancestors, then this view. The view that takes a press gets the
+        // pointer's moves and release.
+        private bool DispatchToLightweight(
+            PointerEventArgs e)
+        {
+            View owner = null;
+            this._pointerOwners?.TryGetValue(e.PointerId, out owner);
+
+            if ((null != owner) && (e.State != PointerInputState.Began))
+            {
+                if ((e.State == PointerInputState.Ended) || (e.State == PointerInputState.Canceled))
+                {
+                    this._pointerOwners.Remove(e.PointerId);
+                }
+
+                return owner.DispatchPointerEvent(this.ToLocal(owner, e));
+            }
+
+            // A press finds its view; a hover move (no pointer pressed) is for
+            // whatever is under it
+            if ((e.State == PointerInputState.Began) || ((e.State == PointerInputState.Moved) && !e.IsInContact))
+            {
+                for (var view = this.HitTestLightweight(e.Position); (null != view) && (view != this); view = view.Parent as View)
+                {
+                    if (view.DispatchPointerEvent(this.ToLocal(view, e)))
+                    {
+                        if (e.State == PointerInputState.Began)
+                        {
+                            this._pointerOwners ??= new Dictionary<int, View>();
+                            this._pointerOwners[e.PointerId] = view;
+                        }
+
+                        return true;
+                    }
+                }
+            }
+
+            return this.DispatchPointerEvent(e);
+        }
+
+        // The event in a lightweight descendant's coordinates
+        private PointerEventArgs ToLocal(
+            View view,
+            PointerEventArgs e)
+        {
+            var offset = view.OffsetInLayer;
+            return new PointerEventArgs(
+                e.PointerId,
+                e.DeviceType,
+                new Point(e.Position.X - offset.X, e.Position.Y - offset.Y),
+                e.State,
+                e.IsInContact,
+                e.KeyModifiers,
+                e.WheelDelta)
+            {
+                OriginalSource = e.OriginalSource,
+            };
         }
 
         #endregion Pointer input

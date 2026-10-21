@@ -22,12 +22,18 @@ namespace XForms.iOS.Renderers
         public void SetLayout(
             IPanelRenderer layoutRenderer)
         {
-            foreach (var subview in this.NativeElement.Subviews)
+            // NOTE: A lightweight layout has no native view; the page draws it
+            // and hosts the native views inside it
+            this._layout?.RemoveFromSuperview();
+            this._layout = (UIView)layoutRenderer.NativeElement;
+            if (null != this._layout)
             {
-                subview.RemoveFromSuperview();
+                this.NativeElement.InsertSubview(this._layout, 0);
             }
 
-            this.NativeElement.AddSubview((UIView)layoutRenderer.NativeElement);
+            this.NativeElement.SetNeedsDisplay();
         }
+
+        private UIView _layout;
     }
 }

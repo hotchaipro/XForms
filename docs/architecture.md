@@ -99,6 +99,19 @@ TextBlock ──CreateRenderer()──► IPlatform.CreateTextBlockRenderer(...)
             Win32:   TextBlockRenderer → DirectComposition visual + DirectWrite
 ```
 
+**Lightweight views.** Most views have no native object of their own.
+Owner-drawn and content controls, panels and text blocks with no animator
+are lightweight: they draw into their nearest native ancestor, their layer.
+Pages, list rows, scrolled content, popup content, views with animators and
+native primitives (text boxes, images, lists, scroll views) are layers.
+- On Android and iOS, the framework provides lightweight renderers. A
+  layer's native view draws its lightweight descendants beneath its
+  subviews, and hosts the native views inside them. The framework hit-tests
+  lightweight views and routes their pointer input.
+- On Win32, lightweight renderers stay in the renderer tree (so hit testing,
+  focus and UI Automation work as before) but have no visual: the layer draws
+  them, and holds the visuals of native views inside them.
+
 Renderer interfaces (`IViewRenderer`, `ITextBoxRenderer`, `IListViewRenderer`,
 and so on) are the contract each platform implements. Control libraries don't
 create renderers. They build on the primitives, chiefly `UserControl` for

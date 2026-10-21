@@ -12,7 +12,7 @@ namespace XForms.Toolkit
         public static readonly ViewProperty<Button, ICommand> CommandProperty = new(nameof(Command), v => v.Command, (v, x) => v.Command = x);
 
         // Animates the control itself (press feedback, spinning)
-        private readonly Animator _ownAnimator;
+        private readonly DrawnAnimator _ownAnimator;
 
         protected override AccessibilityRole DefaultAccessibilityRole
         {
@@ -43,7 +43,7 @@ namespace XForms.Toolkit
 
         public Button()
         {
-            this._ownAnimator = this.CreateOwnAnimator();
+            this._ownAnimator = this.CreateDrawnAnimator();
 
             this.GestureRecognizer = new TapGestureRecognizer(this);
         }

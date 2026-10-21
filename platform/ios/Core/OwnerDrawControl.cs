@@ -36,6 +36,9 @@ namespace XForms.iOS
 
                 this._drawDelegate.InvokeRender(drawContext, bounds.ToRectangle());
             }
+
+            // Lightweight content on top of the control's own drawing
+            base.Draw(area);
         }
     }
 }
