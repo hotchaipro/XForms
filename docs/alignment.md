@@ -1587,3 +1587,51 @@ Neither changed the order of the phases. Both added items, which are below.
       - Collapsed flyout buttons and a hidden (scaled to zero) button are
         still exposed, since they're visible to the framework.
       - Expand and collapse (for pickers), ranges (sliders) and headings.
+
+### After the plan
+
+These phases fill the gaps the phases above left, then add a web platform.
+Each is committed when it's built for every platform and verified on Win32,
+Android and, from phase 17, the browser.
+
+13. **Hover and accessibility gaps.**
+    - `PointerEntered` and `PointerExited` (hover tracking) on Win32, Android
+      (hover events from a mouse or stylus) and iOS (`UIHoverGestureRecognizer`).
+    - Accessibility: a `Heading` role, expand and collapse for pickers (UI
+      Automation's ExpandCollapse pattern, Android's expand and collapse
+      actions), and not exposing views that are scaled to nothing.
+14. **Platform services and the window.**
+    - Safe-area insets as a framework value (`Page.SafeAreaInsets`), so apps
+      can lay out around notches and system bars themselves.
+    - Connectivity (`IConnectivity`: whether there's a network, and a change
+      event).
+    - File pickers (`IFilePicker`: open one or more files, and save a file).
+15. **Lists.**
+    - Pull-to-refresh (`ListView.IsRefreshEnabled`, `RefreshRequested`,
+      `IsRefreshing`).
+    - Horizontal lists and grids (`ListView.Orientation`, and a grid layout
+      with a column count or item width).
+16. **Win32 surfaces and windows.**
+    - Tiled surfaces for tall layers, so a long scrolled page doesn't need one
+      surface the size of all its content.
+    - Secondary windows (`Window` objects an app can open and close).
+17. **Web platform: host, layers and drawing.** .NET 10 on WebAssembly with
+    `[JSImport]` and `[JSExport]`, in `platform/web`:
+    - A layer is a DOM element positioned absolutely; lightweight views draw
+      into a `<canvas>` per layer, as on the other platforms.
+    - Text is drawn and measured with the canvas (`fillText`,
+      `measureText`).
+    - Images, theming (`prefers-color-scheme`, `prefers-contrast`), the
+      dispatcher (the browser's event loop) and pointer input (Pointer
+      Events).
+    - A test host page and a web build of the test app.
+18. **Web platform: controls, animation and app layer.**
+    - Native primitives: `<input>` and `<textarea>` for text boxes, a
+      scrolling `<div>` for scroll views, virtualized lists, and popups.
+    - Animation layers with the Web Animations API.
+    - Keyboard focus, and accessibility through ARIA: DOM elements carry
+      roles and states, and lightweight views get hidden accessible elements
+      (as Flutter's semantics tree does).
+    - Navigation with the browser's history and Back button, and services
+      (clipboard, local storage for preferences, `navigator.share`).
+    - SoonerOrLater in the browser.
