@@ -1146,6 +1146,58 @@ namespace XForms
         }
 
         /// <summary>
+        /// Whether the view (such as a picker) is expanded, or null when it has
+        /// no expanded state.
+        /// </summary>
+        public virtual bool? AccessibilityIsExpanded
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Whether assistive technology should skip the view and its
+        /// descendants: it or an ancestor is hidden, or scaled or faded to
+        /// nothing by an animator.
+        /// </summary>
+        internal bool IsHiddenFromAccessibility
+        {
+            get
+            {
+                for (var view = this; null != view; view = view.Parent as View)
+                {
+                    if (!view._isVisible || IsAnimatedAway(view._animator))
+                    {
+                        return true;
+                    }
+
+                    if (null != view._ownAnimators)
+                    {
+                        foreach (var animator in view._ownAnimators)
+                        {
+                            if (IsAnimatedAway(animator))
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
+
+                return false;
+            }
+        }
+
+        private static bool IsAnimatedAway(
+            Animator animator)
+        {
+            const float Nothing = 0.001f;
+            return (null != animator)
+                && ((Math.Abs(animator.ScaleX) < Nothing) || (Math.Abs(animator.ScaleY) < Nothing) || (animator.Opacity < Nothing));
+        }
+
+        /// <summary>
         /// The value assistive technology reads after the label, such as a
         /// picker's current choice, or null.
         /// </summary>
@@ -1176,6 +1228,10 @@ namespace XForms
                         || (this.AccessibilityRole == AccessibilityRole.TabItem)
                         || (this.AccessibilityRole == AccessibilityRole.RadioButton);
 
+                case AccessibilityAction.Expand:
+                case AccessibilityAction.Collapse:
+                    return this.AccessibilityIsExpanded.HasValue;
+
                 default:
                     return false;
             }
@@ -1194,7 +1250,10 @@ namespace XForms
                 return false;
             }
 
-            if ((action == AccessibilityAction.Select) && this.AccessibilityIsSelected)
+            // Already done
+            if (((action == AccessibilityAction.Select) && this.AccessibilityIsSelected)
+                || ((action == AccessibilityAction.Expand) && (this.AccessibilityIsExpanded == true))
+                || ((action == AccessibilityAction.Collapse) && (this.AccessibilityIsExpanded == false)))
             {
                 return true;
             }
@@ -1900,6 +1959,77 @@ namespace XForms
         public event EventHandler<PointerEventArgs> PointerCanceled;
 
         public event EventHandler<PointerEventArgs> PointerWheelChanged;
+
+        /// <summary>
+        /// Raised when a hovering pointer (a mouse or pen, not a touch) moves
+        /// over the view or one of its descendants.
+        /// </summary>
+        public event EventHandler<PointerEventArgs> PointerEntered;
+
+        /// <summary>
+        /// Raised when a hovering pointer leaves the view and its descendants,
+        /// or the window.
+        /// </summary>
+        public event EventHandler<PointerEventArgs> PointerExited;
+
+        private bool _isPointerOver;
+
+        /// <summary>
+        /// Whether a hovering pointer is over the view or one of its
+        /// descendants.
+        /// </summary>
+        public bool IsPointerOver
+        {
+            get
+            {
+                return this._isPointerOver;
+            }
+        }
+
+        protected virtual void OnPointerEntered(
+            PointerEventArgs e)
+        {
+        }
+
+        protected virtual void OnPointerExited(
+            PointerEventArgs e)
+        {
+        }
+
+        internal void SetPointerOver(
+            bool isPointerOver,
+            PointerEventArgs e)
+        {
+            if (isPointerOver == this._isPointerOver)
+            {
+                return;
+            }
+
+            this._isPointerOver = isPointerOver;
+            if (isPointerOver)
+            {
+                this.OnPointerEntered(e);
+                this.PointerEntered?.Invoke(this, e);
+            }
+            else
+            {
+                this.OnPointerExited(e);
+                this.PointerExited?.Invoke(this, e);
+            }
+
+            this.OnPropertyChanged(nameof(this.IsPointerOver));
+        }
+
+        /// <summary>
+        /// The deepest view under the point (in this view's coordinates) that a
+        /// hovering pointer is over: a lightweight view drawn into this one,
+        /// or this view.
+        /// </summary>
+        internal View HitTestPointerOver(
+            Point point)
+        {
+            return (this.HasLightweightChildren ? this.HitTestLightweight(point) : null) ?? this;
+        }
 
         /// <summary>
         /// Raised when a pointer is pressed and released over the view without

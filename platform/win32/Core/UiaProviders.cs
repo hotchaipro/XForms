@@ -65,7 +65,7 @@ namespace XForms.Win32.Automation
         public static bool IsAccessible(
             ViewRenderer renderer)
         {
-            if (!(renderer.Element is View view) || (view.AccessibilityRole == AccessibilityRole.None) || !renderer.IsShownOnScreen)
+            if (!(renderer.Element is View view) || (view.AccessibilityRole == AccessibilityRole.None) || !renderer.IsShownOnScreen || view.IsHiddenFromAccessibility)
             {
                 return false;
             }
@@ -111,7 +111,7 @@ namespace XForms.Win32.Automation
             ViewRenderer renderer,
             List<ViewRenderer> result)
         {
-            if (!renderer.IsShownOnScreen)
+            if (!renderer.IsShownOnScreen || ((renderer.Element is View view) && view.IsHiddenFromAccessibility))
             {
                 return;
             }
@@ -202,6 +202,11 @@ namespace XForms.Win32.Automation
                 {
                     UiaNative.UiaRaiseAutomationEvent(provider, UiaConstants.SelectionItemElementSelectedEventId);
                 }
+            }
+
+            if (view.AccessibilityIsExpanded is bool isExpanded)
+            {
+                UiaNative.UiaRaiseAutomationPropertyChangedEvent(provider, UiaConstants.ExpandCollapseExpandCollapseStatePropertyId, empty, Variant.FromInt(isExpanded ? UiaConstants.Expanded : UiaConstants.Collapsed));
             }
 
             if (null != view.AccessibilityValue)
@@ -305,7 +310,7 @@ namespace XForms.Win32.Automation
     /// An automation element for one accessible view.
     /// </summary>
     [GeneratedComClass]
-    internal sealed unsafe partial class ElementProvider : IRawElementProviderSimple, IRawElementProviderFragment, IInvokeProvider, IToggleProvider, ISelectionItemProvider, IValueProvider
+    internal sealed unsafe partial class ElementProvider : IRawElementProviderSimple, IRawElementProviderFragment, IInvokeProvider, IToggleProvider, ISelectionItemProvider, IValueProvider, IExpandCollapseProvider
     {
         private readonly WeakReference<ViewRenderer> _renderer;
         private readonly int _runtimeId;
@@ -441,6 +446,14 @@ namespace XForms.Win32.Automation
 
                         break;
 
+                    case UiaConstants.ExpandCollapsePatternId:
+                        if (view.IsAccessibilityActionSupported(AccessibilityAction.Expand))
+                        {
+                            result = AutomationTree.GetInterface<IExpandCollapseProvider>(this);
+                        }
+
+                        break;
+
                     case UiaConstants.ValuePatternId:
                         if (null != view.AccessibilityValue)
                         {
@@ -503,6 +516,22 @@ namespace XForms.Win32.Automation
                         if (view.AccessibilityIsChecked is bool isChecked)
                         {
                             result = Variant.FromInt(isChecked ? UiaConstants.ToggleStateOn : UiaConstants.ToggleStateOff);
+                        }
+
+                        break;
+
+                    case UiaConstants.ExpandCollapseExpandCollapseStatePropertyId:
+                        if (view.AccessibilityIsExpanded is bool isExpanded)
+                        {
+                            result = Variant.FromInt(isExpanded ? UiaConstants.Expanded : UiaConstants.Collapsed);
+                        }
+
+                        break;
+
+                    case UiaConstants.HeadingLevelPropertyId:
+                        if (view.AccessibilityRole == AccessibilityRole.Heading)
+                        {
+                            result = Variant.FromInt(UiaConstants.HeadingLevel1);
                         }
 
                         break;
@@ -612,6 +641,29 @@ namespace XForms.Win32.Automation
             int hr = this.OnUIThread((renderer) =>
             {
                 result = (((View)renderer.Element).AccessibilityIsChecked == true) ? UiaConstants.ToggleStateOn : UiaConstants.ToggleStateOff;
+                return 0;
+            });
+
+            state = result;
+            return hr;
+        }
+
+        public int Expand()
+        {
+            return this.Perform(AccessibilityAction.Expand);
+        }
+
+        public int Collapse()
+        {
+            return this.Perform(AccessibilityAction.Collapse);
+        }
+
+        public int get_ExpandCollapseState(out int state)
+        {
+            int result = 0;
+            int hr = this.OnUIThread((renderer) =>
+            {
+                result = (((View)renderer.Element).AccessibilityIsExpanded == true) ? UiaConstants.Expanded : UiaConstants.Collapsed;
                 return 0;
             });
 

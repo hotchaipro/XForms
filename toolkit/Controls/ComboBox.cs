@@ -166,6 +166,19 @@ namespace XForms.Toolkit
             return;
         }
 
+        protected override bool IsPickerOpen
+        {
+            get
+            {
+                return this._popup?.IsOpen ?? false;
+            }
+        }
+
+        protected override void ClosePicker()
+        {
+            this._popup?.Close();
+        }
+
         protected override void OpenPicker()
         {
             if (this.Items.Count == 0)
@@ -181,6 +194,7 @@ namespace XForms.Toolkit
                     PlacementTarget = this,
                     Content = new ComboBoxDropDown(this, this._itemsView),
                 };
+                this._popup.Closed += (sender, e) => this.NotifyAccessibilityStateChanged();
             }
 
             if (this._popup.IsOpen)
@@ -191,6 +205,7 @@ namespace XForms.Toolkit
             bool hasKeyboardFocus = this.IsFocused;
             this._itemsView.Reset();
             this._popup.Show();
+            this.NotifyAccessibilityStateChanged();
             this._itemsView.BringHighlightIntoView(animated: false);
 
             // From the keyboard, the arrow keys move through the list

@@ -49,6 +49,10 @@ namespace XForms.iOS
                     traits |= UIAccessibilityTrait.Image;
                     break;
 
+                case AccessibilityRole.Heading:
+                    traits |= UIAccessibilityTrait.Header;
+                    break;
+
                 case AccessibilityRole.ToggleButton:
                 case AccessibilityRole.Button:
                 case AccessibilityRole.RadioButton:
@@ -102,7 +106,7 @@ namespace XForms.iOS
             for (int i = 0; i < children.Count; i += 1)
             {
                 var child = children[i];
-                if (!child.IsLightweight || !child.IsVisible)
+                if (!child.IsLightweight || !child.IsVisible || child.IsHiddenFromAccessibility)
                 {
                     continue;
                 }

@@ -28,6 +28,11 @@ namespace XForms
         /// A field that shows a value and opens a picker for it.
         /// </summary>
         ComboBox,
+
+        /// <summary>
+        /// Text that heads a section, which screen readers can jump between.
+        /// </summary>
+        Heading,
     }
 
     /// <summary>
@@ -49,5 +54,15 @@ namespace XForms
         /// Selects a list item, tab or radio button.
         /// </summary>
         Select,
+
+        /// <summary>
+        /// Opens a view with an expanded state, such as a picker's popup.
+        /// </summary>
+        Expand,
+
+        /// <summary>
+        /// Closes a view with an expanded state.
+        /// </summary>
+        Collapse,
     }
 }

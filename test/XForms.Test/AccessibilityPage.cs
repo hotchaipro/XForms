@@ -18,7 +18,7 @@ namespace XForms.Test
         {
             var layout = new StackPanel() { Spacing = 10, Padding = new Thickness(16) };
 
-            layout.Children.Add(new TextBlock() { Text = "Accessibility", FontSize = 22, FontWeight = FontWeight.SemiBold });
+            layout.Children.Add(new TextBlock() { Text = "Accessibility", FontSize = 22, FontWeight = FontWeight.SemiBold, AccessibilityRole = AccessibilityRole.Heading });
 
             this._status = new TextBlock() { FontSize = 13, Text = "Ready" };
             layout.Children.Add(this._status);
@@ -27,6 +27,8 @@ namespace XForms.Test
 
             var button = new Button() { Text = "Say hello", Width = 120, Height = 34 };
             button.Clicked += (sender, e) => this.Show("Hello");
+            button.PointerEntered += (sender, e) => this.Show($"Pointer over the button at {e.Position.X:0},{e.Position.Y:0}");
+            button.PointerExited += (sender, e) => this.Show("Pointer left the button");
             row.Children.Add(button);
 
             var toggle = new ToggleButton() { Text = "Bold" };

@@ -33,6 +33,55 @@ namespace XForms.iOS
 
             // Each finger is its own pointer
             this.MultipleTouchEnabled = true;
+
+            // A pointer (trackpad, mouse or Pencil) hovering over the view
+            if (UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
+            {
+                this.AddGestureRecognizer(new UIHoverGestureRecognizer(this.OnHover));
+            }
+        }
+
+        private void OnHover(
+            UIHoverGestureRecognizer recognizer)
+        {
+            var application = Application.Current;
+            if (null == application)
+            {
+                return;
+            }
+
+            var location = recognizer.LocationInView(this);
+            var point = new Point((float)location.X, (float)location.Y);
+            switch (recognizer.State)
+            {
+                case UIGestureRecognizerState.Began:
+                case UIGestureRecognizerState.Changed:
+                    {
+                        var deepest = this._owner.HitTestPointerOver(point);
+                        var offset = (deepest == this._owner) ? default : deepest.OffsetInLayer;
+                        application.UpdatePointerOver(deepest, new PointerEventArgs(0, PointerDeviceType.Mouse, new Point(point.X - offset.X, point.Y - offset.Y), PointerInputState.Moved, false, KeyModifiers.None));
+                    }
+
+                    break;
+
+                case UIGestureRecognizerState.Ended:
+                case UIGestureRecognizerState.Cancelled:
+                    {
+                        // Leaving this view for a subview or a neighbor enters
+                        // that one next; only a pointer that went nowhere left
+                        int version = application.PointerOverVersion;
+                        var exit = new PointerEventArgs(0, PointerDeviceType.Mouse, point, PointerInputState.Moved, false, KeyModifiers.None);
+                        CoreFoundation.DispatchQueue.MainQueue.DispatchAsync(() =>
+                        {
+                            if (application.PointerOverVersion == version)
+                            {
+                                application.UpdatePointerOver(null, exit);
+                            }
+                        });
+                    }
+
+                    break;
+            }
         }
 
         /// <summary>
@@ -149,7 +198,7 @@ namespace XForms.iOS
         {
             get
             {
-                return this._owner.AccessibilityRole != AccessibilityRole.None;
+                return (this._owner.AccessibilityRole != AccessibilityRole.None) && !this._owner.IsHiddenFromAccessibility;
             }
 
             set

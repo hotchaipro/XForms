@@ -491,6 +491,60 @@ namespace XForms
         /// </summary>
         public event EventHandler<KeyEventArgs> PreviewKeyDown;
 
+        // The views under a hovering pointer, deepest first
+        private List<View> _pointerOverPath = new List<View>();
+        private int _pointerOverVersion;
+
+        /// <summary>
+        /// Counts changes to the views under the hovering pointer, so a
+        /// platform can tell whether the pointer moved on to another view after
+        /// it left one.
+        /// </summary>
+        internal int PointerOverVersion
+        {
+            get
+            {
+                return this._pointerOverVersion;
+            }
+        }
+
+        /// <summary>
+        /// A hovering pointer moved over a view (its deepest view, or null when
+        /// it left the window). Views it left get <see cref="View.PointerExited"/>,
+        /// deepest first; views it moved into get
+        /// <see cref="View.PointerEntered"/>, outermost first.
+        /// </summary>
+        internal void UpdatePointerOver(
+            View deepest,
+            PointerEventArgs e)
+        {
+            this._pointerOverVersion += 1;
+
+            var path = new List<View>();
+            for (var view = deepest; null != view; view = view.Parent as View)
+            {
+                path.Add(view);
+            }
+
+            foreach (var view in this._pointerOverPath)
+            {
+                if (!path.Contains(view))
+                {
+                    view.SetPointerOver(false, e);
+                }
+            }
+
+            for (int i = path.Count - 1; i >= 0; i -= 1)
+            {
+                if (!this._pointerOverPath.Contains(path[i]))
+                {
+                    path[i].SetPointerOver(true, e);
+                }
+            }
+
+            this._pointerOverPath = path;
+        }
+
         internal bool FilterPointerInput(
             View view,
             PointerEventArgs e)

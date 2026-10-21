@@ -1600,6 +1600,34 @@ Android and, from phase 17, the browser.
     - Accessibility: a `Heading` role, expand and collapse for pickers (UI
       Automation's ExpandCollapse pattern, Android's expand and collapse
       actions), and not exposing views that are scaled to nothing.
+
+    **Status: done.**
+    - **Hover:** `PointerEntered`, `PointerExited` and `IsPointerOver`. The
+      framework keeps the path of views under a hovering pointer and raises
+      exits deepest first and entries outermost first, as WPF does; the
+      platforms only report the deepest view under the pointer (lightweight
+      views are found by the framework), or none when it leaves. Win32 uses
+      hover pointer messages and `WM_POINTERLEAVE`; Android the native view's
+      hover events; iOS `UIHoverGestureRecognizer`. Android and iOS wait a
+      turn before treating an exit as leaving the window, since moving into
+      a child or neighbor exits the view first.
+    - **Accessibility:** the `Heading` role (UI Automation's heading level,
+      Android's heading flag, iOS's header trait); `AccessibilityIsExpanded`
+      with expand and collapse actions, which pickers implement (the
+      ExpandCollapse pattern on Win32, expand and collapse actions on
+      Android); and views hidden, or scaled or faded to nothing by an
+      animator, are left out on every platform.
+    - **Flyout buttons** are hidden once collapsed, so they take no input and
+      aren't exposed.
+    - **Verified:**
+      - Win32: hover entering and leaving a button (with a position local to
+        it), and with a UI Automation client, the heading level and a
+        picker's expand and collapse.
+      - Android and Win32: SoonerOrLater exposes only Add and Menu until the
+        flyout opens, then Settings and About, and Settings opens.
+      - Not verified: hover on Android and iOS (the emulator's input tool
+        can't send hover events), and Android's heading flag and expand
+        actions (UI Automator's dump doesn't show them). iOS is only built.
 14. **Platform services and the window.**
     - Safe-area insets as a framework value (`Page.SafeAreaInsets`), so apps
       can lay out around notches and system bars themselves.

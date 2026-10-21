@@ -99,6 +99,20 @@ namespace XForms.Win32.Automation
     }
 
     [GeneratedComInterface]
+    [Guid("d847d3a5-cab0-4a98-8c32-ecb45c59ad24")]
+    internal partial interface IExpandCollapseProvider
+    {
+        [PreserveSig]
+        int Expand();
+
+        [PreserveSig]
+        int Collapse();
+
+        [PreserveSig]
+        int get_ExpandCollapseState(out int state);
+    }
+
+    [GeneratedComInterface]
     [Guid("c7935180-6fb3-4201-b174-7df73adbf64a")]
     internal partial interface IValueProvider
     {
@@ -188,10 +202,20 @@ namespace XForms.Win32.Automation
         public const int ValueValuePropertyId = 30045;
         public const int SelectionItemIsSelectedPropertyId = 30079;
         public const int ToggleToggleStatePropertyId = 30086;
+        public const int ExpandCollapseExpandCollapseStatePropertyId = 30070;
+        public const int HeadingLevelPropertyId = 30173;
+
+        // HeadingLevel
+        public const int HeadingLevel1 = 80051;
 
         // Patterns
         public const int InvokePatternId = 10000;
         public const int ValuePatternId = 10002;
+        public const int ExpandCollapsePatternId = 10005;
+
+        // ExpandCollapseState
+        public const int Collapsed = 0;
+        public const int Expanded = 1;
         public const int SelectionItemPatternId = 10010;
         public const int TogglePatternId = 10015;
 

@@ -284,6 +284,7 @@ namespace XForms.Android.Renderers
                 oldElement.GenericMotion -= Element_GenericMotion;
                 oldElement.FocusChange -= Element_FocusChange;
                 oldElement.KeyPress -= Element_KeyPress;
+                oldElement.Hover -= Element_Hover;
             }
 
             if (null != newElement)
@@ -294,6 +295,7 @@ namespace XForms.Android.Renderers
                 }
 
                 newElement.Touch += Element_Touch;
+                newElement.Hover += Element_Hover;
                 newElement.GenericMotion += Element_GenericMotion;
                 newElement.FocusChange += Element_FocusChange;
 
@@ -401,6 +403,59 @@ namespace XForms.Android.Renderers
             }
 
             e.Handled = result;
+        }
+
+        // A mouse or stylus hovers over the deepest view under it: Android
+        // delivers hover to the deepest native view, and the framework finds
+        // the lightweight view under it
+        private void Element_Hover(
+            object sender,
+            AndroidView.HoverEventArgs e)
+        {
+            e.Handled = false;
+            if (!(this.Element is View view) || (null == Application.Current))
+            {
+                return;
+            }
+
+            var application = Application.Current;
+            var motionEvent = e.Event;
+            var modifiers = ToKeyModifiers(motionEvent.MetaState);
+            switch (motionEvent.ActionMasked)
+            {
+                case MotionEventActions.HoverEnter:
+                case MotionEventActions.HoverMove:
+                    {
+                        var hover = this.ToPointerEvent(motionEvent, 0, PointerInputState.Moved, false, modifiers);
+                        var deepest = view.HitTestPointerOver(hover.Position);
+                        var offset = (deepest == view) ? default : deepest.OffsetInLayer;
+                        application.UpdatePointerOver(deepest, new PointerEventArgs(hover.PointerId, hover.DeviceType, new Point(hover.Position.X - offset.X, hover.Position.Y - offset.Y), PointerInputState.Moved, false, modifiers));
+
+                        // Lightweight views see hover moves too
+                        this.ViewDelegate?.DispatchPointerEvent(hover);
+                        e.Handled = true;
+                    }
+
+                    break;
+
+                case MotionEventActions.HoverExit:
+                    {
+                        // Leaving this view for a child or a neighbor enters that
+                        // one next; only a pointer that went nowhere left the window
+                        var exit = this.ToPointerEvent(motionEvent, 0, PointerInputState.Moved, false, modifiers);
+                        int version = application.PointerOverVersion;
+                        this._nativeView?.Post(() =>
+                        {
+                            if (application.PointerOverVersion == version)
+                            {
+                                application.UpdatePointerOver(null, exit);
+                            }
+                        });
+                        e.Handled = true;
+                    }
+
+                    break;
+            }
         }
 
         private PointerEventArgs ToPointerEvent(

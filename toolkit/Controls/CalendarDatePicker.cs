@@ -111,6 +111,19 @@ namespace XForms.Toolkit
             drawContext.DrawLine(new Point(page.Right - 3.5f, page.Y - 2), new Point(page.Right - 3.5f, page.Y + 1), color, 1.0f);
         }
 
+        protected override bool IsPickerOpen
+        {
+            get
+            {
+                return this._popup?.IsOpen ?? false;
+            }
+        }
+
+        protected override void ClosePicker()
+        {
+            this._popup?.Close();
+        }
+
         protected override void OpenPicker()
         {
             if (null == this._popup)
@@ -123,6 +136,7 @@ namespace XForms.Toolkit
                     PlacementTarget = this,
                     Content = new CalendarFrame(this._calendar),
                 };
+                this._popup.Closed += (sender, e) => this.NotifyAccessibilityStateChanged();
             }
 
             if (this._popup.IsOpen)
@@ -135,6 +149,7 @@ namespace XForms.Toolkit
 
             bool hasKeyboardFocus = this.IsFocused;
             this._popup.Show();
+            this.NotifyAccessibilityStateChanged();
 
             // From the keyboard, the arrow keys move through the days
             if (hasKeyboardFocus)

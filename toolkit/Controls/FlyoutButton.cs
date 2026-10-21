@@ -74,8 +74,9 @@ namespace XForms.Toolkit
                 throw new ArgumentNullException(nameof(button));
             }
 
-            // Start the buttons out at half size
+            // Start the buttons out at half size, hidden behind this one
             button.FlyoutAnimator.Scale = 0.5f;
+            button.IsVisible = false;
 
             this._layout.Children.Insert(0, button);
 
@@ -120,6 +121,7 @@ namespace XForms.Toolkit
                 }
 
                 button.IsEnabled = true;
+                button.IsVisible = true;
 
                 // Start the buttons out at half size
                 button.FlyoutAnimator.Scale = 0.5f;
@@ -188,13 +190,25 @@ namespace XForms.Toolkit
 
                 button.IsEnabled = false;
 
-                // Move and scale the buttons back to the collapsed position
+                // Move and scale the buttons back to the collapsed position,
+                // then hide them (unless the flyout opened again meanwhile)
                 nowait = button.FlyoutAnimator.TranslateTo(new Point(0, 0), this.ActualTheme.Motion.Medium, new SpringEase(EasingMode.EaseIn));
-                nowait = button.FlyoutAnimator.ScaleTo(0.5f, this.ActualTheme.Motion.Medium, new SpringEase(EasingMode.EaseIn));
+                this.HideWhenCollapsed(button, button.FlyoutAnimator.ScaleTo(0.5f, this.ActualTheme.Motion.Medium, new SpringEase(EasingMode.EaseIn)));
             }
             this.Collapsing?.Invoke(this, EventArgs.Empty);
 
             this._isExpandingOrCollapsing = false;
+        }
+
+        private async void HideWhenCollapsed(
+            FloatingButton button,
+            AnimationHandle collapsing)
+        {
+            await collapsing;
+            if (!this._isExpanded)
+            {
+                button.IsVisible = false;
+            }
         }
 
         private sealed class InnerButton : FloatingButton, ITapGestureDelegate

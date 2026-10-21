@@ -666,6 +666,13 @@ namespace XForms.Win32
             uint flags = (uint)((wParam.Value >> 16) & 0xFFFF);
             bool isInContact = (flags & 0x0004) != 0; // POINTER_MESSAGE_FLAG_INCONTACT
 
+            if (msg == PInvoke.WM_POINTERLEAVE)
+            {
+                // The hovering pointer left the window
+                Application.Current?.UpdatePointerOver(null, new PointerEventArgs((int)pointerId, PointerDeviceType.Mouse, default, PointerInputState.Moved, false, KeyModifiers.None));
+                return true;
+            }
+
             if (!this.GetPointerLocation(pointerId, out var point))
             {
                 return false;
@@ -693,10 +700,18 @@ namespace XForms.Win32
                     {
                         this._pointers.Move(pointerId, point);
                     }
+                    else if (deviceType != PointerDeviceType.Touch)
+                    {
+                        this.UpdatePointerOver(pointerId, deviceType, point);
+                    }
                     return true;
 
                 case PInvoke.WM_POINTERUP:
                     this._pointers.Up(pointerId, point);
+                    if (deviceType != PointerDeviceType.Touch)
+                    {
+                        this.UpdatePointerOver(pointerId, deviceType, point);
+                    }
                     if (!isDirect)
                     {
                         PInvoke.ReleaseCapture();
@@ -705,6 +720,24 @@ namespace XForms.Win32
             }
 
             return false;
+        }
+
+        // A mouse or pen hovers over the deepest view under it
+        private void UpdatePointerOver(
+            uint pointerId,
+            PointerDeviceType deviceType,
+            Point point)
+        {
+            var application = Application.Current;
+            if (null == application)
+            {
+                return;
+            }
+
+            this.HitTest(point, out var hit);
+            var origin = hit?.AbsoluteOrigin() ?? default;
+            var e = new PointerEventArgs((int)pointerId, deviceType, new Point(point.X - origin.X, point.Y - origin.Y), PointerInputState.Moved, false, KeyModifiers.None);
+            application.UpdatePointerOver(hit?.Element as View, e);
         }
 
         private Point PointFromLParam(
@@ -818,6 +851,7 @@ namespace XForms.Win32
                     case PInvoke.WM_POINTERDOWN:
                     case PInvoke.WM_POINTERUPDATE:
                     case PInvoke.WM_POINTERUP:
+                    case PInvoke.WM_POINTERLEAVE:
                         if (host.OnPointerMessage(msg, wParam))
                         {
                             return (LRESULT)0;
