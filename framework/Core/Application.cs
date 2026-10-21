@@ -261,7 +261,7 @@ namespace XForms
         }
 
         // The modal pages showing, newest last, with how to complete each
-        private readonly List<(Page Page, Action<object> Complete)> _modals = new List<(Page Page, Action<object> Complete)>();
+        private readonly List<(Page Page, Action Complete)> _modals = new List<(Page Page, Action Complete)>();
 
         /// <summary>
         /// Shows a page (a new instance, or one kept for reuse), keeping the
@@ -301,7 +301,7 @@ namespace XForms
             if (0 < this._modals.Count)
             {
                 var modal = this._modals[this._modals.Count - 1];
-                return await this.CloseModalAsync(modal.Page, null);
+                return await this.CloseModalAsync(modal.Page);
             }
 
             bool didGoBack = await this._rootFrame.GoBackAsync();
@@ -313,25 +313,7 @@ namespace XForms
         /// Shows a page over the current one, sliding up. Completes when it's
         /// closed: by Back, or by the page (<see cref="Page.CloseModalAsync"/>).
         /// </summary>
-        public Task ShowModalAsync(
-            Page page)
-        {
-            return this.ShowModalCoreAsync(page);
-        }
-
-        /// <summary>
-        /// Shows a page over the current one, and completes with the result it
-        /// closes with (<see cref="ModalPage{TResult}.CloseAsync"/>), or the
-        /// default value if it's closed by Back.
-        /// </summary>
-        public async Task<TResult> ShowModalAsync<TResult>(
-            ModalPage<TResult> page)
-        {
-            object result = await this.ShowModalCoreAsync(page);
-            return (result is TResult value) ? value : default;
-        }
-
-        private async Task<object> ShowModalCoreAsync(
+        public async Task ShowModalAsync(
             Page page)
         {
             if (null == page)
@@ -339,8 +321,8 @@ namespace XForms
                 throw new ArgumentNullException(nameof(page));
             }
 
-            var completion = new TaskCompletionSource<object>();
-            this._modals.Add((page, (result) => completion.TrySetResult(result)));
+            var completion = new TaskCompletionSource();
+            this._modals.Add((page, () => completion.TrySetResult()));
 
             while (this.TryClosePopup())
             {
@@ -348,16 +330,15 @@ namespace XForms
 
             await this._rootFrame.NavigateAsync(page, PageTransition.SlideUp);
             this.OnNavigationComplete();
-            return await completion.Task;
+            await completion.Task;
         }
 
         /// <summary>
         /// Closes a modal page (and any pages shown after it), completing its
-        /// <see cref="ShowModalAsync(Page)"/> with the result.
+        /// <see cref="ShowModalAsync(Page)"/>.
         /// </summary>
         internal async Task<bool> CloseModalAsync(
-            Page page,
-            object result)
+            Page page)
         {
             int index = this._modals.FindIndex((modal) => modal.Page == page);
             if (index < 0)
@@ -376,7 +357,7 @@ namespace XForms
 
             await this._rootFrame.GoBackAsync(PageTransition.SlideUp);
             this.OnNavigationComplete();
-            modal.Complete(result);
+            modal.Complete();
             return true;
         }
 
@@ -401,15 +382,7 @@ namespace XForms
             this.Renderer.OnNavigationComplete();
         }
 
-        /// <summary>
-        /// A view that closes (such as a flyout) when the user touches anywhere
-        /// outside it. The touch that dismisses it does nothing else.
-        /// </summary>
-        public ILightDismissTarget LightDismissTarget
-        {
-            get;
-            set;
-        }
+
 
         /// <summary>
         /// Raised for every pointer event before the view under the pointer
@@ -482,11 +455,7 @@ namespace XForms
             View view,
             PointerEventArgs e)
         {
-            // An open light-dismiss surface takes a press outside it
-            if (this.HandleLightDismissEvent(view, e))
-            {
-                return true;
-            }
+
 
             // The application sees each event once, at the view it was sent to
             if (e.OriginalSource == view)
@@ -503,26 +472,6 @@ namespace XForms
         {
             this.PreviewKeyDown?.Invoke(this, e);
             return e.Handled;
-        }
-
-        private bool HandleLightDismissEvent(
-            View view,
-            PointerEventArgs pointerInputEvent)
-        {
-            bool handled = false;
-
-            if (pointerInputEvent.State == PointerInputState.Began)
-            {
-                var target = this.LightDismissTarget;
-                if ((null != target) && ((view is Page) || !target.Contains(view)))
-                {
-                    this.LightDismissTarget = null;
-                    target.OnLightDismiss();
-                    handled = true;
-                }
-            }
-
-            return handled;
         }
 
         /// <summary>

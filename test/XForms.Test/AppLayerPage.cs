@@ -155,8 +155,9 @@ namespace XForms.Test
 
         private async void PickColorAsync()
         {
-            string color = await this.Application.ShowModalAsync(new ColorPage());
-            this.Show($"Modal result: {color ?? "(closed)"}");
+            var page = new ColorPage();
+            await this.Application.ShowModalAsync(page);
+            this.Show($"Modal result: {page.Color ?? "(closed)"}");
         }
 
         private void ShowWindow()
@@ -188,8 +189,16 @@ namespace XForms.Test
         }
 
         // A modal page that closes with the color chosen
-        private sealed class ColorPage : ModalPage<string>
+        private sealed class ColorPage : Page
         {
+            /// <summary>
+            /// The color chosen, or null if the page was closed by Back.
+            /// </summary>
+            public string Color
+            {
+                get;
+                private set;
+            }
             public ColorPage()
             {
                 var layout = new StackPanel() { Spacing = 10, Padding = new Thickness(24) };
@@ -197,7 +206,11 @@ namespace XForms.Test
                 foreach (var name in new[] { "Red", "Green", "Blue" })
                 {
                     var button = new Button() { Text = name, Width = 140, Height = 40, HorizontalAlignment = HorizontalAlignment.Left };
-                    button.Clicked += (sender, e) => _ = this.CloseAsync(name);
+                    button.Clicked += (sender, e) =>
+                    {
+                        this.Color = name;
+                        _ = this.CloseModalAsync();
+                    };
                     layout.Children.Add(button);
                 }
 

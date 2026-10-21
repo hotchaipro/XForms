@@ -8,7 +8,7 @@ namespace XForms.Controls
     /// A control that closes (through <see cref="OnLightDismiss"/>) when the user
     /// touches anywhere outside it, while light dismiss is enabled.
     /// </summary>
-    public class LightDismissControl : ContentControl, ILightDismissTarget
+    public class LightDismissControl : ContentControl
     {
         private bool _isLightDismissEnabled;
 
@@ -25,16 +25,20 @@ namespace XForms.Controls
 
             set
             {
-                if (value)
+                if (value == this._isLightDismissEnabled)
                 {
-                    this.Application.LightDismissTarget = this;
-                }
-                else if (this.Application.LightDismissTarget == this)
-                {
-                    this.Application.LightDismissTarget = null;
+                    return;
                 }
 
                 this._isLightDismissEnabled = value;
+                if (value)
+                {
+                    this.Application.PreviewPointerInput += this.Application_PreviewPointerInput;
+                }
+                else
+                {
+                    this.Application.PreviewPointerInput -= this.Application_PreviewPointerInput;
+                }
             }
         }
 
@@ -42,16 +46,24 @@ namespace XForms.Controls
         {
         }
 
-        bool ILightDismissTarget.Contains(
-            View view)
+        // A press outside the control (or on the page itself) dismisses it,
+        // and does nothing else
+        private void Application_PreviewPointerInput(
+            object sender,
+            PointerEventArgs e)
         {
-            return this.HasDescendant(view);
-        }
+            if (e.State != PointerInputState.Began)
+            {
+                return;
+            }
 
-        void ILightDismissTarget.OnLightDismiss()
-        {
-            this._isLightDismissEnabled = false;
-            this.OnLightDismiss();
+            var view = e.OriginalSource;
+            if ((view is Page) || !this.HasDescendant(view))
+            {
+                e.Handled = true;
+                this.IsLightDismissEnabled = false;
+                this.OnLightDismiss();
+            }
         }
     }
 }

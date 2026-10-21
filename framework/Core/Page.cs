@@ -124,7 +124,7 @@ namespace XForms
         /// </summary>
         public Task CloseModalAsync()
         {
-            return this.Application.CloseModalAsync(this, null);
+            return this.Application.CloseModalAsync(this);
         }
 
         internal protected virtual bool OnNavigatingFrom(
