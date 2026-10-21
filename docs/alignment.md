@@ -1863,7 +1863,7 @@ to go:
 | Assembly | Layer | Builds on |
 |---|---|---|
 | `XForms.Framework` (+ `.Win32`, `.Android`, `.iOS`, `.Web`) | The platform contract: elements, layout, drawing, raw input, and the views the platforms render | — |
-| `XForms.Toolkit` | Platform services and data binding, for any control set (phase 22) | Framework |
+| `XForms.Toolkit` (+ `.Win32`, `.Android`, `.iOS`, `.Web`, phase 23) | Platform services and data binding, for any control set (phase 22) | Framework |
 | `XForms.Controls` | Functional controls (what they do, not how they look) and their base classes; panels and gestures | Framework, Toolkit |
 | `XForms.Themes.<Name>` | How the controls look: `Simple` first | Controls |
 | `XForms.Xaml` | Markup | Framework, Controls |
@@ -2162,7 +2162,157 @@ Win32, Android and the browser, as before.
         result on Win32 and the browser; the browser's text box colors,
         including the placeholder's. iOS builds only.
 
-23. **Themes.** A control says what it does and what state it's in; a
+23. **Platform layers.** Each layer's platform code lives in its own
+    platform assemblies, and the layers are enforced, so they stay clean.
+
+    **Where things stand.**
+    - **The framework's platforms implement the toolkit.** The services
+      (clipboard, launcher, preferences, secure storage, sharing, haptics,
+      connectivity, file pickers: about 1,850 lines across
+      `Core/Services.cs`, `NetworkAndFiles.cs` and Win32's
+      `FileDialogs.cs`) live in `XForms.Framework.<Platform>`, so all four
+      reference `XForms.Toolkit` and register its services as they start.
+      The layer below depends on the layer above.
+    - **What the services need from the platforms is small:**
+      - Win32: the main window's handle, as the file dialogs' owner.
+      - Android: the activity (as context, for haptics on its view, and to
+        start an activity for a result, for the document picker).
+      - iOS: the application delegate, to present the share sheet and the
+        document picker.
+      - The browser: about 16 JavaScript functions (clipboard, storage,
+        sharing, vibration, online status, file picking) in the framework's
+        `xforms.js` and `Js`.
+    - **The platform assemblies are open.** On Android and iOS the
+      renderers, `DrawContext`, `NativeLayoutView`, `OwnerDrawControl`
+      and the platform classes are public (about 30 types), so anything
+      referencing a platform assembly can reach into it. Win32 and the
+      browser already keep nearly everything internal but their entry
+      points.
+    - **The contract is public.** `IPlatform` and the renderer interfaces
+      (`ITextBoxRenderer` and the rest, 17 types in `XForms.Platform`) are
+      public, because an app's `Application` constructor takes an
+      `IPlatform`. No control library, toolkit or app uses them otherwise.
+
+    **Strategies, as in HotChai.Game?** HotChai.Game's platform interfaces
+    (`IGraphicsServiceStrategy`, `ITextureStrategy` and so on) are
+    internal, its platforms see them through `InternalsVisibleTo`, and its
+    analyzer limits the platforms to them. XForms has the same shape since
+    phase 19: `IPlatform` and the renderer interfaces are the strategies,
+    and XF0001 is the same analyzer. What HotChai.Game has that XForms
+    lacks is that the interfaces are **internal**, so nothing but the
+    platforms can see them; this phase does that. Its `Strategy<T>`
+    wrapper (disposal, and a checked cast to the platform's type on a hot
+    path) solves problems XForms doesn't have, since an element owns its
+    renderer and releases it on detach, and renaming renderers to
+    strategies would be churn: "renderer" is the name Xamarin.Forms used
+    and MAUI's handlers replaced. So: the principle, not the class. The
+    toolkit's own service interfaces (`IClipboard` and the rest) are the
+    same pattern one layer up, and stay as they are.
+
+    **The model:**
+
+    | Assembly | Holds | References |
+    |---|---|---|
+    | `XForms.Framework` | Core, primitives, and the platform contract (internal) | — |
+    | `XForms.Framework.<Platform>` | Renderers and hosting; public: only the entry points and the host surface below | Framework |
+    | `XForms.Toolkit` | Service interfaces, binding | Framework |
+    | `XForms.Toolkit.<Platform>` (new: `.Win32`, `.Android`, `.iOS`, `.Web`) | The services' implementations | Toolkit, Framework.<Platform> |
+    | `XForms.Controls` | Controls | Framework, Toolkit |
+
+    - **The contract becomes internal.** `IPlatform`, the renderer and
+      delegate interfaces become internal, visible to the four framework
+      platform assemblies only (they already have `InternalsVisibleTo`).
+      Apps stop seeing `IPlatform`: `Application` gets a parameterless
+      constructor that takes the platform from the host starting it, as
+      WinUI's and WPF's do, so an app is `class App : Application` with
+      `Win32Application.Run("Title", () => new App())`.
+    - **Platform entry points are uniform and few.** Each framework
+      platform's public API is its entry point and nothing else:
+      `Win32Application`, `WebApplication`, `AndroidApplicationActivity`
+      (apps subclass it, and it runs the app instead of the app
+      constructing `AndroidPlatform`) and `NativeApplicationDelegate`
+      (likewise for `NativePlatform`). Every renderer and helper becomes
+      internal.
+    - **A host surface for extension libraries.** What the toolkit's
+      platforms need, made public on those entry types, small and
+      documented, for any library that adds platform features:
+      - Win32: `Win32Application.MainWindowHandle`.
+      - Android: `AndroidApplicationActivity.Current` and
+        `StartActivityForResultAsync`.
+      - iOS: `NativeApplicationDelegate.Current` and its presenting view
+        controller.
+      - The browser: nothing; the toolkit brings its own JavaScript module
+        (`xforms-toolkit.js`, with its own imports and exports).
+    - **Registering the services.** The framework platforms stop setting
+      `PlatformServices.Current`. Each toolkit platform has one call, made
+      by the app's platform project before it runs the app
+      (`Win32ToolkitServices.Register()`, and `await
+      WebToolkitServices.InitializeAsync()` on the browser, which loads its
+      module). The services find the window, activity or delegate when
+      they're used, through the host surface, so registering needs nothing
+      from a running app. An app that uses no services needn't reference
+      the toolkit's platform assemblies at all.
+
+    **Keeping it clean:**
+    - **Allowed references,** checked by the build: a target in
+      `Directory.Build.targets` fails when a project references a layer
+      it mustn't (a framework platform referencing the toolkit or the
+      controls, the toolkit referencing a platform, the controls
+      referencing any platform, a toolkit platform referencing another
+      platform's assemblies).
+    - **Tracked public API:** Microsoft's public API analyzer
+      (`Microsoft.CodeAnalysis.PublicApiAnalyzers`, RS0016 and RS0017) on
+      the framework, the framework platforms, the toolkit and the toolkit
+      platforms, with each assembly's API in `PublicAPI.Shipped.txt` and
+      `PublicAPI.Unshipped.txt`. Making something public then shows up in
+      review as a change to those files, which is how the platform
+      assemblies stay down to their entry points.
+    - **`InternalsVisibleTo` stays narrow:** the framework's internals go
+      to the four framework platforms only (XF0001 still limits them to
+      the contract); the toolkit's go to no one.
+    - `check.py` gains the reference check, so it runs with every build.
+
+    **Steps,** each built for every platform and verified on Win32,
+    Android and the browser:
+    1. **The toolkit's platforms:** create `XForms.Toolkit.Win32`,
+       `.Android`, `.iOS` and `.Web`; move the services and their
+       JavaScript into them; add the host surface; the framework platforms
+       drop their toolkit reference. The test apps and SoonerOrLater
+       reference the toolkit platforms and register the services.
+    2. **Entry points:** `Application()` without a platform;
+       `AndroidApplicationActivity` and `NativeApplicationDelegate` run the
+       app; the test apps and SoonerOrLater updated.
+    3. **Internal:** the contract interfaces and every platform type other
+       than the entry points and host surface.
+    4. **Enforcement:** the reference check and the public API analyzer,
+       with today's API as the baseline.
+    5. **Docs:** `architecture.md` (the layer diagram gains the toolkit's
+       platforms), this document.
+
+    **Verifying:** every service on every platform the way phase 22 did
+    (network, file open and save, preferences, secure storage; Copy and
+    Share only in the browser and on Android, never in the Win32 test app),
+    the test pages pixel for pixel against before on Win32, and
+    SoonerOrLater on Win32, Android and the browser. Also: a deliberate
+    bad reference and a deliberate new public type each fail the build.
+
+    **Decisions to make before starting:**
+    1. **The app's constructor:** a parameterless `Application()` taking
+       its platform from the host (recommended: apps never see the
+       contract), or keep `Application(IPlatform)` with `IPlatform` as an
+       opaque public type whose members are internal.
+    2. **Registering services:** an explicit call in the app's platform
+       project (recommended: it says what the app uses, and nothing runs
+       behind the app's back), or automatic registration when the toolkit
+       platform assembly loads (a module initializer, which runs only once
+       something touches the assembly, so it would still need a reference
+       that forces the load).
+    3. **The public API analyzer:** adopt it (recommended), or rely on the
+       reference check and review alone.
+    4. **Names:** `XForms.Toolkit.Win32` and so on, matching
+       `XForms.Framework.Win32` (recommended), or `XForms.Toolkit.Platform.Win32`.
+
+24. **Themes.** A control says what it does and what state it's in; a
     theme says how it looks. The controls' current look becomes the first
     theme, `XForms.Themes.Simple`, and an app chooses its theme explicitly.
 
@@ -2193,7 +2343,7 @@ Win32, Android and the browser, as before.
     WPF and Avalonia call these `ControlTemplate` and (in Avalonia)
     `TemplatedControl`, and a markup layer will want to write templates, so
     the names follow them. Unlike theirs, a template here is code first:
-    small enough (draw, add parts, react to state) that phase 24 can
+    small enough (draw, add parts, react to state) that phase 25 can
     express one in markup.
 
     - **Templates in the theme.** The templates are a theme extension of
@@ -2286,13 +2436,13 @@ Win32, Android and the browser, as before.
        every view so templates can ask for new animation layers.
 
     **Later, not in this phase:** more themes (Fluent, Material); templates
-    in markup (phase 24).
+    in markup (phase 25).
 
-24. **Later: `XForms.Xaml`.** The proof of concept in `spikes/XForms.Xaml`
+25. **Later: `XForms.Xaml`.** The proof of concept in `spikes/XForms.Xaml`
     becomes a layer over the framework and controls, including templates
     written in markup. To be planned in detail when it's next.
 
-25. **Later: `XForms.Compat.WinUI`.** Adapters giving WinUI's names and a
+26. **Later: `XForms.Compat.WinUI`.** Adapters giving WinUI's names and a
     `DependencyProperty`-style API over XForms' controls, with XAML
     namespace mappings so existing markup loads. It stays separate from any
     Fluent theme, so neither requires the other, and keeps its types in

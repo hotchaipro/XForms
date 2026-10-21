@@ -38,7 +38,8 @@ The goal is that any control library built on the framework runs on every
 supported platform with the same look and the same layout. All of the
 per-platform complexity stays inside the framework and the platforms.
 
-Planned layers ([alignment.md](alignment.md#layering), phases 23-25): themes
+Planned layers ([alignment.md](alignment.md#layering), phases 23-26): the
+toolkit's own platform assemblies and an enforced layering, themes
 (`XForms.Themes.Simple` first) for how the controls look, `XForms.Xaml` for
 markup, and `XForms.Compat.WinUI` for WinUI's API.
 
@@ -444,7 +445,7 @@ contract. Still to do:
 
 - **iOS testing.** iOS builds, but it hasn't been run since the restructure
   (it needs a Mac). Its popups, in particular, are new and untested.
-- **Themes.** The controls still draw themselves; phase 23 of
+- **Themes.** The controls still draw themselves; phase 24 of
   [alignment.md](alignment.md#layering) moves their drawing into themes
   (`XForms.Themes.Simple` first), then adds markup and WinUI compatibility.
   Controls other than `Button` have no styles of their own.
