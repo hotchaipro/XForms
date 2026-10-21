@@ -2163,7 +2163,8 @@ Win32, Android and the browser, as before.
         including the placeholder's. iOS builds only.
 
 23. **Platform layers.** Each layer's platform code lives in its own
-    platform assemblies, and the layers are enforced, so they stay clean.
+    platform assemblies, apps host XForms without deriving from XForms
+    types, and the layers are enforced, so they stay clean.
 
     **Where things stand.**
     - **The framework's platforms implement the toolkit.** The services
@@ -2177,8 +2178,8 @@ Win32, Android and the browser, as before.
       - Win32: the main window's handle, as the file dialogs' owner.
       - Android: the activity (as context, for haptics on its view, and to
         start an activity for a result, for the document picker).
-      - iOS: the application delegate, to present the share sheet and the
-        document picker.
+      - iOS: the scene's view controller, to present the share sheet and
+        the document picker.
       - The browser: about 16 JavaScript functions (clipboard, storage,
         sharing, vibration, online status, file picking) in the framework's
         `xforms.js` and `Js`.
@@ -2188,6 +2189,12 @@ Win32, Android and the browser, as before.
       referencing a platform assembly can reach into it. Win32 and the
       browser already keep nearly everything internal but their entry
       points.
+    - **Apps derive from XForms' native classes.** An Android app's
+      activity must derive from `AndroidApplicationActivity`, and an iOS
+      app's delegate from `NativeApplicationDelegate`. An app that needs
+      another base class (AndroidX's `ComponentActivity`, an SDK's own
+      activity or delegate) can't have it, and XForms can't run inside an
+      existing app's activity.
     - **The contract is public.** `IPlatform` and the renderer interfaces
       (`ITextBoxRenderer` and the rest, 17 types in `XForms.Platform`) are
       public, because an app's `Application` constructor takes an
@@ -2198,60 +2205,100 @@ Win32, Android and the browser, as before.
     internal, its platforms see them through `InternalsVisibleTo`, and its
     analyzer limits the platforms to them. XForms has the same shape since
     phase 19: `IPlatform` and the renderer interfaces are the strategies,
-    and XF0001 is the same analyzer. What HotChai.Game has that XForms
-    lacks is that the interfaces are **internal**, so nothing but the
-    platforms can see them; this phase does that. Its `Strategy<T>`
-    wrapper (disposal, and a checked cast to the platform's type on a hot
-    path) solves problems XForms doesn't have, since an element owns its
-    renderer and releases it on detach, and renaming renderers to
-    strategies would be churn: "renderer" is the name Xamarin.Forms used
-    and MAUI's handlers replaced. So: the principle, not the class. The
-    toolkit's own service interfaces (`IClipboard` and the rest) are the
-    same pattern one layer up, and stay as they are.
+    and XF0001 is the same analyzer. What XForms lacks is that the
+    interfaces are internal; this phase makes them so. HotChai.Game's
+    `Strategy<T>` wrapper (disposal, and a checked cast to the platform's
+    type on a hot path) solves problems XForms doesn't have, since an
+    element owns its renderer and releases it on detach, and renaming
+    renderers to strategies would be churn. So: the principle, not the
+    class. HotChai.Game's hosting is the other model this phase follows:
+    `AndroidGameEngine.Run(activity, hostView, game)` takes any activity,
+    with no base class to derive from.
 
     **The model:**
 
     | Assembly | Holds | References |
     |---|---|---|
     | `XForms.Framework` | Core, primitives, and the platform contract (internal) | — |
-    | `XForms.Framework.<Platform>` | Renderers and hosting; public: only the entry points and the host surface below | Framework |
+    | `XForms.Framework.<Platform>` | Renderers and hosting; public: only its hosting API | Framework |
     | `XForms.Toolkit` | Service interfaces, binding | Framework |
     | `XForms.Toolkit.<Platform>` (new: `.Win32`, `.Android`, `.iOS`, `.Web`) | The services' implementations | Toolkit, Framework.<Platform> |
     | `XForms.Controls` | Controls | Framework, Toolkit |
 
+    - **A platform assembly's public API is its hosting API,** and
+      nothing else: one class per platform, with `Run` methods and the
+      running host's native objects. Every renderer and helper is
+      internal.
+    - **Hosting by composition.** No app derives from an XForms type to
+      host it. Every platform has `Run`, which shows the app in a whole
+      host (a window, the page, an activity, a scene):
+
+      | Platform | XForms creates the host | The app's own host |
+      |---|---|---|
+      | Win32 | `Win32Application.Run("Title", new App())`: its window and message loop | — (embedding in a caller's window is phase 27) |
+      | Browser | `await WebApplication.RunAsync("Title", new App())`: the page | — (embedding in an element is phase 27) |
+      | iOS | `IosApplication.Run(args, new App())` from `Main`: XForms' internal app and scene delegates | `IosApplication.Run(windowScene, new App())` from the app's own scene delegate, with any base class |
+      | Android | — | `AndroidApplication.Run(this, new App())` from the app's own activity's `OnCreate`, with any base class |
+
+      Android has no form where XForms creates the activity: the system
+      starts the launcher activity itself, and a launcher activity in
+      XForms' library would land in every app's manifest (two launcher
+      icons for an app with its own) and fix its label, theme and intent
+      filters. A five-line activity, as HotChai.Game asks for, is where
+      Android developers expect that code. The project templates include
+      it.
+    - **What the native base classes did, done by composition** (every
+      override, checked):
+
+      | Today (an override in the base class) | Instead |
+      |---|---|
+      | Android `OnCreate`: sets the root view | `Run` calls `SetContentView` |
+      | Android `OnPause`, `OnResume` (suspend and resume) | `Application.IActivityLifecycleCallbacks`, for the host activity only |
+      | Android `OnConfigurationChanged` (dark mode, text size) | The root view's `OnConfigurationChanged` |
+      | Android `OnBackPressed` | `OnBackInvokedDispatcher` from Android 13, and a back-key listener on the root view before it (as HotChai.Game) |
+      | Android `OnActivityResult` (the document picker) | A small internal activity in the toolkit's Android assembly that starts the picker and reports back (as Xamarin.Essentials' `IntermediateActivity`), so apps forward nothing |
+      | Android status and navigation bar colors, insets | Already through `activity.Window`; unchanged |
+      | iOS delegate and scene delegate overrides (launch, scenes, activation) | `Run(windowScene, ...)` creates the window; activation from the scene's notifications |
+
+      The base classes' public `Suspending`, `Resuming` and
+      `ConfigurationChanged` events go: apps have `Application`'s
+      `OnSuspend` and `OnResume` already.
+    - **The app object, without a factory.** `Run` takes the app itself,
+      as HotChai.Game takes the game. `Application()` gets a parameterless
+      constructor that builds only what needs no platform (the root frame,
+      the title bar); `Run` attaches the platform, then creates the
+      application renderer, dispatcher and main window, then calls
+      `OnStart`. Apps do their work in `OnStart`, as both apps already do;
+      touching a platform-dependent member (`Dispatcher`, `MainWindow`,
+      services) in the constructor throws, saying to use `OnStart`.
+      `IPlatform` leaves apps entirely.
+    - **When Android re-creates the activity** (a configuration change the
+      activity doesn't declare, such as rotation for the test app), the
+      new activity's `OnCreate` calls `Run` again with a new app object.
+      `Run` re-attaches the running app to the new activity and leaves the
+      new object unused (harmless: by the rule above, it holds nothing).
+      When the activity really finishes, the app stops, so the next launch
+      starts a new one. The templates declare the usual configuration
+      changes so re-creation is rare.
+    - **The running host's native objects,** for apps calling native APIs
+      and for libraries adding platform features (the toolkit's platforms
+      among them), on each platform's class: `Current`, and its `Activity`
+      (Android), `WindowScene` and root view controller (iOS) or
+      `MainWindowHandle` (Win32). They're the objects the app handed over,
+      or the window it asked for, so nothing internal is exposed.
     - **The contract becomes internal.** `IPlatform`, the renderer and
       delegate interfaces become internal, visible to the four framework
-      platform assemblies only (they already have `InternalsVisibleTo`).
-      Apps stop seeing `IPlatform`: `Application` gets a parameterless
-      constructor that takes the platform from the host starting it, as
-      WinUI's and WPF's do, so an app is `class App : Application` with
-      `Win32Application.Run("Title", () => new App())`.
-    - **Platform entry points are uniform and few.** Each framework
-      platform's public API is its entry point and nothing else:
-      `Win32Application`, `WebApplication`, `AndroidApplicationActivity`
-      (apps subclass it, and it runs the app instead of the app
-      constructing `AndroidPlatform`) and `NativeApplicationDelegate`
-      (likewise for `NativePlatform`). Every renderer and helper becomes
-      internal.
-    - **A host surface for extension libraries.** What the toolkit's
-      platforms need, made public on those entry types, small and
-      documented, for any library that adds platform features:
-      - Win32: `Win32Application.MainWindowHandle`.
-      - Android: `AndroidApplicationActivity.Current` and
-        `StartActivityForResultAsync`.
-      - iOS: `NativeApplicationDelegate.Current` and its presenting view
-        controller.
-      - The browser: nothing; the toolkit brings its own JavaScript module
-        (`xforms-toolkit.js`, with its own imports and exports).
+      platform assemblies only (which already have `InternalsVisibleTo`).
     - **Registering the services.** The framework platforms stop setting
       `PlatformServices.Current`. Each toolkit platform has one call, made
-      by the app's platform project before it runs the app
+      by the app's platform project before `Run`
       (`Win32ToolkitServices.Register()`, and `await
-      WebToolkitServices.InitializeAsync()` on the browser, which loads its
-      module). The services find the window, activity or delegate when
-      they're used, through the host surface, so registering needs nothing
-      from a running app. An app that uses no services needn't reference
-      the toolkit's platform assemblies at all.
+      WebToolkitServices.InitializeAsync()` on the browser, which loads
+      the toolkit's own JavaScript module, `xforms-toolkit.js`). The
+      services find the window, activity or view controller when they're
+      used, through `Current`, so registering needs nothing from a running
+      app. An app that uses no services needn't reference the toolkit's
+      platform assemblies at all.
 
     **Keeping it clean:**
     - **Allowed references,** checked by the build: a target in
@@ -2266,7 +2313,7 @@ Win32, Android and the browser, as before.
       platforms, with each assembly's API in `PublicAPI.Shipped.txt` and
       `PublicAPI.Unshipped.txt`. Making something public then shows up in
       review as a change to those files, which is how the platform
-      assemblies stay down to their entry points.
+      assemblies stay down to their hosting API.
     - **`InternalsVisibleTo` stays narrow:** the framework's internals go
       to the four framework platforms only (XF0001 still limits them to
       the contract); the toolkit's go to no one.
@@ -2274,43 +2321,51 @@ Win32, Android and the browser, as before.
 
     **Steps,** each built for every platform and verified on Win32,
     Android and the browser:
-    1. **The toolkit's platforms:** create `XForms.Toolkit.Win32`,
+    1. **Hosting:** `Application()` and the constructor split; `Run` on
+       every platform, by composition; the native base classes and
+       `AndroidPlatform` and `NativePlatform`'s public constructors go;
+       Android re-creation; the test apps and SoonerOrLater updated.
+    2. **The toolkit's platforms:** create `XForms.Toolkit.Win32`,
        `.Android`, `.iOS` and `.Web`; move the services and their
-       JavaScript into them; add the host surface; the framework platforms
-       drop their toolkit reference. The test apps and SoonerOrLater
+       JavaScript into them, with the Android result activity; the
+       framework platforms drop their toolkit reference; the apps
        reference the toolkit platforms and register the services.
-    2. **Entry points:** `Application()` without a platform;
-       `AndroidApplicationActivity` and `NativeApplicationDelegate` run the
-       app; the test apps and SoonerOrLater updated.
     3. **Internal:** the contract interfaces and every platform type other
-       than the entry points and host surface.
+       than the hosting API.
     4. **Enforcement:** the reference check and the public API analyzer,
-       with today's API as the baseline.
+       with the result as the baseline.
     5. **Docs:** `architecture.md` (the layer diagram gains the toolkit's
-       platforms), this document.
+       platforms; hosting), this document.
 
-    **Verifying:** every service on every platform the way phase 22 did
-    (network, file open and save, preferences, secure storage; Copy and
-    Share only in the browser and on Android, never in the Win32 test app),
-    the test pages pixel for pixel against before on Win32, and
-    SoonerOrLater on Win32, Android and the browser. Also: a deliberate
-    bad reference and a deliberate new public type each fail the build.
+    **Verifying:**
+    - Every service on every platform the way phase 22 did (network, file
+      open and save, preferences, secure storage; Copy and Share only in
+      the browser and on Android, never in the Win32 test app).
+    - The test pages pixel for pixel against before on Win32.
+    - Android: suspend and resume, back (on the emulator's API level, and
+      by the back key), dark mode and text size changing in place, and
+      rotating the test app (which re-creates its activity) keeping the
+      app's state.
+    - SoonerOrLater on Win32, Android and the browser.
+    - A deliberate bad reference and a deliberate new public type each
+      fail the build.
 
     **Decisions to make before starting:**
-    1. **The app's constructor:** a parameterless `Application()` taking
-       its platform from the host (recommended: apps never see the
-       contract), or keep `Application(IPlatform)` with `IPlatform` as an
-       opaque public type whose members are internal.
-    2. **Registering services:** an explicit call in the app's platform
+    1. **Registering services:** an explicit call in the app's platform
        project (recommended: it says what the app uses, and nothing runs
        behind the app's back), or automatic registration when the toolkit
        platform assembly loads (a module initializer, which runs only once
        something touches the assembly, so it would still need a reference
        that forces the load).
-    3. **The public API analyzer:** adopt it (recommended), or rely on the
+    2. **The public API analyzer:** adopt it (recommended), or rely on the
        reference check and review alone.
-    4. **Names:** `XForms.Toolkit.Win32` and so on, matching
-       `XForms.Framework.Win32` (recommended), or `XForms.Toolkit.Platform.Win32`.
+    3. **Names:** the hosting classes `Win32Application`,
+       `WebApplication`, `AndroidApplication` and `IosApplication`
+       (recommended: one pattern, and `Win32Application` and
+       `WebApplication` already exist); the toolkit's platforms
+       `XForms.Toolkit.Win32` and so on, matching `XForms.Framework.Win32`.
+    4. **A constructor that touches the platform:** throw (recommended:
+       the mistake shows at once), or queue the work until `OnStart`.
 
 24. **Themes.** A control says what it does and what state it's in; a
     theme says how it looks. The controls' current look becomes the first
@@ -2448,3 +2503,26 @@ Win32, Android and the browser, as before.
     Fluent theme, so neither requires the other, and keeps its types in
     `XForms.Compat.WinUI` rather than Microsoft's namespaces. To be planned
     in detail when it's next.
+
+27. **Later: embedding.** XForms inside part of an existing app's UI,
+    beside native content, with `Attach` beside each platform's `Run`
+    (phase 23): `Run` shows the app in a whole host; `Attach` puts it in
+    a container the caller owns and keeps running its own UI.
+    - Win32: `Win32Application.Attach(parentHwnd, new App())` creates a
+      child window in the caller's window and uses the caller's message
+      loop, leaving the process's DPI awareness alone. That's how
+      WebView2's controller, XAML Islands' `DesktopWindowXamlSource` and
+      CEF embed; taking over the caller's top-level window instead would
+      mean competing with its window procedure for every message XForms
+      needs.
+    - The browser: `WebApplication.AttachAsync(element, new App())`, in
+      one element of an existing page.
+    - Android: `AndroidApplication.Attach(activity, hostView, new App())`,
+      in a `ViewGroup` of the activity, as HotChai.Game's
+      `AndroidGameEngine.Run(activity, hostView, game)`.
+    - iOS: `IosApplication.Attach(viewController, new App())`, as a child
+      view controller.
+
+    The hard part is shared: keyboard focus and Tab moving across the
+    boundary between the host's UI and XForms, and the host and XForms
+    each knowing which has focus. To be planned in detail when it's next.
