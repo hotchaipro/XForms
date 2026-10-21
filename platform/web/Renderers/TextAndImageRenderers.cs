@@ -358,14 +358,28 @@ namespace XForms.Web.Renderers
 
         public async Task LoadAsync()
         {
-            string url = WebImages.UrlFor(((Bitmap)this.Element).Source);
-            if (null == url)
+            var image = this.EnsureImage();
+            if (null != image)
             {
-                return;
+                await image.Loaded;
+            }
+        }
+
+        /// <summary>
+        /// The image, loading (or loaded); null when the source has no URL.
+        /// </summary>
+        public WebImages.Entry EnsureImage()
+        {
+            if (null == this.Image)
+            {
+                string url = WebImages.UrlFor(((Bitmap)this.Element).Source);
+                if (null != url)
+                {
+                    this.Image = WebImages.Load(url);
+                }
             }
 
-            this.Image = WebImages.Load(url);
-            await this.Image.Loaded;
+            return this.Image;
         }
     }
 }

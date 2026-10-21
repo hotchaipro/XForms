@@ -104,11 +104,32 @@ namespace XForms.Web
             this.Add(22, rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height, Pack(color), blurAmount);
         }
 
+        /// <summary>
+        /// The images drawn before they loaded: the layer draws again once
+        /// they have.
+        /// </summary>
+        public List<WebImages.Entry> PendingImages
+        {
+            get;
+        } = new List<WebImages.Entry>();
+
         public override void DrawImage(Bitmap bitmap, Rect destinationRectangle, Color tint)
         {
-            if ((bitmap?.Renderer is BitmapRenderer renderer) && (null != renderer.Image))
+            if (bitmap?.Renderer is BitmapRenderer renderer)
             {
-                this.Add(19, renderer.Image.Id, destinationRectangle.X, destinationRectangle.Y, destinationRectangle.Width, destinationRectangle.Height, tint.IsTransparent ? 0 : Pack(tint));
+                // A bitmap not loaded yet starts loading
+                var image = renderer.EnsureImage();
+                if (null == image)
+                {
+                    return;
+                }
+
+                if (!image.IsLoaded)
+                {
+                    this.PendingImages.Add(image);
+                }
+
+                this.Add(19, image.Id, destinationRectangle.X, destinationRectangle.Y, destinationRectangle.Width, destinationRectangle.Height, tint.IsTransparent ? 0 : Pack(tint));
             }
         }
 

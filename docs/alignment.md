@@ -1804,3 +1804,47 @@ Android and, from phase 17, the browser.
     - Navigation with the browser's history and Back button, and services
       (clipboard, local storage for preferences, `navigator.share`).
     - SoonerOrLater in the browser.
+
+    **Status: done.**
+    - **Keyboard:** focusable views' elements take focus with Tab
+      (`tabindex`); keys go to the focused element's view, or move focus
+      from the root when nothing is focused. Lightweight focus and its ring
+      work as on the other platforms, and Escape goes back.
+    - **Accessibility:** elements carry ARIA roles and states (button,
+      checkbox, radio, tab, listbox and option, combobox with
+      `aria-expanded`, heading, image; checked, selected, disabled, hidden),
+      updated as views' states change. A layer's accessible lightweight
+      views get invisible elements over them, placed among the native
+      elements in the views' order (only those elements move, so native
+      scroll positions and focus aren't disturbed); a click on one, as a
+      screen reader sends, performs the view's default action.
+    - **History:** a history entry stands for the app's back stack, so the
+      browser's Back goes back in the app; it's taken away when the app goes
+      back to its first page on its own.
+    - **Lists:** virtualized by lines (an item, or a grid's row or column):
+      only those near the viewport have containers, recycled as it scrolls,
+      with unmeasured lines estimated and a sizer giving the scroll extent.
+      Pull-to-refresh follows touches (which go on while the list scrolls)
+      and mouse drags from the top, with a spinning indicator while the list
+      refreshes.
+    - **Images** start loading when first drawn, and their layer draws again
+      once they have, so apps needn't wait for bitmaps (the browser has one
+      thread to wait on).
+    - **Files:** .NET's file system in the browser is in memory, and the app
+      data folders are empty paths there. The files the app writes (outside
+      the runtime's folders) are restored from local storage before the app
+      starts and saved there after it suspends.
+    - **Animation** stays as phase 17 left it: layers composed into CSS
+      transforms on animation frames, rather than the Web Animations API.
+    - **SoonerOrLater:** `SoonerOrLater.XForms.Web`. Its model uses an
+      `AppFileStore` (isolated storage, or a folder in the browser, which
+      has no isolated storage), and it loads bitmaps without waiting in the
+      browser.
+    - **Verified** in the browser: Tab focus with the ring, Space toggling a
+      focused toggle; the accessibility tree's roles, names and order;
+      navigating and the browser's Back; list virtualization in list, row
+      and grid layouts; pull-to-refresh (with synthetic pointer events).
+      SoonerOrLater: adding a task, swiping it done, the menu, Settings
+      (dark theme, accent color), and its tasks and settings kept across
+      reloads.
+    - **Not verified:** a screen reader; touch pulls on a real touch screen.

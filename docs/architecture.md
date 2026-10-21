@@ -375,11 +375,11 @@ other threads.
 | Host | Activity with a root `ViewGroup`; edge-to-edge with insets | Scene-based `UIWindow`; safe area | Win32 window with a DirectComposition tree | A page: an element per layer, positioned absolutely |
 | Drawing | `Canvas` | Core Graphics | Direct2D, DirectWrite | A `<canvas>` per layer, from a recorded command list |
 | Text entry | `EditText` | `UITextField` / `UITextView` | RichEdit (`RichEditD2DPT`) | `<input>` / `<textarea>` |
-| List | `ListView`; `RecyclerView` for rows and grids | `UITableView`; `UICollectionView` for rows and grids | Virtualized compositor list | A scrolling element |
+| List | `ListView`; `RecyclerView` for rows and grids | `UITableView`; `UICollectionView` for rows and grids | Virtualized compositor list | A scrolling element, virtualized by lines |
 | Scrolling | Native (`android.widget.ScrollView`) | Native (`UIScrollView`) | Compositor-animated, with touch flick | Native (`overflow: auto`) |
 | Popups | `PopupWindow` | View over the window | Topmost composition target | An element over a backdrop |
-| Accessibility | `AccessibilityNodeInfo`, virtual nodes for lightweight views | `UIAccessibility` elements | UI Automation | Phase 18 (ARIA) |
-| Keyboard focus | Native focus, layer-tracked for lightweight views; view-tree Tab order | The same (first responder) | Tab order, focus ring, activation | Phase 18 |
+| Accessibility | `AccessibilityNodeInfo`, virtual nodes for lightweight views | `UIAccessibility` elements | UI Automation | ARIA roles and states; hidden elements for lightweight views |
+| Keyboard focus | Native focus, layer-tracked for lightweight views; view-tree Tab order | The same (first responder) | Tab order, focus ring, activation | `tabindex` and the browser's focus; lightweight focus as elsewhere |
 | Suspend and resume | Activity pause and resume | Scene resigning and becoming active | Minimized, closed or Windows shutting down; restored | The page hidden or shown |
 | Interop | .NET for Android | .NET for iOS | Source-generated (CsWin32, `GeneratedComInterface`): trimmable and Native AOT-compatible | `[JSImport]`, `[JSExport]` |
 
@@ -397,10 +397,8 @@ picker-specific code. Still to do:
   (it needs a Mac). Its popups, in particular, are new and untested.
 - **Theming.** The toolkit's controls other than `Button` have no styles of
   their own.
-- **Web.** The browser backend (`platform/web`) has its host, layers,
-  drawing, text, input, theming and services; phase 18 of
-  [alignment.md](alignment.md) finishes its controls, accessibility and
-  keyboard.
+- **Web.** The browser backend (`platform/web`) has been tested in one
+  browser (Chromium) without a screen reader or a touch screen.
 - **Known Win32 issue.** RichEdit's built-in spell checker can crash the
   process when a text entry window is shown, hidden or resized while it is
   checking. A fix is in progress.

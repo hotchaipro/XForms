@@ -63,6 +63,14 @@ namespace XForms.Web.Renderers
             this._isContainer = isContainer;
             this.Id = Js.Create(tag);
             WebHost.Current.Register(this);
+
+            // Keyboard focus can move to focusable views (with Tab)
+            if (view.Focusable)
+            {
+                this.EnsureFocusable();
+            }
+
+            this.ApplyAccessibility();
         }
 
         /// <summary>
@@ -145,21 +153,21 @@ namespace XForms.Web.Renderers
 
         #region Children
 
-        // Where the element of a child at the index goes among the element's
-        // children (after the canvas, if any)
-        private int DomIndex(
+        // The element that the element of the child at the index goes before:
+        // the next child's, or the first hosted view's (or none, to append).
+        // Elements for accessibility may sit between them.
+        private int NextElementId(
             int index)
         {
-            int position = (0 != this._canvasId) ? 1 : 0;
-            for (int i = 0; i < index; i += 1)
+            for (int i = index + 1; i < this._ownChildren.Count; i += 1)
             {
-                if (this._ownChildren[i] is ViewRenderer)
+                if (this._ownChildren[i] is ViewRenderer next)
                 {
-                    position += 1;
+                    return next.Id;
                 }
             }
 
-            return position;
+            return (this._hostedViews.Count > 0) ? this._hostedViews[0].Id : 0;
         }
 
         protected void InsertChild(
@@ -171,7 +179,12 @@ namespace XForms.Web.Renderers
             {
                 native.ParentRenderer?.Detach(native);
                 native.ParentRenderer = this;
-                Js.Insert(this.Id, native.Id, this.DomIndex(index));
+                Js.InsertBefore(this.Id, native.Id, this.NextElementId(index));
+                if (null != this._accessibleElements)
+                {
+                    // Places the accessible elements around it
+                    this.InvalidateRender();
+                }
             }
             else
             {
@@ -253,7 +266,7 @@ namespace XForms.Web.Renderers
 
             this._hostedViews.Insert(index, renderer);
             renderer.ParentRenderer = this;
-            Js.Insert(this.Id, renderer.Id, this.DomIndex(this._ownChildren.Count) + index);
+            Js.InsertBefore(this.Id, renderer.Id, (index + 1 < this._hostedViews.Count) ? this._hostedViews[index + 1].Id : 0);
         }
 
         public void RemoveHostedView(
@@ -423,7 +436,15 @@ namespace XForms.Web.Renderers
             var drawContext = new DrawContext(bounds);
             this.DrawContent(drawContext);
             LightweightPainter.PaintDescendants(view, drawContext);
+            view.PaintLightweightFocusRing(drawContext);
             drawContext.Flush(this._canvasId);
+
+            foreach (var image in drawContext.PendingImages)
+            {
+                image.WhenLoaded(this.InvalidateRender);
+            }
+
+            this.UpdateAccessibleElements();
         }
 
         protected virtual void DrawContent(
@@ -447,9 +468,24 @@ namespace XForms.Web.Renderers
             return this._layers.Layers;
         }
 
+        private bool _isFocusable;
+
+        // Lets the element take focus (from the keyboard when the view is
+        // focusable; programmatically otherwise)
+        private void EnsureFocusable()
+        {
+            if (!this._isFocusable)
+            {
+                this._isFocusable = true;
+                Js.SetAttribute(this.Id, "tabindex", this.View.Focusable ? "0" : "-1");
+            }
+        }
+
         public virtual bool Focus()
         {
-            return false;
+            this.EnsureFocusable();
+            Js.Focus(this.Id);
+            return true;
         }
 
         #endregion Animation and focus
@@ -463,5 +499,163 @@ namespace XForms.Web.Renderers
                 this.InvalidateRender();
             }
         }
+
+        #region Accessibility
+
+        /// <summary>
+        /// Describes the view to assistive technology with ARIA attributes.
+        /// </summary>
+        public void ApplyAccessibility()
+        {
+            ApplyAccessibility(this.Id, this.View, isTextElement: this is TextBlockRenderer);
+        }
+
+        // ARIA for an element standing for a view: its role, label, and
+        // checked, selected or expanded state
+        private static void ApplyAccessibility(
+            int id,
+            View view,
+            bool isTextElement)
+        {
+            var role = view.AccessibilityRole;
+            if (view.IsHiddenFromAccessibility)
+            {
+                Js.SetAttribute(id, "aria-hidden", "true");
+                return;
+            }
+
+            Js.SetAttribute(id, "aria-hidden", null);
+            if (role == AccessibilityRole.None)
+            {
+                return;
+            }
+
+            string ariaRole = role switch
+            {
+                AccessibilityRole.Button => "button",
+                AccessibilityRole.ToggleButton => "checkbox",
+                AccessibilityRole.RadioButton => "radio",
+                AccessibilityRole.TabItem => "tab",
+                AccessibilityRole.List => "listbox",
+                AccessibilityRole.ListItem => "option",
+                AccessibilityRole.Image => "img",
+                AccessibilityRole.ComboBox => "combobox",
+                AccessibilityRole.Heading => "heading",
+                AccessibilityRole.Group => "group",
+                _ => null,
+            };
+            Js.SetAttribute(id, "role", ariaRole);
+
+            // Text elements read their own text
+            Js.SetAttribute(id, "aria-label", isTextElement ? null : view.AccessibilityText);
+            Js.SetAttribute(id, "aria-level", (role == AccessibilityRole.Heading) ? "1" : null);
+            Js.SetAttribute(id, "aria-checked", (role == AccessibilityRole.RadioButton) ? (view.AccessibilityIsSelected ? "true" : "false")
+                : view.AccessibilityIsChecked.HasValue ? (view.AccessibilityIsChecked.Value ? "true" : "false")
+                : null);
+            Js.SetAttribute(id, "aria-selected", ((role == AccessibilityRole.TabItem) || (role == AccessibilityRole.ListItem)) ? (view.AccessibilityIsSelected ? "true" : "false") : null);
+            Js.SetAttribute(id, "aria-expanded", view.AccessibilityIsExpanded.HasValue ? (view.AccessibilityIsExpanded.Value ? "true" : "false") : null);
+            Js.SetAttribute(id, "aria-disabled", view.IsHitTestVisible ? null : "true");
+        }
+
+        // Elements standing for the accessible lightweight views drawn into
+        // this layer: invisible, over each view, with its role and label
+        private Dictionary<View, int> _accessibleElements;
+
+        private void UpdateAccessibleElements()
+        {
+            var views = new List<View>();
+            var order = new List<View>();
+            CollectAccessible(this.View, views, order);
+            if ((0 == views.Count) && (null == this._accessibleElements))
+            {
+                return;
+            }
+
+            this._accessibleElements ??= new Dictionary<View, int>();
+            var stale = new HashSet<View>(this._accessibleElements.Keys);
+            foreach (var view in views)
+            {
+                stale.Remove(view);
+                if (!this._accessibleElements.TryGetValue(view, out int id))
+                {
+                    id = Js.Create("div");
+                    Js.SetStyle(id, "pointer-events", "none");
+                    Js.SetStyle(id, "color", "transparent");
+                    Js.SetStyle(id, "overflow", "hidden");
+                    Js.ListenClick(id);
+                    this.Host.RegisterAccessibleElement(id, view);
+                    this._accessibleElements[view] = id;
+                }
+
+                var offset = view.OffsetInLayer;
+                var size = view.Bounds;
+                Js.SetBounds(id, offset.X, offset.Y, size.Width, size.Height);
+                ApplyAccessibility(id, view, isTextElement: view.AccessibilityRole == AccessibilityRole.Text);
+                Js.SetText(id, (view.AccessibilityRole == AccessibilityRole.Text) ? view.AccessibilityLabel ?? string.Empty : string.Empty);
+            }
+
+            foreach (var view in stale)
+            {
+                int id = this._accessibleElements[view];
+                this._accessibleElements.Remove(view);
+                this.Host.UnregisterAccessibleElement(id);
+                Js.Destroy(id);
+            }
+
+            // Assistive technology reads the elements in the views' order: the
+            // accessible elements go between the native ones (which stay put)
+            if (views.Count > 0)
+            {
+                var ids = new int[order.Count];
+                for (int i = 0; i < order.Count; i += 1)
+                {
+                    var view = order[i];
+                    ids[i] = view.IsLightweight ? this._accessibleElements[view] : -((ViewRenderer)view.Renderer).Id;
+                }
+
+                Js.PlaceAccessible(this.Id, ids);
+            }
+        }
+
+        // The accessible lightweight views inside (an accessible view stands
+        // for its own lightweight descendants), and those with the native
+        // children, in order
+        private static void CollectAccessible(
+            View parent,
+            List<View> lightweight,
+            List<View> order)
+        {
+            var children = parent.DrawingOrderChildren;
+            for (int i = 0; i < children.Count; i += 1)
+            {
+                var child = children[i];
+                if (!child.IsLightweight)
+                {
+                    if (child.Renderer is ViewRenderer)
+                    {
+                        order.Add(child);
+                    }
+
+                    continue;
+                }
+
+                if (!child.IsVisible || child.IsHiddenFromAccessibility)
+                {
+                    continue;
+                }
+
+                if (child.AccessibilityRole != AccessibilityRole.None)
+                {
+                    lightweight.Add(child);
+                    order.Add(child);
+                }
+                else
+                {
+                    CollectAccessible(child, lightweight, order);
+                }
+            }
+        }
+
+        #endregion Accessibility
     }
 }

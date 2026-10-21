@@ -101,6 +101,7 @@ namespace XForms.Web
 
         public void OnNavigationComplete()
         {
+            this._host.SyncHistory();
         }
 
         public void InvokeOnUIThreadAsync(
@@ -228,9 +229,15 @@ namespace XForms.Web
             SynchronizationContext.SetSynchronizationContext(new WebHost.WebSynchronizationContext(host));
             Js.SetTitle(title ?? string.Empty);
 
+            // The app's files, kept from earlier visits
+            WebFiles.Restore();
+
             try
             {
                 var application = createApplication(new WebPlatform(host));
+
+                // Saved once the app has suspended (and saved its state)
+                host.Suspending += WebFiles.Save;
                 application.Start();
             }
             catch (Exception ex)

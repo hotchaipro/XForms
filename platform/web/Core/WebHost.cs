@@ -29,6 +29,9 @@ namespace XForms.Web
             Current = this;
             this.ReadViewport();
             Js.ListenVisibility();
+            Js.ListenKeyboard();
+            Js.ListenHistory();
+            View.AccessibilityStateChanged += this.OnAccessibilityStateChanged;
         }
 
         public static WebHost Current
@@ -440,6 +443,174 @@ namespace XForms.Web
             var e = new PointerEventArgs(0, PointerDeviceType.Mouse, new Point(x, y), PointerInputState.Moved, false, (KeyModifiers)modifiers, delta * 48);
             Run(() => result = view.DispatchPointerWheel(e));
             return result;
+        }
+
+        /// <summary>
+        /// A key (by its KeyboardEvent.key name) for the focused element, or
+        /// the root when nothing is focused. Returns whether it was used.
+        /// </summary>
+        public bool OnKey(
+            int id,
+            string name,
+            int modifiers,
+            bool isDown)
+        {
+            var key = ToKey(name);
+            if (key == Key.None)
+            {
+                return false;
+            }
+
+            ViewRenderer renderer = null;
+            if ((0 != id) && !this._renderers.TryGetValue(id, out renderer))
+            {
+                return false;
+            }
+
+            var view = (renderer ?? this._root)?.Element as View;
+            if (null == view)
+            {
+                return false;
+            }
+
+            bool handled = false;
+            var e = new KeyEventArgs(key, (KeyModifiers)modifiers);
+            Run(() =>
+            {
+                if (null == renderer)
+                {
+                    // Nothing focused: Tab starts at the first focusable view
+                    handled = isDown && (key == Key.Tab) && view.MoveFocus(!e.KeyModifiers.HasFlag(KeyModifiers.Shift));
+                    return;
+                }
+
+                handled = isDown ? view.RouteLayerKeyDown(e) : view.RouteLayerKeyUp(e);
+
+                // Escape goes back, as on the desktop
+                var application = Application.Current;
+                if (!handled && isDown && (key == Key.Escape) && (null != application) && application.CanGoBack)
+                {
+                    application.OnBackRequested();
+                    handled = true;
+                }
+            });
+
+            return handled;
+        }
+
+        private static Key ToKey(
+            string name)
+        {
+            switch (name)
+            {
+                case "Tab": return Key.Tab;
+                case "Enter": return Key.Enter;
+                case " ": return Key.Space;
+                case "Escape": return Key.Escape;
+                case "ArrowLeft": return Key.Left;
+                case "ArrowUp": return Key.Up;
+                case "ArrowRight": return Key.Right;
+                case "ArrowDown": return Key.Down;
+                case "Home": return Key.Home;
+                case "End": return Key.End;
+                case "PageUp": return Key.PageUp;
+                case "PageDown": return Key.PageDown;
+                case "Backspace": return Key.Back;
+                case "Delete": return Key.Delete;
+                case "Insert": return Key.Insert;
+            }
+
+            if ((name?.Length == 1) && char.IsLetter(name[0]) && (name[0] < 128))
+            {
+                return Key.A + (char.ToUpperInvariant(name[0]) - 'A');
+            }
+
+            if ((name?.Length == 1) && char.IsDigit(name[0]))
+            {
+                return Key.D0 + (name[0] - '0');
+            }
+
+            // F1 to F12
+            return ((name?.Length >= 2) && (name[0] == 'F') && Enum.TryParse(name, out Key function)) ? function : Key.None;
+        }
+
+        // History: one entry stands for the app's back stack
+        private bool _hasHistoryEntry;
+
+        /// <summary>
+        /// Adds a history entry once the app can go back, so the browser's Back
+        /// goes back in the app, and takes it away once the app can't.
+        /// </summary>
+        public void SyncHistory()
+        {
+            var application = Application.Current;
+            bool canGoBack = (null != application) && application.CanGoBack;
+            if (canGoBack && !this._hasHistoryEntry)
+            {
+                this._hasHistoryEntry = true;
+                Js.PushHistory();
+            }
+            else if (!canGoBack && this._hasHistoryEntry)
+            {
+                this._hasHistoryEntry = false;
+                Js.PopHistory();
+            }
+        }
+
+        public void OnHistoryBack()
+        {
+            this._hasHistoryEntry = false;
+            Run(() =>
+            {
+                var application = Application.Current;
+                if ((null != application) && application.CanGoBack)
+                {
+                    application.OnBackRequested();
+                }
+            });
+        }
+
+        // Accessible elements standing for lightweight views, by element id
+        private readonly Dictionary<int, View> _accessibleElements = new Dictionary<int, View>();
+
+        public void RegisterAccessibleElement(
+            int id,
+            View view)
+        {
+            this._accessibleElements[id] = view;
+        }
+
+        public void UnregisterAccessibleElement(
+            int id)
+        {
+            this._accessibleElements.Remove(id);
+        }
+
+        public void OnAccessibilityClick(
+            int id)
+        {
+            if (this._accessibleElements.TryGetValue(id, out var view) && view.IsAccessibilityActionable)
+            {
+                Run(() => view.PerformDefaultAccessibilityAction());
+            }
+        }
+
+        // A view's state changed: its element's attributes, or its layer's
+        // accessible elements
+        private void OnAccessibilityStateChanged(
+            View view)
+        {
+            Run(() =>
+            {
+                if (view.IsLightweight)
+                {
+                    (view.FindLayer() as ViewRenderer)?.InvalidateRender();
+                }
+                else if (view.Renderer is ViewRenderer renderer)
+                {
+                    renderer.ApplyAccessibility();
+                }
+            });
         }
 
         #endregion Input

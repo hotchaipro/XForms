@@ -56,6 +56,7 @@ export function create(kind) {
     const element = document.createElement(kind);
     const id = nextId++;
     element.dataset.xid = id;
+    element.id = 'x' + id;
     element.style.position = 'absolute';
     element.style.left = '0';
     element.style.top = '0';
@@ -84,6 +85,34 @@ export function insert(parentId, childId, index) {
     const before = (index >= 0) ? (parent.children[index] ?? null) : null;
     if (before !== child) {
         parent.insertBefore(child, before);
+    }
+}
+
+export function insertBefore(parentId, childId, beforeId) {
+    const parent = elements.get(parentId);
+    const child = elements.get(childId);
+    const before = beforeId ? elements.get(beforeId) : null;
+    if (child.parentElement !== parent || child.nextSibling !== before) {
+        parent.insertBefore(child, before);
+    }
+}
+
+// Puts the accessible elements (positive ids) among the native ones
+// (negative ids), in the given order, moving only the accessible ones
+export function placeAccessible(parentId, ids) {
+    const parent = elements.get(parentId);
+    let previous = (parent.firstChild?.tagName === 'CANVAS') ? parent.firstChild : null;
+    for (const id of ids) {
+        const element = elements.get(Math.abs(id));
+        if (id > 0) {
+            const before = previous ? previous.nextSibling : parent.firstChild;
+            if (before !== element) {
+                parent.insertBefore(element, before);
+            }
+        }
+        if (element.parentElement === parent) {
+            previous = element;
+        }
     }
 }
 
@@ -641,4 +670,137 @@ export function saveFile(name, bytes) {
     link.click();
     link.remove();
     setTimeout(() => URL.revokeObjectURL(url), 10000);
+}
+
+// Keyboard and focus: keys go to the focused element (or, with nothing
+// focused, the root); .NET routes them to the view and its ancestors
+
+function focusedId() {
+    for (let element = document.activeElement; element && element !== document.body; element = element.parentElement) {
+        const id = element.dataset?.xid;
+        if (id) {
+            return Number(id);
+        }
+    }
+    return 0;
+}
+
+export function listenKeyboard() {
+    // A focus ring for elements that take focus from the keyboard
+    const style = document.createElement('style');
+    style.textContent = '[data-xid]:focus { outline: none; } [data-xid][tabindex]:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; } @keyframes xforms-spin { to { transform: rotate(360deg); } }';
+    document.head.appendChild(style);
+
+    document.addEventListener('keydown', (e) => {
+        const tag = document.activeElement?.tagName;
+        const isTextEntry = tag === 'INPUT' || tag === 'TEXTAREA';
+        // Text entries handle their own keys, except Tab and Escape
+        if (isTextEntry && e.key !== 'Tab' && e.key !== 'Escape') {
+            return;
+        }
+        if (exports.OnKey(focusedId(), e.key, modifiers(e), true, e.shiftKey && e.key === 'Tab')) {
+            e.preventDefault();
+        }
+    });
+    document.addEventListener('keyup', (e) => {
+        const tag = document.activeElement?.tagName;
+        if (tag !== 'INPUT' && tag !== 'TEXTAREA') {
+            exports.OnKey(focusedId(), e.key, modifiers(e), false, false);
+        }
+    });
+    root.addEventListener('focusin', (e) => {
+        const id = Number(e.target.dataset?.xid ?? 0);
+        if (id) {
+            exports.OnFocusChanged(id, true);
+        }
+    });
+    root.addEventListener('focusout', (e) => {
+        const id = Number(e.target.dataset?.xid ?? 0);
+        if (id) {
+            exports.OnFocusChanged(id, false);
+        }
+    });
+}
+
+// History: one entry stands for the app's back stack, so the browser's Back
+// goes back in the app
+
+export function pushHistory() {
+    history.pushState({ xforms: true }, '');
+}
+
+// Taking the entry away (when the app has gone back on its own) isn't a
+// Back for the app
+let isPoppingHistory = false;
+
+export function popHistory() {
+    isPoppingHistory = true;
+    history.back();
+}
+
+export function listenHistory() {
+    window.addEventListener('popstate', () => {
+        if (isPoppingHistory) {
+            isPoppingHistory = false;
+            return;
+        }
+        exports.OnHistoryBack();
+    });
+}
+
+// Accessible elements for lightweight views: a click (as a screen reader
+// sends) activates the view
+
+export function listenClick(id) {
+    elements.get(id).addEventListener('click', (e) => {
+        exports.OnAccessibilityClick(id);
+        e.stopPropagation();
+    });
+}
+
+// Pull-to-refresh: a touch pulling a list down past its top
+
+// Pulls down from the top of a scrolled element: touches (which go on
+// while the element scrolls), and mouse or pen drags
+export function listenPull(id) {
+    const element = elements.get(id);
+    let start = null;
+    const begin = (y) => {
+        start = (element.scrollTop <= 0) ? y : null;
+    };
+    const move = (y) => {
+        if (start !== null) {
+            exports.OnPull(id, Math.max(0, y - start));
+        }
+    };
+    const end = () => {
+        if (start !== null) {
+            start = null;
+            exports.OnPullReleased(id);
+        }
+    };
+    element.addEventListener('touchstart', (e) => begin(e.touches[0].clientY), { passive: true });
+    element.addEventListener('touchmove', (e) => move(e.touches[0].clientY), { passive: true });
+    element.addEventListener('touchend', end);
+    element.addEventListener('touchcancel', end);
+    element.addEventListener('pointerdown', (e) => {
+        if (e.pointerType !== 'touch') {
+            begin(e.clientY);
+        }
+    });
+    element.addEventListener('pointermove', (e) => {
+        if (e.pointerType !== 'touch') {
+            move(e.clientY);
+        }
+    });
+    element.addEventListener('pointerup', (e) => {
+        if (e.pointerType !== 'touch') {
+            end();
+        }
+    });
+}
+
+export function getScroll(id) {
+    const element = elements.get(id);
+    return [element.scrollLeft, element.scrollTop];
 }

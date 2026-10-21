@@ -39,6 +39,12 @@ namespace XForms.Web
         [JSImport("insert", Module)]
         public static partial void Insert(int parentId, int childId, int index);
 
+        [JSImport("insertBefore", Module)]
+        public static partial void InsertBefore(int parentId, int childId, int beforeId);
+
+        [JSImport("placeAccessible", Module)]
+        public static partial void PlaceAccessible(int parentId, [JSMarshalAs<JSType.Array<JSType.Number>>] int[] ids);
+
         [JSImport("detach", Module)]
         public static partial void Detach(int id);
 
@@ -201,6 +207,30 @@ namespace XForms.Web
         [JSImport("saveFile", Module)]
         public static partial void SaveFile(string name, byte[] bytes);
 
+        // Keyboard, history, accessibility and pulls
+
+        [JSImport("listenKeyboard", Module)]
+        public static partial void ListenKeyboard();
+
+        [JSImport("pushHistory", Module)]
+        public static partial void PushHistory();
+
+        [JSImport("popHistory", Module)]
+        public static partial void PopHistory();
+
+        [JSImport("listenHistory", Module)]
+        public static partial void ListenHistory();
+
+        [JSImport("listenClick", Module)]
+        public static partial void ListenClick(int id);
+
+        [JSImport("listenPull", Module)]
+        public static partial void ListenPull(int id);
+
+        [JSImport("getScroll", Module)]
+        [return: JSMarshalAs<JSType.Array<JSType.Number>>]
+        public static partial double[] GetScroll(int id);
+
         // Events from the page
 
         [JSExport]
@@ -297,6 +327,36 @@ namespace XForms.Web
         internal static void OnOnlineChanged()
         {
             WebConnectivity.Current?.OnChanged();
+        }
+
+        [JSExport]
+        internal static bool OnKey(int id, string key, int modifiers, bool isDown, bool isBackTab)
+        {
+            return WebHost.Current?.OnKey(id, key, modifiers, isDown) ?? false;
+        }
+
+        [JSExport]
+        internal static void OnHistoryBack()
+        {
+            WebHost.Current?.OnHistoryBack();
+        }
+
+        [JSExport]
+        internal static void OnAccessibilityClick(int id)
+        {
+            WebHost.Current?.OnAccessibilityClick(id);
+        }
+
+        [JSExport]
+        internal static void OnPull(int id, double distance)
+        {
+            WebHost.Current?.OnElementEvent(id, (renderer) => (renderer as ListViewRenderer)?.OnPull((float)distance));
+        }
+
+        [JSExport]
+        internal static void OnPullReleased(int id)
+        {
+            WebHost.Current?.OnElementEvent(id, (renderer) => (renderer as ListViewRenderer)?.OnPullReleased());
         }
 
         [JSExport]

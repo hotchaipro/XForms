@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Globalization;
 using System.Runtime.Versioning;
 using XForms.Controls;
 using XForms.Layouts;
@@ -127,15 +128,41 @@ namespace XForms.Web.Renderers
     }
 
     /// <summary>
-    /// A list in a scrolling element. Every item has a container (no
-    /// virtualization yet), stacked in a line or a grid.
+    /// A list in a scrolling element, stacked in lines (one item each, or a
+    /// grid's row or column). Only the lines near the viewport have
+    /// containers; a sizer element gives the element its scroll extent.
     /// </summary>
     [SupportedOSPlatform("browser")]
     internal sealed class ListViewRenderer : ViewRenderer, IListViewRenderer, IScrollingRenderer
     {
-        private readonly List<ListViewItem> _containers = new List<ListViewItem>();
+        // Lines this far outside the viewport keep containers
+        private const float Margin = 400;
+
+        // A line's extent before it is measured (when none has been)
+        private const float DefaultExtent = 48;
+
+        // How far a pull goes before it refreshes
+        private const float RefreshDistance = 72;
+        private const float IndicatorSize = 36;
+
+        // The containers by item index, and those ready for reuse
+        private readonly SortedDictionary<int, ListViewItem> _realized = new SortedDictionary<int, ListViewItem>();
+        private readonly List<ListViewItem> _recycled = new List<ListViewItem>();
+
+        // The lines' measured extents (NaN when not measured)
+        private readonly List<float> _lineExtents = new List<float>();
+
+        private readonly int _sizerId;
         private ListViewSource _source;
         private ListLayout _layout = ListLayout.Vertical;
+        private Rect _viewport;
+        private float _scrollOffset;
+
+        private bool _isRefreshEnabled;
+        private bool _isRefreshing;
+        private float _pullDistance;
+        private int _indicatorId;
+        private Theme _theme;
 
         public ListViewRenderer(
             ListView listView)
@@ -143,6 +170,11 @@ namespace XForms.Web.Renderers
         {
             this.ApplyOverflow();
             Js.ListenScroll(this.Id);
+
+            this._sizerId = Js.Create("div");
+            Js.SetStyle(this._sizerId, "visibility", "hidden");
+            Js.SetStyle(this._sizerId, "pointer-events", "none");
+            Js.Insert(this.Id, this._sizerId, -1);
         }
 
         public float FooterHeight
@@ -157,21 +189,7 @@ namespace XForms.Web.Renderers
             {
                 this._layout = value;
                 this.ApplyOverflow();
-                this.InvalidateMeasure();
-            }
-        }
-
-        public bool IsRefreshEnabled
-        {
-            set
-            {
-            }
-        }
-
-        public bool IsRefreshing
-        {
-            set
-            {
+                this.Reset();
             }
         }
 
@@ -195,6 +213,8 @@ namespace XForms.Web.Renderers
             float left,
             float top)
         {
+            this._scrollOffset = this.IsHorizontal ? left : top;
+            this.Realize();
         }
 
         public void Bind(
@@ -211,61 +231,230 @@ namespace XForms.Web.Renderers
                 source.CollectionChanged += this.Source_CollectionChanged;
             }
 
-            this.Rebuild();
+            this.Reset();
         }
 
         private void Source_CollectionChanged(
             object sender,
             NotifyCollectionChangedEventArgs e)
         {
-            this.Rebuild();
+            this.Reset();
         }
 
-        // A container for every item, reusing those it has
-        private void Rebuild()
+        // Every item may have changed: the containers rebind and the lines
+        // are measured again
+        private void Reset()
         {
-            var listView = (ListView)this.Element;
-            int count = this._source?.Count ?? 0;
-            for (int i = 0; i < count; i += 1)
+            foreach (var index in new List<int>(this._realized.Keys))
             {
-                var reuse = (i < this._containers.Count) ? this._containers[i] : null;
-                var container = this._source.GetItemContainer(listView, reuse, this._source[i]);
-                if (i < this._containers.Count)
-                {
-                    this._containers[i] = container;
-                }
-                else
-                {
-                    this._containers.Add(container);
-                }
-
-                var renderer = (ViewRenderer)container.Renderer;
-                if (renderer.ParentRenderer != this)
-                {
-                    this.InsertChild(Math.Min(i, this.Children.Count), renderer);
-                }
+                this.Recycle(index);
             }
 
-            while (this._containers.Count > count)
-            {
-                var container = this._containers[this._containers.Count - 1];
-                this._containers.RemoveAt(this._containers.Count - 1);
-                container.Recycle();
-                this.RemoveChild((ViewRenderer)container.Renderer);
-            }
-
+            this._lineExtents.Clear();
             this.InvalidateMeasure();
+        }
+
+        private int LineCount
+        {
+            get
+            {
+                int span = this._layout.Columns;
+                return ((this._source?.Count ?? 0) + span - 1) / span;
+            }
+        }
+
+        // The extent of a line not measured yet: the measured ones' average
+        private float EstimatedExtent
+        {
+            get
+            {
+                float total = 0;
+                int count = 0;
+                foreach (var extent in this._lineExtents)
+                {
+                    if (!float.IsNaN(extent))
+                    {
+                        total += extent;
+                        count += 1;
+                    }
+                }
+
+                return (0 == count) ? DefaultExtent : (total / count);
+            }
+        }
+
+        private float LineExtent(
+            int line,
+            float estimate)
+        {
+            return ((line < this._lineExtents.Count) && !float.IsNaN(this._lineExtents[line])) ? this._lineExtents[line] : estimate;
+        }
+
+        // Containers for the lines near the viewport, measured and placed;
+        // the others' containers are recycled
+        private void Realize()
+        {
+            int lines = this.LineCount;
+            while (this._lineExtents.Count < lines)
+            {
+                this._lineExtents.Add(float.NaN);
+            }
+
+            if (this._lineExtents.Count > lines)
+            {
+                this._lineExtents.RemoveRange(lines, this._lineExtents.Count - lines);
+            }
+
+            float viewportExtent = this.IsHorizontal ? this._viewport.Width : this._viewport.Height;
+            float low = this._scrollOffset - Margin;
+            float high = this._scrollOffset + viewportExtent + Margin;
+            int span = this._layout.Columns;
+            float estimate = this.EstimatedExtent;
+
+            // Lines leaving the range give up their containers first, for
+            // the lines coming into it to reuse
+            var needed = new HashSet<int>();
+            float position = 0;
+            for (int line = 0; line < lines; line += 1)
+            {
+                float extent = this.LineExtent(line, estimate);
+                if ((position + extent >= low) && (position <= high))
+                {
+                    needed.Add(line);
+                }
+
+                position += extent;
+            }
+
+            foreach (var index in new List<int>(this._realized.Keys))
+            {
+                if (!needed.Contains(index / span))
+                {
+                    this.Recycle(index);
+                }
+            }
+
+            float crossSize = this.IsHorizontal ? this._viewport.Height : this._viewport.Width;
+            float cellSize = crossSize / span;
+            int count = this._source?.Count ?? 0;
+            var kept = new HashSet<int>();
+            position = 0;
+            for (int line = 0; line < lines; line += 1)
+            {
+                float extent = this.LineExtent(line, estimate);
+                if ((position + extent >= low) && (position <= high))
+                {
+                    // The line's extent is its largest item's
+                    extent = 0;
+                    int first = line * span;
+                    int last = Math.Min(first + span, count);
+                    for (int index = first; index < last; index += 1)
+                    {
+                        var container = this.Realize(index);
+                        container.Measure(this.IsHorizontal
+                            ? new Size(float.PositiveInfinity, cellSize)
+                            : new Size(cellSize, float.PositiveInfinity));
+                        extent = Math.Max(extent, this.IsHorizontal ? container.DesiredSize.Width : container.DesiredSize.Height);
+                        kept.Add(index);
+                    }
+
+                    for (int index = first; index < last; index += 1)
+                    {
+                        int column = index - first;
+                        this._realized[index].Arrange(this.IsHorizontal
+                            ? new Rect(position, column * cellSize, extent, cellSize)
+                            : new Rect(column * cellSize, position, cellSize, extent));
+                    }
+
+                    this._lineExtents[line] = extent;
+                }
+
+                position += extent;
+            }
+
+            foreach (var index in new List<int>(this._realized.Keys))
+            {
+                if (!kept.Contains(index))
+                {
+                    this.Recycle(index);
+                }
+            }
+
+            position += this.FooterHeight;
+            if (this.IsHorizontal)
+            {
+                Js.SetBounds(this._sizerId, 0, 0, position, 1);
+            }
+            else
+            {
+                Js.SetBounds(this._sizerId, 0, 0, 1, position);
+            }
+        }
+
+        // The item's container, bound to it (reusing a recycled one), placed
+        // among the others in item order
+        private ListViewItem Realize(
+            int index)
+        {
+            if (this._realized.TryGetValue(index, out var container))
+            {
+                return container;
+            }
+
+            ListViewItem reuse = null;
+            if (this._recycled.Count > 0)
+            {
+                reuse = this._recycled[this._recycled.Count - 1];
+                this._recycled.RemoveAt(this._recycled.Count - 1);
+            }
+
+            container = this._source.GetItemContainer((ListView)this.Element, reuse, this._source[index]);
+            if ((null != reuse) && (reuse != container))
+            {
+                this._recycled.Add(reuse);
+            }
+
+            int position = 0;
+            foreach (var realized in this._realized.Keys)
+            {
+                if (realized < index)
+                {
+                    position += 1;
+                }
+            }
+
+            this._realized[index] = container;
+            this.InsertChild(position, (ViewRenderer)container.Renderer);
+            return container;
+        }
+
+        private void Recycle(
+            int index)
+        {
+            var container = this._realized[index];
+            this._realized.Remove(index);
+            this.RemoveChild((ViewRenderer)container.Renderer);
+            container.Recycle();
+            this._recycled.Add(container);
         }
 
         public void ScrollToItem(
             object item)
         {
             int index = this._source?.IndexOf(item) ?? -1;
-            if ((index >= 0) && (index < this._containers.Count))
+            if (index < 0)
             {
-                var frame = ((ViewRenderer)this._containers[index].Renderer).Frame;
-                Js.ScrollTo(this.Id, frame.X, frame.Y, true);
+                return;
             }
+
+            float estimate = this.EstimatedExtent;
+            float position = 0;
+            for (int line = 0; line < index / this._layout.Columns; line += 1)
+            {
+                position += this.LineExtent(line, estimate);
+            }
+
+            Js.ScrollTo(this.Id, this.IsHorizontal ? position : 0, this.IsHorizontal ? 0 : position, true);
         }
 
         public override Size MeasureNative(
@@ -281,49 +470,118 @@ namespace XForms.Web.Renderers
         {
             base.ArrangeNative(frame);
 
-            int span = this._layout.Columns;
-            float cellWidth = frame.Width / span;
-            float position = 0;
-            for (int line = 0; (line * span) < this._containers.Count; line += 1)
+            this._viewport = frame;
+            this.Realize();
+        }
+
+        #region Pull to refresh
+
+        public bool IsRefreshEnabled
+        {
+            set
             {
-                float extent = 0;
-                for (int column = 0; column < span; column += 1)
+                if (value && !this._isRefreshEnabled)
                 {
-                    int index = (line * span) + column;
-                    if (index >= this._containers.Count)
-                    {
-                        break;
-                    }
-
-                    var container = this._containers[index];
-                    if (this.IsHorizontal)
-                    {
-                        container.Measure(new Size(float.PositiveInfinity, frame.Height));
-                        extent = container.DesiredSize.Width;
-                        container.Arrange(new Rect(position, 0, extent, frame.Height));
-                    }
-                    else
-                    {
-                        container.Measure(new Size(cellWidth, float.PositiveInfinity));
-                        extent = Math.Max(extent, container.DesiredSize.Height);
-                    }
+                    Js.ListenPull(this.Id);
                 }
 
-                if (!this.IsHorizontal)
-                {
-                    for (int column = 0; column < span; column += 1)
-                    {
-                        int index = (line * span) + column;
-                        if (index < this._containers.Count)
-                        {
-                            this._containers[index].Arrange(new Rect(column * cellWidth, position, cellWidth, extent));
-                        }
-                    }
-                }
-
-                position += extent;
+                this._isRefreshEnabled = value;
             }
         }
+
+        public bool IsRefreshing
+        {
+            set
+            {
+                this._isRefreshing = value;
+                this.PlaceIndicator(0);
+            }
+        }
+
+        public void OnPull(
+            float distance)
+        {
+            if (this._isRefreshEnabled && !this._isRefreshing && !this.IsHorizontal)
+            {
+                this._pullDistance = distance;
+                this.PlaceIndicator(distance);
+            }
+        }
+
+        public void OnPullReleased()
+        {
+            bool refresh = this._isRefreshEnabled && !this._isRefreshing && (this._pullDistance >= RefreshDistance);
+            this._pullDistance = 0;
+            if (refresh)
+            {
+                this._isRefreshing = true;
+                ((ListView)this.Element).NotifyRefreshRequested();
+            }
+
+            this.PlaceIndicator(0);
+        }
+
+        // The indicator follows a pull down from the top, turning as it
+        // goes, and spins while the list refreshes
+        private void PlaceIndicator(
+            float distance)
+        {
+            if ((0 == distance) && !this._isRefreshing)
+            {
+                if (0 != this._indicatorId)
+                {
+                    Js.SetStyle(this._indicatorId, "display", "none");
+                }
+
+                return;
+            }
+
+            if (0 == this._indicatorId)
+            {
+                this._indicatorId = Js.Create("div");
+                Js.SetStyle(this._indicatorId, "border-radius", "50%");
+                Js.SetStyle(this._indicatorId, "border-width", "3px");
+                Js.SetStyle(this._indicatorId, "border-style", "solid");
+                Js.SetStyle(this._indicatorId, "box-shadow", "0 1px 4px rgba(0, 0, 0, 0.3)");
+                Js.SetStyle(this._indicatorId, "pointer-events", "none");
+                Js.SetStyle(this._indicatorId, "z-index", "1");
+                Js.SetAttribute(this._indicatorId, "aria-hidden", "true");
+                Js.Insert(this.Id, this._indicatorId, -1);
+                this.ApplyIndicatorTheme();
+            }
+
+            float travel = this._isRefreshing ? RefreshDistance : Math.Min(distance, RefreshDistance * 1.5f);
+            float x = (this._viewport.Width - IndicatorSize) / 2;
+            float y = this._scrollOffset + (travel / 2) - (IndicatorSize / 2);
+            Js.SetBounds(this._indicatorId, x, y, IndicatorSize, IndicatorSize);
+            Js.SetStyle(this._indicatorId, "display", null);
+            Js.SetStyle(this._indicatorId, "opacity", this._isRefreshing ? "1" : Math.Min(1, distance / RefreshDistance).ToString(CultureInfo.InvariantCulture));
+            Js.SetStyle(this._indicatorId, "animation", this._isRefreshing ? "xforms-spin 0.8s linear infinite" : null);
+            Js.SetStyle(this._indicatorId, "transform", this._isRefreshing ? null : $"rotate({(int)(distance * 3)}deg)");
+        }
+
+        private void ApplyIndicatorTheme()
+        {
+            var theme = this._theme;
+            if ((0 == this._indicatorId) || (null == theme))
+            {
+                return;
+            }
+
+            Js.SetStyle(this._indicatorId, "background", Css(theme.Colors.Surface));
+            Js.SetStyle(this._indicatorId, "border-color", Css(theme.Colors.Accent));
+            Js.SetStyle(this._indicatorId, "border-top-color", "transparent");
+        }
+
+        public override void OnThemeChanged(
+            Theme theme)
+        {
+            base.OnThemeChanged(theme);
+            this._theme = theme;
+            this.ApplyIndicatorTheme();
+        }
+
+        #endregion Pull to refresh
     }
 
     /// <summary>
