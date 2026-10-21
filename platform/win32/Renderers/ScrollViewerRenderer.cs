@@ -10,6 +10,9 @@ namespace XForms.Win32.Renderers
     /// </summary>
     internal sealed unsafe class ScrollViewerRenderer : ViewRenderer, IScrollViewerRenderer, IScrollableRenderer, IScrollContent
     {
+        // Scrolled-out content takes no input
+        protected override bool ClipsHitTesting => true;
+
         private readonly IDCompositionVisual2* _contentVisual;
         private readonly ScrollController _scroller;
         private View _content;

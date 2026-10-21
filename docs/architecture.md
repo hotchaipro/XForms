@@ -337,7 +337,12 @@ the toolkit's controls draw from its tokens.
   - iOS: a view on top of the window.
 - **`Application.LightDismissTarget`** is the in-page equivalent, for views
   such as flyouts that close when the user touches anywhere outside them.
-  Implement `ILightDismissTarget`.
+  Implement `ILightDismissTarget`. "Inside" means the view or any descendant
+  in the element tree, wherever it's drawn.
+- **Views don't clip their children** unless `ClipToBounds` is set, and
+  that holds for input too: a child drawn outside its parent (moved there by
+  an animator, like a flyout's buttons) takes clicks there. Scrolling views
+  always clip.
 
 ## Lists
 
@@ -374,6 +379,7 @@ other threads.
 | Popups | `PopupWindow` | View over the window | Topmost composition target |
 | Accessibility | `AccessibilityNodeInfo`, virtual nodes for lightweight views | `UIAccessibility` elements | UI Automation |
 | Keyboard focus | Native focus, layer-tracked for lightweight views; view-tree Tab order | The same (first responder) | Tab order, focus ring, activation |
+| Suspend and resume | Activity pause and resume | Scene resigning and becoming active | Minimized, closed or Windows shutting down; restored |
 | Interop | .NET for Android | .NET for iOS | Source-generated (CsWin32, `GeneratedComInterface`): trimmable and Native AOT-compatible |
 
 ## Current state
@@ -388,11 +394,8 @@ picker-specific code. Still to do:
 
 - **iOS testing.** iOS builds, but it hasn't been run since the restructure
   (it needs a Mac). Its popups, in particular, are new and untested.
-- **Theming.** Text scale isn't reported yet, and the toolkit's controls
-  other than `Button` have no styles of their own.
-- **Accessibility and keyboard focus on Android and iOS.** The framework's
-  accessibility roles and labels, and keyboard focus, are implemented only on
-  Win32 so far.
+- **Theming.** The toolkit's controls other than `Button` have no styles of
+  their own.
 - **Web.** A browser backend (DOM, native inputs, canvas and CSS transforms)
   fits the same model as the other platforms.
 - **Known Win32 issue.** RichEdit's built-in spell checker can crash the

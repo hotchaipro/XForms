@@ -81,6 +81,8 @@ namespace XForms.Win32
         {
             this._host = host;
             host.SystemThemeChanged += application.NotifySystemThemeChanged;
+            host.Suspending += application.NotifySuspend;
+            host.Resuming += application.NotifyResume;
         }
 
         public Color? TitleBarAccentColor { get; set; }

@@ -67,20 +67,6 @@ namespace XForms
             }
         }
 
-        public bool HasDescendant(
-            Element element)
-        {
-            foreach (var child in this.View.GetChildElements())
-            {
-                if (child.HasDescendant(element))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
         public virtual void OnThemeChanged(
             Theme theme)
         {

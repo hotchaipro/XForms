@@ -91,6 +91,42 @@ namespace XForms.Win32
         /// </summary>
         public event Action SystemThemeChanged;
 
+        // The resource id .NET gives the exe's ApplicationIcon
+        private const int ApplicationIconId = 32512;
+        private const nuint SIZE_MINIMIZED = 1;
+
+        private bool _isSuspended;
+
+        /// <summary>
+        /// Raised when the app should save its state: the window is minimized
+        /// or closing, or Windows is shutting down.
+        /// </summary>
+        public event Action Suspending;
+
+        /// <summary>
+        /// Raised when the window is restored after being minimized.
+        /// </summary>
+        public event Action Resuming;
+
+        private void SetSuspended(
+            bool isSuspended)
+        {
+            if (isSuspended == this._isSuspended)
+            {
+                return;
+            }
+
+            this._isSuspended = isSuspended;
+            if (isSuspended)
+            {
+                this.Suspending?.Invoke();
+            }
+            else
+            {
+                this.Resuming?.Invoke();
+            }
+        }
+
         /// <summary>
         /// The smallest client area the user can resize the window to, in DIPs.
         /// </summary>
@@ -246,6 +282,9 @@ namespace XForms.Win32
                     lpfnWndProc = &WindowProc,
                     hInstance = (HINSTANCE)instance.Value,
                     hCursor = PInvoke.LoadCursor(HINSTANCE.Null, PInvoke.IDC_ARROW),
+
+                    // The exe's icon (the project's ApplicationIcon), if it has one
+                    hIcon = PInvoke.LoadIcon((HINSTANCE)instance.Value, (PCWSTR)(char*)ApplicationIconId),
                     lpszClassName = className,
                 };
                 PInvoke.RegisterClassEx(&windowClass);
@@ -729,6 +768,15 @@ namespace XForms.Win32
 
                     case PInvoke.WM_SIZE:
                         host.RequestLayout();
+
+                        // Minimized, the app saves its state as a mobile app
+                        // does in the background
+                        host.SetSuspended(wParam.Value == SIZE_MINIMIZED);
+                        break;
+
+                    case PInvoke.WM_CLOSE:
+                    case PInvoke.WM_QUERYENDSESSION:
+                        host.SetSuspended(true);
                         break;
 
                     case PInvoke.WM_ERASEBKGND:

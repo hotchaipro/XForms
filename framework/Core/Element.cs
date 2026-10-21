@@ -15,8 +15,6 @@ namespace XForms
             get;
         }
 
-        bool HasDescendant(Element element);
-
         /// <summary>
         /// The element's effective theme, when its native object is created and
         /// whenever the theme changes.
@@ -261,12 +259,15 @@ namespace XForms
         public bool HasDescendant(
             Element element)
         {
-            if (element == this)
+            for (var ancestor = element; null != ancestor; ancestor = ancestor.ParentElement)
             {
-                return true;
+                if (ancestor == this)
+                {
+                    return true;
+                }
             }
 
-            return this._renderer?.HasDescendant(element) ?? false;
+            return false;
         }
 
         private void SetProperty(
