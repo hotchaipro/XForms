@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System;
 using System.Windows.Input;
 using XForms.Input;
 using XForms.Controls;
@@ -132,7 +132,7 @@ namespace XForms.Toolkit
 
             if (this._isTouchDown)
             {
-                drawContext.FillEllipse(buttonBounds, this.Theme.SubtleForegroundColor);
+                drawContext.FillEllipse(buttonBounds, this.ActualTheme.Colors.SubtleForeground);
                 if (null != icon)
                 {
                     drawContext.DrawImage(icon, imageBounds, Colors.White);
@@ -140,7 +140,7 @@ namespace XForms.Toolkit
             }
             else if (this.IsChecked)
             {
-                drawContext.FillEllipse(buttonBounds, this.Theme.AccentColor);
+                drawContext.FillEllipse(buttonBounds, this.ActualTheme.Colors.Accent);
                 if (null != icon)
                 {
                     drawContext.DrawImage(icon, imageBounds, Colors.White);
@@ -148,14 +148,14 @@ namespace XForms.Toolkit
             }
             else
             {
-                drawContext.DrawEllipse(buttonBounds.Center, buttonRadius - 1.0f, buttonRadius - 1.0f, this.Theme.SubtleForegroundColor, strokeWidth: 1.0f);
+                drawContext.DrawEllipse(buttonBounds.Center, buttonRadius - 1.0f, buttonRadius - 1.0f, this.ActualTheme.Colors.SubtleForeground, strokeWidth: 1.0f);
                 if (null != icon)
                 {
-                    drawContext.DrawImage(icon, imageBounds, this.Theme.SubtleForegroundColor);
+                    drawContext.DrawImage(icon, imageBounds, this.ActualTheme.Colors.SubtleForeground);
                 }
             }
 
-            drawContext.DrawText(this.RadioButtonItem.Text, textBounds, this.Theme.SubtleForegroundColor, this._textFormat);
+            drawContext.DrawText(this.RadioButtonItem.Text, textBounds, this.ActualTheme.Colors.SubtleForeground, this._textFormat);
         }
 
         private void UpdateScale()
@@ -166,11 +166,11 @@ namespace XForms.Toolkit
             }
             else if (this.IsChecked)
             {
-                this._ownAnimator.ScaleTo(1.0f, TimeSpan.FromMilliseconds(100), new CubicEase(EasingMode.EaseIn));
+                this._ownAnimator.ScaleTo(1.0f, this.ActualTheme.Motion.Short, new CubicEase(EasingMode.EaseIn));
             }
             else
             {
-                this._ownAnimator.ScaleTo(IsUncheckedScale, TimeSpan.FromMilliseconds(100), new CubicEase(EasingMode.EaseOut));
+                this._ownAnimator.ScaleTo(IsUncheckedScale, this.ActualTheme.Motion.Short, new CubicEase(EasingMode.EaseOut));
             }
         }
 

@@ -86,6 +86,12 @@ namespace XForms.Win32
         }
 
         /// <summary>
+        /// Raised when Windows' theme settings may have changed: dark mode, the
+        /// accent color or high contrast.
+        /// </summary>
+        public event Action SystemThemeChanged;
+
+        /// <summary>
         /// Device pixels per device-independent pixel.
         /// </summary>
         public float Scale
@@ -665,6 +671,16 @@ namespace XForms.Win32
                             PInvoke.EndPaint(hwnd, &paint);
                             return (LRESULT)0;
                         }
+
+                    case PInvoke.WM_SETTINGCHANGE:
+                    case PInvoke.WM_SYSCOLORCHANGE:
+                    case PInvoke.WM_THEMECHANGED:
+                        // Dark mode and the accent color arrive as
+                        // "ImmersiveColorSet"; high contrast as a color change.
+                        // Rereading the settings is cheap, and the app ignores
+                        // a theme that didn't change.
+                        host.SystemThemeChanged?.Invoke();
+                        break;
 
                     case PInvoke.WM_DPICHANGED:
                         host.Scale = (wParam.Value & 0xFFFF) / 96.0f;

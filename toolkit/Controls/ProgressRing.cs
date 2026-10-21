@@ -69,13 +69,13 @@ namespace XForms.Toolkit
 
             float size = Math.Min(bounds.Width, bounds.Height);
             float strokeWidth = Math.Max(2, size / 10);
-            drawContext.DrawArc(bounds.Center, (size - strokeWidth) / 2, 0, 270, this.Theme.AccentColor, strokeWidth);
+            drawContext.DrawArc(bounds.Center, (size - strokeWidth) / 2, 0, 270, this.ActualTheme.Colors.Accent, strokeWidth);
         }
 
-        protected override void OnApplyTheme(
-            AppTheme theme)
+        protected override void OnThemeChanged(
+            Theme theme)
         {
-            base.OnApplyTheme(theme);
+            base.OnThemeChanged(theme);
 
             this.InvalidateVisual();
         }

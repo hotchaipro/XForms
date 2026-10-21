@@ -113,13 +113,13 @@ namespace XForms.Android.Renderers
             }
         }
 
-        public override void OnApplyTheme(
-            AppTheme theme)
+        public override void OnThemeChanged(
+            Theme theme)
         {
-            base.OnApplyTheme(theme);
+            base.OnThemeChanged(theme);
 
-            this._nativeTextEntry.SetTextColor(theme.ForegroundColor.ToAndroidColor());
-            this._nativeTextEntry.SetHintTextColor(theme.SubtleForegroundColor.ToAndroidColor());
+            this._nativeTextEntry.SetTextColor(theme.Colors.OnSurface.ToAndroidColor());
+            this._nativeTextEntry.SetHintTextColor(theme.Colors.SubtleForeground.ToAndroidColor());
         }
 
         public void Focus()

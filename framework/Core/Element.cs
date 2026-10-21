@@ -17,7 +17,11 @@ namespace XForms
 
         bool HasDescendant(Element element);
 
-        void OnApplyTheme(AppTheme theme);
+        /// <summary>
+        /// The element's effective theme, when its native object is created and
+        /// whenever the theme changes.
+        /// </summary>
+        void OnThemeChanged(Theme theme);
     }
 
     public abstract class Element
@@ -82,17 +86,12 @@ namespace XForms
 
         private IElementRenderer _renderer;
 
+        // The theme last given to OnThemeChanged
+        private Theme _deliveredTheme;
+
         protected Element()
         {
             this._properties = new Dictionary<IAttachedProperty, object>();
-
-            // TODO: Use a weak delegate
-            Application.Current.ThemeChanged += Application_ThemeChanged;
-
-            // NOTE: The theme is applied before any derived constructor runs, so
-            // values set by constructors and initializers take precedence. No
-            // native object exists yet: it's created when the element is attached.
-            this.OnApplyTheme(Application.Current.Theme);
         }
 
         protected Application Application
@@ -103,11 +102,34 @@ namespace XForms
             }
         }
 
-        protected AppTheme Theme
+        /// <summary>
+        /// The element's effective theme: its own (a view's
+        /// <see cref="View.Theme"/>), or else its parent's, or else the
+        /// application's.
+        /// </summary>
+        public Theme ActualTheme
         {
             get
             {
-                return Application.Current.Theme;
+                return this.LocalTheme ?? this.ParentElement?.ActualTheme ?? Application.Current.Theme;
+            }
+        }
+
+        // The theme set on the element itself, if any
+        internal virtual Theme LocalTheme
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        // The element whose theme this one inherits
+        internal virtual Element ParentElement
+        {
+            get
+            {
+                return null;
             }
         }
 
@@ -158,8 +180,40 @@ namespace XForms
             var renderer = this.CreateRenderer();
             this._renderer = renderer;
 
-            renderer.OnApplyTheme(this.Theme);
+            var theme = this.ActualTheme;
+            this._deliveredTheme = theme;
+            renderer.OnThemeChanged(theme);
             this.OnRendererCreated();
+
+            // Every constructor has run, and the native object exists
+            this.OnThemeChanged(theme);
+        }
+
+        /// <summary>
+        /// Gives the element and its descendants their effective themes, if
+        /// they changed: after the application's theme changes, a view's
+        /// <see cref="View.Theme"/> is set, or an element moves.
+        /// </summary>
+        internal void UpdateTheme()
+        {
+            if (null == this._renderer)
+            {
+                // Its theme is delivered when its native object is created
+                return;
+            }
+
+            var theme = this.ActualTheme;
+            if (!theme.Equals(this._deliveredTheme))
+            {
+                this._deliveredTheme = theme;
+                this._renderer.OnThemeChanged(theme);
+                this.OnThemeChanged(theme);
+            }
+
+            foreach (var child in this.GetChildElements())
+            {
+                child.UpdateTheme();
+            }
         }
 
         /// <summary>
@@ -204,17 +258,14 @@ namespace XForms
 
         internal abstract IEnumerable<Element> GetChildElements();
 
-        private void Application_ThemeChanged(
-            object sender,
-            AppTheme theme)
+        /// <summary>
+        /// Called with the element's effective theme once it's attached (every
+        /// constructor has run, and its native object exists), and whenever
+        /// that theme changes. Never called from a constructor.
+        /// </summary>
+        protected virtual void OnThemeChanged(
+            Theme theme)
         {
-            this.OnApplyTheme(theme);
-        }
-
-        protected virtual void OnApplyTheme(
-            AppTheme theme)
-        {
-            this._renderer?.OnApplyTheme(theme);
         }
     }
 }

@@ -278,14 +278,14 @@ namespace XForms.Win32.Renderers
             PInvoke.SetFocus(this._hwnd);
         }
 
-        public override void OnApplyTheme(
-            AppTheme theme)
+        public override void OnThemeChanged(
+            Theme theme)
         {
-            base.OnApplyTheme(theme);
+            base.OnThemeChanged(theme);
 
-            this._textColor = theme.ForegroundColor;
-            this._fieldColor = theme.SubtleBackgroundColor;
-            this._placeholderColor = theme.SubtleForegroundColor;
+            this._textColor = theme.Colors.OnSurface;
+            this._fieldColor = theme.Colors.Surface;
+            this._placeholderColor = theme.Colors.SubtleForeground;
             this.ApplyFormat();
             this.InvalidateRender();
         }

@@ -44,8 +44,8 @@ namespace XForms.Win32.Renderers
             return false;
         }
 
-        public virtual void OnApplyTheme(
-            AppTheme theme)
+        public virtual void OnThemeChanged(
+            Theme theme)
         {
         }
     }

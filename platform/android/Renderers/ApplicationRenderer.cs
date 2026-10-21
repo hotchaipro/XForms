@@ -28,6 +28,7 @@ namespace XForms.Android.Renderers
 
             androidApplication.Suspending += Application_Suspending;
             androidApplication.Resuming += Application_Resuming;
+            androidApplication.ConfigurationChanged += (sender, e) => this._applicationDelegate.NotifySystemThemeChanged();
         }
 
         public AndroidApplicationActivity Activity
@@ -70,16 +71,15 @@ namespace XForms.Android.Renderers
 
         private void UpdateSystemBars()
         {
-            // NOTE: The app may never set a theme explicitly
-            var theme = this.Theme ?? this._application.Theme;
-            bool isLightTheme = (theme == AppTheme.Light);
+            var theme = this._theme ?? this._application.Theme;
+            bool isLightTheme = (theme.Mode == ThemeMode.Light);
 
             // The status bar takes the title bar colors; the navigation bar follows the theme
             this._androidApplication.SetStatusBarColors(
-                this._titleBarAccentColor ?? theme.BackgroundColor,
+                this._titleBarAccentColor ?? theme.Colors.Background,
                 this._titleBarForegroundColor.HasValue ? !IsLightColor(this._titleBarForegroundColor.Value) : isLightTheme);
 
-            this._androidApplication.SetNavigationBarColors(theme.BackgroundColor, isLightTheme);
+            this._androidApplication.SetNavigationBarColors(theme.Colors.Background, isLightTheme);
         }
 
         private static bool IsLightColor(
@@ -89,17 +89,47 @@ namespace XForms.Android.Renderers
             return ((0.299 * color.R) + (0.587 * color.G) + (0.114 * color.B)) > 160;
         }
 
-        public Color AccentColor
-        {
-            get;
-            set;
-        }
-
-        public Color ForegroundColor
+        public ThemeMode SystemThemeMode
         {
             get
             {
-                return this.Theme.ForegroundColor;
+                var activity = this._androidApplication;
+
+                // Android 14 added a contrast setting; "high" is 1
+                if (global::Android.OS.Build.VERSION.SdkInt >= global::Android.OS.BuildVersionCodes.UpsideDownCake)
+                {
+                    var uiModeManager = (global::Android.App.UiModeManager)activity.GetSystemService(global::Android.Content.Context.UiModeService);
+                    if ((null != uiModeManager) && (uiModeManager.Contrast >= 0.99f))
+                    {
+                        return ThemeMode.HighContrast;
+                    }
+                }
+
+                var night = activity.Resources.Configuration.UiMode & global::Android.Content.Res.UiMode.NightMask;
+                return (night == global::Android.Content.Res.UiMode.NightYes) ? ThemeMode.Dark : ThemeMode.Light;
+            }
+        }
+
+        public Color? SystemAccentColor
+        {
+            get
+            {
+                // Android 12's dynamic color: the wallpaper's accent
+                if (global::Android.OS.Build.VERSION.SdkInt >= global::Android.OS.BuildVersionCodes.S)
+                {
+                    var color = this._androidApplication.Resources.GetColor(global::Android.Resource.Color.SystemAccent1500, null);
+                    return NativeConversions.FromAndroidColor(color);
+                }
+
+                return null;
+            }
+        }
+
+        public ColorScheme SystemHighContrastColors
+        {
+            get
+            {
+                return null;
             }
         }
 
@@ -122,19 +152,12 @@ namespace XForms.Android.Renderers
             this._androidApplication.Finish();
         }
 
-        public AppTheme Theme
-        {
-            get;
-            private set;
-        }
+        private Theme _theme;
 
         public void ApplyTheme(
-            AppTheme theme)
+            Theme theme)
         {
-            this.Theme = theme;
-
-            this.AccentColor = theme.AccentColor;
-
+            this._theme = theme;
             this.UpdateSystemBars();
         }
 

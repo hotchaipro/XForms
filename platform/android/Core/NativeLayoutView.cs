@@ -24,6 +24,13 @@ namespace XForms.Android
             }
 
             this._owner = owner;
+
+            // NOTE: XForms views don't clip their children unless ClipToBounds is
+            // set (which clips to the outline), as on the other platforms. By
+            // default Android clips each child to the child's bounds, which cuts
+            // off anything a descendant moves or scales outside them.
+            this.SetClipChildren(false);
+            this.SetClipToPadding(false);
         }
 
         protected override void OnMeasure(

@@ -35,13 +35,13 @@ namespace XForms.Toolkit
         {
             get
             {
-                if (this.Theme == AppTheme.Dark)
+                if (this.ActualTheme.Mode != ThemeMode.Light)
                 {
-                    return this.Theme.SubtleBackgroundColor;
+                    return this.ActualTheme.Colors.Surface;
                 }
                 else
                 {
-                    return this.Theme.AccentColor;
+                    return this.ActualTheme.Colors.Accent;
                 }
             }
         }

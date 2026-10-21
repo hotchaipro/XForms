@@ -18,8 +18,6 @@ namespace XForms.Test
 
         public TextAndListPage()
         {
-            this.BackgroundColor = this.Application.Theme.BackgroundColor;
-
             var pageLayout = new DockPanel();
 
             // Editor: a single-line title, a multiline note and an add button

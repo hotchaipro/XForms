@@ -70,11 +70,11 @@ namespace XForms.Toolkit
                 DrawingContext drawContext)
             {
                 var bounds = new Rect(0, 0, this.Bounds.Width, this.Bounds.Height);
-                var theme = this.Theme;
-                drawContext.FillRectangle(bounds, theme.BackgroundColor);
+                var theme = this.ActualTheme;
+                drawContext.FillRectangle(bounds, theme.Colors.Background);
                 drawContext.DrawRectangle(
                     bounds.Deflate(BorderThickness / 2, BorderThickness / 2),
-                    theme.SubtleForegroundColor.MultiplyAlpha(0.4f),
+                    theme.Colors.SubtleForeground.MultiplyAlpha(0.4f),
                     BorderThickness);
             }
         }

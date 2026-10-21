@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Windows.Input;
 using XForms.Input;
 using XForms.Layouts;
@@ -157,7 +157,7 @@ namespace XForms.Toolkit
         {
             get
             {
-                return this.Application.Theme.AccentColor;
+                return this.ActualTheme.Colors.Accent;
             }
         }
 
@@ -209,7 +209,7 @@ namespace XForms.Toolkit
         {
             if (this._ownAnimator.Scale != 1.0f)
             {
-                this._ownAnimator.ScaleTo(1.0f, TimeSpan.FromMilliseconds(100), new SpringEase(EasingMode.EaseOut));
+                this._ownAnimator.ScaleTo(1.0f, this.ActualTheme.Motion.Short, new SpringEase(EasingMode.EaseOut));
             }
         }
 

@@ -54,8 +54,6 @@ namespace XForms.Test
 
         public XamlPage()
         {
-            this.BackgroundColor = this.Application.Theme.BackgroundColor;
-
             var viewModel = new GreetingViewModel();
             var view = XamlLoader.Load(Markup, viewModel);
 

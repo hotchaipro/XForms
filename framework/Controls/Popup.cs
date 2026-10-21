@@ -176,6 +176,15 @@ namespace XForms.Controls
             return this.Application.Platform.CreatePopupRenderer(this);
         }
 
+        // A popup looks like the view it opens from
+        internal override Element ParentElement
+        {
+            get
+            {
+                return this._placementTarget;
+            }
+        }
+
         internal override IEnumerable<Element> GetChildElements()
         {
             var content = this.Content;

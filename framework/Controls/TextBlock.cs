@@ -408,7 +408,7 @@ namespace XForms.Controls
             if (this._verticalTextAlignment.HasValue) native.VerticalTextAlignment = this._verticalTextAlignment.Value;
             if (this._wordWrap.HasValue) native.WordWrap = this._wordWrap.Value;
             if (this._textTrimming.HasValue) native.TextTrimming = this._textTrimming.Value;
-            native.ForegroundColor = this._foreground ?? this.Theme.ForegroundColor;
+            native.ForegroundColor = this._foreground ?? this.ActualTheme.Colors.Foreground;
             if (this._backgroundColor.HasValue) native.BackgroundColor = this._backgroundColor.Value;
             if (this._strikethrough.HasValue) native.Strikethrough = this._strikethrough.Value;
             if (null != this._fontFamily) native.FontFamily = this._fontFamily;
@@ -417,14 +417,14 @@ namespace XForms.Controls
             if (null != this._text) native.Text = this._text;
         }
 
-        protected override void OnApplyTheme(
-            AppTheme theme)
+        protected override void OnThemeChanged(
+            Theme theme)
         {
-            base.OnApplyTheme(theme);
+            base.OnThemeChanged(theme);
 
             if (!this._foreground.HasValue)
             {
-                this.Native?.ForegroundColor = theme.ForegroundColor;
+                this.Native?.ForegroundColor = theme.Colors.Foreground;
             }
         }
 

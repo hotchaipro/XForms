@@ -34,8 +34,6 @@ namespace XForms.Test
             Clock.Restart();
             _lastFirstDrawTicks = 0;
 
-            this.BackgroundColor = this.Application.Theme.BackgroundColor;
-
             var pageLayout = new DockPanel();
 
             this._status = new TextBlock()
@@ -119,14 +117,14 @@ namespace XForms.Test
             DrawingContext drawContext,
             Rect bounds,
             int number,
-            AppTheme theme)
+            Theme theme)
         {
-            drawContext.FillRectangle(bounds, theme.SubtleBackgroundColor);
-            drawContext.DrawRectangle(bounds, theme.AccentColor, 1);
+            drawContext.FillRectangle(bounds, theme.Colors.Surface);
+            drawContext.DrawRectangle(bounds, theme.Colors.Accent, 1);
             drawContext.DrawText(
                 number.ToString(),
                 bounds,
-                theme.ForegroundColor,
+                theme.Colors.Foreground,
                 new TextFormat()
                 {
                     FontSize = 14,
@@ -156,7 +154,7 @@ namespace XForms.Test
             {
                 var bounds = new Rect(0, 0, this.Bounds.Width, this.Bounds.Height);
                 drawContext.Clear(Colors.Transparent);
-                DrawTile(drawContext, bounds, this._number, this.Theme);
+                DrawTile(drawContext, bounds, this._number, this.ActualTheme);
 
                 if (!this._hasDrawn)
                 {
@@ -196,7 +194,7 @@ namespace XForms.Test
                 {
                     float x = ((i % Columns) * slot) + (TileSpacing / 2);
                     float y = ((i / Columns) * slot) + (TileSpacing / 2);
-                    DrawTile(drawContext, new Rect(x, y, TileSize, TileSize), i, this.Theme);
+                    DrawTile(drawContext, new Rect(x, y, TileSize, TileSize), i, this.ActualTheme);
                 }
 
                 if (!this._hasDrawn)

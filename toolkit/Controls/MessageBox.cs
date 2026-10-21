@@ -94,8 +94,6 @@ namespace XForms.Toolkit
             buttonsLayout.Children.Add(okButton);
 
             this.Content = contentLayout;
-
-            this.OnApplyTheme(this.Application.Theme); // HACK
         }
 
         private void CancelButton_Clicked(
@@ -125,25 +123,12 @@ namespace XForms.Toolkit
             return result;
         }
 
-        protected override void OnApplyTheme(
-            AppTheme theme)
+        protected override void OnThemeChanged(
+            Theme theme)
         {
-            // HACK
-            if (null == this._message)
-            {
-                return;
-            }
+            base.OnThemeChanged(theme);
 
-            base.OnApplyTheme(theme);
-
-            if (theme == AppTheme.Dark)
-            {
-                this._messageView.Foreground = Colors.White;
-            }
-            else
-            {
-                this._messageView.Foreground = Colors.Black;
-            }
+            this._messageView.Foreground = theme.Colors.OnSurface;
         }
 
         protected override void OnClosed()

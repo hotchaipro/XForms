@@ -153,14 +153,14 @@ namespace XForms.iOS.Renderers
             this.Editor.BecomeFirstResponder();
         }
 
-        public override void OnApplyTheme(
-            AppTheme theme)
+        public override void OnThemeChanged(
+            Theme theme)
         {
-            base.OnApplyTheme(theme);
+            base.OnThemeChanged(theme);
 
-            this._textColor = theme.ForegroundColor.ToUIColor();
-            this._tintColor = theme.AccentColor.ToUIColor();
-            this._placeholderLabel.TextColor = theme.SubtleForegroundColor.ToUIColor();
+            this._textColor = theme.Colors.OnSurface.ToUIColor();
+            this._tintColor = theme.Colors.Accent.ToUIColor();
+            this._placeholderLabel.TextColor = theme.Colors.SubtleForeground.ToUIColor();
 
             this.ApplyColors();
         }

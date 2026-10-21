@@ -289,6 +289,9 @@ namespace XForms
         /// </summary>
         internal void NotifyAttached()
         {
+            // A view that moved may now inherit a different theme
+            this.UpdateTheme();
+
             this.OnAttached();
             this.Attached?.Invoke(this, EventArgs.Empty);
         }
@@ -317,6 +320,48 @@ namespace XForms
         }
 
         #endregion Attach
+
+        #region Theme
+
+        private Theme _theme;
+
+        /// <summary>
+        /// A theme for this view and its descendants, or null (the default) to
+        /// inherit its parent's. Use it for a section that looks different,
+        /// such as a dark banner in a light app.
+        /// </summary>
+        public Theme Theme
+        {
+            get
+            {
+                return this._theme;
+            }
+
+            set
+            {
+                this._theme = value;
+                this.UpdateTheme();
+                this.OnPropertyChanged();
+            }
+        }
+
+        internal override Theme LocalTheme
+        {
+            get
+            {
+                return this._theme;
+            }
+        }
+
+        internal override Element ParentElement
+        {
+            get
+            {
+                return this.Parent;
+            }
+        }
+
+        #endregion Theme
 
         #region Animation
 

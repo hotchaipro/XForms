@@ -397,7 +397,7 @@ namespace XForms.Toolkit
 
             this._contentLayout.Animator.Translation = new Point(position, 0);
             this._swipeItem.Animator.Translation = new Point(position - (direction * this.Bounds.Size.Width), 0);
-            float dimmedOpacity = (Application.Current.Theme == AppTheme.Light ? 0.1f : 0.25f);
+            float dimmedOpacity = (this.ActualTheme.Mode == ThemeMode.Light ? 0.1f : 0.25f);
             this._swipeItem.Animator.Opacity = (this._swipeEnabled ? 1.0f : dimmedOpacity);
 
             return true;
@@ -475,8 +475,8 @@ namespace XForms.Toolkit
                 return;
             }
 
-            this._contentLayout.Animator.TranslateTo(new Point(direction * this.Bounds.Size.Width, 0), TimeSpan.FromMilliseconds(100), new CubicEase(EasingMode.EaseInOut));
-            this._swipeItem.Animator.TranslateTo(new Point(0, 0), TimeSpan.FromMilliseconds(100), new CubicEase(EasingMode.EaseInOut)).Completion.ContinueWith((ignore) =>
+            this._contentLayout.Animator.TranslateTo(new Point(direction * this.Bounds.Size.Width, 0), this.ActualTheme.Motion.Short, new CubicEase(EasingMode.EaseInOut));
+            this._swipeItem.Animator.TranslateTo(new Point(0, 0), this.ActualTheme.Motion.Short, new CubicEase(EasingMode.EaseInOut)).Completion.ContinueWith((ignore) =>
             {
                 Application.InvokeOnUIThreadAsync(() =>
                 {
@@ -496,9 +496,9 @@ namespace XForms.Toolkit
                 return;
             }
 
-            this._contentLayout.Animator.TranslateTo(Point.Zero, TimeSpan.FromMilliseconds(100), new CubicEase(EasingMode.EaseInOut));
+            this._contentLayout.Animator.TranslateTo(Point.Zero, this.ActualTheme.Motion.Short, new CubicEase(EasingMode.EaseInOut));
             this._swipeItem.Animator.TranslateTo(
-                new Point(-direction * this.Bounds.Size.Width, 0), TimeSpan.FromMilliseconds(100), new CubicEase(EasingMode.EaseInOut)).Completion.ContinueWith(
+                new Point(-direction * this.Bounds.Size.Width, 0), this.ActualTheme.Motion.Short, new CubicEase(EasingMode.EaseInOut)).Completion.ContinueWith(
                 (ignore) => { this._swipeItem.Animator.Translation = new XForms.Point(-1000, 0); }, TaskContinuationOptions.ExecuteSynchronously);
         }
 

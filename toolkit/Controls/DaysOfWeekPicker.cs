@@ -190,18 +190,18 @@ namespace XForms.Toolkit
 
             if (this._isTouchDown)
             {
-                drawContext.FillEllipse(buttonBounds, this.Theme.SubtleForegroundColor);
+                drawContext.FillEllipse(buttonBounds, this.ActualTheme.Colors.SubtleForeground);
                 drawContext.DrawText(this._text, textBounds, Colors.White, this._textFormat);
             }
             else if (this.IsChecked)
             {
-                drawContext.FillEllipse(buttonBounds, this.Theme.AccentColor);
+                drawContext.FillEllipse(buttonBounds, this.ActualTheme.Colors.Accent);
                 drawContext.DrawText(this._text, textBounds, Colors.White, this._textFormat);
             }
             else
             {
-                drawContext.DrawEllipse(buttonBounds.Center, buttonRadius - 1.0f, buttonRadius - 1.0f, this.Theme.SubtleForegroundColor, strokeWidth: 1.0f);
-                drawContext.DrawText(this._text, textBounds, this.Theme.SubtleForegroundColor, this._textFormat);
+                drawContext.DrawEllipse(buttonBounds.Center, buttonRadius - 1.0f, buttonRadius - 1.0f, this.ActualTheme.Colors.SubtleForeground, strokeWidth: 1.0f);
+                drawContext.DrawText(this._text, textBounds, this.ActualTheme.Colors.SubtleForeground, this._textFormat);
             }
         }
 
@@ -213,11 +213,11 @@ namespace XForms.Toolkit
             }
             else if (this.IsChecked)
             {
-                this._ownAnimator.ScaleTo(1.0f, TimeSpan.FromMilliseconds(100), new CubicEase(EasingMode.EaseIn));
+                this._ownAnimator.ScaleTo(1.0f, this.ActualTheme.Motion.Short, new CubicEase(EasingMode.EaseIn));
             }
             else
             {
-                this._ownAnimator.ScaleTo(IsUncheckedScale, TimeSpan.FromMilliseconds(100), new CubicEase(EasingMode.EaseOut));
+                this._ownAnimator.ScaleTo(IsUncheckedScale, this.ActualTheme.Motion.Short, new CubicEase(EasingMode.EaseOut));
             }
         }
 

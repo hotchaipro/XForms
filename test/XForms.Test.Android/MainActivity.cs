@@ -7,6 +7,8 @@ namespace XForms.Test
 {
     [Activity(
         Label = "XForms Test",
+        // Dark mode changes in place; XForms restyles the views
+        ConfigurationChanges = global::Android.Content.PM.ConfigChanges.UiMode,
         MainLauncher = true,
         Icon = "@drawable/icon")]
     public class MainActivity : AndroidApplicationActivity
@@ -22,6 +24,7 @@ namespace XForms.Test
             {
                 // An intent extra picks another page: adb shell am start ... --es page benchmark-views
                 TestApp.StartPage = this.Intent?.GetStringExtra("page");
+                TestApp.ThemeModeSwitches = this.Intent?.GetStringExtra("themes");
 
                 var platform = new AndroidPlatform(this);
                 this._app = new TestApp(platform);

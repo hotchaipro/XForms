@@ -86,29 +86,29 @@ namespace XForms.Toolkit
             DrawingContext drawContext)
         {
             var bounds = new Rect(0, 0, this.Bounds.Width, this.Bounds.Height);
-            var theme = this.Theme;
+            var theme = this.ActualTheme;
 
             drawContext.Clear(Colors.Transparent);
-            drawContext.FillRectangle(bounds, theme.SubtleBackgroundColor);
+            drawContext.FillRectangle(bounds, theme.Colors.Surface);
             if (this._isPressed)
             {
-                drawContext.FillRectangle(bounds, theme.ForegroundColor.MultiplyAlpha(0.08f));
+                drawContext.FillRectangle(bounds, theme.Colors.Foreground.MultiplyAlpha(0.08f));
             }
 
             var textBounds = new Rect(TextInset, 0, Math.Max(0, bounds.Width - TextInset - GlyphWidth), bounds.Height);
             drawContext.DrawText(
                 this.DisplayText,
                 textBounds,
-                this.IsPlaceholder ? theme.SubtleForegroundColor : theme.ForegroundColor,
+                this.IsPlaceholder ? theme.Colors.SubtleForeground : theme.Colors.Foreground,
                 this.CreateTextFormat());
 
-            this.DrawGlyph(drawContext, new Rect(bounds.Width - GlyphWidth, 0, GlyphWidth, bounds.Height), theme.SubtleForegroundColor);
+            this.DrawGlyph(drawContext, new Rect(bounds.Width - GlyphWidth, 0, GlyphWidth, bounds.Height), theme.Colors.SubtleForeground);
         }
 
-        protected override void OnApplyTheme(
-            AppTheme theme)
+        protected override void OnThemeChanged(
+            Theme theme)
         {
-            base.OnApplyTheme(theme);
+            base.OnThemeChanged(theme);
 
             this.InvalidateVisual();
         }
@@ -204,12 +204,12 @@ namespace XForms.Toolkit
         protected internal static void DrawPopupFrame(
             DrawingContext drawContext,
             Rect bounds,
-            AppTheme theme)
+            Theme theme)
         {
-            drawContext.FillRectangle(bounds, theme.BackgroundColor);
+            drawContext.FillRectangle(bounds, theme.Colors.Background);
             drawContext.DrawRectangle(
                 bounds.Deflate(PopupBorderThickness / 2, PopupBorderThickness / 2),
-                theme.SubtleForegroundColor.MultiplyAlpha(0.4f),
+                theme.Colors.SubtleForeground.MultiplyAlpha(0.4f),
                 PopupBorderThickness);
         }
 

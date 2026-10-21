@@ -60,7 +60,7 @@ namespace XForms.Toolkit
         {
             get
             {
-                return this.Theme.AccentColor;
+                return this.ActualTheme.Colors.Accent;
             }
         }
 
@@ -78,13 +78,13 @@ namespace XForms.Toolkit
             {
                 if (this.IsSubtleStyle)
                 {
-                    if (this.Theme == AppTheme.Dark)
+                    if (this.ActualTheme.Mode != ThemeMode.Light)
                     {
-                        return this.Theme.ForegroundColor;
+                        return this.ActualTheme.Colors.Foreground;
                     }
                     else
                     {
-                        return this.Theme.ForegroundColor;
+                        return this.ActualTheme.Colors.Foreground;
                     }
                 }
                 else
@@ -100,18 +100,18 @@ namespace XForms.Toolkit
             {
                 if (this.IsSubtleStyle)
                 {
-                    if (this.Theme == AppTheme.Dark)
+                    if (this.ActualTheme.Mode != ThemeMode.Light)
                     {
                         return Color.FromRgb(0x33, 0x33, 0x33);
                     }
                     else
                     {
-                        return this.Theme.BackgroundColor;
+                        return this.ActualTheme.Colors.Background;
                     }
                 }
                 else
                 {
-                    return this.Theme.AccentColor;
+                    return this.ActualTheme.Colors.Accent;
                 }
             }
         }

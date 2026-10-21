@@ -12,8 +12,7 @@ namespace XForms.Android.Renderers
         where TNativeElement : AndroidView
     {
         private AndroidView _nativeView;
-        private AnimationLayer[] _layers;
-        private AndroidView _rootView;
+        private AnimationLayerStack _layers;
 
         public ViewRenderer(
             global::Android.Content.Context context,
@@ -63,7 +62,7 @@ namespace XForms.Android.Renderers
 
             set
             {
-                var nativeView = this._rootView ?? this._nativeView;
+                var nativeView = this._nativeView;
                 if (null != nativeView)
                 {
                     nativeView.Visibility = (value ? global::Android.Views.ViewStates.Visible : global::Android.Views.ViewStates.Gone);
@@ -115,21 +114,14 @@ namespace XForms.Android.Renderers
             // such as ListView lay out their content using the mode of the last
             // measure, not just its size. Android caches measurements per spec,
             // so this costs nothing when the view hasn't changed.
-            // A wrapping animation layer fills itself with the view
-            var rootView = this._rootView ?? nativeView;
-            rootView.Measure(
+            nativeView.Measure(
                 AndroidView.MeasureSpec.MakeMeasureSpec(right - left, MeasureSpecMode.Exactly),
                 AndroidView.MeasureSpec.MakeMeasureSpec(bottom - top, MeasureSpecMode.Exactly));
 
-            rootView.Layout(left, top, right, bottom);
+            nativeView.Layout(left, top, right, bottom);
 
-            if (null != this._layers)
-            {
-                foreach (var layer in this._layers)
-                {
-                    layer.UpdatePivot();
-                }
-            }
+            // The transform origin follows the size
+            this._layers?.Update();
         }
 
         public virtual void InvalidateMeasure()
@@ -232,36 +224,8 @@ namespace XForms.Android.Renderers
                 throw new InvalidOperationException("The view's animation layers can't be created.");
             }
 
-            // The innermost layer is the view itself; outer ones are views that
-            // wrap it, each filling the one outside it
-            float density = this.DevicePixelsToPixels(1);
-            var layers = new AnimationLayer[count];
-            layers[count - 1] = new AnimationLayer(nativeView, density);
-
-            AndroidView inner = nativeView;
-            for (int i = count - 2; i >= 0; i -= 1)
-            {
-                var wrapper = new AnimationLayerView(this.NativeContext);
-                wrapper.AddView(inner);
-                layers[i] = new AnimationLayer(wrapper, density);
-                inner = wrapper;
-            }
-
-            if (inner != nativeView)
-            {
-                this._rootView = inner;
-            }
-
-            this._layers = layers;
-            return layers;
-        }
-
-        protected override object RootNativeElement
-        {
-            get
-            {
-                return (object)this._rootView ?? this.NativeElement;
-            }
+            this._layers = new AnimationLayerStack(nativeView, this.DevicePixelsToPixels(1), count);
+            return this._layers.Layers;
         }
 
         public bool Focus()

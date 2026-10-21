@@ -1,80 +1,127 @@
 using System;
+using System.Collections.Generic;
 using Android.Animation;
 using Android.Views;
-using AndroidContext = Android.Content.Context;
 using AndroidRect = Android.Graphics.Rect;
 using AndroidView = Android.Views.View;
 
 namespace XForms.Android
 {
     /// <summary>
-    /// An animator's layer: a view's render properties (translation, scale,
-    /// rotation, alpha and clip bounds), set directly or animated with property
-    /// animators.
+    /// A view's animation layers, composed onto the view's own render
+    /// properties: translation, scale, rotation, alpha, and an outline clip.
     /// </summary>
-    internal sealed class AnimationLayer : IAnimationLayer
+    /// <remarks>
+    /// Layers aren't wrapper views: a parent clips each child to the child's
+    /// own bounds, so a wrapper would cut off an inner layer that moves out of
+    /// it. Android's property animators run on the UI thread either way.
+    /// </remarks>
+    internal sealed class AnimationLayerStack
     {
-        private const int ChannelCount = 10;
-
         private readonly AndroidView _view;
         private readonly float _density;
-        private readonly ValueAnimator[] _animators = new ValueAnimator[ChannelCount];
+        private readonly AnimationLayer[] _layers;
 
-        // Clip edges, in device-independent pixels
-        private readonly float[] _clip = new float[4];
-        private Point _transformOrigin = new Point(0.5f, 0.5f);
-        private bool _isClipEnabled;
-
-        // The clip is the view's outline while it's enabled; the view's own
+        // The clip is the view's outline while a layer clips; the view's own
         // outline (for ClipToBounds) is restored after
         private ClipOutlineProvider _clipOutline;
         private ViewOutlineProvider _savedOutline;
         private bool _savedClipToOutline;
+        private bool _isClipping;
 
-        public AnimationLayer(
+        public AnimationLayerStack(
             AndroidView view,
-            float density)
+            float density,
+            int count)
         {
             this._view = view;
             this._density = density;
+            this._layers = new AnimationLayer[count];
+            for (int i = 0; i < count; i += 1)
+            {
+                this._layers[i] = new AnimationLayer(this);
+            }
         }
 
-        public AndroidView View
+        public IAnimationLayer[] Layers
         {
             get
             {
-                return this._view;
+                return this._layers;
             }
         }
 
-        public Point TransformOrigin
+        /// <summary>
+        /// Applies the layers' values, outermost first: a layer's translation
+        /// moves with the scale and rotation of the layers outside it, and
+        /// scales, rotations, opacities and clips combine.
+        /// </summary>
+        public void Update()
         {
-            set
-            {
-                this._transformOrigin = value;
-                this.UpdatePivot();
-            }
-        }
+            float x = 0, y = 0, scaleX = 1, scaleY = 1, rotation = 0, opacity = 1;
+            float clipLeft = float.NegativeInfinity, clipTop = float.NegativeInfinity;
+            float clipRight = float.PositiveInfinity, clipBottom = float.PositiveInfinity;
+            bool isClipping = false;
+            Point origin = new Point(0.5f, 0.5f);
 
-        public bool IsClipEnabled
-        {
-            set
+            foreach (var layer in this._layers)
             {
-                if (value == this._isClipEnabled)
+                var values = layer.Values;
+                double radians = rotation * Math.PI / 180;
+                float cos = (float)Math.Cos(radians), sin = (float)Math.Sin(radians);
+                float tx = values[(int)AnimationChannel.TranslationX];
+                float ty = values[(int)AnimationChannel.TranslationY];
+                x += scaleX * ((cos * tx) - (sin * ty));
+                y += scaleY * ((sin * tx) + (cos * ty));
+
+                scaleX *= values[(int)AnimationChannel.ScaleX];
+                scaleY *= values[(int)AnimationChannel.ScaleY];
+                rotation += values[(int)AnimationChannel.Rotation];
+                opacity *= values[(int)AnimationChannel.Opacity];
+
+                if (layer.IsClipEnabledValue)
                 {
-                    return;
+                    isClipping = true;
+                    clipLeft = Math.Max(clipLeft, values[(int)AnimationChannel.ClipLeft]);
+                    clipTop = Math.Max(clipTop, values[(int)AnimationChannel.ClipTop]);
+                    clipRight = Math.Min(clipRight, values[(int)AnimationChannel.ClipRight]);
+                    clipBottom = Math.Min(clipBottom, values[(int)AnimationChannel.ClipBottom]);
                 }
 
-                this._isClipEnabled = value;
-                var view = this._view;
-                if (value)
+                origin = layer.Origin;
+            }
+
+            var view = this._view;
+            view.TranslationX = x * this._density;
+            view.TranslationY = y * this._density;
+            view.ScaleX = scaleX;
+            view.ScaleY = scaleY;
+            view.Rotation = rotation;
+            view.Alpha = opacity;
+            view.PivotX = origin.X * view.Width;
+            view.PivotY = origin.Y * view.Height;
+
+            this.UpdateClip(isClipping, clipLeft, clipTop, clipRight, clipBottom);
+        }
+
+        private void UpdateClip(
+            bool isClipping,
+            float left,
+            float top,
+            float right,
+            float bottom)
+        {
+            var view = this._view;
+            if (isClipping != this._isClipping)
+            {
+                this._isClipping = isClipping;
+                if (isClipping)
                 {
                     this._savedOutline = view.OutlineProvider;
                     this._savedClipToOutline = view.ClipToOutline;
                     this._clipOutline ??= new ClipOutlineProvider();
                     view.OutlineProvider = this._clipOutline;
                     view.ClipToOutline = true;
-                    this.UpdateClip();
                 }
                 else
                 {
@@ -83,32 +130,18 @@ namespace XForms.Android
                     this._savedOutline = null;
                 }
             }
-        }
 
-        /// <summary>
-        /// Updates the pivot to the view's size.
-        /// </summary>
-        public void UpdatePivot()
-        {
-            this._view.PivotX = this._transformOrigin.X * this._view.Width;
-            this._view.PivotY = this._transformOrigin.Y * this._view.Height;
-        }
-
-        private void UpdateClip()
-        {
-            if (!this._isClipEnabled)
+            if (isClipping)
             {
-                return;
+                // NOTE: View.ClipBounds didn't clip an owner-drawn layout view
+                // on API 36; outline clipping does
+                this._clipOutline.Rect = new AndroidRect(
+                    (int)Math.Round(left * this._density),
+                    (int)Math.Round(top * this._density),
+                    (int)Math.Round(right * this._density),
+                    (int)Math.Round(bottom * this._density));
+                view.InvalidateOutline();
             }
-
-            // NOTE: View.ClipBounds didn't clip on the render thread here (an
-            // owner-drawn layout view on API 36); outline clipping does
-            this._clipOutline.Rect = new AndroidRect(
-                (int)Math.Round(this._clip[0] * this._density),
-                (int)Math.Round(this._clip[1] * this._density),
-                (int)Math.Round(this._clip[2] * this._density),
-                (int)Math.Round(this._clip[3] * this._density));
-            this._view.InvalidateOutline();
         }
 
         private sealed class ClipOutlineProvider : ViewOutlineProvider
@@ -120,7 +153,7 @@ namespace XForms.Android
                 global::Android.Graphics.Outline outline)
             {
                 var rect = this.Rect;
-                if (rect.IsEmpty)
+                if ((rect.Width() <= 0) || (rect.Height() <= 0))
                 {
                     // An empty outline doesn't clip; clip to a pixel outside
                     // the view instead, which shows nothing
@@ -132,33 +165,57 @@ namespace XForms.Android
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// One animator's layer: its channels' values, set directly or animated by
+    /// value animators, composed by its stack.
+    /// </summary>
+    internal sealed class AnimationLayer : IAnimationLayer
+    {
+        private const int ChannelCount = 10;
+
+        private readonly AnimationLayerStack _stack;
+        private readonly ValueAnimator[] _animators = new ValueAnimator[ChannelCount];
+
+        public AnimationLayer(
+            AnimationLayerStack stack)
+        {
+            this._stack = stack;
+        }
+
+        // The channels' values now, in device-independent pixels and degrees
+        public float[] Values { get; } = { 0, 0, 1, 1, 0, 1, 0, 0, 0, 0 };
+
+        public Point Origin { get; private set; } = new Point(0.5f, 0.5f);
+
+        public bool IsClipEnabledValue { get; private set; }
+
+        public Point TransformOrigin
+        {
+            set
+            {
+                this.Origin = value;
+                this._stack.Update();
+            }
+        }
+
+        public bool IsClipEnabled
+        {
+            set
+            {
+                this.IsClipEnabledValue = value;
+                this._stack.Update();
+            }
+        }
 
         public void SetValue(
             AnimationChannel channel,
             float value)
         {
             this.Cancel(channel);
-            this.Apply(channel, value);
-        }
-
-        private void Apply(
-            AnimationChannel channel,
-            float value)
-        {
-            var view = this._view;
-            switch (channel)
-            {
-                case AnimationChannel.TranslationX: view.TranslationX = value * this._density; break;
-                case AnimationChannel.TranslationY: view.TranslationY = value * this._density; break;
-                case AnimationChannel.ScaleX: view.ScaleX = value; break;
-                case AnimationChannel.ScaleY: view.ScaleY = value; break;
-                case AnimationChannel.Rotation: view.Rotation = value; break;
-                case AnimationChannel.Opacity: view.Alpha = value; break;
-                default:
-                    this._clip[channel - AnimationChannel.ClipLeft] = value;
-                    this.UpdateClip();
-                    break;
-            }
+            this.Values[(int)channel] = value;
+            this._stack.Update();
         }
 
         public void Animate(
@@ -169,20 +226,12 @@ namespace XForms.Android
         {
             this.Cancel(channel);
 
-            ValueAnimator animator;
-            string property = PropertyName(channel);
-            if (null != property)
+            var animator = ValueAnimator.OfFloat(from, to);
+            animator.Update += (sender, e) =>
             {
-                // The view's own property: the render thread can draw it without
-                // the view redrawing
-                float scale = ((channel == AnimationChannel.TranslationX) || (channel == AnimationChannel.TranslationY)) ? this._density : 1;
-                animator = ObjectAnimator.OfFloat(this._view, property, from * scale, to * scale);
-            }
-            else
-            {
-                animator = ValueAnimator.OfFloat(from, to);
-                animator.Update += (sender, e) => this.Apply(channel, (float)e.Animation.AnimatedValue);
-            }
+                this.Values[(int)channel] = (float)e.Animation.AnimatedValue;
+                this._stack.Update();
+            };
 
             animator.SetDuration((long)Math.Max(1, timing.Duration.TotalMilliseconds));
             animator.StartDelay = (long)timing.Delay.TotalMilliseconds;
@@ -192,6 +241,10 @@ namespace XForms.Android
                 animator.RepeatCount = timing.Loop ? ValueAnimator.Infinite : 1;
                 animator.RepeatMode = timing.AutoReverse ? ValueAnimatorRepeatMode.Reverse : ValueAnimatorRepeatMode.Restart;
             }
+
+            // Start where it starts (a delayed animation holds its first value)
+            this.Values[(int)channel] = from;
+            this._stack.Update();
 
             this._animators[(int)channel] = animator;
             animator.Start();
@@ -206,21 +259,6 @@ namespace XForms.Android
                 this._animators[(int)channel] = null;
                 animator.Cancel();
                 animator.Dispose();
-            }
-        }
-
-        private static string PropertyName(
-            AnimationChannel channel)
-        {
-            switch (channel)
-            {
-                case AnimationChannel.TranslationX: return "translationX";
-                case AnimationChannel.TranslationY: return "translationY";
-                case AnimationChannel.ScaleX: return "scaleX";
-                case AnimationChannel.ScaleY: return "scaleY";
-                case AnimationChannel.Rotation: return "rotation";
-                case AnimationChannel.Opacity: return "alpha";
-                default: return null;
             }
         }
 
@@ -249,57 +287,6 @@ namespace XForms.Android
                 int index = Math.Min(Samples - 1, (int)position);
                 float fraction = position - index;
                 return this._table[index] + ((this._table[index + 1] - this._table[index]) * fraction);
-            }
-        }
-    }
-
-    /// <summary>
-    /// A view that wraps another, filling it, so an outer animator's render
-    /// properties apply on top of the inner one's.
-    /// </summary>
-    internal sealed class AnimationLayerView : ViewGroup
-    {
-        public AnimationLayerView(
-            AndroidContext context)
-            : base(context)
-        {
-            // A scaled or moved child may draw outside the wrapper
-            this.SetClipChildren(false);
-            this.SetClipToPadding(false);
-        }
-
-        protected override void OnMeasure(
-            int widthMeasureSpec,
-            int heightMeasureSpec)
-        {
-            var child = (0 < this.ChildCount) ? this.GetChildAt(0) : null;
-            if (null != child)
-            {
-                child.Measure(widthMeasureSpec, heightMeasureSpec);
-                this.SetMeasuredDimension(child.MeasuredWidth, child.MeasuredHeight);
-            }
-            else
-            {
-                this.SetMeasuredDimension(MeasureSpec.GetSize(widthMeasureSpec), MeasureSpec.GetSize(heightMeasureSpec));
-            }
-        }
-
-        protected override void OnLayout(
-            bool changed,
-            int left,
-            int top,
-            int right,
-            int bottom)
-        {
-            var child = (0 < this.ChildCount) ? this.GetChildAt(0) : null;
-            if (null != child)
-            {
-                int width = right - left;
-                int height = bottom - top;
-                child.Measure(
-                    MeasureSpec.MakeMeasureSpec(width, MeasureSpecMode.Exactly),
-                    MeasureSpec.MakeMeasureSpec(height, MeasureSpecMode.Exactly));
-                child.Layout(0, 0, width, height);
             }
         }
     }

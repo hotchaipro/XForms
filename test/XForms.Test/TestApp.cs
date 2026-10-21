@@ -23,6 +23,17 @@ namespace XForms.Test
             set;
         }
 
+        /// <summary>
+        /// For testing theme changes without input: modes ("light", "dark",
+        /// "highcontrast" or "system") to switch to in turn, two seconds
+        /// apart, separated by commas.
+        /// </summary>
+        public static string ThemeModeSwitches
+        {
+            get;
+            set;
+        }
+
         protected override void OnStart()
         {
             base.OnStart();
@@ -30,8 +41,27 @@ namespace XForms.Test
             StartAsync();
         }
 
+        private async void SwitchThemeModesAsync()
+        {
+            foreach (string name in ThemeModeSwitches.Split(','))
+            {
+                await System.Threading.Tasks.Task.Delay(2000);
+                this.RequestedThemeMode = name.Trim().ToLowerInvariant() switch
+                {
+                    "light" => ThemeMode.Light,
+                    "dark" => ThemeMode.Dark,
+                    "highcontrast" => ThemeMode.HighContrast,
+                    _ => null,
+                };
+            }
+        }
+
         private async void StartAsync()
         {
+            if (!string.IsNullOrEmpty(ThemeModeSwitches))
+            {
+                this.SwitchThemeModesAsync();
+            }
             await ThemeResources.Default.LoadResourcesAsync();
 
             switch (StartPage?.ToLowerInvariant())
@@ -58,6 +88,10 @@ namespace XForms.Test
 
                 case "panels":
                     this.NavigateTo(new PanelsPage());
+                    return;
+
+                case "theme":
+                    this.NavigateTo(new ThemePage());
                     return;
 
                 case "animation":

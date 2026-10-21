@@ -9,6 +9,12 @@ namespace XForms
         void NotifySuspend();
 
         void NotifyResume();
+
+        /// <summary>
+        /// The system's theme mode, accent color or high-contrast colors
+        /// changed.
+        /// </summary>
+        void NotifySystemThemeChanged();
     }
 
     public interface IApplicationRenderer
@@ -27,17 +33,32 @@ namespace XForms
 
         void Exit();
 
-        void ApplyTheme(AppTheme theme);
+        /// <summary>
+        /// Styles the platform's own parts (title bar, system bars) for the
+        /// application's theme.
+        /// </summary>
+        void ApplyTheme(Theme theme);
+
+        /// <summary>
+        /// The system's theme mode: dark mode, or a high-contrast setting.
+        /// </summary>
+        ThemeMode SystemThemeMode { get; }
+
+        /// <summary>
+        /// The system's accent color, or null where there isn't one.
+        /// </summary>
+        Color? SystemAccentColor { get; }
+
+        /// <summary>
+        /// The system's high-contrast colors, or null to use XForms' own.
+        /// </summary>
+        ColorScheme SystemHighContrastColors { get; }
 
         Color? TitleBarAccentColor { get; set; }
 
         Color? TitleBarForegroundColor { get; set; }
 
         Version GetVersion();
-
-        Color AccentColor { get; set; }
-
-        Color ForegroundColor { get; }
     }
 
     public abstract class Application : IApplicationDelegate
@@ -47,12 +68,17 @@ namespace XForms
         private IPlatform _platform;
         private Frame _rootFrame;
         private readonly List<Popup> _openPopups = new List<Popup>();
-        private AppTheme _appTheme;
-        private ThemeColor _accentColor;
+        private ThemeMode? _requestedThemeMode;
+        private Color? _accentColor;
+        private Theme _theme;
 
         public static float TouchSlop = 15.0f;
 
-        public event EventHandler<AppTheme> ThemeChanged;
+        /// <summary>
+        /// Raised when the application's theme changes: its mode, accent color
+        /// or design tokens.
+        /// </summary>
+        public event EventHandler ThemeChanged;
 
         public static Application Current
         {
@@ -80,7 +106,6 @@ namespace XForms
 
             this._rootFrame = new Frame();
 
-            this._accentColor = AppTheme.DefaultAccentColor;
         }
 
         internal IPlatform Platform
@@ -97,13 +122,7 @@ namespace XForms
             private set;
         }
 
-        public Color ForegroundColor
-        {
-            get
-            {
-                return this.Renderer.ForegroundColor;
-            }
-        }
+
 
         public TitleBar TitleBar
         {
@@ -114,34 +133,76 @@ namespace XForms
         {
             this.Renderer.SetRootFrame(this._rootFrame);
 
+            // The platform's own parts exist once the root is set
+            var theme = this.Theme;
+            this.Renderer.ApplyTheme(theme);
+            this.OnThemeChanged(theme);
+
             this.OnStart();
 
             this.OnLoadResources();
         }
 
-        public AppTheme Theme
+        /// <summary>
+        /// The application's theme: the one <see cref="CreateTheme"/> builds for
+        /// the actual mode and accent color. Views inherit it unless they set
+        /// their own <see cref="View.Theme"/>.
+        /// </summary>
+        public Theme Theme
         {
             get
             {
-                return this._appTheme ?? AppTheme.Light;
+                return this._theme ??= this.CreateTheme(this.ActualThemeMode, this.ActualAccentColor);
+            }
+        }
+
+        /// <summary>
+        /// The mode the app asks for, or null (the default) to follow the
+        /// system.
+        /// </summary>
+        public ThemeMode? RequestedThemeMode
+        {
+            get
+            {
+                return this._requestedThemeMode;
             }
 
             set
             {
-                this._appTheme = value;
-
-                if (null == value)
-                {
-                    this.ApplyTheme(AppTheme.Light);
-                }
-                else
-                {
-                    this.ApplyTheme(value);
-                }
+                this._requestedThemeMode = value;
+                this.UpdateTheme();
             }
         }
 
-        public ThemeColor AccentColor
+        /// <summary>
+        /// The system's theme mode.
+        /// </summary>
+        public ThemeMode SystemThemeMode
+        {
+            get
+            {
+                return this.Renderer.SystemThemeMode;
+            }
+        }
+
+        /// <summary>
+        /// The mode in use. The system's high contrast always wins, since
+        /// people who turn it on need it.
+        /// </summary>
+        public ThemeMode ActualThemeMode
+        {
+            get
+            {
+                var system = this.SystemThemeMode;
+                return (system == ThemeMode.HighContrast) ? system : (this._requestedThemeMode ?? system);
+            }
+        }
+
+        /// <summary>
+        /// The app's accent color, or null (the default) for the system's (or,
+        /// without one, <see cref="Theme.DefaultAccentColor"/>).
+        /// </summary>
+        public Color? AccentColor
         {
             get
             {
@@ -151,9 +212,83 @@ namespace XForms
             set
             {
                 this._accentColor = value;
-
-                this.ApplyTheme(this._appTheme);
+                this.UpdateTheme();
             }
+        }
+
+        /// <summary>
+        /// The accent color in use.
+        /// </summary>
+        public Color ActualAccentColor
+        {
+            get
+            {
+                return this._accentColor ?? this.Renderer.SystemAccentColor ?? Theme.DefaultAccentColor;
+            }
+        }
+
+        /// <summary>
+        /// Builds the application's theme for a mode and accent color. Override
+        /// it for a brand's colors, type scale, shapes or control styles; call
+        /// <see cref="InvalidateTheme"/> when what it depends on changes.
+        /// </summary>
+        protected virtual Theme CreateTheme(
+            ThemeMode mode,
+            Color accentColor)
+        {
+            var theme = Theme.Create(mode, accentColor);
+            if (mode == ThemeMode.HighContrast)
+            {
+                var system = this.Renderer.SystemHighContrastColors;
+                if (null != system)
+                {
+                    theme = theme with { Colors = system };
+                }
+            }
+
+            return theme;
+        }
+
+        /// <summary>
+        /// Builds the theme again (see <see cref="CreateTheme"/>), and gives it
+        /// to every view if it changed.
+        /// </summary>
+        public void InvalidateTheme()
+        {
+            this.UpdateTheme();
+        }
+
+        private void UpdateTheme()
+        {
+            var theme = this.CreateTheme(this.ActualThemeMode, this.ActualAccentColor)
+                ?? throw new InvalidOperationException("CreateTheme returned null.");
+
+            bool isChanged = !theme.Equals(this._theme);
+            this._theme = theme;
+            if (!isChanged)
+            {
+                return;
+            }
+
+            this.Renderer.ApplyTheme(theme);
+            this.OnThemeChanged(theme);
+
+            this._rootFrame.UpdateTheme();
+            foreach (var popup in this._openPopups)
+            {
+                popup.UpdateTheme();
+            }
+
+            this.ThemeChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Called with the application's theme when it starts, and whenever
+        /// the theme changes.
+        /// </summary>
+        protected virtual void OnThemeChanged(
+            Theme theme)
+        {
         }
 
         public bool CanNavigateBack
@@ -162,26 +297,6 @@ namespace XForms
             {
                 return (this._openPopups.Count > 0) || (this._rootFrame.CanNavigateBack);
             }
-        }
-
-        private void ApplyTheme(
-            AppTheme theme)
-        {
-            if (null == theme)
-            {
-                throw new ArgumentNullException(nameof(theme));
-            }
-
-            this.OnApplyTheme(theme);
-
-            this.Renderer.ApplyTheme(theme);
-
-            this.ThemeChanged?.Invoke(this, theme);
-        }
-
-        protected virtual void OnApplyTheme(
-            AppTheme theme)
-        {
         }
 
         public Version GetVersion()
@@ -447,6 +562,11 @@ namespace XForms
         void IApplicationDelegate.NotifyResume()
         {
             this.OnResume();
+        }
+
+        void IApplicationDelegate.NotifySystemThemeChanged()
+        {
+            this.UpdateTheme();
         }
     }
 }

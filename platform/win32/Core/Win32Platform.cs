@@ -20,7 +20,7 @@ namespace XForms.Win32
             this._host = host ?? throw new ArgumentNullException(nameof(host));
         }
 
-        public IApplicationRenderer CreateApplicationRenderer(Application application) => new ApplicationRenderer(this._host);
+        public IApplicationRenderer CreateApplicationRenderer(Application application) => new ApplicationRenderer(this._host, application);
 
         public IPageRenderer CreatePageRenderer(Page page) => new PageRenderer(page);
 
@@ -71,26 +71,22 @@ namespace XForms.Win32
         private readonly Win32Host _host;
 
         public ApplicationRenderer(
-            Win32Host host)
+            Win32Host host,
+            IApplicationDelegate application)
         {
             this._host = host;
+            host.SystemThemeChanged += application.NotifySystemThemeChanged;
         }
 
         public Color? TitleBarAccentColor { get; set; }
 
         public Color? TitleBarForegroundColor { get; set; }
 
-        public Color AccentColor { get; set; }
+        public ThemeMode SystemThemeMode => SystemTheme.Mode;
 
-        public Color ForegroundColor
-        {
-            get
-            {
-                return this.Theme?.ForegroundColor ?? Colors.Black;
-            }
-        }
+        public Color? SystemAccentColor => SystemTheme.AccentColor;
 
-        public AppTheme Theme { get; private set; }
+        public ColorScheme SystemHighContrastColors => SystemTheme.HighContrastColors;
 
         public void SetRootFrame(
             Frame frame)
@@ -129,10 +125,9 @@ namespace XForms.Win32
         }
 
         public void ApplyTheme(
-            AppTheme theme)
+            Theme theme)
         {
-            this.Theme = theme;
-            this.AccentColor = theme.AccentColor;
+            SystemTheme.ApplyToWindow(this._host.Hwnd, theme.Mode);
         }
 
         public Version GetVersion()

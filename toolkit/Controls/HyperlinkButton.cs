@@ -60,7 +60,7 @@ namespace XForms.Toolkit
 
         void ITapGestureDelegate.OnTapEnded()
         {
-            this._ownAnimator.ScaleTo(1.0f, TimeSpan.FromMilliseconds(100), new CubicEase(EasingMode.EaseIn));
+            this._ownAnimator.ScaleTo(1.0f, this.ActualTheme.Motion.Short, new CubicEase(EasingMode.EaseIn));
         }
 
         void ITapGestureDelegate.OnTapped()

@@ -32,10 +32,10 @@ namespace XForms.Toolkit
 
         private const float TouchDownScale = 0.9f;
 
-        private TextFormat _textFormat;
         private string _text;
         private bool _isEnabled = true;
         private bool _isAlert;
+        private ButtonStyle _style;
 
         private ICommand _command;
 
@@ -44,13 +44,6 @@ namespace XForms.Toolkit
         public Button()
         {
             this._ownAnimator = this.CreateOwnAnimator();
-
-            this._textFormat = new TextFormat()
-            {
-                FontSize = 14.0f,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center,
-            };
 
             this.GestureRecognizer = new TapGestureRecognizer(this);
         }
@@ -169,34 +162,50 @@ namespace XForms.Toolkit
             }
         }
 
-        private Color? ForegroundColor
+        /// <summary>
+        /// The button's own style, or null (the default) for the theme's.
+        /// </summary>
+        public ButtonStyle Style
         {
             get
             {
-                return Colors.White;
+                return this._style;
+            }
+
+            set
+            {
+                this._style = value;
+                this.InvalidateVisual();
+                this.OnPropertyChanged();
             }
         }
 
+        // The button draws its own rounded fill
         public override Color BackgroundColor
         {
             get
             {
-                if (this.IsAlertStyle)
-                {
-                    return Colors.Red;
-                }
-                else
-                {
-                    return this.Application.Theme.AccentColor;
-                }
+                return Colors.Transparent;
             }
         }
 
-        private Color? DisabledColor
+        // The style in effect: the button's own, over the theme's, over the
+        // theme's tokens
+        private ButtonStyle ActualStyle
         {
             get
             {
-                return this.Application.Theme.SubtleForegroundColor;
+                var theme = this.ActualTheme;
+                var colors = theme.Colors;
+                var defaults = new ButtonStyle()
+                {
+                    Background = this.IsAlertStyle ? colors.Error : colors.Accent,
+                    Foreground = this.IsAlertStyle ? colors.OnError : colors.OnAccent,
+                    CornerRadius = theme.Shapes.SmallCornerRadius,
+                    TextStyle = theme.Typography.Label,
+                };
+
+                return (this._style ?? new ButtonStyle()).Over(theme.GetStyle<ButtonStyle>()).Over(defaults);
             }
         }
 
@@ -204,27 +213,21 @@ namespace XForms.Toolkit
             DrawingContext drawContext)
         {
             var bounds = new Rect(0, 0, this.Bounds.Width, this.Bounds.Height);
-            Rect textBounds = new Rect(bounds.X, bounds.Y, bounds.Width, bounds.Height);
+            var style = this.ActualStyle;
+            var format = style.TextStyle.ToTextFormat();
+            format.HorizontalAlignment = HorizontalAlignment.Center;
+            format.VerticalAlignment = VerticalAlignment.Center;
 
+            drawContext.Clear(Colors.Transparent);
             if (this.IsEnabled)
             {
-                base.Render(drawContext);
-
-                var foregroundColor = this.ForegroundColor;
-                if (foregroundColor.HasValue)
-                {
-                    drawContext.DrawText(this.Text, textBounds, foregroundColor.Value, this._textFormat);
-                }
+                drawContext.FillRoundedRectangle(bounds, style.CornerRadius.Value, new SolidColorBrush(style.Background.Value));
+                drawContext.DrawText(this.Text, bounds, style.Foreground.Value, format);
             }
             else
             {
-                drawContext.Clear(Colors.Transparent);
-
-                var foregroundColor = this.DisabledColor;
-                if (foregroundColor.HasValue)
-                {
-                    drawContext.DrawText(this.Text, textBounds, foregroundColor.Value, this._textFormat);
-                }
+                // A disabled button is its text alone, dimmed
+                drawContext.DrawText(this.Text, bounds, this.ActualTheme.Colors.Disabled, format);
             }
         }
 
@@ -237,7 +240,7 @@ namespace XForms.Toolkit
 
         void ITapGestureDelegate.OnTapEnded()
         {
-            this._ownAnimator.ScaleTo(1.0f, TimeSpan.FromMilliseconds(100), new CubicEase(EasingMode.EaseIn));
+            this._ownAnimator.ScaleTo(1.0f, this.ActualTheme.Motion.Short, new CubicEase(EasingMode.EaseIn));
         }
 
         void ITapGestureDelegate.OnTapped()

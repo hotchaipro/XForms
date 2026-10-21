@@ -286,7 +286,7 @@ namespace XForms.iOS
             var theme = XForms.Application.Current?.Theme;
             if (null != theme)
             {
-                this.BackgroundColor = theme.BackgroundColor.ToUIColor();
+                this.BackgroundColor = theme.Colors.Background.ToUIColor();
             }
         }
 

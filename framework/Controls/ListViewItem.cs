@@ -44,7 +44,7 @@ namespace XForms.Controls
         {
             get
             {
-                return this.Theme.BackgroundColor;
+                return this.ActualTheme.Colors.Background;
             }
         }
 

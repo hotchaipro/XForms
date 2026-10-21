@@ -75,8 +75,8 @@ namespace XForms.iOS.Renderers
         {
         }
 
-        public virtual void OnApplyTheme(
-            AppTheme theme)
+        public virtual void OnThemeChanged(
+            Theme theme)
         {
         }
 

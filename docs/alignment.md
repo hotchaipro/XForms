@@ -670,8 +670,9 @@ from. Where XForms keeps its own name, the reason is in
 | `KeyInputEvent` | `KeyEventArgs` | WPF, Avalonia | `Key` stays |
 | `GestureRecognizer`, `TapGestureRecognizer`, `SwipeGestureRecognizer` | Keep | MAUI | Plus `Tapped`, `DoubleTapped` and `Holding` events on views |
 | `AccessibilityRole` | Keep | SwiftUI, Flutter, React Native | Plain view property |
-| `AppTheme`, `LightTheme`, `DarkTheme` | `Theme` (design tokens: `ColorScheme`, `Typography`, `Shapes`, `Motion`), and `ThemeMode` (`Light`, `Dark`, `HighContrast`) | Flutter (`ThemeData`), Compose (`MaterialTheme`); MAUI's `AppTheme` is the mode | Typed tokens, scoped to any view, not resource dictionaries |
-| `OnApplyTheme(AppTheme)` | `OnThemeChanged(Theme)` | | Runs after attach and on changes, never from a constructor |
+| `AppTheme`, `LightTheme`, `DarkTheme`, `ThemeColor` | `Theme` (design tokens: `ColorScheme`, `Typography`, `Shapes`, `Motion`), and `ThemeMode` (`Light`, `Dark`, `HighContrast`) | Flutter (`ThemeData`), Compose (`MaterialTheme`); MAUI's `AppTheme` is the mode | Typed tokens, scoped to any view, not resource dictionaries. **Done** |
+| `OnApplyTheme(AppTheme)` | `OnThemeChanged(Theme)` | | Runs after attach and on changes, never from a constructor. **Done** |
+| `Application.Theme` (set), `AccentColor` (`ThemeColor`) | `Application.RequestedThemeMode` (null follows the system), `AccentColor` (null for the system's), `Theme` (read), `CreateTheme` | MAUI (`UserAppTheme`), WinUI (`RequestedTheme`) | **Done** |
 | `ICommand` | `System.Windows.Input.ICommand` | All | Use the standard interface |
 
 ### Framework: members
@@ -989,11 +990,9 @@ Neither changed the order of the phases. Both added items, which are below.
      - `RelayCommand` (phase 3).
    - **Still to do:**
      - Make the renderer interfaces and `Application.Renderer` internal.
-     - Theme overrides still run from `Element`'s constructor, before
-       derived constructors. A control whose `OnApplyTheme` uses views that
-       its constructor builds has to skip that first call (SoonerOrLater's
-       `TaskListViewItem` does). Phase 7 (theming) replaces it with
-       `OnThemeChanged`, after attach.
+     - Theme overrides ran from `Element`'s constructor, before derived
+       constructors. **Done in phase 7:** `OnThemeChanged` runs after
+       attach.
 2. **Panels and view basics.**
    - Add `Grid`, `StackPanel`, `Border`, `WrapPanel` and `Canvas`, each with
      typed layout parameters for its children.
@@ -1227,10 +1226,13 @@ Neither changed the order of the phases. Both added items, which are below.
      - Win32: a composition visual per layer, with a translate, scale and
        rotate transform group, opacity and a rectangle clip. Easing curves
        become cubic segments that the compositor plays.
-     - Android: the view itself is the innermost layer, and outer layers
-       are wrapper views. Animations are property animators with the easing
-       sampled into a table. The clip is the view's outline (`ClipBounds`
-       didn't clip).
+     - Android: the layers are composed onto the view's own render
+       properties (a layer's translation moves with the scale and rotation
+       outside it). Animations are value animators with the easing sampled
+       into a table. The clip is the view's outline (`ClipBounds` didn't
+       clip). Phase 7 replaced the first version's wrapper views: a parent
+       clips each child to the child's bounds, which cut off inner layers
+       that moved out of their wrapper.
      - iOS: the view's layer, with wrapper views for outer layers, and
        keyframe animations of the layer's transform, opacity and a mask.
    - **Pages** get a framework animator for frame transitions.
@@ -1267,6 +1269,77 @@ Neither changed the order of the phases. Both added items, which are below.
      the theme's tokens, and add typed styles to the controls that need
      them (buttons first).
    - Update SoonerOrLater, and test both modes and high contrast.
+
+   **Status: done.**
+   - **`ThemeMode`** (`Light`, `Dark`, `HighContrast`). Each platform reports
+     the system's mode and its changes:
+     - Win32: the "apps use light theme" setting, and high contrast, on
+       `WM_SETTINGCHANGE` and `WM_SYSCOLORCHANGE`. The title bar follows the
+       app's mode.
+     - Android: the night mode and, on Android 14 and later, high contrast,
+       when the configuration changes. Activities declare
+       `ConfigChanges.UiMode`, so dark mode restyles the app in place
+       instead of recreating it.
+     - iOS: the trait collection's style and "increase contrast", when the
+       app becomes active or the contrast setting changes.
+   - **The application's theme:**
+     - `RequestedThemeMode` is null to follow the system, or the mode the app
+       chooses. The system's high contrast always wins.
+     - `AccentColor` is null for the system's accent (Windows' accent, or
+       Android 12's wallpaper color) or the default blue.
+     - `CreateTheme(mode, accent)` builds the theme, and an app overrides it
+       for a brand. `InvalidateTheme()` rebuilds it.
+     - In high contrast, Win32 uses the system's contrast colors.
+   - **`Theme`**, an immutable record: a `ColorScheme` (accent, background,
+     surface and error, each with its "on" color, plus subtle foreground,
+     outline and disabled), `Typography` (display, title, body, label,
+     caption), `Shapes` (corner radii) and `Motion` (durations and easings).
+     `Theme.Create(mode, accent)` builds XForms' themes, and `WithStyle`
+     adds default control styles.
+   - **Scoped:** `View.Theme` sets a theme for a view and its descendants,
+     and `ActualTheme` is the effective one (a popup inherits from the view
+     it opens from).
+   - **`OnThemeChanged(Theme)`** replaces `OnApplyTheme`. It runs once the
+     element is attached (after every constructor, with its native object)
+     and whenever its effective theme changes, never from a constructor.
+     Elements no longer subscribe to a static event (which leaked them).
+   - **Toolkit:**
+     - Every color comes from `ActualTheme.Colors`, and animation durations
+       from `ActualTheme.Motion`.
+     - `Button` takes a `ButtonStyle` (background, foreground, corner radius,
+       text style), over the theme's default `ButtonStyle`, over the
+       tokens. Buttons are rounded, and alert buttons use the error colors.
+   - **SoonerOrLater** maps its light and dark setting to
+     `RequestedThemeMode`, keeps one accent color (the theme lightens it in
+     dark mode), and its list items no longer skip their first theme call.
+   - **Fixed on the way:**
+     - Android clipped every child to its bounds, unlike the other
+       platforms. Layout views no longer clip unless `ClipToBounds` is set.
+       This shows SoonerOrLater's flyout menu and its focus toggles, which
+       sit outside their parents' bounds.
+     - Android's animation layers are composed rather than wrapped (see
+       phase 6).
+   - **Verified:**
+     - Win32 (theme test page): light, dark, high contrast, switching
+       modes while running, the system accent color, a scoped dark section
+       with its own button style, and button styles.
+     - Android: switching the system's dark mode while running, the
+       wallpaper accent color, and SoonerOrLater in light mode.
+     - iOS is only built.
+   - **Not done:**
+     - Android can't tap a view moved outside its parent's bounds, such as
+       SoonerOrLater's flyout menu items (they were hidden before), so its
+       settings can't be opened on Android. Framework hit-testing (phase 8)
+       fixes this.
+     - SoonerOrLater in dark mode isn't verified on a device (its setting
+       is behind that menu).
+     - Text boxes have no outline, so in high contrast (where the surface
+       and background are both black) a text box's edge doesn't show.
+     - The toolkit's other controls take colors from the theme, but not yet
+       styles of their own; their text sizes are still fixed.
+     - A Win32 text box crashed once in RichEdit while the theme changed
+       (an access violation in `SendMessage`). It didn't recur in 21
+       automated switches; it looks like the known RichEdit crash.
 8. **Lightweight controls.** After the Animator, since it decides which views
    have layers.
    - Draw owner-drawn controls, `Border`, panels and `TextBlock` into their

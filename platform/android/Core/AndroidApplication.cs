@@ -18,6 +18,13 @@ namespace XForms.Android
         public event EventHandler Suspending;
         public event EventHandler Resuming;
 
+        /// <summary>
+        /// Raised when the configuration changes in place, such as dark mode.
+        /// The activity must declare <c>ConfigChanges.UiMode</c>, or Android
+        /// recreates it instead.
+        /// </summary>
+        public event EventHandler ConfigurationChanged;
+
         private readonly SystemBarsBackground _systemBarsBackground = new SystemBarsBackground();
         private bool _isStatusBarLight;
         private bool _isNavigationBarLight;
@@ -38,6 +45,14 @@ namespace XForms.Android
             base.OnResume();
 
             this.Resuming?.Invoke(this, EventArgs.Empty);
+        }
+
+        public override void OnConfigurationChanged(
+            global::Android.Content.Res.Configuration newConfig)
+        {
+            base.OnConfigurationChanged(newConfig);
+
+            this.ConfigurationChanged?.Invoke(this, EventArgs.Empty);
         }
 
         protected override void OnCreate(

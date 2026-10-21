@@ -210,7 +210,8 @@ methods (translate, scale, rotate, fade, reveal) run on the platform's
 compositor or animation thread:
 - Win32: a DirectComposition visual per layer, with its transforms, opacity
   and clip animated by the compositor.
-- Android: the view and wrapper views, animated by property animators.
+- Android: the layers composed onto the view's own render properties,
+  animated by value animators.
 - iOS: Core Animation keyframe animations.
 
 Each returns an `AnimationHandle`, which can be awaited for whether the
@@ -268,6 +269,26 @@ accessibility API:
 - iOS: VoiceOver, through `UIAccessibility` (not yet implemented).
 
 Native text entries expose themselves natively.
+
+## Themes
+
+A `Theme` is an immutable record of design tokens: a `ColorScheme` of
+semantic colors (accent, background, surface and error, each with the color
+of content on it, plus subtle foreground, outline and disabled),
+`Typography`, `Shapes` and `Motion`, for a `ThemeMode` (light, dark or high
+contrast). It can also carry default styles for controls, such as the
+toolkit's `ButtonStyle`.
+
+The application builds its theme with `CreateTheme(mode, accent)` from the
+mode (the system's, unless the app sets `RequestedThemeMode`) and the accent
+color (the system's, unless the app sets `AccentColor`). Each platform
+reports the system's mode, accent and contrast colors, and their changes.
+
+Any view can set `Theme` for itself and its descendants; `ActualTheme` is the
+effective one. An element hears its theme in `OnThemeChanged`, once it's
+attached and whenever the theme changes. The framework's primitives use the
+theme's colors by default (text, page and list backgrounds, text boxes), and
+the toolkit's controls draw from its tokens.
 
 ## Popups and light dismiss
 
@@ -338,10 +359,8 @@ picker-specific code. Still to do:
 
 - **iOS testing.** iOS builds, but it hasn't been run since the restructure
   (it needs a Mac). Its popups, in particular, are new and untested.
-- **Theming.** `AppTheme` lives in the framework, and some primitives read
-  colors from it. Over time, primitives should expose plain color properties,
-  leaving themes to control libraries, while the framework reports the system
-  settings (dark mode, accent color, text scale).
+- **Theming.** Text scale isn't reported yet, and the toolkit's controls
+  other than `Button` have no styles of their own.
 - **Accessibility and keyboard focus on Android and iOS.** The framework's
   accessibility roles and labels, and keyboard focus, are implemented only on
   Win32 so far.

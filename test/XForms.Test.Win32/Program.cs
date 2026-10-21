@@ -18,6 +18,7 @@ namespace XForms.Test.Win32
 
             // XFORMS_TEST_PAGE picks another page, such as "pickers"
             TestApp.StartPage = Environment.GetEnvironmentVariable("XFORMS_TEST_PAGE");
+            TestApp.ThemeModeSwitches = Environment.GetEnvironmentVariable("XFORMS_THEME_SWITCHES");
 
             Win32Application.Run("XForms Test (Win32)", (platform) => new TestApp(platform));
         }

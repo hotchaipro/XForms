@@ -15,19 +15,21 @@ namespace XForms
     public class Page : View
     {
         private Panel _layout;
-        private Color _backgroundColor;
+        private Color? _backgroundColor;
 
         public Page()
         {
         }
 
-        protected override void OnApplyTheme(
-            AppTheme theme)
+        protected override void OnThemeChanged(
+            Theme theme)
         {
-#if !DEBUG_LAYOUT
-            // Need an opaque background to support overlapping page animations
-            this.BackgroundColor = theme.BackgroundColor;
-#endif
+            base.OnThemeChanged(theme);
+
+            if (!this._backgroundColor.HasValue)
+            {
+                this.Native?.BackgroundColor = theme.Colors.Background;
+            }
         }
 
         internal new IPageRenderer Renderer
@@ -46,11 +48,15 @@ namespace XForms
             }
         }
 
+        /// <summary>
+        /// The page's background: the theme's background color unless set.
+        /// Pages are opaque, so they can overlap as they slide in and out.
+        /// </summary>
         public Color BackgroundColor
         {
             get
             {
-                return this._backgroundColor;
+                return this._backgroundColor ?? this.ActualTheme.Colors.Background;
             }
 
             set
@@ -101,7 +107,7 @@ namespace XForms
             base.OnRendererCreated();
 
             var native = this.Native;
-            native.BackgroundColor = this._backgroundColor;
+            native.BackgroundColor = this.BackgroundColor;
 
             var layout = this._layout;
             if (null != layout)

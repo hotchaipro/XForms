@@ -52,7 +52,7 @@ namespace XForms.Controls
         {
             get
             {
-                return this.Theme.SubtleBackgroundColor;
+                return this.ActualTheme.Colors.Surface;
             }
         }
 

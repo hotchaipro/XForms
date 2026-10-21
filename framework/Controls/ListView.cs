@@ -134,7 +134,7 @@ namespace XForms.Controls
         {
             get
             {
-                return Theme.SubtleBackgroundColor;
+                return this.ActualTheme.Colors.Surface;
             }
         }
 

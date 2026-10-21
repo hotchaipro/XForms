@@ -279,7 +279,7 @@ namespace XForms.Toolkit
             {
                 var bounds = new Rect(0, 0, this.Bounds.Width, this.Bounds.Height);
                 drawContext.Clear(Colors.Transparent);
-                DrawPopupFrame(drawContext, bounds, this.Theme);
+                DrawPopupFrame(drawContext, bounds, this.ActualTheme);
             }
         }
 
@@ -451,7 +451,7 @@ namespace XForms.Toolkit
                 DrawingContext drawContext)
             {
                 var bounds = new Rect(0, 0, this.Bounds.Width, this.Bounds.Height);
-                var theme = this.Theme;
+                var theme = this.ActualTheme;
                 var items = this._picker.Items;
                 int selectedIndex = this._picker.SelectedIndex;
 
@@ -466,23 +466,23 @@ namespace XForms.Toolkit
 
                     if (i == this._pressedIndex)
                     {
-                        drawContext.FillRectangle(highlight, theme.ForegroundColor.MultiplyAlpha(0.12f));
+                        drawContext.FillRectangle(highlight, theme.Colors.Foreground.MultiplyAlpha(0.12f));
                     }
                     else if ((i == selectedIndex) || ((i == this._highlightIndex) && this.IsFocused))
                     {
-                        drawContext.FillRectangle(highlight, theme.SubtleBackgroundColor);
+                        drawContext.FillRectangle(highlight, theme.Colors.Surface);
                     }
 
                     if (i == selectedIndex)
                     {
                         // The selected item's accent mark
-                        drawContext.FillRectangle(new Rect(4, row.Y + ((RowHeight - 16) / 2), 3, 16), theme.AccentColor);
+                        drawContext.FillRectangle(new Rect(4, row.Y + ((RowHeight - 16) / 2), 3, 16), theme.Colors.Accent);
                     }
 
                     drawContext.DrawText(
                         items[i].Text,
                         new Rect(TextInset, row.Y, Math.Max(0, bounds.Width - (2 * TextInset)), RowHeight),
-                        theme.ForegroundColor,
+                        theme.Colors.Foreground,
                         textFormat);
                 }
             }

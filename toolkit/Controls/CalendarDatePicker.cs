@@ -169,7 +169,7 @@ namespace XForms.Toolkit
             {
                 var bounds = new Rect(0, 0, this.Bounds.Width, this.Bounds.Height);
                 drawContext.Clear(Colors.Transparent);
-                DrawPopupFrame(drawContext, bounds, this.Theme);
+                DrawPopupFrame(drawContext, bounds, this.ActualTheme);
             }
         }
     }

@@ -159,10 +159,10 @@ namespace XForms.Controls
             }
         }
 
-        protected override void OnApplyTheme(
-            AppTheme theme)
+        protected override void OnThemeChanged(
+            Theme theme)
         {
-            base.OnApplyTheme(theme);
+            base.OnThemeChanged(theme);
 
             this.InvalidateVisual();
         }

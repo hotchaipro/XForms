@@ -61,10 +61,10 @@ namespace XForms.Controls
             this.Native.BackgroundColor = this.BackgroundColor;
         }
 
-        protected override void OnApplyTheme(
-            AppTheme theme)
+        protected override void OnThemeChanged(
+            Theme theme)
         {
-            base.OnApplyTheme(theme);
+            base.OnThemeChanged(theme);
 
             this.Native?.BackgroundColor = this.BackgroundColor;
         }

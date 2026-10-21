@@ -141,15 +141,15 @@ namespace XForms.Toolkit
             }
             else if (this.IsChecked)
             {
-                this._ownAnimator.ScaleTo(1.0f, TimeSpan.FromMilliseconds(100), new SpringEase(EasingMode.EaseOut));
+                this._ownAnimator.ScaleTo(1.0f, this.ActualTheme.Motion.Short, new SpringEase(EasingMode.EaseOut));
 
                 this._ownAnimator.Opacity = 1.0f;
             }
             else
             {
-                this._ownAnimator.ScaleTo(DefaultScale, TimeSpan.FromMilliseconds(100), new CubicEase(EasingMode.EaseIn));
+                this._ownAnimator.ScaleTo(DefaultScale, this.ActualTheme.Motion.Short, new CubicEase(EasingMode.EaseIn));
 
-                if (this.Theme == AppTheme.Dark)
+                if (this.ActualTheme.Mode != ThemeMode.Light)
                 {
                     this._ownAnimator.Opacity = 1.0f;
                 }
@@ -189,15 +189,15 @@ namespace XForms.Toolkit
             //drawContext.DrawRectangle(textBounds, Color.FromArgb(0x40, 255, 0, 0));
 
             Color foregroundColor;
-            if (this.Theme == AppTheme.Dark)
+            if (this.ActualTheme.Mode != ThemeMode.Light)
             {
                 if (this.IsChecked)
                 {
-                    foregroundColor = this.Application.Theme.AccentColor;
+                    foregroundColor = this.ActualTheme.Colors.Accent;
                 }
                 else
                 {
-                    foregroundColor = this.Application.Theme.SubtleForegroundColor;
+                    foregroundColor = this.ActualTheme.Colors.SubtleForeground;
                 }
             }
             else

@@ -29,6 +29,12 @@ namespace XForms.iOS.Renderers
 
             nativeApplication.Suspending += Application_Suspending;
             nativeApplication.Resuming += Application_Resuming;
+
+            // Increased contrast changes while the app runs; dark mode is reread
+            // when the app becomes active
+            Foundation.NSNotificationCenter.DefaultCenter.AddObserver(
+                UIKit.UIView.DarkerSystemColorsStatusDidChangeNotification,
+                (notification) => this._applicationDelegate.NotifySystemThemeChanged());
         }
 
         public Color? TitleBarAccentColor
@@ -43,17 +49,35 @@ namespace XForms.iOS.Renderers
             set;
         }
 
-        public Color AccentColor
-        {
-            get;
-            set;
-        }
-
-        public Color ForegroundColor
+        public ThemeMode SystemThemeMode
         {
             get
             {
-                return this.Theme.ForegroundColor;
+                if (UIKit.UIAccessibility.DarkerSystemColorsEnabled)
+                {
+                    return ThemeMode.HighContrast;
+                }
+
+                return (UIKit.UITraitCollection.CurrentTraitCollection.UserInterfaceStyle == UIKit.UIUserInterfaceStyle.Dark)
+                    ? ThemeMode.Dark
+                    : ThemeMode.Light;
+            }
+        }
+
+        public Color? SystemAccentColor
+        {
+            get
+            {
+                // iOS has no system-wide accent color; apps choose their own tint
+                return null;
+            }
+        }
+
+        public ColorScheme SystemHighContrastColors
+        {
+            get
+            {
+                return null;
             }
         }
 
@@ -68,6 +92,7 @@ namespace XForms.iOS.Renderers
             object sender,
             EventArgs e)
         {
+            this._applicationDelegate.NotifySystemThemeChanged();
             this._applicationDelegate.NotifyResume();
         }
 
@@ -76,18 +101,16 @@ namespace XForms.iOS.Renderers
             throw new NotImplementedException();
         }
 
-        public AppTheme Theme
-        {
-            get;
-            private set;
-        }
-
         public void ApplyTheme(
-            AppTheme theme)
+            Theme theme)
         {
-            this.Theme = theme;
-
-            this.AccentColor = theme.AccentColor;
+            // System views (keyboards, menus) follow the app's mode
+            var window = this._nativeApplicationDelegate.Window;
+            if (null != window)
+            {
+                window.OverrideUserInterfaceStyle = (theme.Mode == ThemeMode.Light) ? UIKit.UIUserInterfaceStyle.Light : UIKit.UIUserInterfaceStyle.Dark;
+                window.TintColor = theme.Colors.Accent.ToUIColor();
+            }
         }
 
         public void InvokeOnUIThreadAsync(

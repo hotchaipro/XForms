@@ -343,10 +343,10 @@ namespace XForms.Toolkit
             this.InvalidateVisual();
         }
 
-        protected override void OnApplyTheme(
-            AppTheme theme)
+        protected override void OnThemeChanged(
+            Theme theme)
         {
-            base.OnApplyTheme(theme);
+            base.OnThemeChanged(theme);
 
             this.InvalidateVisual();
         }
@@ -402,7 +402,7 @@ namespace XForms.Toolkit
             DrawingContext drawContext)
         {
             var bounds = new Rect(0, 0, this.Bounds.Width, this.Bounds.Height);
-            var theme = this.Theme;
+            var theme = this.ActualTheme;
             var culture = CultureInfo.CurrentCulture;
             float gridLeft = this.GridLeft;
 
@@ -412,7 +412,7 @@ namespace XForms.Toolkit
             drawContext.DrawText(
                 this._month.ToString("MMMM yyyy", culture),
                 new Rect(gridLeft + 8, Inset, (5 * CellSize) - 8, HeaderHeight),
-                theme.ForegroundColor,
+                theme.Colors.Foreground,
                 new TextFormat()
                 {
                     FontSize = 16,
@@ -438,7 +438,7 @@ namespace XForms.Toolkit
                 drawContext.DrawText(
                     culture.DateTimeFormat.GetShortestDayName(dayOfWeek),
                     new Rect(gridLeft + (column * CellSize), Inset + HeaderHeight, CellSize, WeekdayHeight),
-                    theme.SubtleForegroundColor,
+                    theme.Colors.SubtleForeground,
                     weekdayFormat);
             }
 
@@ -465,30 +465,30 @@ namespace XForms.Toolkit
                     bool isInMonth = date.Month == this._month.Month;
                     bool isSelected = this._selectedDate == date;
 
-                    var textColor = isInMonth ? theme.ForegroundColor : theme.SubtleForegroundColor;
+                    var textColor = isInMonth ? theme.Colors.Foreground : theme.Colors.SubtleForeground;
                     if (!isEnabled)
                     {
-                        textColor = theme.SubtleForegroundColor.MultiplyAlpha(0.45f);
+                        textColor = theme.Colors.SubtleForeground.MultiplyAlpha(0.45f);
                     }
 
                     if (isSelected)
                     {
-                        drawContext.FillEllipse(center, Radius, Radius, theme.AccentColor);
-                        textColor = theme.BackgroundColor;
+                        drawContext.FillEllipse(center, Radius, Radius, theme.Colors.Accent);
+                        textColor = theme.Colors.Background;
                     }
                     else if ((this._pressedPart == Part.Day) && (this._pressedDate == date) && isEnabled)
                     {
-                        drawContext.FillEllipse(center, Radius, Radius, theme.ForegroundColor.MultiplyAlpha(0.12f));
+                        drawContext.FillEllipse(center, Radius, Radius, theme.Colors.Foreground.MultiplyAlpha(0.12f));
                     }
 
                     if (date == today)
                     {
-                        drawContext.DrawEllipse(center, Radius, Radius, isSelected ? theme.BackgroundColor : theme.AccentColor, 1.5f);
+                        drawContext.DrawEllipse(center, Radius, Radius, isSelected ? theme.Colors.Background : theme.Colors.Accent, 1.5f);
                     }
 
                     if (this.IsFocused && (date == this._keyboardDate))
                     {
-                        drawContext.DrawEllipse(center, Radius + 1.5f, Radius + 1.5f, theme.ForegroundColor, 2);
+                        drawContext.DrawEllipse(center, Radius + 1.5f, Radius + 1.5f, theme.Colors.Foreground, 2);
                     }
 
                     drawContext.DrawText(date.Day.ToString(culture), cell, textColor, dayFormat);
@@ -507,15 +507,15 @@ namespace XForms.Toolkit
             bool isEnabled,
             Part part)
         {
-            var theme = this.Theme;
+            var theme = this.ActualTheme;
             var center = bounds.Center;
 
             if (isEnabled && (this._pressedPart == part))
             {
-                drawContext.FillEllipse(center, 16, 16, theme.ForegroundColor.MultiplyAlpha(0.12f));
+                drawContext.FillEllipse(center, 16, 16, theme.Colors.Foreground.MultiplyAlpha(0.12f));
             }
 
-            var color = isEnabled ? theme.ForegroundColor : theme.SubtleForegroundColor.MultiplyAlpha(0.45f);
+            var color = isEnabled ? theme.Colors.Foreground : theme.Colors.SubtleForeground.MultiplyAlpha(0.45f);
             float tip = center.Y + (direction * 2.5f);
             float tail = center.Y - (direction * 2.5f);
             drawContext.DrawLine(new Point(center.X - 5, tail), new Point(center.X, tip), color, 1.25f);

@@ -143,7 +143,7 @@ namespace XForms.Android
 
             // Without a snapshot, the content may be shorter than a closing row;
             // fill the gap with the item background rather than the list's
-            var backgroundColor = XForms.Application.Current?.Theme?.BackgroundColor;
+            var backgroundColor = XForms.Application.Current?.Theme?.Colors.Background;
             if ((this.ChildCount > 0) && (backgroundColor.HasValue))
             {
                 int contentBottom = this.GetChildAt(0).Bottom;
