@@ -7,7 +7,6 @@ using Windows.Win32.Graphics.DirectComposition;
 using Windows.Win32.Graphics.Dxgi.Common;
 using Windows.Win32.System.Com;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
-using XForms.Input;
 using XForms.Win32.Renderers;
 using XForms.Platform;
 

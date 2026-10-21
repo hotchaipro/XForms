@@ -210,7 +210,10 @@ namespace XForms.Toolkit
             };
             this._contentLayout.Children.Add(this._commandBar, Dock.Bottom);
 
-            this.GestureRecognizer = new SwipeGestureRecognizer(this);
+            // The swipe recognizer reports taps too, so it replaces the list
+            // item's tap recognizer
+            this.GestureRecognizers.Clear();
+            this.GestureRecognizers.Add(new SwipeGestureRecognizer(this));
         }
 
         private CommandListView CommandListView

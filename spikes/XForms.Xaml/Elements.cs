@@ -55,7 +55,7 @@ namespace XForms.Xaml
 
         public Button()
         {
-            this.GestureRecognizer = new TapGestureRecognizer(this);
+            this.GestureRecognizers.Add(new TapGestureRecognizer(this));
         }
 
         public object ButtonContent { get; set; }

@@ -62,7 +62,7 @@ namespace XForms.Toolkit
             this.Height = 60;
             this._ownAnimator.Scale = IsUncheckedScale;
 
-            this.GestureRecognizer = new TapGestureRecognizer(this);
+            this.GestureRecognizers.Add(new TapGestureRecognizer(this));
         }
 
         public bool IsChecked

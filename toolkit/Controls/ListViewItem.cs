@@ -20,7 +20,7 @@ namespace XForms.Controls
 
         public ListViewItem()
         {
-            this.GestureRecognizer = new TapGestureRecognizer(this);
+            this.GestureRecognizers.Add(new TapGestureRecognizer(this));
 
             // The container draws the row's background, beneath its children
             this.DrawsContent = true;

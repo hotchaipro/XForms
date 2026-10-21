@@ -18,7 +18,7 @@ namespace XForms.Toolkit
         {
             this._ownAnimator = this.CreateOwnAnimator();
 
-            this.GestureRecognizer = new TapGestureRecognizer(this);
+            this.GestureRecognizers.Add(new TapGestureRecognizer(this));
         }
 
         public Uri NavigationUri

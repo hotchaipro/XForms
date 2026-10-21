@@ -44,7 +44,7 @@ namespace XForms.Toolkit
             this.MenuItem = menuItem;
             this.IsVisible = menuItem.IsVisible;
 
-            this.GestureRecognizer = new TapGestureRecognizer(this);
+            this.GestureRecognizers.Add(new TapGestureRecognizer(this));
 
             menuItem.PropertyChanged += MenuItem_PropertyChanged; // TODO: Matching detach event handler
         }

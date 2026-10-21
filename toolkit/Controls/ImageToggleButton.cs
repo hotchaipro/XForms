@@ -32,7 +32,7 @@ namespace XForms.Toolkit
 
         public ImageToggleButton()
         {
-            this.GestureRecognizer = new TapGestureRecognizer(this);
+            this.GestureRecognizers.Add(new TapGestureRecognizer(this));
         }
 
         /// <summary>

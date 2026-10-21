@@ -58,7 +58,7 @@ namespace XForms.Toolkit
 
             this._ownAnimator.Scale = DefaultScale;
 
-            this.GestureRecognizer = new TapGestureRecognizer(this);
+            this.GestureRecognizers.Add(new TapGestureRecognizer(this));
         }
 
         public bool IsChecked

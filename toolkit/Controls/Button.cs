@@ -46,7 +46,7 @@ namespace XForms.Toolkit
         {
             this._ownAnimator = this.CreateDrawnAnimator();
 
-            this.GestureRecognizer = new TapGestureRecognizer(this);
+            this.GestureRecognizers.Add(new TapGestureRecognizer(this));
         }
 
         public bool IsEnabled

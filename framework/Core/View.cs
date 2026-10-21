@@ -2302,38 +2302,24 @@ namespace XForms
 
         #endregion Layout
 
-        private GestureRecognizer _gestureRecognizer;
+        private GestureRecognizerCollection _gestureRecognizers;
 
         /// <summary>
-        /// The gesture recognizer that interprets the view's pointer input.
+        /// The gesture recognizers that interpret the view's pointer input
+        /// (taps, swipes, pans and so on), each given every pointer event in
+        /// turn.
         /// </summary>
-        public GestureRecognizer GestureRecognizer
+        public IList<GestureRecognizer> GestureRecognizers
         {
             get
             {
-                return this._gestureRecognizer;
-            }
-
-            set
-            {
-                if (value == this._gestureRecognizer)
-                {
-                    return;
-                }
-
-                this._gestureRecognizer?.Detach(this);
-                this._gestureRecognizer = value;
-                value?.Attach(this);
+                return this._gestureRecognizers ??= new GestureRecognizerCollection(this);
             }
         }
 
         #region Pointer input
 
         private HashSet<int> _capturedPointers;
-        private TapTracker _tapTracker;
-        private EventHandler<TappedEventArgs> _tapped;
-        private EventHandler<TappedEventArgs> _doubleTapped;
-        private EventHandler<HoldingEventArgs> _holding;
 
         public event EventHandler<PointerEventArgs> PointerPressed;
 
@@ -2416,53 +2402,6 @@ namespace XForms
             return (this.HasLightweightChildren ? this.HitTestLightweight(point) : null) ?? this;
         }
 
-        /// <summary>
-        /// Raised when a pointer is pressed and released over the view without
-        /// moving. Subscribing makes the view take the pointers pressed on it.
-        /// </summary>
-        public event EventHandler<TappedEventArgs> Tapped
-        {
-            add
-            {
-                if (null == this._tapped)
-                {
-                    this.Activated += this.OnActivatedAsTap;
-                }
-
-                this._tapped += value;
-                this.EnsureTapTracker();
-            }
-
-            remove
-            {
-                this._tapped -= value;
-                if (null == this._tapped)
-                {
-                    this.Activated -= this.OnActivatedAsTap;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Raised for a second tap soon after a first, close to it.
-        /// </summary>
-        public event EventHandler<TappedEventArgs> DoubleTapped
-        {
-            add { this._doubleTapped += value; this.EnsureTapTracker(); }
-            remove { this._doubleTapped -= value; }
-        }
-
-        /// <summary>
-        /// Raised when a pointer is held down on the view without moving
-        /// (<see cref="HoldingState.Started"/>), and again when it's released
-        /// or moves away. A held pointer doesn't also tap.
-        /// </summary>
-        public event EventHandler<HoldingEventArgs> Holding
-        {
-            add { this._holding += value; this.EnsureTapTracker(); }
-            remove { this._holding -= value; }
-        }
-
         protected virtual void OnPointerPressed(
             PointerEventArgs e)
         {
@@ -2526,20 +2465,6 @@ namespace XForms
             return this._capturedPointers?.Contains(pointerId) ?? false;
         }
 
-        private void EnsureTapTracker()
-        {
-            this._tapTracker ??= new TapTracker(this);
-        }
-
-        // Activation (Enter, Space, a screen reader) taps the view's center
-        private void OnActivatedAsTap(
-            object sender,
-            EventArgs e)
-        {
-            var center = new Point(this.Bounds.Width / 2, this.Bounds.Height / 2);
-            this._tapped?.Invoke(this, new TappedEventArgs(center, PointerDeviceType.Mouse));
-        }
-
         /// <summary>
         /// Delivers a pointer event from the platform: the application's preview,
         /// then the overrides and events, then gestures. Returns whether the view
@@ -2578,14 +2503,17 @@ namespace XForms
                     break;
             }
 
-            bool takesPress = false;
-            if (null != this._tapTracker)
-            {
-                takesPress = this._tapTracker.OnPointer(e);
-            }
-
             var result = new GestureEventResult();
-            this.GestureRecognizer?.HandlePointerInput(e, ref result);
+            var recognizers = this._gestureRecognizers;
+            if (null != recognizers)
+            {
+                for (int i = 0; i < recognizers.Count; i += 1)
+                {
+                    var recognizerResult = new GestureEventResult();
+                    recognizers[i].HandlePointerInput(e, ref recognizerResult);
+                    result.DidHandleEvent |= recognizerResult.DidHandleEvent;
+                }
+            }
 
             bool isCaptured = this.HasPointerCapture(e.PointerId);
             if ((e.State == PointerInputState.Ended) || (e.State == PointerInputState.Canceled))
@@ -2595,8 +2523,7 @@ namespace XForms
 
             return e.Handled
                 || result.DidHandleEvent
-                || isCaptured
-                || ((e.State == PointerInputState.Began) && takesPress);
+                || isCaptured;
         }
 
         /// <summary>
@@ -2617,141 +2544,6 @@ namespace XForms
             this.OnPointerWheelChanged(e);
             this.PointerWheelChanged?.Invoke(this, e);
             return e.Handled;
-        }
-
-        // Recognizes taps, double taps and holds of the view's first pointer
-        private sealed class TapTracker
-        {
-            private static readonly TimeSpan HoldTime = TimeSpan.FromMilliseconds(500);
-            private static readonly TimeSpan DoubleTapTime = TimeSpan.FromMilliseconds(500);
-
-            private readonly View _view;
-            private DispatcherTimer _holdTimer;
-            private int? _pointerId;
-            private PointerDeviceType _deviceType;
-            private Point _start;
-            private bool _isHolding;
-            private DateTime _lastTapTime;
-            private Point _lastTapPosition;
-
-            public TapTracker(
-                View view)
-            {
-                this._view = view;
-            }
-
-            // Returns whether the view takes a press
-            public bool OnPointer(
-                PointerEventArgs e)
-            {
-                switch (e.State)
-                {
-                    case PointerInputState.Began:
-                        if (null != this._pointerId)
-                        {
-                            // A second finger isn't a tap
-                            this.Cancel();
-                            return true;
-                        }
-
-                        this._pointerId = e.PointerId;
-                        this._deviceType = e.DeviceType;
-                        this._start = e.Position;
-                        this._isHolding = false;
-
-                        if (null != this._view._holding)
-                        {
-                            this._holdTimer ??= new DispatcherTimer(HoldTime, this.OnHoldTime);
-                            this._holdTimer.Start();
-                        }
-
-                        return true;
-
-                    case PointerInputState.Moved:
-                        if ((e.PointerId == this._pointerId) && (e.Position.DistanceTo(this._start) > Application.TouchSlop))
-                        {
-                            this.Cancel();
-                        }
-
-                        break;
-
-                    case PointerInputState.Ended:
-                        if (e.PointerId == this._pointerId)
-                        {
-                            this._holdTimer?.Stop();
-                            this._pointerId = null;
-
-                            if (this._isHolding)
-                            {
-                                this._isHolding = false;
-                                this._view._holding?.Invoke(this._view, new HoldingEventArgs(e.Position, HoldingState.Completed));
-                            }
-                            else if (e.Position.DistanceTo(this._start) <= Application.TouchSlop)
-                            {
-                                this.OnTap(e.Position);
-                            }
-                        }
-
-                        break;
-
-                    case PointerInputState.Canceled:
-                        if (e.PointerId == this._pointerId)
-                        {
-                            this.Cancel();
-                        }
-
-                        break;
-                }
-
-                return false;
-            }
-
-            private void OnTap(
-                Point position)
-            {
-                var now = DateTime.UtcNow;
-                bool isDouble = ((now - this._lastTapTime) <= DoubleTapTime)
-                    && (position.DistanceTo(this._lastTapPosition) <= 2 * Application.TouchSlop);
-
-                var args = new TappedEventArgs(position, this._deviceType);
-                this._view._tapped?.Invoke(this._view, args);
-
-                if (isDouble)
-                {
-                    // A third tap starts over
-                    this._lastTapTime = DateTime.MinValue;
-                    this._view._doubleTapped?.Invoke(this._view, args);
-                }
-                else
-                {
-                    this._lastTapTime = now;
-                    this._lastTapPosition = position;
-                }
-            }
-
-            private void OnHoldTime()
-            {
-                if (null == this._pointerId)
-                {
-                    return;
-                }
-
-                this._holdTimer.Stop();
-                this._isHolding = true;
-                this._view._holding?.Invoke(this._view, new HoldingEventArgs(this._start, HoldingState.Started));
-            }
-
-            private void Cancel()
-            {
-                this._holdTimer?.Stop();
-                this._pointerId = null;
-
-                if (this._isHolding)
-                {
-                    this._isHolding = false;
-                    this._view._holding?.Invoke(this._view, new HoldingEventArgs(this._start, HoldingState.Canceled));
-                }
-            }
         }
 
         /// <summary>

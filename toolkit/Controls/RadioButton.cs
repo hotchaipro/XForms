@@ -74,7 +74,7 @@ namespace XForms.Toolkit
             this.RadioButtons = radioButtonGroup;
             this.RadioButtonItem = radioButtonItem;
 
-            this.GestureRecognizer = new TapGestureRecognizer(this);
+            this.GestureRecognizers.Add(new TapGestureRecognizer(this));
 
             radioButtonItem.PropertyChanged += MenuItem_PropertyChanged; // TODO: Matching detach event handler
         }

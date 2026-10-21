@@ -91,7 +91,7 @@ namespace XForms.Toolkit
 
             this._ownAnimator.Scale = 1.0f;
 
-            this.GestureRecognizer = new TapGestureRecognizer(this);
+            this.GestureRecognizers.Add(new TapGestureRecognizer(this));
         }
 
         public ICommand Command

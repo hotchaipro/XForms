@@ -31,7 +31,7 @@ namespace XForms.Toolkit
         public FloatingButton()
         {
             this._flyoutAnimator = this.CreateOwnAnimator();
-            this.GestureRecognizer = new SwipeGestureRecognizer(this);
+            this.GestureRecognizers.Add(new SwipeGestureRecognizer(this));
 
             this.IsEnabled = true;
             this.Focusable = true;

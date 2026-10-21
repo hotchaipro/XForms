@@ -122,7 +122,7 @@ namespace XForms.Toolkit
             this.Height = 40;
             this._ownAnimator.Scale = IsUncheckedScale;
 
-            this.GestureRecognizer = new TapGestureRecognizer(this);
+            this.GestureRecognizers.Add(new TapGestureRecognizer(this));
         }
 
         public string Text
