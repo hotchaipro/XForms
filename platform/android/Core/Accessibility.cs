@@ -5,6 +5,7 @@ using Android.OS;
 using Android.Views.Accessibility;
 using AndroidView = Android.Views.View;
 using NodeAction = Android.Views.Accessibility.Action;
+using XForms.Platform;
 
 namespace XForms.Android
 {
@@ -26,7 +27,7 @@ namespace XForms.Android
             if (!_isListening)
             {
                 _isListening = true;
-                View.AccessibilityStateChanged += OnStateChanged;
+                LayerHost.AccessibilityStateChanged += OnStateChanged;
             }
         }
 
@@ -69,7 +70,7 @@ namespace XForms.Android
             info.ClassName = ClassFor(role);
 
             // NOTE: TalkBack reads a list item's children itself
-            string text = (role == AccessibilityRole.ListItem) ? view.AccessibilityLabel : view.AccessibilityText;
+            string text = (role == AccessibilityRole.ListItem) ? view.AccessibilityLabel : LayerHost.For(view).AccessibilityText;
             if (!string.IsNullOrEmpty(text))
             {
                 if (role == AccessibilityRole.Image)
@@ -106,7 +107,7 @@ namespace XForms.Android
                 info.Heading = true;
             }
 
-            if (view.IsAccessibilityActionable)
+            if (LayerHost.For(view).IsAccessibilityActionable)
             {
                 info.Clickable = true;
                 info.AddAction(AccessibilityNodeInfo.AccessibilityAction.ActionClick);
@@ -121,9 +122,9 @@ namespace XForms.Android
         private static void OnStateChanged(
             View view)
         {
-            if (view.IsLightweight)
+            if (LayerHost.For(view).IsLightweight)
             {
-                var layer = view.FindLayer()?.NativeElement as NativeLayoutView;
+                var layer = LayerHost.For(view).Layer?.NativeElement as NativeLayoutView;
                 layer?.NodeProvider?.NotifyChanged(view);
                 return;
             }
@@ -155,7 +156,7 @@ namespace XForms.Android
         {
             base.OnInitializeAccessibilityNodeInfo(host, info);
 
-            if (this._view.TryGetTarget(out var hidden) && hidden.IsHiddenFromAccessibility)
+            if (this._view.TryGetTarget(out var hidden) && LayerHost.For(hidden).IsHiddenFromAccessibility)
             {
                 info.VisibleToUser = false;
                 return;
@@ -172,9 +173,9 @@ namespace XForms.Android
             NodeAction action,
             Bundle args)
         {
-            if ((action == NodeAction.Click) && this._view.TryGetTarget(out var view) && view.IsAccessibilityActionable)
+            if ((action == NodeAction.Click) && this._view.TryGetTarget(out var view) && LayerHost.For(view).IsAccessibilityActionable)
             {
-                if (view.PerformDefaultAccessibilityAction())
+                if (LayerHost.For(view).PerformDefaultAccessibilityAction())
                 {
                     host.SendAccessibilityEvent(EventTypes.ViewClicked);
                     return true;
@@ -195,7 +196,7 @@ namespace XForms.Android
             AndroidView host)
         {
             // A layer's lightweight views are virtual nodes inside it
-            if ((host is NativeLayoutView layer) && layer.Owner.HasLightweightChildren)
+            if ((host is NativeLayoutView layer) && LayerHost.For(layer.Owner).HasLightweightChildren)
             {
                 return layer.GetOrCreateNodeProvider();
             }
@@ -258,7 +259,7 @@ namespace XForms.Android
             int id)
         {
             if (this._views.TryGetValue(id, out var reference) && reference.TryGetTarget(out var view)
-                && view.IsLightweight && (view.FindLayer()?.NativeElement == this._host))
+                && LayerHost.For(view).IsLightweight && (LayerHost.For(view).Layer?.NativeElement == this._host))
             {
                 return view;
             }
@@ -276,16 +277,16 @@ namespace XForms.Android
             List<object> result,
             bool includeNative)
         {
-            var children = parent.DrawingOrderChildren;
+            var children = LayerHost.For(parent).Children;
             for (int i = 0; i < children.Count; i += 1)
             {
                 var child = children[i];
-                if (!child.IsVisible || child.IsHiddenFromAccessibility)
+                if (!child.IsVisible || LayerHost.For(child).IsHiddenFromAccessibility)
                 {
                     continue;
                 }
 
-                if (!child.IsLightweight)
+                if (!LayerHost.For(child).IsLightweight)
                 {
                     if (includeNative && (child.CreatedRenderer?.NativeElement is AndroidView nativeView))
                     {
@@ -328,7 +329,7 @@ namespace XForms.Android
             View view)
         {
             var context = this._host.Context;
-            var offset = view.OffsetInLayer;
+            var offset = LayerHost.For(view).OffsetInLayer;
             var size = view.Bounds;
             return new global::Android.Graphics.Rect(
                 (int)NativeConversions.DevicePixelsToPixels(context, offset.X),
@@ -364,12 +365,12 @@ namespace XForms.Android
             // Its parent is the nearest accessible lightweight ancestor, or the
             // layer
             var parent = view.Parent as View;
-            while ((null != parent) && parent.IsLightweight && (parent.AccessibilityRole == AccessibilityRole.None))
+            while ((null != parent) && LayerHost.For(parent).IsLightweight && (parent.AccessibilityRole == AccessibilityRole.None))
             {
                 parent = parent.Parent as View;
             }
 
-            if ((null != parent) && parent.IsLightweight)
+            if ((null != parent) && LayerHost.For(parent).IsLightweight)
             {
                 node.SetParent(this._host, this.IdOf(parent));
             }
@@ -420,7 +421,7 @@ namespace XForms.Android
             if (null != view)
             {
                 e.ClassName = AndroidAccessibility.ClassFor(view.AccessibilityRole);
-                string text = view.AccessibilityText;
+                string text = LayerHost.For(view).AccessibilityText;
                 if (!string.IsNullOrEmpty(text))
                 {
                     e.Text.Add(new Java.Lang.String(text));
@@ -485,7 +486,7 @@ namespace XForms.Android
                     return true;
 
                 case NodeAction.Click:
-                    if (view.IsAccessibilityActionable && view.PerformDefaultAccessibilityAction())
+                    if (LayerHost.For(view).IsAccessibilityActionable && LayerHost.For(view).PerformDefaultAccessibilityAction())
                     {
                         this.Send(virtualViewId, EventTypes.ViewClicked);
                         return true;
@@ -524,7 +525,7 @@ namespace XForms.Android
                 var point = new Point(
                     NativeConversions.PixelsToDevicePixels(this._host.Context, e.GetX()),
                     NativeConversions.PixelsToDevicePixels(this._host.Context, e.GetY()));
-                for (var view = this._host.Owner.HitTestLightweight(point); (null != view) && view.IsLightweight; view = view.Parent as View)
+                for (var view = LayerHost.For(this._host.Owner).HitTestLightweight(point); (null != view) && LayerHost.For(view).IsLightweight; view = view.Parent as View)
                 {
                     if (view.AccessibilityRole != AccessibilityRole.None)
                     {

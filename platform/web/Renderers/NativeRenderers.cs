@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Runtime.Versioning;
 using XForms.Controls;
 using XForms.Layouts;
+using XForms.Platform;
 
 namespace XForms.Web.Renderers
 {
@@ -959,15 +960,15 @@ namespace XForms.Web.Renderers
                 return null;
             }
 
-            if (target.IsLightweight)
+            if (LayerHost.For(target).IsLightweight)
             {
-                if (!(target.FindLayer() is ViewRenderer layer))
+                if (!(LayerHost.For(target).Layer is ViewRenderer layer))
                 {
                     return null;
                 }
 
                 var layerRect = Js.GetRect(layer.Id);
-                var offset = target.OffsetInLayer;
+                var offset = LayerHost.For(target).OffsetInLayer;
                 return new Rect((float)layerRect[0] + offset.X, (float)layerRect[1] + offset.Y, target.Bounds.Width, target.Bounds.Height);
             }
 

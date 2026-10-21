@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Foundation;
 using UIKit;
+using XForms.Platform;
 
 namespace XForms.iOS
 {
@@ -21,7 +22,7 @@ namespace XForms.iOS
 
         public bool TouchesBegan(
             UIView view,
-            IViewDelegate viewDelegate,
+            View viewDelegate,
             NSSet touches)
         {
             if ((null == viewDelegate) || (!view.UserInteractionEnabled))
@@ -50,7 +51,7 @@ namespace XForms.iOS
 
         public bool TouchesMoved(
             UIView view,
-            IViewDelegate viewDelegate,
+            View viewDelegate,
             NSSet touches)
         {
             bool tracked = false;
@@ -68,7 +69,7 @@ namespace XForms.iOS
 
         public bool TouchesEnded(
             UIView view,
-            IViewDelegate viewDelegate,
+            View viewDelegate,
             NSSet touches)
         {
             return this.EndTracking(view, viewDelegate, touches, PointerInputState.Ended);
@@ -76,7 +77,7 @@ namespace XForms.iOS
 
         public bool TouchesCancelled(
             UIView view,
-            IViewDelegate viewDelegate,
+            View viewDelegate,
             NSSet touches)
         {
             return this.EndTracking(view, viewDelegate, touches, PointerInputState.Canceled);
@@ -84,7 +85,7 @@ namespace XForms.iOS
 
         private bool EndTracking(
             UIView view,
-            IViewDelegate viewDelegate,
+            View viewDelegate,
             NSSet touches,
             PointerInputState state)
         {
@@ -103,7 +104,7 @@ namespace XForms.iOS
 
         private static bool Dispatch(
             UIView view,
-            IViewDelegate viewDelegate,
+            View viewDelegate,
             UITouch touch,
             int pointerId,
             PointerInputState state)
@@ -120,7 +121,7 @@ namespace XForms.iOS
                 : (touch.Type == UITouchType.IndirectPointer) ? PointerDeviceType.Mouse
                 : PointerDeviceType.Touch;
 
-            return viewDelegate.DispatchPointerEvent(new PointerEventArgs(pointerId, deviceType, point, state, true, KeyModifiers.None));
+            return LayerHost.For(viewDelegate).DispatchPointer(new PointerEventArgs(pointerId, deviceType, point, state, true, KeyModifiers.None));
         }
     }
 }

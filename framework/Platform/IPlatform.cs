@@ -2,10 +2,18 @@
 using XForms.Controls;
 using XForms.Layouts;
 
-namespace XForms
+namespace XForms.Platform
 {
     public interface IPlatform
     {
+        /// <summary>
+        /// Whether the framework draws lightweight views into their layer with
+        /// its own renderers (through <see cref="LayerHost"/>), rather than the
+        /// platform creating every view's renderer and drawing lightweight
+        /// views itself (as Win32 does).
+        /// </summary>
+        bool UsesLightweightRenderers { get; }
+
         IApplicationRenderer CreateApplicationRenderer(Application application);
         IPageRenderer CreatePageRenderer(Page page);
         IPanelRenderer CreatePanelRenderer(Panel layout);

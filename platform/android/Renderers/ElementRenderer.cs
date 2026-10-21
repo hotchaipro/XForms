@@ -1,4 +1,5 @@
 ﻿using System;
+using XForms.Platform;
 using AndroidContext = Android.Content.Context;
 
 namespace XForms.Android.Renderers

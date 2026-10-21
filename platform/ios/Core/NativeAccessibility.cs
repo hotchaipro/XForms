@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using CoreGraphics;
 using Foundation;
 using UIKit;
+using XForms.Platform;
 
 namespace XForms.iOS
 {
@@ -21,7 +22,7 @@ namespace XForms.iOS
             if (string.IsNullOrEmpty(label) && (view.AccessibilityRole == AccessibilityRole.ListItem))
             {
                 // Named by the text inside it
-                return view.AccessibilityText;
+                return LayerHost.For(view).AccessibilityText;
             }
 
             return label;
@@ -88,7 +89,7 @@ namespace XForms.iOS
             if (!_isListening)
             {
                 _isListening = true;
-                View.AccessibilityStateChanged += (view) => UIAccessibility.PostNotification(UIAccessibilityPostNotification.LayoutChanged, null);
+                LayerHost.AccessibilityStateChanged += (view) => UIAccessibility.PostNotification(UIAccessibilityPostNotification.LayoutChanged, null);
             }
 
             var elements = new List<NSObject>();
@@ -102,11 +103,11 @@ namespace XForms.iOS
             View parent,
             List<NSObject> elements)
         {
-            var children = parent.DrawingOrderChildren;
+            var children = LayerHost.For(parent).Children;
             for (int i = 0; i < children.Count; i += 1)
             {
                 var child = children[i];
-                if (!child.IsLightweight || !child.IsVisible || child.IsHiddenFromAccessibility)
+                if (!LayerHost.For(child).IsLightweight || !child.IsVisible || LayerHost.For(child).IsHiddenFromAccessibility)
                 {
                     continue;
                 }
@@ -136,7 +137,7 @@ namespace XForms.iOS
             {
                 this._view = new WeakReference<View>(view);
 
-                var offset = view.OffsetInLayer;
+                var offset = LayerHost.For(view).OffsetInLayer;
                 var size = view.Bounds;
                 this.AccessibilityFrameInContainerSpace = new CGRect(offset.X, offset.Y, size.Width, size.Height);
                 this.IsAccessibilityElement = true;
@@ -181,7 +182,7 @@ namespace XForms.iOS
             [Export("accessibilityActivate")]
             public bool Activate()
             {
-                return this._view.TryGetTarget(out var view) && view.IsAccessibilityActionable && view.PerformDefaultAccessibilityAction();
+                return this._view.TryGetTarget(out var view) && LayerHost.For(view).IsAccessibilityActionable && LayerHost.For(view).PerformDefaultAccessibilityAction();
             }
         }
     }

@@ -2,6 +2,7 @@ using System;
 using Windows.Win32.Graphics.Direct2D.Common;
 using Windows.Win32.Graphics.DirectComposition;
 using XForms.Controls;
+using XForms.Platform;
 
 namespace XForms.Win32.Renderers
 {

@@ -1,26 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using XForms.Platform;
 
 namespace XForms
 {
-    public interface IFrameRenderer : IViewRenderer
-    {
-        /// <summary>
-        /// Adds a page's native view, above the frame's other pages, if it
-        /// isn't there. The frame shows and hides pages with their
-        /// <see cref="View.IsVisible"/>.
-        /// </summary>
-        void AddPage(Page page);
-
-        void RemovePage(Page page);
-
-        /// <summary>
-        /// Draws the page above the frame's other pages.
-        /// </summary>
-        void BringToFront(Page page);
-    }
-
     /// <summary>
     /// How a page arrives or leaves.
     /// </summary>
@@ -65,6 +49,7 @@ namespace XForms
         {
         }
 
+        [PlatformContract]
         internal new IFrameRenderer Renderer
         {
             get

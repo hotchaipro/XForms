@@ -6,6 +6,7 @@ using System.Runtime.InteropServices.Marshalling;
 using System.Text;
 using System.Threading;
 using XForms.Win32.Renderers;
+using XForms.Platform;
 
 namespace XForms.Win32.Automation
 {
@@ -36,7 +37,7 @@ namespace XForms.Win32.Automation
                 {
                     // Once a client has asked for the tree, views tell it when
                     // their states change
-                    View.AccessibilityStateChanged += RaiseStateChanged;
+                    LayerHost.AccessibilityStateChanged += RaiseStateChanged;
                 }
 
                 root = new RootProvider(host);
@@ -72,7 +73,7 @@ namespace XForms.Win32.Automation
         public static bool IsAccessible(
             ViewRenderer renderer)
         {
-            if (!(renderer.Element is View view) || (view.AccessibilityRole == AccessibilityRole.None) || !renderer.IsShownOnScreen || view.IsHiddenFromAccessibility)
+            if (!(renderer.Element is View view) || (view.AccessibilityRole == AccessibilityRole.None) || !renderer.IsShownOnScreen || LayerHost.For(view).IsHiddenFromAccessibility)
             {
                 return false;
             }
@@ -119,7 +120,7 @@ namespace XForms.Win32.Automation
             ViewRenderer renderer,
             List<ViewRenderer> result)
         {
-            if (!renderer.IsShownOnScreen || ((renderer.Element is View view) && view.IsHiddenFromAccessibility))
+            if (!renderer.IsShownOnScreen || ((renderer.Element is View view) && LayerHost.For(view).IsHiddenFromAccessibility))
             {
                 return;
             }

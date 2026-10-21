@@ -1919,6 +1919,53 @@ Win32, Android and the browser, as before.
       platform could live outside this repository. Making them internal is
       simpler and can be undone.
 
+    **Status: done.**
+    - **The analyzer** (`analyzers/XForms.Analyzers`, rule XF0001) runs on
+      every `XForms.Framework.*` project. On the first build it found 50
+      framework internals the platforms used; none are left.
+    - **`XForms.Platform`** holds `IPlatform`, every renderer interface (and
+      the two callbacks the platforms make into views, `ITextBoxDelegate` and
+      `IPopupDelegate`), `PlatformContractAttribute` and the hosts, in
+      `framework/Platform`. The interfaces stay public: apps pass `IPlatform`
+      to their `Application`, which can't take an internal type. The hosts
+      are internal, since only the platforms use them.
+    - **`ApplicationHost`** replaces `IApplicationDelegate`: suspend and
+      resume, the system theme, the safe area, Back, hover and closing
+      windows. A platform gets it with `ApplicationHost.For(application)` or
+      `ApplicationHost.Current`.
+    - **`LayerHost`** (a struct over one view, from `LayerHost.For(view)`):
+      lightweight views (painting, hit testing, the focus ring), pointer,
+      wheel and key routing, focus, owner drawing, root sizes and
+      accessibility. It absorbed the internal `IViewDelegate`. Its pointer
+      and wheel dispatch go to the lightweight view under the pointer, as
+      the delegate's did, and fall through to the view itself on Win32.
+    - **The framework picks lightweight renderers:** `IPlatform` says
+      whether it uses them (`UsesLightweightRenderers`: true on Android,
+      iOS and the web; false on Win32, which draws lightweight views in its
+      own composition tree), and `TextBlock`, `Panel`, `ContentControl` and
+      `UserControl` create them. The platforms no longer each repeat the
+      check.
+    - **The element-to-renderer links** (`Renderer` and `CreatedRenderer`)
+      and `ListView.NotifyRefreshRequested` are marked `[PlatformContract]`.
+    - **Activation:** `View.Activated` is raised by the default
+      `OnActivate`, which no longer fakes a pointer press. Enter and Space,
+      a screen reader's activate command and UI Automation's patterns all
+      reach it. A view is focusable by default when something handles
+      `Activated`: `TapGestureRecognizer` and `SwipeGestureRecognizer`
+      handle it once attached to a view (recognizers now know their view),
+      and so does `View.Tapped`, as a tap at the view's center. Controls
+      that override `OnActivate` (the pickers, the calendar) are unchanged.
+    - **Verified:**
+      - Win32: clicks, Tab and Space, UI Automation's select, toggle and
+        list selection, Escape going back, and closing a second window.
+      - Android: taps, Tab and Space on a lightweight radio button (with its
+        focus ring), and the accessibility tree. In SoonerOrLater: opening a
+        task's commands with a tap, swiping a task done, and Undo.
+      - The browser: clicks, Tab and Space.
+    - **Fixed on the way:** Win32's focus manager called `OnActivate`
+      directly; it's `protected internal`, which the analyzer treats as
+      visible, so it goes through `LayerHost.Activate` now.
+
 20. **Slim the framework.** With the contract explicit, move out what isn't
     needed to serve it.
     - **One container primitive.** Today the platforms render five kinds

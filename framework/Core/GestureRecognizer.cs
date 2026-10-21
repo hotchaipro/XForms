@@ -61,6 +61,47 @@ namespace XForms
             this.State = GestureState.Possible;
         }
 
+        /// <summary>
+        /// The view the recognizer is attached to, or null.
+        /// </summary>
+        protected View View
+        {
+            get;
+            private set;
+        }
+
+        internal void Attach(
+            View view)
+        {
+            this.View = view;
+            this.OnAttached(view);
+        }
+
+        internal void Detach(
+            View view)
+        {
+            this.OnDetached(view);
+            this.View = null;
+        }
+
+        /// <summary>
+        /// Called when the recognizer becomes a view's
+        /// <see cref="View.GestureRecognizer"/>.
+        /// </summary>
+        protected virtual void OnAttached(
+            View view)
+        {
+        }
+
+        /// <summary>
+        /// Called when the recognizer stops being a view's
+        /// <see cref="View.GestureRecognizer"/>.
+        /// </summary>
+        protected virtual void OnDetached(
+            View view)
+        {
+        }
+
         private int? _pointerId;
 
         /// <summary>

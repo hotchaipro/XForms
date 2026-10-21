@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.Versioning;
 using XForms.Controls;
+using XForms.Platform;
 
 namespace XForms.Web.Renderers
 {
@@ -89,7 +90,7 @@ namespace XForms.Web.Renderers
     [SupportedOSPlatform("browser")]
     internal sealed class UserControlRenderer : ViewRenderer, IUserControlRenderer
     {
-        private readonly IDrawDelegate _drawDelegate;
+        private readonly UserControl _drawDelegate;
 
         public UserControlRenderer(
             UserControl userControl)
@@ -137,7 +138,7 @@ namespace XForms.Web.Renderers
         protected override void DrawContent(
             DrawContext drawContext)
         {
-            this._drawDelegate.InvokeRender(drawContext, new Rect(0, 0, this.Frame.Width, this.Frame.Height));
+            LayerHost.For(this._drawDelegate).Render(drawContext, new Rect(0, 0, this.Frame.Width, this.Frame.Height));
         }
     }
 

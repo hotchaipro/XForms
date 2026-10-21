@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using XForms.Platform;
 
 namespace XForms.Controls
 {
@@ -8,13 +9,6 @@ namespace XForms.Controls
         void InvokeRender(
             DrawingContext drawContext,
             Rect bounds);
-    }
-
-    public interface IUserControlRenderer : IControlRenderer
-    {
-        void Invalidate();
-
-        void SetContent(IViewRenderer content);
     }
 
     // TODO: Try to move IDrawDelegate to the Control base class or to CanvasControl
@@ -102,6 +96,7 @@ namespace XForms.Controls
             }
         }
 
+        [PlatformContract]
         internal new IUserControlRenderer Renderer
         {
             get
@@ -140,7 +135,10 @@ namespace XForms.Controls
 
         protected override IElementRenderer CreateRenderer()
         {
-            return this.Application.Platform.CreateUserControlRenderer(this);
+            var platform = this.Application.Platform;
+            return (platform.UsesLightweightRenderers && this.CanBeLightweight)
+                ? new LightweightControlRenderer(this)
+                : platform.CreateUserControlRenderer(this);
         }
 
         /// <summary>

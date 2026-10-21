@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Android.Graphics;
 using AndroidImageView = global::Android.Widget.ImageView;
 using XForms.Controls;
+using XForms.Platform;
 
 namespace XForms.Android.Renderers
 {

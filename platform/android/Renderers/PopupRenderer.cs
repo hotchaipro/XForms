@@ -3,6 +3,7 @@ using Android.Graphics.Drawables;
 using Android.Views;
 using AndroidPopupWindow = global::Android.Widget.PopupWindow;
 using XForms.Controls;
+using XForms.Platform;
 
 namespace XForms.Android.Renderers
 {
@@ -77,7 +78,7 @@ namespace XForms.Android.Renderers
 
             // A lightweight target has no native view: place the popup below its
             // place in its layer's view (or above, with more room there)
-            if ((null != target) && (null != this._content) && (target.FindLayer()?.NativeElement is global::Android.Views.View layer))
+            if ((null != target) && (null != this._content) && (LayerHost.For(target).Layer?.NativeElement is global::Android.Views.View layer))
             {
                 this.ShowAt(layer, target);
                 return;
@@ -99,7 +100,7 @@ namespace XForms.Android.Renderers
             var layerLocation = new int[2];
             layer.GetLocationInWindow(layerLocation);
 
-            var offset = target.OffsetInLayer;
+            var offset = LayerHost.For(target).OffsetInLayer;
             float left = Dips(layerLocation[0]) + offset.X;
             float top = Dips(layerLocation[1]) + offset.Y;
             float bottom = top + target.Bounds.Height;

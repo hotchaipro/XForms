@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using XForms.Platform;
 
 namespace XForms
 {
-    public interface IBitmapRenderer : IElementRenderer
-    {
-        Task LoadAsync();
-    }
-
     public class Bitmap : Element
     {
         public Bitmap(
@@ -33,6 +29,7 @@ namespace XForms
             private set;
         }
 
+        [PlatformContract]
         internal new IBitmapRenderer Renderer
         {
             get

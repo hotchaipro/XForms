@@ -1,12 +1,13 @@
 ﻿using System;
 using Android.Graphics;
 using XForms.Controls;
+using XForms.Platform;
 
 namespace XForms.Android
 {
     public sealed class OwnerDrawControl : NativeLayoutView
     {
-        private IDrawDelegate _drawDelegate;
+        private UserControl _drawDelegate;
 
         internal OwnerDrawControl(
             global::Android.Content.Context context,
@@ -39,7 +40,7 @@ namespace XForms.Android
                     XForms.Android.NativeConversions.PixelsToDevicePixels(this.Context, drawingRect.Height()));
 
                 var drawContext = new DrawContext(this.Context, canvas);
-                this._drawDelegate.InvokeRender(drawContext, bounds);
+                LayerHost.For(this._drawDelegate).Render(drawContext, bounds);
             }
         }
     }

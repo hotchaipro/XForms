@@ -1,6 +1,7 @@
 ﻿using System;
 using CoreGraphics;
 using UIKit;
+using XForms.Platform;
 
 namespace XForms.iOS.Renderers
 {
@@ -17,11 +18,11 @@ namespace XForms.iOS.Renderers
         {
         }
 
-        private IViewDelegate ViewDelegate
+        private View ViewDelegate
         {
             get
             {
-                return (IViewDelegate)this.Element;
+                return (View)this.Element;
             }
         }
 

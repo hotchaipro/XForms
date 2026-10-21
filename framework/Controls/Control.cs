@@ -1,18 +1,15 @@
 ﻿using System;
+using XForms.Platform;
 
 namespace XForms.Controls
 {
-    public interface IControlRenderer : IViewRenderer
-    {
-        Color BackgroundColor { get; set; }
-    }
-
     public abstract class Control : View
     {
         protected Control()
         {
         }
 
+        [PlatformContract]
         internal new IControlRenderer Renderer
         {
             get

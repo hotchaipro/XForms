@@ -4,6 +4,7 @@ using AndroidX.RecyclerView.Widget;
 using AndroidX.SwipeRefreshLayout.Widget;
 using XForms.Controls;
 using XForms.Layouts;
+using XForms.Platform;
 using AndroidListView = global::Android.Widget.ListView;
 using AndroidView = global::Android.Views.View;
 

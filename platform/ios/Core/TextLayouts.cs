@@ -4,6 +4,7 @@ using CoreGraphics;
 using CoreText;
 using Foundation;
 using UIKit;
+using XForms.Platform;
 
 namespace XForms.iOS
 {

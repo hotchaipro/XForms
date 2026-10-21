@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Reflection;
 using Windows.Win32;
 using XForms.Controls;
+using XForms.Platform;
 using XForms.Win32.Renderers;
 
 namespace XForms.Win32
@@ -19,6 +20,9 @@ namespace XForms.Win32
         {
             this._host = host ?? throw new ArgumentNullException(nameof(host));
         }
+
+        // NOTE: Win32 draws lightweight views itself, in its composition tree
+        public bool UsesLightweightRenderers => false;
 
         public IApplicationRenderer CreateApplicationRenderer(Application application) => new ApplicationRenderer(this._host, application);
 
@@ -77,12 +81,13 @@ namespace XForms.Win32
 
         public ApplicationRenderer(
             Win32Host host,
-            IApplicationDelegate application)
+            Application app)
         {
             this._host = host;
-            host.SystemThemeChanged += application.NotifySystemThemeChanged;
-            host.Suspending += application.NotifySuspend;
-            host.Resuming += application.NotifyResume;
+            var application = ApplicationHost.For(app);
+            host.SystemThemeChanged += application.SystemThemeChanged;
+            host.Suspending += application.Suspend;
+            host.Resuming += application.Resume;
         }
 
         public Color? TitleBarAccentColor { get; set; }
@@ -116,7 +121,7 @@ namespace XForms.Win32
             Size size)
         {
             var host = Win32Host.OpenWindow(title, size);
-            host.Closed = window.OnClosed;
+            host.Closed = () => ApplicationHost.Current.WindowClosed(window);
             host.SetRoot((ViewRenderer)frame.Renderer);
             SystemTheme.ApplyToWindow(host.Hwnd, Application.Current.Theme.Mode);
             return new WindowRenderer(host);

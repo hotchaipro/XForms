@@ -1,35 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using XForms.Layouts;
+using XForms.Platform;
 
 namespace XForms.Controls
 {
-    public interface IListViewRenderer : IElementRenderer
-    {
-        float FooterHeight { get; set; }
-
-        void Bind(ListViewSource source);
-
-        void ScrollToItem(object item);
-
-        /// <summary>
-        /// Lays the items out in a vertical list (the default), a horizontal
-        /// one, or a grid.
-        /// </summary>
-        ListLayout Layout { set; }
-
-        /// <summary>
-        /// Whether pulling the list down past its top asks for a refresh. The
-        /// platform calls <see cref="ListView.NotifyRefreshRequested"/>.
-        /// </summary>
-        bool IsRefreshEnabled { set; }
-
-        /// <summary>
-        /// Whether the refresh indicator shows.
-        /// </summary>
-        bool IsRefreshing { set; }
-    }
-
     /// <summary>
     /// How a list lays its items out: in a vertical or horizontal line, or a
     /// grid of columns that scrolls vertically.
@@ -301,6 +276,7 @@ namespace XForms.Controls
         /// Called by the platform when the user pulls to refresh (its indicator
         /// already shows).
         /// </summary>
+        [PlatformContract]
         internal void NotifyRefreshRequested()
         {
             if (!this._isRefreshing)
@@ -311,6 +287,7 @@ namespace XForms.Controls
             }
         }
 
+        [PlatformContract]
         internal new IListViewRenderer Renderer
         {
             get

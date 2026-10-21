@@ -4,6 +4,7 @@ using System.Runtime.Versioning;
 using System.Text;
 using System.Threading.Tasks;
 using XForms.Controls;
+using XForms.Platform;
 
 namespace XForms.Web.Renderers
 {

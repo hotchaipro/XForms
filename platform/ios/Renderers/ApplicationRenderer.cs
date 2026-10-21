@@ -1,4 +1,5 @@
 ﻿using System;
+using XForms.Platform;
 
 namespace XForms.iOS.Renderers
 {
@@ -6,7 +7,7 @@ namespace XForms.iOS.Renderers
     {
         private Application _application;
         private Frame _rootFrame;
-        private IApplicationDelegate _applicationDelegate;
+        private ApplicationHost _applicationHost;
         private NativeApplicationDelegate _nativeApplicationDelegate;
         //private Color? _titleBarAccentColor, _titleBarForegroundColor;
 
@@ -25,7 +26,7 @@ namespace XForms.iOS.Renderers
             }
 
             this._application = application;
-            this._applicationDelegate = application;
+            this._applicationHost = ApplicationHost.For(application);
             this._nativeApplicationDelegate = nativeApplication;
 
             nativeApplication.Suspending += Application_Suspending;
@@ -35,12 +36,12 @@ namespace XForms.iOS.Renderers
             // when the app becomes active
             Foundation.NSNotificationCenter.DefaultCenter.AddObserver(
                 UIKit.UIView.DarkerSystemColorsStatusDidChangeNotification,
-                (notification) => this._applicationDelegate.NotifySystemThemeChanged());
+                (notification) => this._applicationHost.SystemThemeChanged());
 
             // The text size (Dynamic Type)
             Foundation.NSNotificationCenter.DefaultCenter.AddObserver(
                 UIKit.UIApplication.ContentSizeCategoryChangedNotification,
-                (notification) => this._applicationDelegate.NotifySystemThemeChanged());
+                (notification) => this._applicationHost.SystemThemeChanged());
         }
 
         public Color? TitleBarAccentColor
@@ -145,15 +146,15 @@ namespace XForms.iOS.Renderers
             object sender,
             EventArgs e)
         {
-            this._applicationDelegate.NotifySuspend();
+            this._applicationHost.Suspend();
         }
 
         private void Application_Resuming(
             object sender,
             EventArgs e)
         {
-            this._applicationDelegate.NotifySystemThemeChanged();
-            this._applicationDelegate.NotifyResume();
+            this._applicationHost.SystemThemeChanged();
+            this._applicationHost.Resume();
         }
 
         public void Exit()

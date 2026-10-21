@@ -1,11 +1,12 @@
 ﻿using System;
+using XForms.Platform;
 
 namespace XForms.Android.Renderers
 {
     public class ApplicationRenderer : IApplicationRenderer
     {
         private Application _application;
-        private IApplicationDelegate _applicationDelegate;
+        private ApplicationHost _applicationHost;
         private AndroidApplicationActivity _androidApplication;
 
         public ApplicationRenderer(
@@ -23,13 +24,13 @@ namespace XForms.Android.Renderers
             }
 
             this._application = application;
-            this._applicationDelegate = application;
+            this._applicationHost = ApplicationHost.For(application);
             this._androidApplication = androidApplication;
 
             androidApplication.Suspending += Application_Suspending;
             androidApplication.Resuming += Application_Resuming;
-            androidApplication.ConfigurationChanged += (sender, e) => this._applicationDelegate.NotifySystemThemeChanged();
-            androidApplication.SafeAreaInsetsChanged += (insets) => this._applicationDelegate.NotifySafeAreaInsetsChanged(insets);
+            androidApplication.ConfigurationChanged += (sender, e) => this._applicationHost.SystemThemeChanged();
+            androidApplication.SafeAreaInsetsChanged += (insets) => this._applicationHost.SafeAreaInsetsChanged(insets);
         }
 
         public AndroidApplicationActivity Activity
@@ -185,14 +186,14 @@ namespace XForms.Android.Renderers
             object sender,
             EventArgs e)
         {
-            this._applicationDelegate.NotifySuspend();
+            this._applicationHost.Suspend();
         }
 
         private void Application_Resuming(
             object sender,
             EventArgs e)
         {
-            this._applicationDelegate.NotifyResume();
+            this._applicationHost.Resume();
         }
 
         public void Exit()
@@ -275,7 +276,7 @@ namespace XForms.Android.Renderers
         {
             // Back goes back in the app while it can; otherwise the system
             // takes it (and leaves the app)
-            this._androidApplication.SetBackHandler(this._application.CanGoBack ? this._application.OnBackRequested : null);
+            this._androidApplication.SetBackHandler(this._application.CanGoBack ? ApplicationHost.For(this._application).Back : null);
         }
     }
 }

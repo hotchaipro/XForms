@@ -1,21 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using XForms.Platform;
 
 namespace XForms.Controls
 {
-    public interface IScrollViewerRenderer : IViewRenderer
-    {
-        View Content { get; set; }
-
-        bool IsVerticalScrollingEnabled { get; set; }
-
-        bool IsHorizontalScrollingEnabled { get; set; }
-
-        float VerticalOffset { get; }
-
-        void ScrollTo(float verticalOffset, bool animated);
-    }
-
     public class ScrollViewer : View
     {
         // Its content is a layer of its own
@@ -126,6 +114,7 @@ namespace XForms.Controls
             }
         }
 
+        [PlatformContract]
         internal new IScrollViewerRenderer Renderer
         {
             get

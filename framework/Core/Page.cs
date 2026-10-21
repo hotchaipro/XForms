@@ -1,17 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using XForms.Platform;
 
 namespace XForms
 {
 
-
-    public interface IPageRenderer : IViewRenderer
-    {
-        void SetLayout(IPanelRenderer layoutRenderer);
-
-        Color BackgroundColor { get; set; }
-    }
 
     public class Page : View
     {
@@ -34,6 +28,7 @@ namespace XForms
             }
         }
 
+        [PlatformContract]
         internal new IPageRenderer Renderer
         {
             get

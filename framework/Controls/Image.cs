@@ -1,14 +1,8 @@
 ﻿using System;
+using XForms.Platform;
 
 namespace XForms.Controls
 {
-    public interface IImageRenderer : IViewRenderer
-    {
-        void SetTint(Color color);
-
-        void SetSource(ImageSource source);
-    }
-
     public class Image : View
     {
         public static readonly ViewProperty<Image, ImageSource> SourceProperty = new(nameof(Source), v => v.Source, (v, x) => v.Source = x);
@@ -61,6 +55,7 @@ namespace XForms.Controls
             }
         }
 
+        [PlatformContract]
         internal new IImageRenderer Renderer
         {
             get

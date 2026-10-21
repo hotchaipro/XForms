@@ -1,4 +1,5 @@
 ﻿using System;
+using XForms.Platform;
 using AndroidView = global::Android.Views.View;
 using AndroidViewGroup = global::Android.Views.ViewGroup;
 

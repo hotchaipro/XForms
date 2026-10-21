@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using XForms.Controls;
+using XForms.Platform;
 
 namespace XForms
 {

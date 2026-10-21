@@ -4,4 +4,9 @@
     <Nullable>disable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
   </PropertyGroup>
+
+  <!-- The platforms are kept to the platform contract (XF0001) -->
+  <ItemGroup Condition="$(MSBuildProjectName.StartsWith('XForms.Framework.'))">
+    <ProjectReference Include="$(MSBuildThisFileDirectory)analyzers\XForms.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="all" />
+  </ItemGroup>
 </Project>

@@ -1,5 +1,6 @@
 ﻿using System;
 using XForms.Controls;
+using XForms.Platform;
 using AndroidView = global::Android.Views.View;
 
 namespace XForms.Android.Renderers

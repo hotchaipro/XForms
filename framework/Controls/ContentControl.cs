@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using XForms.Platform;
 
 namespace XForms.Controls
 {
-    public interface IContentControlRenderer : IControlRenderer
-    {
-        void SetContent(IViewRenderer content);
-    }
-
     public abstract class ContentControl : Control
     {
         internal override bool IsLightweightType
@@ -91,6 +87,7 @@ namespace XForms.Controls
             }
         }
 
+        [PlatformContract]
         internal new IContentControlRenderer Renderer
         {
             get
@@ -121,7 +118,10 @@ namespace XForms.Controls
 
         protected override IElementRenderer CreateRenderer()
         {
-            return this.Application.Platform.CreateContentControlRenderer(this);
+            var platform = this.Application.Platform;
+            return (platform.UsesLightweightRenderers && this.CanBeLightweight)
+                ? new LightweightControlRenderer(this)
+                : platform.CreateContentControlRenderer(this);
         }
 
         protected override Size MeasureOverride(

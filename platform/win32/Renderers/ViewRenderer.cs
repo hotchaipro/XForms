@@ -7,6 +7,7 @@ using Windows.Win32.Graphics.DirectComposition;
 using Windows.Win32.Graphics.Dxgi.Common;
 using Windows.Win32.System.Com;
 using XForms.Controls;
+using XForms.Platform;
 
 namespace XForms.Win32.Renderers
 {
@@ -88,7 +89,7 @@ namespace XForms.Win32.Renderers
 
             // A lightweight view has no visual of its own: it draws into its
             // layer's surface (see IsLightweight)
-            this._isLightweight = this.SupportsLightweight && view.CanBeLightweight;
+            this._isLightweight = this.SupportsLightweight && LayerHost.For(view).CanBeLightweight;
             if (!this._isLightweight)
             {
                 this.CreateVisual();
@@ -960,8 +961,7 @@ namespace XForms.Win32.Renderers
                 var translation = drawContext.PushTransform(System.Numerics.Matrix3x2.CreateTranslation(frame.X, frame.Y));
                 var clip = child._clipToBounds ? drawContext.PushClip(bounds) : default;
 
-                var previous = drawContext.LightweightBounds;
-                drawContext.LightweightBounds = bounds;
+                var previous = LayerHost.SetLightweightBounds(drawContext, bounds);
                 try
                 {
                     if (!child._backgroundColor.IsTransparent)
@@ -973,7 +973,7 @@ namespace XForms.Win32.Renderers
                 }
                 finally
                 {
-                    drawContext.LightweightBounds = previous;
+                    LayerHost.SetLightweightBounds(drawContext, previous);
                 }
 
                 child.DrawLightweightChildren(drawContext);

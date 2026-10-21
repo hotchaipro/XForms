@@ -1,5 +1,6 @@
 using System;
 using Android.Views;
+using XForms.Platform;
 
 namespace XForms.Android
 {
@@ -105,7 +106,7 @@ namespace XForms.Android
         {
             // Keyboard focus can move into a layer with focusable lightweight
             // views inside it
-            if (!this.Focusable && this._owner.HasFocusableLightweight)
+            if (!this.Focusable && LayerHost.For(this._owner).HasFocusableLightweight)
             {
                 this.Focusable = true;
             }
@@ -147,17 +148,17 @@ namespace XForms.Android
         {
             // Lightweight descendants draw into this view, beneath its native
             // children
-            if (this._owner.HasLightweightChildren)
+            if (LayerHost.For(this._owner).HasLightweightChildren)
             {
                 var drawContext = new DrawContext(this.Context, canvas);
-                LightweightPainter.PaintDescendants(this._owner, drawContext);
+                LayerHost.For(this._owner).PaintLightweightViews(drawContext);
             }
 
             base.DispatchDraw(canvas);
 
-            if (null != this._owner.FocusedLightweight)
+            if (null != LayerHost.For(this._owner).FocusedLightweight)
             {
-                this._owner.PaintLightweightFocusRing(new DrawContext(this.Context, canvas));
+                LayerHost.For(this._owner).PaintFocusRing(new DrawContext(this.Context, canvas));
             }
         }
 

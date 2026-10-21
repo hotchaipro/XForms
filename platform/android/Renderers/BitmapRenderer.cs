@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using Android.Graphics;
+using XForms.Platform;
 using AndroidBitmap = global::Android.Graphics.Bitmap;
 
 namespace XForms.Android.Renderers

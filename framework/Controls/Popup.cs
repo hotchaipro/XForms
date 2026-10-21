@@ -1,28 +1,9 @@
 using System;
 using System.Collections.Generic;
+using XForms.Platform;
 
 namespace XForms.Controls
 {
-    public interface IPopupDelegate
-    {
-        /// <summary>
-        /// Called by the platform when the popup closes, including when the user
-        /// dismisses it (by clicking outside it or pressing Escape).
-        /// </summary>
-        void NotifyClosed();
-    }
-
-    public interface IPopupRenderer : IElementRenderer
-    {
-        View Content { get; set; }
-
-        View PlacementTarget { get; set; }
-
-        void Show();
-
-        void Close();
-    }
-
     /// <summary>
     /// Shows a view above the page until it is closed: centered in the window,
     /// or below (or, without room, above) its <see cref="PlacementTarget"/>.
@@ -139,6 +120,7 @@ namespace XForms.Controls
             this.Closed?.Invoke(this, EventArgs.Empty);
         }
 
+        [PlatformContract]
         internal new IPopupRenderer Renderer
         {
             get

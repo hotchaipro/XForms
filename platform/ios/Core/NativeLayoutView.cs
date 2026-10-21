@@ -2,6 +2,7 @@ using System;
 using CoreGraphics;
 using Foundation;
 using UIKit;
+using XForms.Platform;
 
 namespace XForms.iOS
 {
@@ -57,9 +58,9 @@ namespace XForms.iOS
                 case UIGestureRecognizerState.Began:
                 case UIGestureRecognizerState.Changed:
                     {
-                        var deepest = this._owner.HitTestPointerOver(point);
-                        var offset = (deepest == this._owner) ? default : deepest.OffsetInLayer;
-                        application.UpdatePointerOver(deepest, new PointerEventArgs(0, PointerDeviceType.Mouse, new Point(point.X - offset.X, point.Y - offset.Y), PointerInputState.Moved, false, KeyModifiers.None));
+                        var deepest = LayerHost.For(this._owner).HitTestPointerOver(point);
+                        var offset = (deepest == this._owner) ? default : LayerHost.For(deepest).OffsetInLayer;
+                        ApplicationHost.For(application).PointerOver(deepest, new PointerEventArgs(0, PointerDeviceType.Mouse, new Point(point.X - offset.X, point.Y - offset.Y), PointerInputState.Moved, false, KeyModifiers.None));
                     }
 
                     break;
@@ -69,13 +70,13 @@ namespace XForms.iOS
                     {
                         // Leaving this view for a subview or a neighbor enters
                         // that one next; only a pointer that went nowhere left
-                        int version = application.PointerOverVersion;
+                        int version = ApplicationHost.For(application).PointerOverVersion;
                         var exit = new PointerEventArgs(0, PointerDeviceType.Mouse, point, PointerInputState.Moved, false, KeyModifiers.None);
                         CoreFoundation.DispatchQueue.MainQueue.DispatchAsync(() =>
                         {
-                            if (application.PointerOverVersion == version)
+                            if (ApplicationHost.For(application).PointerOverVersion == version)
                             {
-                                application.UpdatePointerOver(null, exit);
+                                ApplicationHost.For(application).PointerOver(null, exit);
                             }
                         });
                     }
@@ -90,11 +91,11 @@ namespace XForms.iOS
         public override void Draw(
             CoreGraphics.CGRect area)
         {
-            if (this._owner.HasLightweightChildren)
+            if (LayerHost.For(this._owner).HasLightweightChildren)
             {
                 var drawContext = new DrawContext(UIGraphics.GetCurrentContext(), this.Bounds);
-                LightweightPainter.PaintDescendants(this._owner, drawContext);
-                this._owner.PaintLightweightFocusRing(drawContext);
+                LayerHost.For(this._owner).PaintLightweightViews(drawContext);
+                LayerHost.For(this._owner).PaintFocusRing(drawContext);
             }
         }
 
@@ -111,7 +112,7 @@ namespace XForms.iOS
         /// The view that receives pointer input from touches that land on this
         /// view or on any descendant that does not handle them.
         /// </summary>
-        internal IViewDelegate PointerInputDelegate
+        internal View PointerInputDelegate
         {
             get;
             set;
@@ -155,10 +156,10 @@ namespace XForms.iOS
 
             // The window's safe area, for pages that lay out around it
             var window = this.Window;
-            if ((null != window) && (Application.Current is IApplicationDelegate application))
+            if ((null != window) && (ApplicationHost.Current is ApplicationHost application))
             {
                 var insets = window.SafeAreaInsets;
-                application.NotifySafeAreaInsetsChanged(new Thickness((float)insets.Left, (float)insets.Top, (float)insets.Right, (float)insets.Bottom));
+                application.SafeAreaInsetsChanged(new Thickness((float)insets.Left, (float)insets.Top, (float)insets.Right, (float)insets.Bottom));
             }
         }
 
@@ -206,7 +207,7 @@ namespace XForms.iOS
         {
             get
             {
-                return (this._owner.AccessibilityRole != AccessibilityRole.None) && !this._owner.IsHiddenFromAccessibility;
+                return (this._owner.AccessibilityRole != AccessibilityRole.None) && !LayerHost.For(this._owner).IsHiddenFromAccessibility;
             }
 
             set
@@ -252,14 +253,14 @@ namespace XForms.iOS
 
         public override bool AccessibilityActivate()
         {
-            return this._owner.IsAccessibilityActionable && this._owner.PerformDefaultAccessibilityAction();
+            return LayerHost.For(this._owner).IsAccessibilityActionable && LayerHost.For(this._owner).PerformDefaultAccessibilityAction();
         }
 
         // NOTE: Null (nil) means the subviews
         [Export("accessibilityElements")]
         public NSObject[] GetAccessibilityElements()
         {
-            if ((this._owner.AccessibilityRole != AccessibilityRole.None) || !this._owner.HasLightweightChildren)
+            if ((this._owner.AccessibilityRole != AccessibilityRole.None) || !LayerHost.For(this._owner).HasLightweightChildren)
             {
                 return null;
             }
@@ -275,7 +276,7 @@ namespace XForms.iOS
         {
             get
             {
-                return this._owner.Focusable || this._owner.HasFocusableLightweight;
+                return this._owner.Focusable || LayerHost.For(this._owner).HasFocusableLightweight;
             }
         }
 
@@ -284,7 +285,7 @@ namespace XForms.iOS
             bool result = base.BecomeFirstResponder();
             if (result)
             {
-                this._owner.OnNativeFocusChanged(true, isBackward: false);
+                LayerHost.For(this._owner).NativeFocusChanged(true, isBackward: false);
             }
 
             return result;
@@ -295,7 +296,7 @@ namespace XForms.iOS
             bool result = base.ResignFirstResponder();
             if (result)
             {
-                this._owner.OnNativeFocusChanged(false, isBackward: false);
+                LayerHost.For(this._owner).NativeFocusChanged(false, isBackward: false);
             }
 
             return result;
@@ -342,7 +343,7 @@ namespace XForms.iOS
                 }
 
                 var keyEvent = new KeyEventArgs(key, ToKeyModifiers(uiKey.ModifierFlags));
-                handled |= isDown ? this._owner.RouteLayerKeyDown(keyEvent) : this._owner.RouteLayerKeyUp(keyEvent);
+                handled |= isDown ? LayerHost.For(this._owner).RouteKeyDown(keyEvent) : LayerHost.For(this._owner).RouteKeyUp(keyEvent);
             }
 
             return handled;

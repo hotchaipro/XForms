@@ -1,4 +1,5 @@
 ﻿using System;
+using XForms.Platform;
 
 namespace XForms.Controls
 {
@@ -9,57 +10,6 @@ namespace XForms.Controls
         SpellCheck = 1,
         Suggestions = 2,
         All = SpellCheck | Suggestions,
-    }
-
-    public interface ITextBoxDelegate
-    {
-        /// <summary>
-        /// Called by the platform after the user changes the text.
-        /// </summary>
-        void OnNativeTextChanged();
-
-        /// <summary>
-        /// Called by the platform when the user submits a single-line text box
-        /// (Enter, or the keyboard's Done or Go key).
-        /// </summary>
-        void OnNativeSubmitted();
-
-        /// <summary>
-        /// Called by the platform after the selection (or the caret) moves.
-        /// </summary>
-        void OnNativeSelectionChanged();
-    }
-
-    public interface ITextBoxRenderer : IControlRenderer
-    {
-        string Text { get; set; }
-        string PlaceholderText { get; set; }
-        bool Multiline { get; set; }
-        KeyboardOptions KeyboardOptions { get; set; }
-
-        /// <summary>
-        /// Shows the text as dots, and offers no suggestions or copying.
-        /// </summary>
-        bool IsPassword { set; }
-
-        /// <summary>
-        /// The most characters the user can enter, or 0 for no limit.
-        /// </summary>
-        int MaxLength { set; }
-
-        bool IsReadOnly { set; }
-
-        /// <summary>
-        /// The selected range, in UTF-16 code units; an empty range is the
-        /// caret.
-        /// </summary>
-        int SelectionStart { get; }
-
-        int SelectionLength { get; }
-
-        void Select(int start, int length);
-
-        new void Focus();
     }
 
     public class TextBox : Control, ITextBoxDelegate
@@ -403,6 +353,7 @@ namespace XForms.Controls
             }
         }
 
+        [PlatformContract]
         internal new ITextBoxRenderer Renderer
         {
             get

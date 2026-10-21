@@ -1,25 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using XForms.Platform;
 
 namespace XForms
 {
-    /// <summary>
-    /// Hosts the native views of a layout's children. Positioning is done in
-    /// Core by the layout itself; the platform only keeps the native child list.
-    /// </summary>
-    public interface IPanelRenderer : IViewRenderer
-    {
-        void ClearChildren();
-
-        void AddChild(IViewRenderer childRenderer);
-
-        void InsertChild(int index, IViewRenderer childRenderer);
-
-        void RemoveChildAt(int index);
-
-        void ReplaceChild(int index, IViewRenderer childRenderer);
-    }
-
     /// <summary>
     /// Base for layout containers. A panel creates a <see cref="ViewCollection"/>
     /// (or a <see cref="ViewCollection{TLayout}"/>, for children with layout
@@ -43,6 +27,7 @@ namespace XForms
             this._nativeOrder = new List<View>();
         }
 
+        [PlatformContract]
         internal new IPanelRenderer Renderer
         {
             get
@@ -325,7 +310,10 @@ namespace XForms
 
         protected override IElementRenderer CreateRenderer()
         {
-            return this.Application.Platform.CreatePanelRenderer(this);
+            var platform = this.Application.Platform;
+            return (platform.UsesLightweightRenderers && this.CanBeLightweight)
+                ? new LightweightPanelRenderer(this)
+                : platform.CreatePanelRenderer(this);
         }
 
         internal override bool IsLightweightType

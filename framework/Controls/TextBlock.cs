@@ -1,40 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using XForms.Platform;
 
 namespace XForms.Controls
 {
-    public interface ITextBlockRenderer : IViewRenderer
-    {
-        string Text { get; set; }
-
-        TextAlignment HorizontalTextAlignment { get; set; }
-
-        TextAlignment VerticalTextAlignment { get; set; }
-
-        bool WordWrap { get; set; }
-
-        bool TextTrimming { get; set; }
-
-        Color ForegroundColor { get; set; }
-
-        Color BackgroundColor { get; set; }
-
-        float FontSize { get; set; }
-
-        FontStyle FontStyle { get; set; }
-
-        FontWeight FontWeight { get; set; }
-
-        bool Strikethrough { get; set; }
-
-        string FontFamily { set; }
-
-        int MaxLines { set; }
-
-        IReadOnlyList<TextSpan> Spans { set; }
-    }
-
     /// <summary>
     /// A piece of a <see cref="TextBlock"/>'s text with its own style. Unset
     /// values keep the text block's own.
@@ -394,6 +364,7 @@ namespace XForms.Controls
             }
         }
 
+        [PlatformContract]
         internal new ITextBlockRenderer Renderer
         {
             get
@@ -458,7 +429,10 @@ namespace XForms.Controls
 
         protected override IElementRenderer CreateRenderer()
         {
-            return this.Application.Platform.CreateTextBlockRenderer(this);
+            var platform = this.Application.Platform;
+            return (platform.UsesLightweightRenderers && this.CanBeLightweight)
+                ? new LightweightTextBlockRenderer(this)
+                : platform.CreateTextBlockRenderer(this);
         }
     }
 }

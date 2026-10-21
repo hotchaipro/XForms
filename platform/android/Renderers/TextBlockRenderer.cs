@@ -2,6 +2,7 @@
 using Android.Views;
 using AndroidTextView = Android.Widget.TextView;
 using XForms.Controls;
+using XForms.Platform;
 
 namespace XForms.Android.Renderers
 {

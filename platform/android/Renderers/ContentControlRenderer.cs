@@ -1,5 +1,6 @@
 ﻿using System;
 using XForms.Controls;
+using XForms.Platform;
 
 namespace XForms.Android.Renderers
 {

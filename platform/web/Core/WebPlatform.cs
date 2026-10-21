@@ -4,6 +4,7 @@ using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 using XForms.Controls;
+using XForms.Platform;
 using XForms.Web.Renderers;
 
 namespace XForms.Web
@@ -19,28 +20,30 @@ namespace XForms.Web
             this._host = host;
         }
 
+        public bool UsesLightweightRenderers => true;
+
         public IApplicationRenderer CreateApplicationRenderer(Application application) => new ApplicationRenderer(this._host, application);
 
         public IPageRenderer CreatePageRenderer(Page page) => new PageRenderer(page);
 
         public IPanelRenderer CreatePanelRenderer(Panel layout)
         {
-            return layout.CanBeLightweight ? new LightweightPanelRenderer(layout) : new PanelRenderer(layout);
+            return new PanelRenderer(layout);
         }
 
         public ITextBlockRenderer CreateTextBlockRenderer(TextBlock label)
         {
-            return label.CanBeLightweight ? new LightweightTextBlockRenderer(label) : new TextBlockRenderer(label);
+            return new TextBlockRenderer(label);
         }
 
         public IContentControlRenderer CreateContentControlRenderer(ContentControl customControl)
         {
-            return customControl.CanBeLightweight ? new LightweightControlRenderer(customControl) : new ContentControlRenderer(customControl);
+            return new ContentControlRenderer(customControl);
         }
 
         public IUserControlRenderer CreateUserControlRenderer(UserControl userControl)
         {
-            return userControl.CanBeLightweight ? new LightweightControlRenderer(userControl) : new UserControlRenderer(userControl);
+            return new UserControlRenderer(userControl);
         }
 
         public IImageRenderer CreateImageRenderer(Image image) => new ImageRenderer(image);
@@ -85,12 +88,13 @@ namespace XForms.Web
 
         public ApplicationRenderer(
             WebHost host,
-            IApplicationDelegate application)
+            Application app)
         {
             this._host = host;
-            host.ThemeChanged += application.NotifySystemThemeChanged;
-            host.Suspending += application.NotifySuspend;
-            host.Resuming += application.NotifyResume;
+            var application = ApplicationHost.For(app);
+            host.ThemeChanged += application.SystemThemeChanged;
+            host.Suspending += application.Suspend;
+            host.Resuming += application.Resume;
         }
 
         public void SetRootFrame(

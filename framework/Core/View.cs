@@ -3,77 +3,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using XForms.Platform;
 
 namespace XForms
 {
-    internal interface IViewDelegate
-    {
-        bool DispatchPointerEvent(PointerEventArgs e);
-
-        bool DispatchPointerWheel(PointerEventArgs e);
-    }
-
-    public interface IViewRenderer : IElementRenderer
-    {
-        bool IsVisible { get; set; }
-
-        bool IsHitTestVisible { get; set; }
-
-        /// <summary>
-        /// Measures the native view within the available size (which excludes the
-        /// view's margin and may be infinite). A native container measures its
-        /// children by calling back into <see cref="View.MeasureContent"/>.
-        /// </summary>
-        Size MeasureNative(Size availableSize);
-
-        /// <summary>
-        /// Positions the native view at the frame, relative to its parent view. A
-        /// native container arranges its children by calling back into
-        /// <see cref="View.LayoutContent"/>.
-        /// </summary>
-        void ArrangeNative(Rect frame);
-
-        /// <summary>
-        /// Asks the platform to lay this view (and its ancestors) out again.
-        /// </summary>
-        void InvalidateMeasure();
-
-        /// <summary>
-        /// Whether the native view clips its children and drawing to its bounds.
-        /// </summary>
-        bool ClipToBounds { set; }
-
-        /// <summary>
-        /// Creates the view's animation layers, one per animator, outermost
-        /// first: each wraps the next, and the innermost wraps the view's own
-        /// content and children. Called once, when the native view is created,
-        /// and only for views with animators.
-        /// </summary>
-        IAnimationLayer[] CreateAnimationLayers(int count);
-
-        /// <summary>
-        /// Adds the native object of a view inside lightweight descendants of
-        /// this view, which have none of their own to add it to, at its place
-        /// in drawing order among the views it hosts. Hosted views are drawn
-        /// above the lightweight content and this view's own children.
-        /// </summary>
-        void AddHostedView(IViewRenderer child, int index);
-
-        void RemoveHostedView(IViewRenderer child);
-
-        /// <summary>
-        /// Draws the lightweight views inside this view again.
-        /// </summary>
-        void InvalidateLayerContent();
-
-        /// <summary>
-        /// Moves keyboard focus to the view. Returns false where the platform
-        /// has no keyboard focus for owner-drawn views.
-        /// </summary>
-        bool Focus();
-    }
-
-    public abstract class View : Element, IViewDelegate, INotifyPropertyChanged
+    public abstract class View : Element, INotifyPropertyChanged
     {
         public static readonly ViewProperty<View, bool> IsVisibleProperty = new(nameof(IsVisible), v => v.IsVisible, (v, x) => v.IsVisible = x);
         public static readonly ViewProperty<View, bool> IsHitTestVisibleProperty = new(nameof(IsHitTestVisible), v => v.IsHitTestVisible, (v, x) => v.IsHitTestVisible = x);
@@ -91,6 +25,7 @@ namespace XForms
         {
         }
 
+        [PlatformContract]
         internal new IViewRenderer Renderer
         {
             get
@@ -1936,10 +1871,29 @@ namespace XForms
 
         #endregion Layout
 
+        private GestureRecognizer _gestureRecognizer;
+
+        /// <summary>
+        /// The gesture recognizer that interprets the view's pointer input.
+        /// </summary>
         public GestureRecognizer GestureRecognizer
         {
-            get;
-            set;
+            get
+            {
+                return this._gestureRecognizer;
+            }
+
+            set
+            {
+                if (value == this._gestureRecognizer)
+                {
+                    return;
+                }
+
+                this._gestureRecognizer?.Detach(this);
+                this._gestureRecognizer = value;
+                value?.Attach(this);
+            }
         }
 
         #region Pointer input
@@ -2037,8 +1991,25 @@ namespace XForms
         /// </summary>
         public event EventHandler<TappedEventArgs> Tapped
         {
-            add { this._tapped += value; this.EnsureTapTracker(); }
-            remove { this._tapped -= value; }
+            add
+            {
+                if (null == this._tapped)
+                {
+                    this.Activated += this.OnActivatedAsTap;
+                }
+
+                this._tapped += value;
+                this.EnsureTapTracker();
+            }
+
+            remove
+            {
+                this._tapped -= value;
+                if (null == this._tapped)
+                {
+                    this.Activated -= this.OnActivatedAsTap;
+                }
+            }
         }
 
         /// <summary>
@@ -2127,6 +2098,15 @@ namespace XForms
         private void EnsureTapTracker()
         {
             this._tapTracker ??= new TapTracker(this);
+        }
+
+        // Activation (Enter, Space, a screen reader) taps the view's center
+        private void OnActivatedAsTap(
+            object sender,
+            EventArgs e)
+        {
+            var center = new Point(this.Bounds.Width / 2, this.Bounds.Height / 2);
+            this._tapped?.Invoke(this, new TappedEventArgs(center, PointerDeviceType.Mouse));
         }
 
         /// <summary>
@@ -2343,7 +2323,11 @@ namespace XForms
             }
         }
 
-        bool IViewDelegate.DispatchPointerEvent(
+        /// <summary>
+        /// Delivers a pointer event from the platform to this view as a layer:
+        /// to the lightweight view under it (or holding it), or to this view.
+        /// </summary>
+        internal bool DispatchLayerPointerEvent(
             PointerEventArgs e)
         {
             if (this.HasLightweightChildren || (0 < (this._pointerOwners?.Count ?? 0)))
@@ -2354,7 +2338,11 @@ namespace XForms
             return this.DispatchPointerEvent(e);
         }
 
-        bool IViewDelegate.DispatchPointerWheel(
+        /// <summary>
+        /// Delivers a wheel event from the platform to this view as a layer: to
+        /// the lightweight view under it and its ancestors, then this view.
+        /// </summary>
+        internal bool DispatchLayerPointerWheel(
             PointerEventArgs e)
         {
             if (this.HasLightweightChildren)
@@ -2460,8 +2448,7 @@ namespace XForms
         {
             get
             {
-                return this._isKeyboardFocusable
-                    ?? ((this.GestureRecognizer is Input.TapGestureRecognizer) || (null != this._tapped));
+                return this._isKeyboardFocusable ?? (null != this._activated);
             }
 
             set
@@ -2616,16 +2603,55 @@ namespace XForms
             return false;
         }
 
+        private EventHandler _activated;
+
         /// <summary>
-        /// Does what a tap would: called for Enter or Space on a focused view,
-        /// and for a screen reader's activate command. By default this sends a
-        /// press and release to the center of the view.
+        /// Raised when the view is activated without a pointer: Enter or Space
+        /// while it has focus, or a screen reader's or UI Automation's activate
+        /// command. Handling it says the view does something when activated,
+        /// so it's focusable unless <see cref="Focusable"/> says otherwise.
+        /// Gestures that respond to taps handle it, as a tap.
+        /// </summary>
+        public event EventHandler Activated
+        {
+            add
+            {
+                bool wasFocusable = this.Focusable;
+                this._activated += value;
+                if (wasFocusable != this.Focusable)
+                {
+                    this.OnPropertyChanged(nameof(this.Focusable));
+                }
+            }
+
+            remove
+            {
+                bool wasFocusable = this.Focusable;
+                this._activated -= value;
+                if (wasFocusable != this.Focusable)
+                {
+                    this.OnPropertyChanged(nameof(this.Focusable));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Activates the view, as Enter or Space would while it has focus.
+        /// </summary>
+        internal void Activate()
+        {
+            this.OnActivate();
+        }
+
+        /// <summary>
+        /// Called for Enter or Space on a focused view, and for a screen
+        /// reader's activate command. By default this raises
+        /// <see cref="Activated"/>; a control that does something else
+        /// overrides it.
         /// </summary>
         protected internal virtual void OnActivate()
         {
-            var center = new Point(this.Bounds.Width / 2, this.Bounds.Height / 2);
-            this.DispatchPointerEvent(new PointerEventArgs(-1, PointerDeviceType.Mouse, center, PointerInputState.Began, true, KeyModifiers.None));
-            this.DispatchPointerEvent(new PointerEventArgs(-1, PointerDeviceType.Mouse, center, PointerInputState.Ended, true, KeyModifiers.None));
+            this._activated?.Invoke(this, EventArgs.Empty);
         }
 
         #endregion Keyboard

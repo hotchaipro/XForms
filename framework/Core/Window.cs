@@ -1,4 +1,5 @@
 using System;
+using XForms.Platform;
 
 namespace XForms
 {
@@ -44,6 +45,7 @@ namespace XForms
         /// <summary>
         /// The renderer of a window the app opened.
         /// </summary>
+        [PlatformContract]
         internal IWindowRenderer Renderer
         {
             get;

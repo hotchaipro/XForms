@@ -3,6 +3,7 @@ using System.Runtime.InteropServices.JavaScript;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using XForms.Web.Renderers;
+using XForms.Platform;
 
 namespace XForms.Web
 {
@@ -308,7 +309,13 @@ namespace XForms.Web
         [JSExport]
         internal static void OnFocusChanged(int id, bool hasFocus)
         {
-            WebHost.Current?.OnElementEvent(id, (renderer) => (renderer.Element as View)?.OnNativeFocusChanged(hasFocus, false));
+            WebHost.Current?.OnElementEvent(id, (renderer) =>
+            {
+                if (renderer.Element is View view)
+                {
+                    LayerHost.For(view).NativeFocusChanged(hasFocus, false);
+                }
+            });
         }
 
         [JSExport]

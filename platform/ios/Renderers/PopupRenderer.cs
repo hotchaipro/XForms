@@ -2,6 +2,7 @@ using System;
 using CoreGraphics;
 using UIKit;
 using XForms.Controls;
+using XForms.Platform;
 
 namespace XForms.iOS.Renderers
 {
@@ -57,9 +58,9 @@ namespace XForms.iOS.Renderers
                 return true;
             }
 
-            if ((null != target) && (target.FindLayer()?.NativeElement is UIView layer))
+            if ((null != target) && (LayerHost.For(target).Layer?.NativeElement is UIView layer))
             {
-                var offset = target.OffsetInLayer;
+                var offset = LayerHost.For(target).OffsetInLayer;
                 var local = new CoreGraphics.CGRect(offset.X, offset.Y, target.Bounds.Width, target.Bounds.Height);
                 anchorFrame = layer.ConvertRectToView(local, window);
                 return true;

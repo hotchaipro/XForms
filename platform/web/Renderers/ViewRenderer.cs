@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Runtime.Versioning;
 using XForms.Controls;
+using XForms.Platform;
 
 namespace XForms.Web.Renderers
 {
@@ -412,7 +413,7 @@ namespace XForms.Web.Renderers
         public void Render()
         {
             var view = this.View;
-            bool hasDrawing = this.HasContent || view.HasLightweightChildren;
+            bool hasDrawing = this.HasContent || LayerHost.For(view).HasLightweightChildren;
             if (!hasDrawing)
             {
                 if (0 != this._canvasId)
@@ -435,8 +436,8 @@ namespace XForms.Web.Renderers
             var bounds = new Rect(0, 0, this._frame.Width, this._frame.Height);
             var drawContext = new DrawContext(bounds);
             this.DrawContent(drawContext);
-            LightweightPainter.PaintDescendants(view, drawContext);
-            view.PaintLightweightFocusRing(drawContext);
+            LayerHost.For(view).PaintLightweightViews(drawContext);
+            LayerHost.For(view).PaintFocusRing(drawContext);
             drawContext.Flush(this._canvasId);
 
             foreach (var image in drawContext.PendingImages)
@@ -518,7 +519,7 @@ namespace XForms.Web.Renderers
             bool isTextElement)
         {
             var role = view.AccessibilityRole;
-            if (view.IsHiddenFromAccessibility)
+            if (LayerHost.For(view).IsHiddenFromAccessibility)
             {
                 Js.SetAttribute(id, "aria-hidden", "true");
                 return;
@@ -547,7 +548,7 @@ namespace XForms.Web.Renderers
             Js.SetAttribute(id, "role", ariaRole);
 
             // Text elements read their own text
-            Js.SetAttribute(id, "aria-label", isTextElement ? null : view.AccessibilityText);
+            Js.SetAttribute(id, "aria-label", isTextElement ? null : LayerHost.For(view).AccessibilityText);
             Js.SetAttribute(id, "aria-level", (role == AccessibilityRole.Heading) ? "1" : null);
             Js.SetAttribute(id, "aria-checked", (role == AccessibilityRole.RadioButton) ? (view.AccessibilityIsSelected ? "true" : "false")
                 : view.AccessibilityIsChecked.HasValue ? (view.AccessibilityIsChecked.Value ? "true" : "false")
@@ -587,7 +588,7 @@ namespace XForms.Web.Renderers
                     this._accessibleElements[view] = id;
                 }
 
-                var offset = view.OffsetInLayer;
+                var offset = LayerHost.For(view).OffsetInLayer;
                 var size = view.Bounds;
                 Js.SetBounds(id, offset.X, offset.Y, size.Width, size.Height);
                 ApplyAccessibility(id, view, isTextElement: view.AccessibilityRole == AccessibilityRole.Text);
@@ -610,7 +611,7 @@ namespace XForms.Web.Renderers
                 for (int i = 0; i < order.Count; i += 1)
                 {
                     var view = order[i];
-                    ids[i] = view.IsLightweight ? this._accessibleElements[view] : -((ViewRenderer)view.Renderer).Id;
+                    ids[i] = LayerHost.For(view).IsLightweight ? this._accessibleElements[view] : -((ViewRenderer)view.Renderer).Id;
                 }
 
                 Js.PlaceAccessible(this.Id, ids);
@@ -625,11 +626,11 @@ namespace XForms.Web.Renderers
             List<View> lightweight,
             List<View> order)
         {
-            var children = parent.DrawingOrderChildren;
+            var children = LayerHost.For(parent).Children;
             for (int i = 0; i < children.Count; i += 1)
             {
                 var child = children[i];
-                if (!child.IsLightweight)
+                if (!LayerHost.For(child).IsLightweight)
                 {
                     if (child.Renderer is ViewRenderer)
                     {
@@ -639,7 +640,7 @@ namespace XForms.Web.Renderers
                     continue;
                 }
 
-                if (!child.IsVisible || child.IsHiddenFromAccessibility)
+                if (!child.IsVisible || LayerHost.For(child).IsHiddenFromAccessibility)
                 {
                     continue;
                 }

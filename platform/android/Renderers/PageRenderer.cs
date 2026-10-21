@@ -2,6 +2,7 @@
 using XForms.Android;
 using XForms.Layouts;
 using Android.Graphics.Drawables;
+using XForms.Platform;
 
 namespace XForms.Android.Renderers
 {

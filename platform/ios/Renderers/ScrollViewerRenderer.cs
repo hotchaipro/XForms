@@ -1,6 +1,7 @@
 using System;
 using UIKit;
 using XForms.Controls;
+using XForms.Platform;
 
 namespace XForms.iOS.Renderers
 {

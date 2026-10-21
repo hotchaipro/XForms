@@ -44,6 +44,27 @@ namespace XForms.Input
             this._gestureStart = Point.Zero;
         }
 
+        // Activation (Enter, Space, a screen reader) is a tap, which also
+        // makes the view focusable
+        protected override void OnAttached(
+            View view)
+        {
+            view.Activated += this.View_Activated;
+        }
+
+        protected override void OnDetached(
+            View view)
+        {
+            view.Activated -= this.View_Activated;
+        }
+
+        private void View_Activated(
+            object sender,
+            EventArgs e)
+        {
+            this._delegate.OnTapped();
+        }
+
         protected override void OnPointerInput(
             PointerEventArgs touch,
             ref GestureEventResult result)

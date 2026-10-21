@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Runtime.Versioning;
 using System.Text;
+using XForms.Platform;
 
 namespace XForms.Web
 {

@@ -6,6 +6,7 @@ using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Direct2D;
 using Windows.Win32.Graphics.DirectWrite;
 using Windows.Win32.System.Com;
+using XForms.Platform;
 
 namespace XForms.Win32
 {

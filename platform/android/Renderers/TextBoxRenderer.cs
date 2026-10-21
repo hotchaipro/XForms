@@ -1,5 +1,6 @@
 ﻿using System;
 using XForms.Controls;
+using XForms.Platform;
 using AndroidTextEntry = global::Android.Widget.EditText;
 
 namespace XForms.Android.Renderers

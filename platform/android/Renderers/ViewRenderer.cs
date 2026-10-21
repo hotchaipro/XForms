@@ -4,6 +4,7 @@ using Android.Views;
 using Android.Views.Animations;
 using Android.Animation;
 using Android.Graphics.Drawables;
+using XForms.Platform;
 using AndroidView = global::Android.Views.View;
 
 namespace XForms.Android.Renderers
@@ -21,11 +22,11 @@ namespace XForms.Android.Renderers
         {
         }
 
-        private IViewDelegate ViewDelegate
+        private LayerHost ViewDelegate
         {
             get
             {
-                return (IViewDelegate)this.Element;
+                return LayerHost.For((View)this.Element);
             }
         }
 
@@ -322,10 +323,9 @@ namespace XForms.Android.Renderers
             AndroidView.TouchEventArgs e)
         {
             bool result = false;
-            var control = this.ViewDelegate;
-
-            if (this.IsHitTestVisible && (null != control))
+            if (this.IsHitTestVisible && (this.Element is View view))
             {
+                var control = LayerHost.For(view);
                 var motionEvent = e.Event;
                 var modifiers = ToKeyModifiers(motionEvent.MetaState);
 
@@ -337,7 +337,7 @@ namespace XForms.Android.Renderers
                             int index = motionEvent.ActionIndex;
                             int pointerId = motionEvent.GetPointerId(index);
                             this._pointers.Add(pointerId);
-                            result = control.DispatchPointerEvent(this.ToPointerEvent(motionEvent, index, PointerInputState.Began, true, modifiers));
+                            result = control.DispatchPointer(this.ToPointerEvent(motionEvent, index, PointerInputState.Began, true, modifiers));
                             if (!result)
                             {
                                 this._pointers.Remove(pointerId);
@@ -352,7 +352,7 @@ namespace XForms.Android.Renderers
                         {
                             if (this._pointers.Contains(motionEvent.GetPointerId(index)))
                             {
-                                result |= control.DispatchPointerEvent(this.ToPointerEvent(motionEvent, index, PointerInputState.Moved, true, modifiers));
+                                result |= control.DispatchPointer(this.ToPointerEvent(motionEvent, index, PointerInputState.Moved, true, modifiers));
                             }
                         }
 
@@ -372,7 +372,7 @@ namespace XForms.Android.Renderers
                             int pointerId = motionEvent.GetPointerId(index);
                             if (this._pointers.Remove(pointerId))
                             {
-                                result = control.DispatchPointerEvent(this.ToPointerEvent(motionEvent, index, PointerInputState.Ended, true, modifiers));
+                                result = control.DispatchPointer(this.ToPointerEvent(motionEvent, index, PointerInputState.Ended, true, modifiers));
                             }
 
                             if (0 == this._pointers.Count)
@@ -388,7 +388,7 @@ namespace XForms.Android.Renderers
                         {
                             if (this._pointers.Remove(motionEvent.GetPointerId(index)))
                             {
-                                control.DispatchPointerEvent(this.ToPointerEvent(motionEvent, index, PointerInputState.Canceled, true, modifiers));
+                                control.DispatchPointer(this.ToPointerEvent(motionEvent, index, PointerInputState.Canceled, true, modifiers));
                             }
                         }
 
@@ -397,7 +397,7 @@ namespace XForms.Android.Renderers
                         break;
 
                     case MotionEventActions.HoverMove:
-                        result = control.DispatchPointerEvent(this.ToPointerEvent(motionEvent, 0, PointerInputState.Moved, false, modifiers));
+                        result = control.DispatchPointer(this.ToPointerEvent(motionEvent, 0, PointerInputState.Moved, false, modifiers));
                         break;
                 }
             }
@@ -427,12 +427,12 @@ namespace XForms.Android.Renderers
                 case MotionEventActions.HoverMove:
                     {
                         var hover = this.ToPointerEvent(motionEvent, 0, PointerInputState.Moved, false, modifiers);
-                        var deepest = view.HitTestPointerOver(hover.Position);
-                        var offset = (deepest == view) ? default : deepest.OffsetInLayer;
-                        application.UpdatePointerOver(deepest, new PointerEventArgs(hover.PointerId, hover.DeviceType, new Point(hover.Position.X - offset.X, hover.Position.Y - offset.Y), PointerInputState.Moved, false, modifiers));
+                        var deepest = LayerHost.For(view).HitTestPointerOver(hover.Position);
+                        var offset = (deepest == view) ? default : LayerHost.For(deepest).OffsetInLayer;
+                        ApplicationHost.For(application).PointerOver(deepest, new PointerEventArgs(hover.PointerId, hover.DeviceType, new Point(hover.Position.X - offset.X, hover.Position.Y - offset.Y), PointerInputState.Moved, false, modifiers));
 
                         // Lightweight views see hover moves too
-                        this.ViewDelegate?.DispatchPointerEvent(hover);
+                        this.ViewDelegate.DispatchPointer(hover);
                         e.Handled = true;
                     }
 
@@ -443,12 +443,12 @@ namespace XForms.Android.Renderers
                         // Leaving this view for a child or a neighbor enters that
                         // one next; only a pointer that went nowhere left the window
                         var exit = this.ToPointerEvent(motionEvent, 0, PointerInputState.Moved, false, modifiers);
-                        int version = application.PointerOverVersion;
+                        int version = ApplicationHost.For(application).PointerOverVersion;
                         this._nativeView?.Post(() =>
                         {
-                            if (application.PointerOverVersion == version)
+                            if (ApplicationHost.For(application).PointerOverVersion == version)
                             {
-                                application.UpdatePointerOver(null, exit);
+                                ApplicationHost.For(application).PointerOver(null, exit);
                             }
                         });
                         e.Handled = true;
@@ -511,7 +511,7 @@ namespace XForms.Android.Renderers
             AndroidView.GenericMotionEventArgs e)
         {
             var motionEvent = e.Event;
-            if ((motionEvent.Action != MotionEventActions.Scroll) || (null == this.ViewDelegate))
+            if ((motionEvent.Action != MotionEventActions.Scroll) || !(this.Element is View))
             {
                 e.Handled = false;
                 return;
@@ -521,7 +521,7 @@ namespace XForms.Android.Renderers
             float delta = motionEvent.GetAxisValue(Axis.Vscroll) * 48.0f;
             var position = new Point(this.PixelsToDevicePixels(motionEvent.GetX()), this.PixelsToDevicePixels(motionEvent.GetY()));
             var pointerEvent = new PointerEventArgs(0, PointerDeviceType.Mouse, position, PointerInputState.Moved, false, ToKeyModifiers(motionEvent.MetaState), delta);
-            e.Handled = this.ViewDelegate.DispatchPointerWheel(pointerEvent);
+            e.Handled = this.ViewDelegate.DispatchWheel(pointerEvent);
         }
 
         private void Element_FocusChange(
@@ -530,7 +530,7 @@ namespace XForms.Android.Renderers
         {
             if (this.Element is View view)
             {
-                view.OnNativeFocusChanged(e.HasFocus, (sender as NativeLayoutView)?.IsFocusBackward ?? false);
+                LayerHost.For(view).NativeFocusChanged(e.HasFocus, (sender as NativeLayoutView)?.IsFocusBackward ?? false);
             }
         }
 
@@ -554,11 +554,11 @@ namespace XForms.Android.Renderers
             var keyEvent = new KeyEventArgs(key, ToKeyModifiers(e.Event.MetaState));
             if (e.Event.Action == KeyEventActions.Down)
             {
-                e.Handled = view.RouteLayerKeyDown(keyEvent);
+                e.Handled = LayerHost.For(view).RouteKeyDown(keyEvent);
             }
             else if (e.Event.Action == KeyEventActions.Up)
             {
-                e.Handled = view.RouteLayerKeyUp(keyEvent);
+                e.Handled = LayerHost.For(view).RouteKeyUp(keyEvent);
             }
         }
 

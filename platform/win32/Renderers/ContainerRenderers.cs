@@ -6,6 +6,7 @@ using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Direct2D;
 using Windows.Win32.Graphics.Imaging;
 using XForms.Controls;
+using XForms.Platform;
 
 namespace XForms.Win32.Renderers
 {
@@ -115,7 +116,7 @@ namespace XForms.Win32.Renderers
             }
         }
 
-        private readonly IDrawDelegate _drawDelegate;
+        private readonly UserControl _drawDelegate;
 
         public UserControlRenderer(
             UserControl userControl)
@@ -164,7 +165,7 @@ namespace XForms.Win32.Renderers
         protected override void DrawContent(
             DrawContext drawContext)
         {
-            this._drawDelegate.InvokeRender(drawContext, new Rect(0, 0, this.Frame.Width, this.Frame.Height));
+            LayerHost.For(this._drawDelegate).Render(drawContext, new Rect(0, 0, this.Frame.Width, this.Frame.Height));
         }
     }
 
