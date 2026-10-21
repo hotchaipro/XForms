@@ -2,9 +2,10 @@
 
 XForms is built in layers. The **framework** contains only what needs a
 platform: hosting, the views the platforms render natively, raw input,
-drawing, focus and accessibility. **XForms.Controls** is the controls, with
-the panels and gestures, built only on the framework's public API. **Apps**
-use both.
+drawing, focus and accessibility. **XForms.Toolkit** has what apps use
+besides controls (platform services and data binding), for any set of
+controls. **XForms.Controls** is our controls, with the panels and gestures,
+built only on the framework's public API. **Apps** use all three.
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
@@ -12,8 +13,12 @@ use both.
 ├──────────────────────────────────────────────────────────────┤
 │ Controls: XForms.Controls                                    │
 │   Buttons, tabs, menus, pickers, calendar, lists, panels,    │
-│   gestures, and their base classes                           │
+│   gestures, their base classes, and their theme tokens       │
 │   Built only on the public framework API                     │
+├──────────────────────────────────────────────────────────────┤
+│ Toolkit: XForms.Toolkit                                      │
+│   Platform services (implemented by the platforms) and data  │
+│   binding, for any set of controls                           │
 ├──────────────────────────────────────────────────────────────┤
 │ Framework: XForms.Framework                                  │
 │   Application, pages, views and layout, raw input, focus,    │
@@ -33,7 +38,7 @@ The goal is that any control library built on the framework runs on every
 supported platform with the same look and the same layout. All of the
 per-platform complexity stays inside the framework and the platforms.
 
-Planned layers ([alignment.md](alignment.md#layering), phases 22-24): themes
+Planned layers ([alignment.md](alignment.md#layering), phases 23-25): themes
 (`XForms.Themes.Simple` first) for how the controls look, `XForms.Xaml` for
 markup, and `XForms.Compat.WinUI` for WinUI's API.
 
@@ -81,6 +86,7 @@ spinner built from that animation goes in XForms.Controls.
 | `platform/ios/` | `XForms.Framework.iOS` | iOS implementation (UIKit) |
 | `platform/win32/` | `XForms.Framework.Win32` | Windows implementation (Win32, DirectComposition, Direct2D, DirectWrite, RichEdit) |
 | `platform/web/` | `XForms.Framework.Web` | Browser implementation (.NET on WebAssembly, DOM elements and canvases) |
+| `toolkit/` | `XForms.Toolkit` (net10.0) | Platform services (each platform implements them) and data binding |
 | `controls/` | `XForms.Controls` (net10.0) | Controls, panels and gestures |
 | `analyzers/` | `XForms.Analyzers` | XF0001, which keeps the platforms to the platform contract |
 | `test/` | `XForms.Test.*` | Test apps (the pages are shared in `test/XForms.Test`) |
@@ -92,8 +98,10 @@ The dependency rules:
   `ApplicationHost`, `LayerHost`) and members marked `[PlatformContract]`.
   The framework gives them its internals (`InternalsVisibleTo`), and the
   XF0001 analyzer makes any other use a build error.
+- **XForms.Toolkit** references the framework only, and the platforms
+  reference it to implement its services.
 - **XForms.Controls**, and any other control library, references the
-  framework only. It uses **public API only**. This is enforced by the
+  framework (and XForms.Toolkit, for binding). It uses **public API only**. This is enforced by the
   compiler: it has no access to framework internals. Needing an internal is
   a signal that the framework is missing a public API for control authors.
 - **An app** references the framework, one platform project, and the control
@@ -101,7 +109,8 @@ The dependency rules:
   example `Win32Application.Run` or an `AndroidApplicationActivity` subclass.
 
 Namespaces: the framework uses `XForms`, `XForms.Primitives` (the native
-primitives) and `XForms.Platform` (the contract). XForms.Controls uses
+primitives) and `XForms.Platform` (the contract). XForms.Toolkit uses
+`XForms`. XForms.Controls uses
 `XForms.Controls` (controls, `Panel` and the base classes), `XForms.Layouts`
 (the panels) and `XForms.Input` (the gesture recognizers).
 
@@ -329,12 +338,15 @@ Native text entries expose themselves natively.
 
 ## Themes
 
-A `Theme` is an immutable record of design tokens: a `ColorScheme` of
-semantic colors (accent, background, surface and error, each with the color
-of content on it, plus subtle foreground, outline and disabled),
-`Typography`, `Shapes` and `Motion`, for a `ThemeMode` (light, dark or high
-contrast). It can also carry default styles for controls, such as the
-XForms.Controls' `ButtonStyle`.
+A `Theme` is an immutable record: a `ThemeMode` (light, dark or high
+contrast), a `ColorScheme` of semantic colors (accent, background, surface
+and error, each with the color of content on it, plus subtle foreground,
+outline and disabled), and **extensions** that control libraries add
+(`GetExtension`, `WithExtension`), as Flutter's theme extensions. The
+framework knows only the mode and colors, which the platforms also fill
+from the system's high-contrast colors. XForms.Controls adds its
+`Typography`, `Shapes` and `Motion` (read as `theme.Typography` and so on)
+and default control styles such as `ButtonStyle`.
 
 The application builds its theme with `CreateTheme(mode, accent)` from the
 mode (the system's, unless the app sets `RequestedThemeMode`) and the accent
@@ -424,7 +436,7 @@ contract. Still to do:
 
 - **iOS testing.** iOS builds, but it hasn't been run since the restructure
   (it needs a Mac). Its popups, in particular, are new and untested.
-- **Themes.** The controls still draw themselves; phase 22 of
+- **Themes.** The controls still draw themselves; phase 23 of
   [alignment.md](alignment.md#layering) moves their drawing into themes
   (`XForms.Themes.Simple` first), then adds markup and WinUI compatibility.
   Controls other than `Button` have no styles of their own.

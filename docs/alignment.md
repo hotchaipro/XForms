@@ -1863,7 +1863,8 @@ to go:
 | Assembly | Layer | Builds on |
 |---|---|---|
 | `XForms.Framework` (+ `.Win32`, `.Android`, `.iOS`, `.Web`) | The platform contract: elements, layout, drawing, raw input, and the views the platforms render | — |
-| `XForms.Controls` | Functional controls (what they do, not how they look) and their base classes; panels and gestures | Framework |
+| `XForms.Toolkit` | Platform services and data binding, for any control set (phase 22) | Framework |
+| `XForms.Controls` | Functional controls (what they do, not how they look) and their base classes; panels and gestures | Framework, Toolkit |
 | `XForms.Themes.<Name>` | How the controls look: `Simple` first | Controls |
 | `XForms.Xaml` | Markup | Framework, Controls |
 | `XForms.Compat.WinUI` | WinUI's API over XForms' controls | Controls, Xaml |
@@ -2092,7 +2093,54 @@ Win32, Android and the browser, as before.
       the four test apps and SoonerOrLater on Win32, Android and the web);
       the rename changes no behavior that phases 19 and 20 verified.
 
-22. **Themes.** A control says what it does and what state it's in; a
+22. **Trim the framework.** The framework keeps only what a different set
+    of controls would also need; what's specific to ours, or isn't UI at
+    all, moves out.
+
+    **Status: done.**
+    - **`XForms.Toolkit`** (new, `toolkit/`), what apps use besides
+      controls, for any control set:
+      - **Services** (clipboard, launcher, preferences, secure storage,
+        sharing, connectivity, file pickers, haptics). The platforms still
+        implement them, and now register them as they start
+        (`PlatformServices.Current`); `IPlatform.CreateServices` is gone.
+        `Application.Services` remains, as an extension property, so apps
+        are unchanged.
+      - **Data binding** (`Binding`, `Bind`, `ViewProperty`). Bindings stay
+        alive with their views through a `ConditionalWeakTable` instead of a
+        hook on `View`. The framework views' descriptors
+        (`TextBlock.TextProperty` and the rest) are C# 14 static extension
+        properties here, so apps' code is unchanged.
+    - **`Theme`** keeps the mode and `ColorScheme`. Every color in the scheme
+      is one the platforms use (they fill it from the system's high-contrast
+      colors), so it's the system's vocabulary rather than our controls'.
+      Everything else is a theme **extension** a control library adds,
+      after Flutter's `ThemeExtension`: `GetExtension` and `WithExtension`
+      replace `GetStyle` and `WithStyle`. XForms.Controls' `Typography`,
+      `TextStyle`, `Shapes` and `Motion` are extensions, read through
+      extension properties (`theme.Typography`), with defaults when a theme
+      has none. `Frame` times its own transitions (`TransitionDuration`).
+    - **Modal pages:** `ModalPage<TResult>` and the generic
+      `ShowModalAsync<TResult>` are gone. `ShowModalAsync(Page)` completes
+      when the page closes (`Page.CloseModalAsync`); a page keeps its own
+      result.
+    - **Light dismiss:** `ILightDismissTarget` and
+      `Application.LightDismissTarget` are gone. XForms.Controls'
+      `LightDismissControl` handles the general
+      `Application.PreviewPointerInput` while it's open.
+    - **Verified:**
+      - Win32: a modal page's result, the network service, two-way binding
+        (and a bound command's enabled state), and the pickers and panels
+        pages pixel for pixel against phase 20 (apart from the spinning
+        progress ring).
+      - Android: SoonerOrLater's menu closes on a press on a task (which
+        then does nothing else).
+      - The browser: the network service and a modal page's result.
+    - **Not done:** a press on a list's blank space (below its last row)
+      doesn't reach the framework on Android, so it doesn't close an open
+      flyout. That was already so before this phase.
+
+23. **Themes.** A control says what it does and what state it's in; a
     theme says how it looks. The controls' current look becomes the first
     theme, `XForms.Themes.Simple`, and an app chooses its theme explicitly.
 
@@ -2106,15 +2154,16 @@ Win32, Android and the browser, as before.
     build child views for their look (a picker's chevron, a calendar's day
     labels). The rest (`CommandBar`, `MessageBox`, `TabStrip`,
     `RadioButtons`, `MenuBar`, `FlyoutButton`, `CommandListView`,
-    `ListView<T>`) only compose those. `Theme` holds tokens (colors,
-    typography, shapes, motion) and per-control styles (`ButtonStyle`), and
-    `Application.CreateTheme` builds it for the mode and accent color.
+    `ListView<T>`) only compose those. `Theme` holds the mode and colors,
+    and XForms.Controls' extensions (typography, shapes, motion, per-control
+    styles such as `ButtonStyle`); `Application.CreateTheme` builds it for
+    the mode and accent color.
 
     **The model:**
 
     | Concept | Where | What it is |
     |---|---|---|
-    | `Theme` | framework | The data: mode, colors, typography, shapes, motion, styles, and now the templates. Immutable; inherited down the view tree and overridable per view, as now |
+    | `Theme` | framework | The data: the mode and colors, and extensions (XForms.Controls' typography, shapes, motion, styles, and now templates). Immutable; inherited down the view tree and overridable per view, as now |
     | `TemplatedControl` | XForms.Controls | Base for controls with a look: it resolves its template from its theme, hands it its state, and draws through it |
     | `ControlTemplate<TControl>` | XForms.Controls | One control's look: its drawing, the child views (parts) it adds, its layout of them, and its response to state changes |
     | `SimpleTheme` | XForms.Themes.Simple | Builds a `Theme` with the Simple tokens, styles and a template for every control |
@@ -2122,15 +2171,15 @@ Win32, Android and the browser, as before.
     WPF and Avalonia call these `ControlTemplate` and (in Avalonia)
     `TemplatedControl`, and a markup layer will want to write templates, so
     the names follow them. Unlike theirs, a template here is code first:
-    small enough (draw, add parts, react to state) that phase 23 can
+    small enough (draw, add parts, react to state) that phase 24 can
     express one in markup.
 
-    - **Templates in the theme.** `Theme` gains `Templates`, a map from
-      control type to template, with `GetTemplate` and `WithTemplate`
-      alongside `GetStyle` and `WithStyle`. The framework stores them as
-      objects (it knows nothing of controls); XForms.Controls reads them
-      typed. A control without its own entry uses its base type's (a
-      subclass of `ToggleButton` looks like one), so per-view overrides
+    - **Templates in the theme.** The templates are a theme extension of
+      XForms.Controls' (phase 22): a map from control type to template,
+      read and changed through extension methods (`theme.GetTemplate`,
+      `theme.WithTemplate`). The framework knows nothing of them. A control
+      without its own entry uses its base type's (a subclass of
+      `ToggleButton` looks like one), so per-view overrides
       (`view.Theme = theme.WithTemplate(...)`) work as styles do.
     - **`TemplatedControl`** (a `UserControl`, so it draws and has content):
       - Resolves its template when it's attached (when its theme is known,
@@ -2153,7 +2202,7 @@ Win32, Android and the browser, as before.
       select).
     - **Styles are the theme's.** `ButtonStyle` describes the Simple look,
       so it moves to XForms.Themes.Simple. Per-view styling stays the
-      theme's: `button.Theme = theme.WithStyle(new ButtonStyle { ... })`.
+      theme's: `button.Theme = theme.WithExtension(new ButtonStyle { ... })`.
       That removes `Button.Style` (decision 3).
     - **Choosing a theme.** An app chooses it in `CreateTheme`:
       `protected override Theme CreateTheme(ThemeMode mode, Color accent)
@@ -2173,7 +2222,7 @@ Win32, Android and the browser, as before.
     **Steps,** each built for every platform and verified on Win32, Android
     and the browser:
 
-    1. **The mechanism:** `Theme.Templates`; `TemplatedControl`,
+    1. **The mechanism:** the templates extension; `TemplatedControl`,
        `ControlTemplate<TControl>` and `TemplateContext`; the state
        properties and `StateChanged`; the missing-template error. A
        framework hook if it's needed to resolve the template after the view
@@ -2215,13 +2264,13 @@ Win32, Android and the browser, as before.
        every view so templates can ask for new animation layers.
 
     **Later, not in this phase:** more themes (Fluent, Material); templates
-    in markup (phase 23).
+    in markup (phase 24).
 
-23. **Later: `XForms.Xaml`.** The proof of concept in `spikes/XForms.Xaml`
+24. **Later: `XForms.Xaml`.** The proof of concept in `spikes/XForms.Xaml`
     becomes a layer over the framework and controls, including templates
     written in markup. To be planned in detail when it's next.
 
-24. **Later: `XForms.Compat.WinUI`.** Adapters giving WinUI's names and a
+25. **Later: `XForms.Compat.WinUI`.** Adapters giving WinUI's names and a
     `DependencyProperty`-style API over XForms' controls, with XAML
     namespace mappings so existing markup loads. It stays separate from any
     Fluent theme, so neither requires the other, and keeps its types in
