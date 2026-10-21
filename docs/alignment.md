@@ -702,8 +702,9 @@ from. Where XForms keeps its own name, the reason is in
 | `UserControl.DrawBackground(IDrawContext, Rectangle)` | `Control.Render(DrawingContext)` | Avalonia |
 | `UserControl.Invalidate()` | `InvalidateVisual()` | WPF, Avalonia |
 | `Page.Layout` | `Page.Content` | WinUI, Avalonia, MAUI |
-| `Application.NavigateTo`, `NavigateBack`, `CanNavigateBack` | `NavigateAsync(page)`, `GoBackAsync()`, `CanGoBack` | MAUI, WinUI |
-| `Application.InvokeOnUIThreadAsync` | `Dispatcher.Post` and `Dispatcher.InvokeAsync` | Avalonia, WPF |
+| `Application.NavigateTo`, `NavigateBack`, `CanNavigateBack` | `NavigateAsync(page)`, `GoBackAsync()`, `CanGoBack` | MAUI, WinUI | **Done**, with `ShowModalAsync` and `PageTransition` |
+| `Application.InvokeOnUIThreadAsync` | `Dispatcher.Post` and `Dispatcher.InvokeAsync` | Avalonia, WPF | **Done** |
+| `Application.OpenUri` | `Application.Services` (`Clipboard`, `Launcher`, `Preferences`, `SecureStorage`, `Share`, `HapticFeedback`) | MAUI Essentials (as instances) | **Done** |
 | `Application.OpenUri` | A launcher service from the application (`OpenAsync`) | MAUI |
 | `Application.MeasureText` | `TextLayout` | Avalonia, DirectWrite |
 | `TextView.ForegroundColor` | `Foreground` | All |
@@ -1489,5 +1490,51 @@ Neither changed the order of the phases. Both added items, which are below.
    - Platform services, as interfaces from the application.
    - Windows on desktop.
    - System text-scale changes.
+
+   **Status: done**, except file pickers and secondary windows.
+   - **Navigation:**
+     - `Application.NavigateAsync(page, transition)`, `GoBackAsync()` and
+       `CanGoBack` replace `NavigateTo`, `NavigateBack` and
+       `CanNavigateBack`. Parameters go to the page's constructor, and each
+       method completes when its transition has.
+     - Modal pages: `ShowModalAsync(page)` completes when the page closes
+       (by Back, or `Page.CloseModalAsync`), and
+       `ShowModalAsync<TResult>(ModalPage<TResult>)` completes with the result
+       the page closes with (`ModalPage<TResult>.CloseAsync(result)`).
+     - `PageTransition`: a slide (the default), sliding up (modal pages), a
+       fade, or none, played by the pages' animators.
+     - `Frame` gained `NavigateAsync`, `GoBackAsync`, `ReplaceAsync` (for
+       tabs, which was `NavigateInPlace`) and `CurrentPage`. Its renderers
+       keep pages in the frame and bring the arriving one to the front, so
+       two pages show during a transition (Android and iOS used to replace
+       the frame's only child). Pages leaving the back stack are removed.
+     - Android's Back key and gesture go back in the app
+       (`OnBackInvokedCallback`, registered only while there's somewhere to
+       go back to, so the system's predictive back still leaves the app).
+   - **`Dispatcher`** (`Post`, `InvokeAsync`, `CheckAccess`) replaces
+     `Application.InvokeOnUIThreadAsync`.
+   - **Services**, from `Application.Services`, each an interface the app can
+     replace: `IClipboard`, `ILauncher`, `IPreferences` (with typed `Get` and
+     `Set`), `ISecureStorage` (DPAPI, the Android Keystore, the iOS
+     Keychain), `IShare` and `IHapticFeedback`. On Windows, sharing copies to
+     the clipboard (the share sheet needs a packaged app), and there are no
+     haptics.
+   - **`Application.MainWindow`**: `Title`, `Size` and `SizeChanged`, and on
+     Windows `Resize` and `MinimumSize`.
+   - **Text size:** font sizes follow the system's text size on every
+     platform (Android's scaled pixels already did; Windows' "make text
+     bigger" and iOS's Dynamic Type now do too). `Application.TextScale` and
+     `TextScaleChanged` report it, and views lay out again when it changes.
+   - **Verified** on Win32 (an app layer test page: forward, back, a fade,
+     a modal page's result, preferences, secure storage, the window title
+     and size) and Android (the same, plus the clipboard and the Back key),
+     and SoonerOrLater's tabs, Settings and Back on Android. iOS is only
+     built. The clipboard and share on Windows weren't run (they'd replace
+     the user's clipboard), nor sharing anywhere (it opens a system sheet).
+   - **Not done:**
+     - File pickers, connectivity and safe-area insets (from the gap
+       analysis).
+     - Secondary windows on the desktop: the Win32 host is one window.
+     - Changing the text size wasn't tested (it's a system setting).
 12. **Ongoing.** Accessibility (states, values, actions; Android and iOS) and
     keyboard focus on every platform, alongside the phases above.

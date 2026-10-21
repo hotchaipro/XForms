@@ -141,6 +141,11 @@ namespace XForms.Android
             Fonts.Register(this._androidApplication.ApplicationContext, familyName, fileName);
         }
 
+        public PlatformServices CreateServices()
+        {
+            return AndroidServices.Create(this._androidApplication);
+        }
+
         public void NavigateToUri(
             Uri uri)
         {

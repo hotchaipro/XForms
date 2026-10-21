@@ -65,7 +65,7 @@ namespace XForms.Test
             // the storyboard once the UI thread has finished building the page.
             if (view.Storyboards.TryGetValue("Loaded", out var storyboard))
             {
-                this.Application.InvokeOnUIThreadAsync(storyboard.Begin);
+                this.Application.Dispatcher.Post(storyboard.Begin);
             }
         }
 

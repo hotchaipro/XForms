@@ -217,6 +217,28 @@ namespace XForms
         }
 
         /// <summary>
+        /// Lays out and draws the element and its descendants again, at the
+        /// system's new text size.
+        /// </summary>
+        internal void OnTextScaleChanged()
+        {
+            if (null == this._renderer)
+            {
+                return;
+            }
+
+            this.OnTextScaleChangedCore();
+            foreach (var child in this.GetThemedChildElements())
+            {
+                child.OnTextScaleChanged();
+            }
+        }
+
+        internal virtual void OnTextScaleChangedCore()
+        {
+        }
+
+        /// <summary>
         /// The children that follow the element's theme: its children, and
         /// any it keeps without showing (such as a frame's back stack).
         /// </summary>

@@ -12,7 +12,7 @@ namespace XForms.iOS.Renderers
             Frame frame)
             : base(frame)
         {
-            var view = new NativeView()
+            var view = new RootView(frame)
             {
                 BackgroundColor = UIColor.SystemBackground,
             };
@@ -23,6 +23,24 @@ namespace XForms.iOS.Renderers
             this.SetNativeElement(view);
         }
 
+        // Reports its size: the root frame is the window's content
+        private sealed class RootView : NativeView
+        {
+            private readonly Frame _frame;
+
+            public RootView(
+                Frame frame)
+            {
+                this._frame = frame;
+            }
+
+            public override void LayoutSubviews()
+            {
+                base.LayoutSubviews();
+                this._frame.NotifyRootSize(new Size((float)this.Bounds.Width, (float)this.Bounds.Height));
+            }
+        }
+
         internal UIViewController ViewController
         {
             get
@@ -31,23 +49,30 @@ namespace XForms.iOS.Renderers
             }
         }
 
-        void IFrameRenderer.Push(
+        // Pages stay in the frame (hidden when not showing), so transitions can
+        // show two at once
+        public void AddPage(
             Page page)
         {
+            var nativePage = (NativeView)page.Renderer.NativeElement;
+            if (nativePage.Superview != this.NativeElement)
+            {
+                this.NativeElement.AddSubview(nativePage);
+                nativePage.Frame = this.NativeElement.Bounds;
+                nativePage.AutoresizingMask = UIViewAutoresizing.FlexibleDimensions;
+            }
         }
 
-        public void SetContent(
-            Page newPage,
-            bool hideCurrentPage)
+        public void RemovePage(
+            Page page)
         {
-            for (int i = 0; i < this.NativeElement.Subviews.Length; i++)
-            {
-                this.NativeElement.Subviews[i].RemoveFromSuperview();
-            }
-            var nativePage = (NativeView)newPage.Renderer.NativeElement;
-            this.NativeElement.AddSubview(nativePage);
-            nativePage.Frame = this.NativeElement.Bounds;
-            nativePage.AutoresizingMask = UIViewAutoresizing.FlexibleDimensions;
+            ((NativeView)page.Renderer.NativeElement).RemoveFromSuperview();
+        }
+
+        public void BringToFront(
+            Page page)
+        {
+            this.NativeElement.BringSubviewToFront((NativeView)page.Renderer.NativeElement);
         }
     }
 }

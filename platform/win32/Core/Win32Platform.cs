@@ -52,6 +52,11 @@ namespace XForms.Win32
             Process.Start(new ProcessStartInfo(uri.AbsoluteUri) { UseShellExecute = true });
         }
 
+        public PlatformServices CreateServices()
+        {
+            return Win32Services.Create();
+        }
+
         public ITextLayoutRenderer CreateTextLayout(
             TextLayout layout)
         {
@@ -87,6 +92,32 @@ namespace XForms.Win32
         public Color? SystemAccentColor => SystemTheme.AccentColor;
 
         public ColorScheme SystemHighContrastColors => SystemTheme.HighContrastColors;
+
+        public float SystemTextScale => SystemTheme.TextScale;
+
+        public string WindowTitle
+        {
+            set
+            {
+                PInvoke.SetWindowText(this._host.Hwnd, value ?? string.Empty);
+            }
+        }
+
+        public bool CanResizeWindow => true;
+
+        public Size MinimumWindowSize
+        {
+            set
+            {
+                this._host.MinimumClientSize = value;
+            }
+        }
+
+        public void ResizeWindow(
+            Size size)
+        {
+            this._host.ResizeClient(size);
+        }
 
         public void SetRootFrame(
             Frame frame)

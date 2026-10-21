@@ -235,5 +235,11 @@ namespace XForms.Controls
 
             this.InvalidateVisual();
         }
+
+        internal override void OnTextScaleChangedCore()
+        {
+            base.OnTextScaleChangedCore();
+            this.InvalidateVisual();
+        }
     }
 }

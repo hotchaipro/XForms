@@ -43,6 +43,9 @@ namespace XForms.iOS
             FontWeight weight,
             FontStyle style)
         {
+            // Font sizes follow the Dynamic Type text size
+            size = (float)UIFontMetrics.DefaultMetrics.GetScaledValue(size);
+
             UIFont font;
             bool isSerif = string.Equals(family, FontFamilies.Serif, StringComparison.OrdinalIgnoreCase);
             bool isMonospace = string.Equals(family, FontFamilies.Monospace, StringComparison.OrdinalIgnoreCase);

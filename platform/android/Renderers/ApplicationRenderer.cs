@@ -133,6 +133,33 @@ namespace XForms.Android.Renderers
             }
         }
 
+        // NOTE: Android applies the font scale itself: text sizes are in
+        // scaled pixels
+        public float SystemTextScale => this._androidApplication.Resources.Configuration.FontScale;
+
+        public string WindowTitle
+        {
+            set
+            {
+                // Shown in the recent apps list
+                this._androidApplication.Title = value;
+            }
+        }
+
+        public bool CanResizeWindow => false;
+
+        public Size MinimumWindowSize
+        {
+            set
+            {
+            }
+        }
+
+        public void ResizeWindow(
+            Size size)
+        {
+        }
+
         private void Application_Suspending(
             object sender,
             EventArgs e)
@@ -225,6 +252,9 @@ namespace XForms.Android.Renderers
 
         public void OnNavigationComplete()
         {
+            // Back goes back in the app while it can; otherwise the system
+            // takes it (and leaves the app)
+            this._androidApplication.SetBackHandler(this._application.CanGoBack ? this._application.OnBackRequested : null);
         }
     }
 }

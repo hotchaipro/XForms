@@ -245,9 +245,9 @@ namespace XForms.Win32
         private bool NavigateBack()
         {
             var application = Application.Current;
-            if ((null != application) && application.CanNavigateBack)
+            if ((null != application) && application.CanGoBack)
             {
-                application.NavigateBack();
+                application.OnBackRequested();
                 return true;
             }
 

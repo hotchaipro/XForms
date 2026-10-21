@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 
 namespace XForms
@@ -120,6 +121,15 @@ namespace XForms
         protected override IElementRenderer CreateRenderer()
         {
             return this.Application.Platform.CreatePageRenderer(this);
+        }
+
+        /// <summary>
+        /// Closes the page, when it's shown with
+        /// <see cref="Application.ShowModalAsync(Page)"/>.
+        /// </summary>
+        public Task CloseModalAsync()
+        {
+            return this.Application.CloseModalAsync(this, null);
         }
 
         internal protected virtual bool OnNavigatingFrom(

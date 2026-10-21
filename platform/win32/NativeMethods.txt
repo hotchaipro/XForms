@@ -130,3 +130,7 @@ SystemParametersInfo
 HIGHCONTRASTW
 GetSysColor
 SYS_COLOR_INDEX
+MINMAXINFO
+GetWindowLong
+AdjustWindowRectExForDpi
+WINDOW_LONG_PTR_INDEX

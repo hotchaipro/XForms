@@ -433,6 +433,18 @@ namespace XForms.Controls
             if (null != this._text) native.Text = this._text;
         }
 
+        internal override void OnTextScaleChangedCore()
+        {
+            base.OnTextScaleChangedCore();
+
+            // The native text measures again at the new scale
+            var native = this.Native;
+            if (null != native)
+            {
+                native.FontSize = native.FontSize;
+            }
+        }
+
         protected override void OnThemeChanged(
             Theme theme)
         {

@@ -136,6 +136,11 @@ namespace XForms.iOS
             Fonts.Register(familyName, fileName);
         }
 
+        public PlatformServices CreateServices()
+        {
+            return IosServices.Create(this._nativeApplication);
+        }
+
         public void NavigateToUri(
             Uri uri)
         {

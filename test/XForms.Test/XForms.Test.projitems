@@ -9,6 +9,7 @@
     <Import_RootNamespace>XForms.Test</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AppLayerPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AnimationPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BenchmarkPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ControlPage.cs" />

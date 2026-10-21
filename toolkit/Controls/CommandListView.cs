@@ -524,7 +524,7 @@ namespace XForms.Toolkit
             this._contentLayout.Animator.TranslateTo(new Point(direction * this.Bounds.Size.Width, 0), this.ActualTheme.Motion.Short, new CubicEase(EasingMode.EaseInOut));
             this._swipeItem.Animator.TranslateTo(new Point(0, 0), this.ActualTheme.Motion.Short, new CubicEase(EasingMode.EaseInOut)).Completion.ContinueWith((ignore) =>
             {
-                Application.InvokeOnUIThreadAsync(() =>
+                Application.Dispatcher.Post(() =>
                 {
                     this._swipeCommand?.Execute(this.Item);
 

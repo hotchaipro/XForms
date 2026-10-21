@@ -87,9 +87,47 @@ namespace XForms.Win32
 
         /// <summary>
         /// Raised when Windows' theme settings may have changed: dark mode, the
-        /// accent color or high contrast.
+        /// accent color, high contrast or the text size.
         /// </summary>
         public event Action SystemThemeChanged;
+
+        /// <summary>
+        /// The smallest client area the user can resize the window to, in DIPs.
+        /// </summary>
+        public Size MinimumClientSize
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// The window size (in pixels) for a client area (in DIPs).
+        /// </summary>
+        public System.Drawing.Size ClientToWindowSize(
+            Size clientSize)
+        {
+            var rect = new RECT()
+            {
+                left = 0,
+                top = 0,
+                right = (int)Math.Round(clientSize.Width * this.Scale),
+                bottom = (int)Math.Round(clientSize.Height * this.Scale),
+            };
+
+            var style = (WINDOW_STYLE)PInvoke.GetWindowLong(this._hwnd, WINDOW_LONG_PTR_INDEX.GWL_STYLE);
+            PInvoke.AdjustWindowRectExForDpi(ref rect, style, false, 0, PInvoke.GetDpiForWindow(this._hwnd));
+            return new System.Drawing.Size(rect.right - rect.left, rect.bottom - rect.top);
+        }
+
+        /// <summary>
+        /// Resizes the window so its client area is the size (in DIPs).
+        /// </summary>
+        public void ResizeClient(
+            Size clientSize)
+        {
+            var size = this.ClientToWindowSize(clientSize);
+            PInvoke.SetWindowPos(this._hwnd, HWND.Null, 0, 0, size.Width, size.Height, SET_WINDOW_POS_FLAGS.SWP_NOMOVE | SET_WINDOW_POS_FLAGS.SWP_NOZORDER | SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE);
+        }
 
         /// <summary>
         /// Device pixels per device-independent pixel.
@@ -677,6 +715,18 @@ namespace XForms.Win32
                         }
                         break;
 
+                    case PInvoke.WM_GETMINMAXINFO:
+                        if (0 < (host.MinimumClientSize.Width + host.MinimumClientSize.Height))
+                        {
+                            var minimum = host.ClientToWindowSize(host.MinimumClientSize);
+                            var info = (MINMAXINFO*)lParam.Value;
+                            info->ptMinTrackSize.X = minimum.Width;
+                            info->ptMinTrackSize.Y = minimum.Height;
+                            return (LRESULT)0;
+                        }
+
+                        break;
+
                     case PInvoke.WM_SIZE:
                         host.RequestLayout();
                         break;
@@ -700,6 +750,7 @@ namespace XForms.Win32
                         // "ImmersiveColorSet"; high contrast as a color change.
                         // Rereading the settings is cheap, and the app ignores
                         // a theme that didn't change.
+                        SystemTheme.Invalidate();
                         host.SystemThemeChanged?.Invoke();
                         break;
 

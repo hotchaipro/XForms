@@ -581,7 +581,7 @@ namespace XForms
                 // Settle on the final value when it ends, unless replaced first
                 var application = Application.Current;
                 Task.Delay(timing.TotalDuration).ContinueWith(
-                    (task) => application.InvokeOnUIThreadAsync(() =>
+                    (task) => application.Dispatcher.Post(() =>
                     {
                         if (this._running[(int)channel] == running)
                         {

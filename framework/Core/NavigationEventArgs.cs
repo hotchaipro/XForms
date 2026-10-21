@@ -10,12 +10,18 @@ namespace XForms
 
     public class NavigationEventArgs : EventArgs
     {
-        private NavigationMode _navigationMode;
-
         public NavigationEventArgs(
             NavigationMode navigationMode)
         {
-            this._navigationMode = navigationMode;
+            this.NavigationMode = navigationMode;
+        }
+
+        /// <summary>
+        /// Whether the navigation went forward to a page or back to it.
+        /// </summary>
+        public NavigationMode NavigationMode
+        {
+            get;
         }
     }
 }

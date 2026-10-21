@@ -47,6 +47,68 @@ namespace XForms.Android
             this.Resuming?.Invoke(this, EventArgs.Empty);
         }
 
+        private BackCallback _backCallback;
+
+        /// <summary>
+        /// Handles the Back key and gesture with the action, or leaves them to
+        /// the system (null).
+        /// </summary>
+        internal void SetBackHandler(
+            Action onBack)
+        {
+            if (global::Android.OS.Build.VERSION.SdkInt < global::Android.OS.BuildVersionCodes.Tiramisu)
+            {
+                this._legacyBackHandler = onBack;
+                return;
+            }
+
+            if ((null != onBack) && (null == this._backCallback))
+            {
+                this._backCallback = new BackCallback(onBack);
+                this.OnBackInvokedDispatcher.RegisterOnBackInvokedCallback(0, this._backCallback);
+            }
+            else if (null != onBack)
+            {
+                this._backCallback.OnBack = onBack;
+            }
+            else if (null != this._backCallback)
+            {
+                this.OnBackInvokedDispatcher.UnregisterOnBackInvokedCallback(this._backCallback);
+                this._backCallback = null;
+            }
+        }
+
+        private Action _legacyBackHandler;
+
+        // Before Android 13, Back arrives here
+        [Obsolete]
+        public override void OnBackPressed()
+        {
+            if (null != this._legacyBackHandler)
+            {
+                this._legacyBackHandler();
+                return;
+            }
+
+            base.OnBackPressed();
+        }
+
+        private sealed class BackCallback : Java.Lang.Object, global::Android.Window.IOnBackInvokedCallback
+        {
+            public BackCallback(
+                Action onBack)
+            {
+                this.OnBack = onBack;
+            }
+
+            public Action OnBack { get; set; }
+
+            public void OnBackInvoked()
+            {
+                this.OnBack?.Invoke();
+            }
+        }
+
         public override void OnConfigurationChanged(
             global::Android.Content.Res.Configuration newConfig)
         {

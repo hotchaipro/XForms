@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using XForms.Controls;
 
@@ -11,8 +12,8 @@ namespace XForms
         void NotifyResume();
 
         /// <summary>
-        /// The system's theme mode, accent color or high-contrast colors
-        /// changed.
+        /// The system's appearance settings changed: its theme mode, accent
+        /// color, high-contrast colors or text size.
         /// </summary>
         void NotifySystemThemeChanged();
     }
@@ -53,6 +54,20 @@ namespace XForms
         /// The system's high-contrast colors, or null to use XForms' own.
         /// </summary>
         ColorScheme SystemHighContrastColors { get; }
+
+        /// <summary>
+        /// The system's text size, as a scale (1 is the default). The platform
+        /// applies it to every font size, as Android's scaled pixels do.
+        /// </summary>
+        float SystemTextScale { get; }
+
+        string WindowTitle { set; }
+
+        bool CanResizeWindow { get; }
+
+        Size MinimumWindowSize { set; }
+
+        void ResizeWindow(Size size);
 
         Color? TitleBarAccentColor { get; set; }
 
@@ -105,6 +120,10 @@ namespace XForms
             this.TitleBar = new TitleBar(this);
 
             this._rootFrame = new Frame();
+            this.Dispatcher = new Dispatcher(this.Renderer);
+            this.Services = this._platform.CreateServices();
+            this.MainWindow = new Window(this.Renderer);
+            this._textScale = this.Renderer.SystemTextScale;
 
         }
 
@@ -291,11 +310,15 @@ namespace XForms
         {
         }
 
-        public bool CanNavigateBack
+        /// <summary>
+        /// Whether going back has somewhere to go: a popup or modal page to
+        /// close, or a page in the back stack.
+        /// </summary>
+        public bool CanGoBack
         {
             get
             {
-                return (this._openPopups.Count > 0) || (this._rootFrame.CanNavigateBack);
+                return (this._openPopups.Count > 0) || (this._modals.Count > 0) || this._rootFrame.CanGoBack;
             }
         }
 
@@ -304,12 +327,21 @@ namespace XForms
             return this.Renderer.GetVersion();
         }
 
-        public void NavigateTo(
-            Page newPage)
+        // The modal pages showing, newest last, with how to complete each
+        private readonly List<(Page Page, Action<object> Complete)> _modals = new List<(Page Page, Action<object> Complete)>();
+
+        /// <summary>
+        /// Shows a page (a new instance, or one kept for reuse), keeping the
+        /// current page in the back stack. Pass what the page needs to its
+        /// constructor. Completes when the transition has.
+        /// </summary>
+        public async Task NavigateAsync(
+            Page page,
+            PageTransition transition = PageTransition.Default)
         {
-            if (null == newPage)
+            if (null == page)
             {
-                throw new ArgumentNullException(nameof(newPage));
+                throw new ArgumentNullException(nameof(page));
             }
 
             // Close any open popups before navigating
@@ -317,28 +349,118 @@ namespace XForms
             {
             }
 
-            this._rootFrame.NavigateTo(newPage);
-
+            await this._rootFrame.NavigateAsync(page, transition);
             this.OnNavigationComplete();
         }
 
-        public void NavigateBack()
+        /// <summary>
+        /// Goes back: closes the top popup, or the top modal page, or returns
+        /// to the previous page. Completes with false if there was nowhere to
+        /// go.
+        /// </summary>
+        public async Task<bool> GoBackAsync()
         {
-            if (!this.CanNavigateBack)
-            {
-                this.Exit();
-                return;
-            }
-
-            // Going back closes the top popup first
             if (this.TryClosePopup())
             {
-                return;
+                return true;
             }
 
-            this._rootFrame.NavigateBack();
+            if (0 < this._modals.Count)
+            {
+                var modal = this._modals[this._modals.Count - 1];
+                return await this.CloseModalAsync(modal.Page, null);
+            }
 
+            bool didGoBack = await this._rootFrame.GoBackAsync();
             this.OnNavigationComplete();
+            return didGoBack;
+        }
+
+        /// <summary>
+        /// Shows a page over the current one, sliding up. Completes when it's
+        /// closed: by Back, or by the page (<see cref="Page.CloseModalAsync"/>).
+        /// </summary>
+        public Task ShowModalAsync(
+            Page page)
+        {
+            return this.ShowModalCoreAsync(page);
+        }
+
+        /// <summary>
+        /// Shows a page over the current one, and completes with the result it
+        /// closes with (<see cref="ModalPage{TResult}.CloseAsync"/>), or the
+        /// default value if it's closed by Back.
+        /// </summary>
+        public async Task<TResult> ShowModalAsync<TResult>(
+            ModalPage<TResult> page)
+        {
+            object result = await this.ShowModalCoreAsync(page);
+            return (result is TResult value) ? value : default;
+        }
+
+        private async Task<object> ShowModalCoreAsync(
+            Page page)
+        {
+            if (null == page)
+            {
+                throw new ArgumentNullException(nameof(page));
+            }
+
+            var completion = new TaskCompletionSource<object>();
+            this._modals.Add((page, (result) => completion.TrySetResult(result)));
+
+            while (this.TryClosePopup())
+            {
+            }
+
+            await this._rootFrame.NavigateAsync(page, PageTransition.SlideUp);
+            this.OnNavigationComplete();
+            return await completion.Task;
+        }
+
+        /// <summary>
+        /// Closes a modal page (and any pages shown after it), completing its
+        /// <see cref="ShowModalAsync(Page)"/> with the result.
+        /// </summary>
+        internal async Task<bool> CloseModalAsync(
+            Page page,
+            object result)
+        {
+            int index = this._modals.FindIndex((modal) => modal.Page == page);
+            if (index < 0)
+            {
+                return false;
+            }
+
+            var modal = this._modals[index];
+            this._modals.RemoveAt(index);
+
+            // Back to the page beneath the modal page
+            while ((this._rootFrame.CurrentPage != page) && this._rootFrame.CanGoBack)
+            {
+                await this._rootFrame.GoBackAsync(PageTransition.None);
+            }
+
+            await this._rootFrame.GoBackAsync(PageTransition.SlideUp);
+            this.OnNavigationComplete();
+            modal.Complete(result);
+            return true;
+        }
+
+        /// <summary>
+        /// The platform's Back key or gesture: goes back, or leaves the app
+        /// when there's nowhere to go back to.
+        /// </summary>
+        internal void OnBackRequested()
+        {
+            if (this.CanGoBack)
+            {
+                _ = this.GoBackAsync();
+            }
+            else
+            {
+                this.Exit();
+            }
         }
 
         private void OnNavigationComplete()
@@ -416,15 +538,65 @@ namespace XForms
             return handled;
         }
 
-        public void InvokeOnUIThreadAsync(
-            Action action)
+        /// <summary>
+        /// Runs code on the UI thread.
+        /// </summary>
+        public Dispatcher Dispatcher
         {
-            if (null == action)
+            get;
+        }
+
+        /// <summary>
+        /// The app's main window.
+        /// </summary>
+        public Window MainWindow
+        {
+            get;
+        }
+
+        private float _textScale;
+
+        /// <summary>
+        /// The system's text size, as a scale (1 is the default). Every font
+        /// size is scaled by it, on every platform, so text follows the user's
+        /// setting; layouts that depend on text size should leave room for it.
+        /// </summary>
+        public float TextScale
+        {
+            get
             {
-                throw new ArgumentNullException(nameof(action));
+                return this._textScale;
+            }
+        }
+
+        public event EventHandler TextScaleChanged;
+
+        // Lays text out again at the system's new text size
+        private void UpdateTextScale()
+        {
+            float scale = this.Renderer.SystemTextScale;
+            if (scale == this._textScale)
+            {
+                return;
             }
 
-            this.Renderer.InvokeOnUIThreadAsync(action);
+            this._textScale = scale;
+            this._rootFrame.OnTextScaleChanged();
+            foreach (var popup in this._openPopups)
+            {
+                popup.OnTextScaleChanged();
+            }
+
+            this.TextScaleChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// The platform's services. Each can be replaced, for example with a
+        /// fake in tests.
+        /// </summary>
+        public PlatformServices Services
+        {
+            get;
         }
 
         private List<Action<TimeSpan>> _frameCallbacks = new List<Action<TimeSpan>>();
@@ -567,6 +739,7 @@ namespace XForms
         void IApplicationDelegate.NotifySystemThemeChanged()
         {
             this.UpdateTheme();
+            this.UpdateTextScale();
         }
     }
 }

@@ -67,60 +67,64 @@ namespace XForms.Test
             switch (StartPage?.ToLowerInvariant())
             {
                 case "pickers":
-                    this.NavigateTo(new PickersPage());
+                    _ = this.NavigateAsync(new PickersPage());
                     return;
 
                 case "benchmark-views":
-                    this.NavigateTo(new BenchmarkPage(drawAsOneView: false));
+                    _ = this.NavigateAsync(new BenchmarkPage(drawAsOneView: false));
                     return;
 
                 case "drawing":
-                    this.NavigateTo(new DrawingPage());
+                    _ = this.NavigateAsync(new DrawingPage());
                     return;
 
                 case "input":
-                    this.NavigateTo(new InputPage());
+                    _ = this.NavigateAsync(new InputPage());
                     return;
 
                 case "binding":
-                    this.NavigateTo(new BindingPage());
+                    _ = this.NavigateAsync(new BindingPage());
                     return;
 
                 case "panels":
-                    this.NavigateTo(new PanelsPage());
+                    _ = this.NavigateAsync(new PanelsPage());
                     return;
 
                 case "text":
-                    this.NavigateTo(new TextEntryPage());
+                    _ = this.NavigateAsync(new TextEntryPage());
                     return;
 
                 case "lists":
-                    this.NavigateTo(new ListsPage());
+                    _ = this.NavigateAsync(new ListsPage());
+                    return;
+
+                case "app":
+                    _ = this.NavigateAsync(new AppLayerPage());
                     return;
 
                 case "theme":
-                    this.NavigateTo(new ThemePage());
+                    _ = this.NavigateAsync(new ThemePage());
                     return;
 
                 case "animation":
-                    this.NavigateTo(new AnimationPage());
+                    _ = this.NavigateAsync(new AnimationPage());
                     return;
 
                 case "xaml":
-                    this.NavigateTo(new XamlPage());
+                    _ = this.NavigateAsync(new XamlPage());
                     return;
 
                 case "benchmark-drawn":
-                    this.NavigateTo(new BenchmarkPage(drawAsOneView: true));
+                    _ = this.NavigateAsync(new BenchmarkPage(drawAsOneView: true));
                     return;
             }
 
-            this.NavigateTo(new TextAndListPage());
-            //this.NavigateTo(new DockLayoutPage());
-            //this.NavigateTo(new DistributedStackLayoutPage());
-            //this.NavigateTo(new TabbedPage());
-            //this.NavigateTo(new MarginPage());
-            //this.NavigateTo(new ControlPage());
+            _ = this.NavigateAsync(new TextAndListPage());
+            //this.NavigateAsync(new DockLayoutPage());
+            //this.NavigateAsync(new DistributedStackLayoutPage());
+            //this.NavigateAsync(new TabbedPage());
+            //this.NavigateAsync(new MarginPage());
+            //this.NavigateAsync(new ControlPage());
         }
     }
 }

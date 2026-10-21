@@ -1,23 +1,58 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace XForms
 {
     public interface IFrameRenderer : IViewRenderer
     {
-        void SetContent(Page newPage, bool hideCurrentPage);
+        /// <summary>
+        /// Adds a page's native view, above the frame's other pages, if it
+        /// isn't there. The frame shows and hides pages with their
+        /// <see cref="View.IsVisible"/>.
+        /// </summary>
+        void AddPage(Page page);
 
-        void Push(Page page);
+        void RemovePage(Page page);
+
+        /// <summary>
+        /// Draws the page above the frame's other pages.
+        /// </summary>
+        void BringToFront(Page page);
     }
 
+    /// <summary>
+    /// How a page arrives or leaves.
+    /// </summary>
+    public enum PageTransition
+    {
+        /// <summary>The platform's usual transition: a slide.</summary>
+        Default,
+
+        /// <summary>Slides in from the side, and back out.</summary>
+        Slide,
+
+        /// <summary>Slides up from the bottom, and back down (modal pages).</summary>
+        SlideUp,
+
+        /// <summary>Fades in, and out.</summary>
+        Fade,
+
+        /// <summary>Shows at once.</summary>
+        None,
+    }
+
+    /// <summary>
+    /// Shows one page at a time, with a back stack. Navigation is
+    /// asynchronous: each method completes when its transition has.
+    /// </summary>
     public class Frame : View
     {
+        private readonly Stack<Page> _backStack = new Stack<Page>();
         private Page _currentPage;
-        private Stack<Page> _backStack;
 
         public Frame()
         {
-            this._backStack = new Stack<Page>();
         }
 
         internal new IFrameRenderer Renderer
@@ -28,6 +63,29 @@ namespace XForms
             }
         }
 
+        /// <summary>
+        /// The page showing, or null.
+        /// </summary>
+        public Page CurrentPage
+        {
+            get
+            {
+                return this._currentPage;
+            }
+        }
+
+        public virtual bool CanGoBack
+        {
+            get
+            {
+                return (this._backStack.Count > 0);
+            }
+        }
+
+        /// <summary>
+        /// Adds a page to the frame without showing it, so it's ready to show
+        /// at once (as tabs are).
+        /// </summary>
         public void Push(
             Page page)
         {
@@ -37,17 +95,7 @@ namespace XForms
             }
 
             page.IsVisible = false;
-            page.AttachTo(this);
-            this.Renderer.Push(page);
-            page.NotifyAttached();
-        }
-
-        public virtual bool CanNavigateBack
-        {
-            get
-            {
-                return (this._backStack.Count > 0);
-            }
+            this.Attach(page);
         }
 
         protected override IElementRenderer CreateRenderer()
@@ -55,128 +103,193 @@ namespace XForms
             return this.Application.Platform.CreateFrameRenderer(this);
         }
 
-        public virtual void NavigateTo(
-            Page newPage)
+        /// <summary>
+        /// Shows the page, keeping the current one in the back stack. Completes
+        /// when the transition has, or at once if the current page cancels.
+        /// </summary>
+        public virtual async Task NavigateAsync(
+            Page page,
+            PageTransition transition = PageTransition.Default)
         {
-            if (null == newPage)
+            if (null == page)
             {
-                throw new ArgumentNullException(nameof(newPage));
+                throw new ArgumentNullException(nameof(page));
             }
 
-            Page currentPage = this._currentPage;
+            var currentPage = this._currentPage;
+            if ((null != currentPage) && !currentPage.OnNavigatingFrom(new NavigationEventArgs(NavigationMode.Forward)))
+            {
+                return;
+            }
+
             if (null != currentPage)
             {
-                if (!currentPage.OnNavigatingFrom(new NavigationEventArgs(NavigationMode.Forward)))
-                {
-                    // Navigation canceled
-                    return;
-                }
-
                 this._backStack.Push(currentPage);
             }
 
-            this.SetContent(newPage);
-
-            currentPage?.OnNavigatedFrom(new NavigationEventArgs(NavigationMode.Forward));
-            newPage.OnNavigatedTo(new NavigationEventArgs(NavigationMode.Forward));
-
-            this._currentPage = newPage;
+            await this.ShowAsync(page, currentPage, NavigationMode.Forward, transition, removeLeavingPage: false);
         }
 
-        public virtual void NavigateBack()
+        /// <summary>
+        /// Shows the page in place of the current one, without the back stack
+        /// (as tabs switch). The mode sets the direction it slides from.
+        /// </summary>
+        public virtual async Task ReplaceAsync(
+            Page page,
+            NavigationMode mode = NavigationMode.Forward,
+            PageTransition transition = PageTransition.Default)
         {
-            if (!this.CanNavigateBack)
+            if (null == page)
             {
-                throw new InvalidOperationException();
+                throw new ArgumentNullException(nameof(page));
             }
 
-            Page currentPage = this._currentPage;
-            if (null != currentPage)
+            var currentPage = this._currentPage;
+            if (page == currentPage)
             {
-                if (!currentPage.OnNavigatingFrom(new NavigationEventArgs(NavigationMode.Back)))
-                {
-                    // Navigation canceled
-                    return;
-                }
+                return;
             }
 
-            Page newPage = this._backStack.Pop();
+            if ((null != currentPage) && !currentPage.OnNavigatingFrom(new NavigationEventArgs(mode)))
+            {
+                return;
+            }
 
-            this.SetContent(newPage);
-
-            currentPage?.OnNavigatedFrom(new NavigationEventArgs(NavigationMode.Back));
-            newPage.OnNavigatedTo(new NavigationEventArgs(NavigationMode.Back));
-
-            this._currentPage = newPage;
+            await this.ShowAsync(page, currentPage, mode, transition, removeLeavingPage: false, slideFromStart: mode == NavigationMode.Back);
         }
 
-        public virtual void NavigateInPlace(
-            Page newPage,
-            NavigationMode navigationMode)
+        /// <summary>
+        /// Goes back to the previous page. Completes with false if there's
+        /// none, or the current page cancels.
+        /// </summary>
+        public virtual async Task<bool> GoBackAsync(
+            PageTransition transition = PageTransition.Default)
         {
-            if (null == newPage)
+            if (!this.CanGoBack)
             {
-                throw new ArgumentNullException(nameof(newPage));
+                return false;
             }
 
-            Page currentPage = this._currentPage;
-            if (null != currentPage)
+            var currentPage = this._currentPage;
+            if ((null != currentPage) && !currentPage.OnNavigatingFrom(new NavigationEventArgs(NavigationMode.Back)))
             {
-                if (!currentPage.OnNavigatingFrom(new NavigationEventArgs(NavigationMode.Forward)))
+                return false;
+            }
+
+            var previousPage = this._backStack.Pop();
+            await this.ShowAsync(previousPage, currentPage, NavigationMode.Back, transition, removeLeavingPage: true);
+            return true;
+        }
+
+        // Shows the arriving page with the transition, then hides (or removes)
+        // the leaving one
+        private async Task ShowAsync(
+            Page arriving,
+            Page leaving,
+            NavigationMode mode,
+            PageTransition transition,
+            bool removeLeavingPage,
+            bool slideFromStart = false)
+        {
+            bool isBack = (mode == NavigationMode.Back) && !slideFromStart;
+
+            this.Attach(arriving);
+            if (!isBack)
+            {
+                // An arriving page goes on top; going back uncovers it instead
+                this.Renderer.BringToFront(arriving);
+            }
+
+            arriving.IsVisible = true;
+            this._currentPage = arriving;
+
+            leaving?.OnNavigatedFrom(new NavigationEventArgs(mode));
+            arriving.OnNavigatedTo(new NavigationEventArgs(mode));
+
+            if ((null != leaving) && (transition != PageTransition.None))
+            {
+                await this.PlayAsync(isBack ? leaving : arriving, isBack, transition, slideFromStart);
+            }
+
+            if ((null != leaving) && (leaving != this._currentPage))
+            {
+                leaving.IsVisible = false;
+                if (removeLeavingPage)
                 {
-                    // Navigation canceled
+                    this.Detach(leaving);
+                }
+            }
+        }
+
+        // Moves the page in (arriving) or out (going back) as the transition says
+        private async Task PlayAsync(
+            Page page,
+            bool isBack,
+            PageTransition transition,
+            bool slideFromStart)
+        {
+            var animator = page.GetOrCreateAnimator();
+            var motion = page.ActualTheme.Motion;
+            var easing = isBack ? motion.Accelerate : motion.Decelerate;
+            var size = this.Bounds.Size;
+
+            Point offset;
+            switch (transition)
+            {
+                case PageTransition.Fade:
+                    animator.Translation = Point.Zero;
+                    if (isBack)
+                    {
+                        await animator.FadeTo(0, motion.Medium, easing);
+                    }
+                    else
+                    {
+                        await animator.FadeFrom(0, motion.Medium, easing);
+                    }
+
+                    animator.Opacity = 1;
                     return;
-                }
 
-                if (navigationMode == NavigationMode.Forward)
-                {
-                    // Current page animates out of the frame
-                    var currentAnimator = currentPage.GetOrCreateAnimator();
-                    currentAnimator.Translation = XForms.Point.Zero;
-                    currentAnimator.TranslateTo(new XForms.Point(-this.Bounds.Size.Width, 0), TimeSpan.FromMilliseconds(150), new CubicEase(EasingMode.EaseOut)).Completion.ContinueWith(
-                        (task) => this.Application.InvokeOnUIThreadAsync(() => { currentPage.IsVisible = false; }));
-                }
-                else
-                {
-                    // Current page stays in position and is overlapped by the new page
-                }
+                case PageTransition.SlideUp:
+                    offset = new Point(0, size.Height);
+                    break;
+
+                default:
+                    offset = new Point(slideFromStart ? -size.Width : size.Width, 0);
+                    break;
             }
 
-            this.SetContent(newPage, hideCurrentPage: false);
-
-            if (navigationMode == NavigationMode.Forward)
+            animator.Opacity = 1;
+            if (isBack)
             {
-                // New page stays in position and is uncovered as the current page moves out of the frame
-                newPage.GetOrCreateAnimator().Translation = XForms.Point.Zero;
-                newPage.IsVisible = true;
+                animator.Translation = Point.Zero;
+                await animator.TranslateTo(offset, motion.Medium, easing);
+                animator.Translation = Point.Zero;
             }
             else
             {
-                // New page animates into the frame
-                var newAnimator = newPage.GetOrCreateAnimator();
-                newAnimator.Translation = new XForms.Point(-this.Bounds.Size.Width, 0);
-                newPage.IsVisible = true;
-                newAnimator.TranslateTo(XForms.Point.Zero, TimeSpan.FromMilliseconds(150), new CubicEase(EasingMode.EaseIn)).Completion.ContinueWith(
-                        (task) => this.Application.InvokeOnUIThreadAsync(() => { if (null != currentPage) currentPage.IsVisible = false; }));
+                animator.Translation = offset;
+                await animator.TranslateTo(Point.Zero, motion.Medium, easing);
             }
-
-            currentPage?.OnNavigatedFrom(new NavigationEventArgs(NavigationMode.Forward));
-            newPage.OnNavigatedTo(new NavigationEventArgs(NavigationMode.Forward));
-
-            this._currentPage = newPage;
         }
 
-        private void SetContent(
-            Page page,
-            bool hideCurrentPage = true)
+        private void Attach(
+            Page page)
         {
             bool isNew = (page.Parent != this);
             page.AttachTo(this);
-            this.Renderer.SetContent(page, hideCurrentPage);
+            this.Renderer.AddPage(page);
             if (isNew)
             {
                 page.NotifyAttached();
             }
+        }
+
+        private void Detach(
+            Page page)
+        {
+            this.Renderer.RemovePage(page);
+            page.NotifyDetached();
         }
 
         internal override IEnumerable<Element> GetChildElements()

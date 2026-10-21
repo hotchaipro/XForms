@@ -142,7 +142,7 @@ namespace XForms.Win32.Renderers
             format.Base.dwMask = CFM_MASK.CFM_FACE | CFM_MASK.CFM_SIZE | CFM_MASK.CFM_COLOR;
 
             // Points, in twips
-            format.Base.yHeight = (int)(FontSize * 72 / 96 * 20);
+            format.Base.yHeight = (int)(FontSize * SystemTheme.TextScale * 72 / 96 * 20);
             format.Base.crTextColor = ToColorRef(this._textColor);
             "Segoe UI".AsSpan().CopyTo(format.Base.szFaceName.AsSpan());
 

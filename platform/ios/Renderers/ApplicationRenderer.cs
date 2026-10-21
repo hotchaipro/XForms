@@ -35,6 +35,11 @@ namespace XForms.iOS.Renderers
             Foundation.NSNotificationCenter.DefaultCenter.AddObserver(
                 UIKit.UIView.DarkerSystemColorsStatusDidChangeNotification,
                 (notification) => this._applicationDelegate.NotifySystemThemeChanged());
+
+            // The text size (Dynamic Type)
+            Foundation.NSNotificationCenter.DefaultCenter.AddObserver(
+                UIKit.UIApplication.ContentSizeCategoryChangedNotification,
+                (notification) => this._applicationDelegate.NotifySystemThemeChanged());
         }
 
         public Color? TitleBarAccentColor
@@ -79,6 +84,35 @@ namespace XForms.iOS.Renderers
             {
                 return null;
             }
+        }
+
+        // Dynamic Type: the body text size over its default
+        public float SystemTextScale => (float)UIKit.UIFontMetrics.DefaultMetrics.GetScaledValue(1);
+
+        public string WindowTitle
+        {
+            set
+            {
+                var scene = this._nativeApplicationDelegate.Window?.WindowScene;
+                if (null != scene)
+                {
+                    scene.Title = value;
+                }
+            }
+        }
+
+        public bool CanResizeWindow => false;
+
+        public Size MinimumWindowSize
+        {
+            set
+            {
+            }
+        }
+
+        public void ResizeWindow(
+            Size size)
+        {
         }
 
         private void Application_Suspending(

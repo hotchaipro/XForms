@@ -20,6 +20,34 @@ namespace XForms.Win32
         // DWMWA_USE_IMMERSIVE_DARK_MODE (Windows 10 20H1 and later)
         private const int UseImmersiveDarkMode = 20;
 
+        private static float? _textScale;
+
+        /// <summary>
+        /// Windows' "make text bigger" setting, as a scale (1 to 2.25). Cached
+        /// until the settings change.
+        /// </summary>
+        public static float TextScale
+        {
+            get
+            {
+                if (!_textScale.HasValue)
+                {
+                    object value = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Accessibility")?.GetValue("TextScaleFactor");
+                    _textScale = (value is int percent) ? Math.Max(1, percent / 100.0f) : 1;
+                }
+
+                return _textScale.Value;
+            }
+        }
+
+        /// <summary>
+        /// Rereads the settings next time.
+        /// </summary>
+        public static void Invalidate()
+        {
+            _textScale = null;
+        }
+
         public static bool IsHighContrast
         {
             get

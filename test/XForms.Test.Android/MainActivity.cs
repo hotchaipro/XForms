@@ -7,8 +7,8 @@ namespace XForms.Test
 {
     [Activity(
         Label = "XForms Test",
-        // Dark mode changes in place; XForms restyles the views
-        ConfigurationChanges = global::Android.Content.PM.ConfigChanges.UiMode,
+        // Dark mode and the text size change in place; XForms restyles the views
+        ConfigurationChanges = global::Android.Content.PM.ConfigChanges.UiMode | global::Android.Content.PM.ConfigChanges.FontScale,
         MainLauncher = true,
         Icon = "@drawable/icon")]
     public class MainActivity : AndroidApplicationActivity

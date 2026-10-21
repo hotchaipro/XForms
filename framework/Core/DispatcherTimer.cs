@@ -68,7 +68,7 @@ namespace XForms
             var application = Application.Current;
             Task.Delay(this.Interval).ContinueWith((task) =>
             {
-                application.InvokeOnUIThreadAsync(() =>
+                application.Dispatcher.Post(() =>
                 {
                     // Ignore ticks from before the latest Start or Stop
                     if (!this.IsEnabled || (generation != this._generation))

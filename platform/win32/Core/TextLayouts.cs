@@ -107,7 +107,8 @@ namespace XForms.Win32
                 (DWRITE_FONT_WEIGHT)(int)(weight ?? format.FontWeight),
                 (fontStyle == FontStyle.Italic) ? DWRITE_FONT_STYLE.DWRITE_FONT_STYLE_ITALIC : DWRITE_FONT_STYLE.DWRITE_FONT_STYLE_NORMAL,
                 DWRITE_FONT_STRETCH.DWRITE_FONT_STRETCH_NORMAL,
-                Math.Max(1, format.FontSize),
+                // Font sizes follow Windows' text size setting
+                Math.Max(1, format.FontSize * SystemTheme.TextScale),
                 "",
                 &textFormat);
 

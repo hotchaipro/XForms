@@ -351,6 +351,34 @@ namespace XForms
 
         #endregion Attach
 
+        /// <summary>
+        /// Reports the size a platform gave a root view it lays out natively.
+        /// </summary>
+        internal void NotifyRootSize(
+            Size size)
+        {
+            if (!(this.Parent is View))
+            {
+                this._frame = new Rect(this._frame.X, this._frame.Y, size.Width, size.Height);
+                this.OnRootSizeChanged(size);
+            }
+        }
+
+        // The application's root frame is the window's content
+        private void OnRootSizeChanged(
+            Size size)
+        {
+            if ((this is Frame) && (null == this.Parent))
+            {
+                this.Application.MainWindow.OnSizeChanged(size);
+            }
+        }
+
+        internal override void OnTextScaleChangedCore()
+        {
+            this.InvalidateMeasure();
+        }
+
         #region Lightweight views
 
         /// <summary>
@@ -1217,6 +1245,10 @@ namespace XForms
             }
 
             this._frame = new Rect(x, y, width, height);
+            if (!(this.Parent is View))
+            {
+                this.OnRootSizeChanged(new Size(width, height));
+            }
 
             // A native view inside lightweight ancestors is positioned in their
             // layer
@@ -1264,6 +1296,7 @@ namespace XForms
             if (!(this.Parent is View))
             {
                 this._frame = new Rect(this._frame.X, this._frame.Y, size.Width, size.Height);
+                this.OnRootSizeChanged(size);
             }
 
             if (size != this._contentMeasureSize)

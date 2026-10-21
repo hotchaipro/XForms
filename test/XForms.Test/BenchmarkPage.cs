@@ -103,7 +103,7 @@ namespace XForms.Test
 
         private void Report()
         {
-            this.Application.InvokeOnUIThreadAsync(() =>
+            this.Application.Dispatcher.Post(() =>
             {
                 double built = this._builtTicks * 1000.0 / Stopwatch.Frequency;
                 double drawn = _lastFirstDrawTicks * 1000.0 / Stopwatch.Frequency;

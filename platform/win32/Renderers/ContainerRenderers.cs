@@ -179,7 +179,7 @@ namespace XForms.Win32.Renderers
         {
         }
 
-        public void Push(
+        public void AddPage(
             Page page)
         {
             var renderer = (ViewRenderer)page.Renderer;
@@ -189,28 +189,22 @@ namespace XForms.Win32.Renderers
             }
         }
 
-        public void SetContent(
-            Page newPage,
-            bool hideCurrentPage)
+        public void RemovePage(
+            Page page)
         {
-            var renderer = (ViewRenderer)newPage.Renderer;
-            if (!this.Children.Contains(renderer))
+            this.RemoveChild((ViewRenderer)page.Renderer);
+        }
+
+        public void BringToFront(
+            Page page)
+        {
+            // Children draw in order: move the page to the end
+            var renderer = (ViewRenderer)page.Renderer;
+            if (this.Children.IndexOf(renderer) != (this.Children.Count - 1))
             {
+                this.RemoveChild(renderer);
                 this.AddChild(renderer);
             }
-
-            if (hideCurrentPage)
-            {
-                foreach (var child in this.Children)
-                {
-                    if (child != renderer)
-                    {
-                        child.IsVisible = false;
-                    }
-                }
-            }
-
-            renderer.IsVisible = true;
         }
 
         public override Size MeasureNative(

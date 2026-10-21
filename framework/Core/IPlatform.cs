@@ -21,6 +21,12 @@ namespace XForms
         IPopupRenderer CreatePopupRenderer(Popup popup);
         void NavigateToUri(Uri uri);
 
+        /// <summary>
+        /// The platform's services: clipboard, launcher, preferences, secure
+        /// storage, sharing and haptics.
+        /// </summary>
+        PlatformServices CreateServices();
+
         ITextLayoutRenderer CreateTextLayout(TextLayout layout);
 
         void RegisterFont(string familyName, string fileName);

@@ -114,7 +114,7 @@ namespace XForms.Xaml
             timer = new System.Threading.Timer((state) =>
             {
                 double t = Math.Min(1, (DateTime.UtcNow - start).TotalMilliseconds / duration.TotalMilliseconds);
-                application.InvokeOnUIThreadAsync(() => view.Animator.Opacity = (float)(from + ((to - from) * t)));
+                application.Dispatcher.Post(() => view.Animator.Opacity = (float)(from + ((to - from) * t)));
                 if (t >= 1)
                 {
                     timer.Dispose();
