@@ -18,8 +18,8 @@
   <Folder Name="/themes/">
     <Project Path="themes/simple/XForms.Themes.Simple.csproj" />
   </Folder>
-  <Folder Name="/controls/">
-    <Project Path="controls/XForms.Controls.csproj" />
+  <Folder Name="/xforms/">
+    <Project Path="xforms/XForms.csproj" />
   </Folder>
   <Folder Name="/test/">
     <Project Path="test/XForms.Test.Android/XForms.Test.Android.csproj" />

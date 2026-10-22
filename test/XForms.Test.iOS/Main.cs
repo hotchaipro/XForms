@@ -1,5 +1,4 @@
-﻿using XForms.iOS;
-using XForms.Toolkit;
+﻿using XForms.Themes.Simple;
 
 namespace XForms.Test.iOS
 {
@@ -9,8 +8,7 @@ namespace XForms.Test.iOS
         static void Main(
             string[] args)
         {
-            IosToolkitServices.Register(() => IosApplication.Current?.RootViewController);
-            IosApplication.Run(args, new TestApp());
+            XFormsApp.Run(args, new TestApp(), new SimpleTheme());
         }
     }
 }

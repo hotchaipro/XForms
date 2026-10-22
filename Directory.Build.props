@@ -11,13 +11,13 @@
   </ItemGroup>
 
   <!--
-    The framework, its platforms, the toolkit, its platforms and the themes
-    track their
+    XForms, the framework, its platforms, the toolkit, its platforms and the
+    themes track their
     public API in PublicAPI.Shipped.txt and PublicAPI.Unshipped.txt: public
     API that isn't listed (RS0016), or listed API that's gone (RS0017), fails
     the build, so every change to it shows in review.
   -->
-  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'XForms.Framework' or $(MSBuildProjectName.StartsWith('XForms.Framework.')) or '$(MSBuildProjectName)' == 'XForms.Toolkit' or $(MSBuildProjectName.StartsWith('XForms.Toolkit.')) or $(MSBuildProjectName.StartsWith('XForms.Themes.'))">
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'XForms' or '$(MSBuildProjectName)' == 'XForms.Framework' or $(MSBuildProjectName.StartsWith('XForms.Framework.')) or '$(MSBuildProjectName)' == 'XForms.Toolkit' or $(MSBuildProjectName.StartsWith('XForms.Toolkit.')) or $(MSBuildProjectName.StartsWith('XForms.Themes.'))">
     <XFormsTracksPublicApi>true</XFormsTracksPublicApi>
   </PropertyGroup>
   <PropertyGroup Condition="'$(XFormsTracksPublicApi)' == 'true'">
@@ -32,5 +32,8 @@
     <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="5.0.0" PrivateAssets="all" />
     <AdditionalFiles Include="PublicAPI.Shipped.txt" />
     <AdditionalFiles Include="PublicAPI.Unshipped.txt" />
+    <!-- A multi-targeted project's API on one platform only -->
+    <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Shipped.txt" Condition="Exists('PublicAPI/$(TargetFramework)/PublicAPI.Shipped.txt')" />
+    <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Unshipped.txt" Condition="Exists('PublicAPI/$(TargetFramework)/PublicAPI.Unshipped.txt')" />
   </ItemGroup>
 </Project>

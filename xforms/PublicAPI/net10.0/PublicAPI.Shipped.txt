@@ -1,0 +1,1 @@
+static XForms.XFormsApp.RunAsync(string title, XForms.Application application, XForms.Controls.AppTheme theme) -> System.Threading.Tasks.Task

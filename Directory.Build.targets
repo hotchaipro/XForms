@@ -15,11 +15,14 @@
     <!-- The toolkit stands alone: nothing of XForms -->
     <XFormsAllowedReferences Condition="'$(MSBuildProjectName)' == 'XForms.Toolkit'">(none)</XFormsAllowedReferences>
     <XFormsAllowedReferences Condition="$(MSBuildProjectName.StartsWith('XForms.Toolkit.'))">XForms.Toolkit</XFormsAllowedReferences>
-    <XFormsAllowedReferences Condition="'$(MSBuildProjectName)' == 'XForms.Controls'">XForms.Framework</XFormsAllowedReferences>
-    <XFormsAllowedReferences Condition="$(MSBuildProjectName.StartsWith('XForms.Themes.'))">XForms.Controls;XForms.Toolkit;XForms.Framework</XFormsAllowedReferences>
+    <!-- XForms, what apps reference: the framework and toolkit, and on each
+         platform their platform's assemblies -->
+    <XFormsAllowedReferences Condition="'$(MSBuildProjectName)' == 'XForms'">XForms.Framework;XForms.Toolkit;XForms.Framework.Win32;XForms.Toolkit.Win32;XForms.Framework.Android;XForms.Toolkit.Android;XForms.Framework.iOS;XForms.Toolkit.iOS;XForms.Framework.Web;XForms.Toolkit.Web</XFormsAllowedReferences>
+    <XFormsAllowedReferences Condition="$(MSBuildProjectName.StartsWith('XForms.Themes.'))">XForms</XFormsAllowedReferences>
   </PropertyGroup>
 
-  <Target Name="XFormsCheckLayerReferences" BeforeTargets="ResolveProjectReferences;CoreCompile" Condition="'$(XFormsAllowedReferences)' != ''">
+  <!-- A project's own references (before the SDK adds those that come through them) -->
+  <Target Name="XFormsCheckLayerReferences" BeforeTargets="IncludeTransitiveProjectReferences;ResolveProjectReferences;CoreCompile" Condition="'$(XFormsAllowedReferences)' != ''">
     <ItemGroup>
       <_XFormsReferencedProject Include="@(ProjectReference->'%(Filename)')" />
       <_XFormsAllowedProject Include="$(XFormsAllowedReferences)" />

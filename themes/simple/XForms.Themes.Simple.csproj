@@ -14,7 +14,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\controls\XForms.Controls.csproj" />
+    <ProjectReference Include="..\..\xforms\XForms.csproj" />
   </ItemGroup>
 
 </Project>

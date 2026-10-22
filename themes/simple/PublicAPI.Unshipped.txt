@@ -12,9 +12,10 @@ XForms.Themes.Simple.ButtonStyle.Over(XForms.Themes.Simple.ButtonStyle other) ->
 XForms.Themes.Simple.ButtonStyle.TextStyle.get -> XForms.Controls.TextStyle
 XForms.Themes.Simple.ButtonStyle.TextStyle.init -> void
 XForms.Themes.Simple.SimpleTheme
+XForms.Themes.Simple.SimpleTheme.SimpleTheme() -> void
 override XForms.Themes.Simple.ButtonStyle.Equals(object obj) -> bool
 override XForms.Themes.Simple.ButtonStyle.GetHashCode() -> int
 override XForms.Themes.Simple.ButtonStyle.ToString() -> string
+override XForms.Themes.Simple.SimpleTheme.Apply(XForms.Theme theme) -> XForms.Theme
 static XForms.Themes.Simple.ButtonStyle.operator !=(XForms.Themes.Simple.ButtonStyle left, XForms.Themes.Simple.ButtonStyle right) -> bool
 static XForms.Themes.Simple.ButtonStyle.operator ==(XForms.Themes.Simple.ButtonStyle left, XForms.Themes.Simple.ButtonStyle right) -> bool
-static XForms.Themes.Simple.SimpleTheme.Apply(XForms.Theme theme) -> XForms.Theme

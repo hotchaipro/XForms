@@ -62,7 +62,7 @@ namespace XForms.Test
 
             // A section with its own theme: dark, with pill-shaped buttons,
             // whatever the app's mode
-            var dark = SimpleTheme.Apply(Theme.Create(ThemeMode.Dark, Color.FromRgb(0xffc107)))
+            var dark = new SimpleTheme().Apply(Theme.Create(ThemeMode.Dark, Color.FromRgb(0xffc107)))
                 .WithExtension(new ButtonStyle() { CornerRadius = 18 });
             var sectionContent = new StackPanel() { Spacing = 8 };
             sectionContent.Children.Add(new TypeSample(t => t.Body, "A section with its own dark theme"));

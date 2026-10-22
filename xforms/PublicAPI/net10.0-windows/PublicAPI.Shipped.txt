@@ -1,0 +1,1 @@
+static XForms.XFormsApp.Run(string title, XForms.Application application, XForms.Controls.AppTheme theme) -> void

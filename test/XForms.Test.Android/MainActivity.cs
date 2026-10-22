@@ -2,7 +2,7 @@
 using Android.App;
 using Android.OS;
 using XForms.Android;
-using XForms.Toolkit;
+using XForms.Themes.Simple;
 
 namespace XForms.Test
 {
@@ -37,8 +37,7 @@ namespace XForms.Test
             }
 
             TestApp.RecreateHost = () => AndroidApplication.Current?.Activity?.Recreate();
-            AndroidToolkitServices.Register(() => AndroidApplication.Current?.Activity);
-            AndroidApplication.Run(this, new TestApp());
+            XFormsApp.Run(this, new TestApp(), new SimpleTheme());
         }
     }
 }

@@ -4,16 +4,13 @@ using XForms.Controls;
 namespace XForms.Themes.Simple
 {
     /// <summary>
-    /// The Simple theme: XForms.Controls' plain, flat look. Choose it in
-    /// <c>Application.CreateTheme</c>:
+    /// The Simple theme: XForms' controls in a plain, flat look. An app
+    /// chooses it as it starts:
     /// <code>
-    /// protected override Theme CreateTheme(ThemeMode mode, Color accentColor)
-    /// {
-    ///     return SimpleTheme.Apply(base.CreateTheme(mode, accentColor));
-    /// }
+    /// XFormsApp.Run("My app", new App(), new SimpleTheme());
     /// </code>
     /// </summary>
-    public static class SimpleTheme
+    public sealed class SimpleTheme : AppTheme
     {
         /// <summary>
         /// The theme (with its mode and colors, which the framework builds,
@@ -21,7 +18,7 @@ namespace XForms.Themes.Simple
         /// scale, shapes, motion and control templates. Tokens the theme
         /// already has (an app's own) are kept.
         /// </summary>
-        public static Theme Apply(
+        public override Theme Apply(
             Theme theme)
         {
             ArgumentNullException.ThrowIfNull(theme);

@@ -228,7 +228,18 @@ namespace XForms
                 }
             }
 
-            return theme;
+            return this.ThemeExtender?.Invoke(theme) ?? theme;
+        }
+
+        /// <summary>
+        /// Adds to the theme <see cref="CreateTheme"/> builds, before an app's
+        /// override adjusts it: set by what hosts the app, such as a control
+        /// library adding its theme package's tokens and templates.
+        /// </summary>
+        public Func<Theme, Theme> ThemeExtender
+        {
+            get;
+            set;
         }
 
         /// <summary>

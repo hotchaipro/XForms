@@ -1,21 +1,56 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <!--
-    XForms' controls: what controls do (not how they look), with the panels
-    and gestures, built only on the framework's public API, so they behave
-    and lay out the same on every platform.
+    XForms: what apps reference. The controls (what they do, not how they
+    look: a theme package draws them), with the panels, gestures and data
+    binding, built only on the framework's public API; and on each platform,
+    the app's entry point (XFormsApp.Run), which starts the framework's host
+    with the app and its theme, and registers XForms.Toolkit's services.
+    Almost all of it is shared; Platforms/ holds the entry points.
   -->
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <RootNamespace>XForms.Controls</RootNamespace>
-    <AssemblyName>XForms.Controls</AssemblyName>
+    <TargetFrameworks>net10.0;net10.0-windows;net10.0-android;net10.0-ios</TargetFrameworks>
+    <RootNamespace>XForms</RootNamespace>
+    <AssemblyName>XForms</AssemblyName>
     <IsTrimmable>true</IsTrimmable>
     <IsAotCompatible>true</IsAotCompatible>
+    <DefaultItemExcludes>$(DefaultItemExcludes);Platforms/**</DefaultItemExcludes>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\framework\XForms.Framework.csproj" />
+    <ProjectReference Include="..\toolkit\XForms.Toolkit.csproj" />
+  </ItemGroup>
+
+  <!-- The browser (whose apps target plain net10.0) -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+    <ProjectReference Include="..\platform\web\XForms.Framework.Web.csproj" />
+    <ProjectReference Include="..\toolkit\platform\web\XForms.Toolkit.Web.csproj" />
+    <Compile Include="Platforms\Web\**\*.cs" />
+  </ItemGroup>
+
+  <!-- Windows (Win32) -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-windows'">
+    <PlatformTarget>x64</PlatformTarget>
+    <NoWarn>$(NoWarn);CA1416</NoWarn>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-windows'">
+    <ProjectReference Include="..\platform\win32\XForms.Framework.Win32.csproj" />
+    <ProjectReference Include="..\toolkit\platform\win32\XForms.Toolkit.Win32.csproj" />
+    <Compile Include="Platforms\Win32\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-android'">
+    <ProjectReference Include="..\platform\android\XForms.Framework.Android.csproj" />
+    <ProjectReference Include="..\toolkit\platform\android\XForms.Toolkit.Android.csproj" />
+    <Compile Include="Platforms\Android\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-ios'">
+    <ProjectReference Include="..\platform\ios\XForms.Framework.iOS.csproj" />
+    <ProjectReference Include="..\toolkit\platform\ios\XForms.Toolkit.iOS.csproj" />
+    <Compile Include="Platforms\iOS\**\*.cs" />
   </ItemGroup>
 
 </Project>

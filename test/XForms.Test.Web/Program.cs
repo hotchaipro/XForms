@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using XForms.Web;
-using XForms.Toolkit;
+using XForms.Themes.Simple;
 
 namespace XForms.Test.Web
 {
@@ -16,8 +16,7 @@ namespace XForms.Test.Web
             TestApp.StartPage = WebApplication.GetQueryParameter("page");
             TestApp.ThemeModeSwitches = WebApplication.GetQueryParameter("themes");
 
-            await WebToolkitServices.InitializeAsync();
-            await WebApplication.RunAsync("XForms Test (Web)", new TestApp());
+            await XFormsApp.RunAsync("XForms Test (Web)", new TestApp(), new SimpleTheme());
         }
     }
 }

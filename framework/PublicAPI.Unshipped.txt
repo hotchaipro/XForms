@@ -1,1 +1,3 @@
 virtual XForms.Element.OnAttaching(XForms.Theme theme) -> void
+XForms.Application.ThemeExtender.get -> System.Func<XForms.Theme, XForms.Theme>
+XForms.Application.ThemeExtender.set -> void

@@ -1,0 +1,889 @@
+XForms.Binding
+XForms.Controls.AppTheme
+XForms.Controls.AppTheme.AppTheme() -> void
+XForms.Controls.Border
+XForms.Controls.Border.Background.get -> XForms.Color
+XForms.Controls.Border.Background.set -> void
+XForms.Controls.Border.Border() -> void
+XForms.Controls.Border.BorderBrush.get -> XForms.Color
+XForms.Controls.Border.BorderBrush.set -> void
+XForms.Controls.Border.BorderThickness.get -> XForms.Thickness
+XForms.Controls.Border.BorderThickness.set -> void
+XForms.Controls.Border.Child.get -> XForms.View
+XForms.Controls.Border.Child.set -> void
+XForms.Controls.Border.CornerRadius.get -> float
+XForms.Controls.Border.CornerRadius.set -> void
+XForms.Controls.Button
+XForms.Controls.Button.Button() -> void
+XForms.Controls.Button.Clicked -> System.EventHandler
+XForms.Controls.Button.Command.get -> System.Windows.Input.ICommand
+XForms.Controls.Button.Command.set -> void
+XForms.Controls.Button.CommandParameter.get -> object
+XForms.Controls.Button.CommandParameter.set -> void
+XForms.Controls.Button.IsAlertStyle.get -> bool
+XForms.Controls.Button.IsAlertStyle.set -> void
+XForms.Controls.Button.Text.get -> string
+XForms.Controls.Button.Text.set -> void
+XForms.Controls.CalendarDatePicker
+XForms.Controls.CalendarDatePicker.CalendarDatePicker() -> void
+XForms.Controls.CalendarDatePicker.MinimumDate.get -> System.DateTime
+XForms.Controls.CalendarDatePicker.MinimumDate.set -> void
+XForms.Controls.CalendarDatePicker.PlaceholderText.get -> string
+XForms.Controls.CalendarDatePicker.PlaceholderText.set -> void
+XForms.Controls.CalendarDatePicker.SelectedDate.get -> System.DateTime?
+XForms.Controls.CalendarDatePicker.SelectedDate.set -> void
+XForms.Controls.CalendarDatePicker.SelectedDateChanged -> System.EventHandler<System.DateTime?>
+XForms.Controls.CalendarView
+XForms.Controls.CalendarView.CalendarView() -> void
+XForms.Controls.CalendarView.CanShowPreviousMonth.get -> bool
+XForms.Controls.CalendarView.DisplayedMonth.get -> System.DateTime
+XForms.Controls.CalendarView.FirstShownDay.get -> System.DateTime
+XForms.Controls.CalendarView.FocusedDate.get -> System.DateTime
+XForms.Controls.CalendarView.GetDayBounds(int row, int column) -> XForms.Rect
+XForms.Controls.CalendarView.GetWeekdayBounds(int column) -> XForms.Rect
+XForms.Controls.CalendarView.HeaderBounds.get -> XForms.Rect
+XForms.Controls.CalendarView.IsDateEnabled(System.DateTime date) -> bool
+XForms.Controls.CalendarView.MinimumDate.get -> System.DateTime
+XForms.Controls.CalendarView.MinimumDate.set -> void
+XForms.Controls.CalendarView.NextButtonBounds.get -> XForms.Rect
+XForms.Controls.CalendarView.PressedDate.get -> System.DateTime
+XForms.Controls.CalendarView.PressedPart.get -> XForms.Controls.CalendarViewPart
+XForms.Controls.CalendarView.PreviousButtonBounds.get -> XForms.Rect
+XForms.Controls.CalendarView.SelectedDate.get -> System.DateTime?
+XForms.Controls.CalendarView.SelectedDate.set -> void
+XForms.Controls.CalendarView.SelectedDateChanged -> System.EventHandler<System.DateTime?>
+XForms.Controls.CalendarViewPart
+XForms.Controls.CalendarViewPart.Day = 3 -> XForms.Controls.CalendarViewPart
+XForms.Controls.CalendarViewPart.NextMonth = 2 -> XForms.Controls.CalendarViewPart
+XForms.Controls.CalendarViewPart.None = 0 -> XForms.Controls.CalendarViewPart
+XForms.Controls.CalendarViewPart.PreviousMonth = 1 -> XForms.Controls.CalendarViewPart
+XForms.Controls.ComboBox
+XForms.Controls.ComboBox.ComboBox() -> void
+XForms.Controls.ComboBox.Items.get -> XForms.Controls.ComboBoxItemCollection
+XForms.Controls.ComboBox.Select(int index) -> void
+XForms.Controls.ComboBox.SelectedIndex.get -> int
+XForms.Controls.ComboBox.SelectedIndex.set -> void
+XForms.Controls.ComboBox.SelectedItem.get -> XForms.Controls.ComboBoxItem
+XForms.Controls.ComboBox.SelectedItem.set -> void
+XForms.Controls.ComboBox.SelectionChanged -> System.EventHandler<XForms.Controls.ComboBoxItem>
+XForms.Controls.ComboBoxItem
+XForms.Controls.ComboBoxItem.ComboBoxItem() -> void
+XForms.Controls.ComboBoxItem.ComboBoxItem(string text) -> void
+XForms.Controls.ComboBoxItem.PropertyChanged -> System.ComponentModel.PropertyChangedEventHandler
+XForms.Controls.ComboBoxItem.Text.get -> string
+XForms.Controls.ComboBoxItem.Text.set -> void
+XForms.Controls.ComboBoxItem.Value.get -> object
+XForms.Controls.ComboBoxItem.Value.set -> void
+XForms.Controls.ComboBoxItemCollection
+XForms.Controls.ComboBoxItemCollection.Add(XForms.Controls.ComboBoxItem listPickerItem) -> void
+XForms.Controls.ComboBoxItemCollection.Clear() -> void
+XForms.Controls.ComboBoxItemCollection.Count.get -> int
+XForms.Controls.ComboBoxItemCollection.GetEnumerator() -> System.Collections.Generic.IEnumerator<XForms.Controls.ComboBoxItem>
+XForms.Controls.ComboBoxItemCollection.IndexOf(XForms.Controls.ComboBoxItem item) -> int
+XForms.Controls.ComboBoxItemCollection.this[int index].get -> XForms.Controls.ComboBoxItem
+XForms.Controls.ComboBoxItemsView
+XForms.Controls.ComboBoxItemsView.ComboBox.get -> XForms.Controls.ComboBox
+XForms.Controls.ComboBoxItemsView.HighlightedIndex.get -> int
+XForms.Controls.ComboBoxItemsView.PressedIndex.get -> int
+XForms.Controls.CommandBar
+XForms.Controls.CommandBar.CommandBar() -> void
+XForms.Controls.CommandBar.CommandParameter.get -> object
+XForms.Controls.CommandBar.CommandParameter.set -> void
+XForms.Controls.CommandBarButton
+XForms.Controls.CommandBarButton.Command.get -> System.Windows.Input.ICommand
+XForms.Controls.CommandBarButton.Command.set -> void
+XForms.Controls.CommandBarButton.CommandBarButton() -> void
+XForms.Controls.CommandBarButton.CommandParameter.get -> object
+XForms.Controls.CommandBarButton.CommandParameter.set -> void
+XForms.Controls.CommandBarButton.Icon.get -> XForms.Bitmap
+XForms.Controls.CommandBarButton.Icon.set -> void
+XForms.Controls.CommandBarButton.Text.get -> string
+XForms.Controls.CommandBarButton.Text.set -> void
+XForms.Controls.CommandBarCommandCollection
+XForms.Controls.CommandBarCommandCollection.CommandBarCommandCollection() -> void
+XForms.Controls.CommandBarCommandCollection.PrimaryCommands.get -> System.Collections.Generic.List<XForms.Controls.UICommand>
+XForms.Controls.CommandBarCommandCollection.SecondaryCommands.get -> System.Collections.Generic.List<XForms.Controls.UICommand>
+XForms.Controls.CommandListView
+XForms.Controls.CommandListView.CommandBarCommands.get -> XForms.Controls.CommandBarCommandCollection
+XForms.Controls.CommandListView.CommandListView() -> void
+XForms.Controls.CommandListView.SwipeCommands.get -> XForms.Controls.SwipeCommandCollection
+XForms.Controls.CommandListViewItem
+XForms.Controls.CommandListViewItem.CommandBarMargin.get -> XForms.Thickness
+XForms.Controls.CommandListViewItem.CommandBarMargin.set -> void
+XForms.Controls.CommandListViewItem.CommandListViewItem() -> void
+XForms.Controls.CommandListViewItem.IsCommandBarVisible.get -> bool
+XForms.Controls.CommandListViewItem.IsCommandBarVisible.set -> void
+XForms.Controls.CommandListViewItem.Item.get -> object
+XForms.Controls.CommandListViewItem.Item.set -> void
+XForms.Controls.CommandListViewItemContainer
+XForms.Controls.CommandListViewItemContainer.CommandBarMargin.get -> XForms.Thickness
+XForms.Controls.CommandListViewItemContainer.CommandBarMargin.set -> void
+XForms.Controls.CommandListViewItemContainer.CommandListViewItemContainer() -> void
+XForms.Controls.CommandListViewItemContainer.IsCommandBarVisible.get -> bool
+XForms.Controls.CommandListViewItemContainer.IsCommandBarVisible.set -> void
+XForms.Controls.ContentControl
+XForms.Controls.ContentControl.Content.get -> XForms.View
+XForms.Controls.ContentControl.Content.set -> void
+XForms.Controls.ContentControl.ContentControl() -> void
+XForms.Controls.ContentControl.Padding.get -> XForms.Thickness
+XForms.Controls.ContentControl.Padding.set -> void
+XForms.Controls.Control
+XForms.Controls.Control.Control() -> void
+XForms.Controls.ControlTemplate
+XForms.Controls.ControlTemplate<TControl>
+XForms.Controls.ControlTemplate<TControl>.ControlTemplate() -> void
+XForms.Controls.ControlTemplates
+XForms.Controls.ControlTemplates.<Clone>$() -> XForms.Controls.ControlTemplates
+XForms.Controls.ControlTemplates.ControlTemplates() -> void
+XForms.Controls.ControlTemplates.Equals(XForms.Controls.ControlTemplates other) -> bool
+XForms.Controls.ControlTemplates.Get(System.Type controlType) -> XForms.Controls.ControlTemplate
+XForms.Controls.ControlTemplates.With(XForms.Controls.ControlTemplate template) -> XForms.Controls.ControlTemplates
+XForms.Controls.DayOfWeekToggleButton
+XForms.Controls.DayOfWeekToggleButton.DaysOfWeekPicker.get -> XForms.Controls.DaysOfWeekPicker
+XForms.Controls.DayOfWeekToggleButton.IsChecked.get -> bool
+XForms.Controls.DayOfWeekToggleButton.IsChecked.set -> void
+XForms.Controls.DayOfWeekToggleButton.IsCheckedChanged -> System.EventHandler<XForms.Controls.ToggledEventArgs>
+XForms.Controls.DayOfWeekToggleButton.Text.get -> string
+XForms.Controls.DayOfWeekToggleButton.Text.set -> void
+XForms.Controls.DaysOfWeekPicker
+XForms.Controls.DaysOfWeekPicker.DaysOfWeekPicker() -> void
+XForms.Controls.DaysOfWeekPicker.SelectedDaysOfWeek.get -> System.DayOfWeek[]
+XForms.Controls.DaysOfWeekPicker.SelectedDaysOfWeek.set -> void
+XForms.Controls.FloatingButton
+XForms.Controls.FloatingButton.Clicked -> System.EventHandler
+XForms.Controls.FloatingButton.FloatingButton() -> void
+XForms.Controls.FloatingButton.Icon.get -> XForms.Bitmap
+XForms.Controls.FloatingButton.Icon.set -> void
+XForms.Controls.FloatingButton.IsSubtleStyle.get -> bool
+XForms.Controls.FloatingButton.IsSubtleStyle.set -> void
+XForms.Controls.FloatingButton.Swiped -> System.EventHandler<int>
+XForms.Controls.Flyout
+XForms.Controls.Flyout.Content.get -> XForms.View
+XForms.Controls.Flyout.Content.set -> void
+XForms.Controls.Flyout.Flyout() -> void
+XForms.Controls.Flyout.ShowAsync() -> void
+XForms.Controls.FlyoutButton
+XForms.Controls.FlyoutButton.AddButton(XForms.Controls.FloatingButton button) -> void
+XForms.Controls.FlyoutButton.Collapsing -> System.EventHandler
+XForms.Controls.FlyoutButton.Expanding -> System.EventHandler
+XForms.Controls.FlyoutButton.FlyoutButton() -> void
+XForms.Controls.FlyoutButton.Icon.get -> XForms.Bitmap
+XForms.Controls.FlyoutButton.Icon.set -> void
+XForms.Controls.HyperlinkButton
+XForms.Controls.HyperlinkButton.Content.get -> XForms.View
+XForms.Controls.HyperlinkButton.Content.set -> void
+XForms.Controls.HyperlinkButton.HyperlinkButton() -> void
+XForms.Controls.HyperlinkButton.NavigationUri.get -> System.Uri
+XForms.Controls.HyperlinkButton.NavigationUri.set -> void
+XForms.Controls.IMenuItemContainer
+XForms.Controls.IMenuItemContainer.Add(XForms.Controls.MenuItem menuItem) -> void
+XForms.Controls.ImageToggleButton
+XForms.Controls.ImageToggleButton.CheckedIcon.get -> XForms.Bitmap
+XForms.Controls.ImageToggleButton.CheckedIcon.set -> void
+XForms.Controls.ImageToggleButton.CommandParameter.get -> object
+XForms.Controls.ImageToggleButton.CommandParameter.set -> void
+XForms.Controls.ImageToggleButton.IconSize.get -> XForms.Size?
+XForms.Controls.ImageToggleButton.IconSize.set -> void
+XForms.Controls.ImageToggleButton.ImageToggleButton() -> void
+XForms.Controls.ImageToggleButton.IsChecked.get -> bool
+XForms.Controls.ImageToggleButton.IsChecked.set -> void
+XForms.Controls.ImageToggleButton.IsCheckedChanged -> System.EventHandler<XForms.Controls.ToggledEventArgs>
+XForms.Controls.ImageToggleButton.Tint.get -> XForms.Color
+XForms.Controls.ImageToggleButton.Tint.set -> void
+XForms.Controls.ImageToggleButton.ToggleCommand.get -> System.Windows.Input.ICommand
+XForms.Controls.ImageToggleButton.ToggleCommand.set -> void
+XForms.Controls.ImageToggleButton.UncheckedIcon.get -> XForms.Bitmap
+XForms.Controls.ImageToggleButton.UncheckedIcon.set -> void
+XForms.Controls.ItemClickEventArgs
+XForms.Controls.ItemClickEventArgs.ClickedItem.get -> object
+XForms.Controls.ItemClickEventArgs.ItemClickEventArgs(object clickedItem, XForms.View itemView) -> void
+XForms.Controls.ItemClickEventArgs.ItemView.get -> XForms.View
+XForms.Controls.ItemViewFactory<T>
+XForms.Controls.LayoutTransition
+XForms.Controls.LayoutTransition.AnimatesEntrances.get -> bool
+XForms.Controls.LayoutTransition.AnimatesEntrances.init -> void
+XForms.Controls.LayoutTransition.AnimatesMoves.get -> bool
+XForms.Controls.LayoutTransition.AnimatesMoves.init -> void
+XForms.Controls.LayoutTransition.Duration.get -> System.TimeSpan
+XForms.Controls.LayoutTransition.Duration.init -> void
+XForms.Controls.LayoutTransition.Easing.get -> XForms.EasingFunction
+XForms.Controls.LayoutTransition.Easing.init -> void
+XForms.Controls.LayoutTransition.LayoutTransition() -> void
+XForms.Controls.LightDismissControl
+XForms.Controls.LightDismissControl.IsLightDismissEnabled.get -> bool
+XForms.Controls.LightDismissControl.IsLightDismissEnabled.set -> void
+XForms.Controls.LightDismissControl.LightDismissControl() -> void
+XForms.Controls.ListView
+XForms.Controls.ListView.ClearSelection() -> void
+XForms.Controls.ListView.ContainerFromItem(object item) -> XForms.Controls.ListViewItem
+XForms.Controls.ListView.ItemClick -> System.EventHandler<XForms.Controls.ItemClickEventArgs>
+XForms.Controls.ListView.ListView() -> void
+XForms.Controls.ListView.SelectedItem.get -> object
+XForms.Controls.ListView.SelectedItem.set -> void
+XForms.Controls.ListView.SelectedItems.get -> System.Collections.Generic.IReadOnlyList<object>
+XForms.Controls.ListView.SelectionChanged -> System.EventHandler<XForms.Controls.SelectionChangedEventArgs>
+XForms.Controls.ListView.SelectionMode.get -> XForms.Controls.SelectionMode
+XForms.Controls.ListView.SelectionMode.set -> void
+XForms.Controls.ListView<T>
+XForms.Controls.ListView<T>.GroupHeaderFactory.get -> XForms.Controls.ItemViewFactory<object>
+XForms.Controls.ListView<T>.GroupHeaderFactory.set -> void
+XForms.Controls.ListView<T>.GroupKeySelector.get -> System.Func<T, object>
+XForms.Controls.ListView<T>.GroupKeySelector.set -> void
+XForms.Controls.ListView<T>.ItemViewFactory.get -> XForms.Controls.ItemViewFactory<T>
+XForms.Controls.ListView<T>.ItemViewFactory.set -> void
+XForms.Controls.ListView<T>.ItemsSource.get -> System.Collections.Generic.IReadOnlyList<T>
+XForms.Controls.ListView<T>.ItemsSource.set -> void
+XForms.Controls.ListView<T>.ListView() -> void
+XForms.Controls.ListView<T>.ScrollIntoView(T item) -> void
+XForms.Controls.ListView<T>.SelectedItem.get -> T
+XForms.Controls.ListView<T>.SelectedItem.set -> void
+XForms.Controls.ListView<T>.SelectedItems.get -> System.Collections.Generic.IReadOnlyList<T>
+XForms.Controls.ListViewItem
+XForms.Controls.ListViewItem.IsSelected.get -> bool
+XForms.Controls.ListViewItem.ListView.get -> XForms.Controls.ListView
+XForms.Controls.ListViewItem.ListViewItem() -> void
+XForms.Controls.ListViewSwipeDirection
+XForms.Controls.ListViewSwipeDirection.Primary = 0 -> XForms.Controls.ListViewSwipeDirection
+XForms.Controls.ListViewSwipeDirection.Secondary = 1 -> XForms.Controls.ListViewSwipeDirection
+XForms.Controls.ListViewSwipeItem
+XForms.Controls.ListViewSwipeItem.Command.get -> XForms.Controls.UICommand
+XForms.Controls.ListViewSwipeItem.Command.set -> void
+XForms.Controls.ListViewSwipeItem.Direction.get -> XForms.Controls.ListViewSwipeDirection
+XForms.Controls.ListViewSwipeItem.Direction.set -> void
+XForms.Controls.ListViewSwipeItem.Icon.get -> XForms.Bitmap
+XForms.Controls.ListViewSwipeItem.IconSize.get -> XForms.Size
+XForms.Controls.ListViewSwipeItem.IconSize.set -> void
+XForms.Controls.ListViewSwipeItem.ListViewSwipeItem() -> void
+XForms.Controls.ListViewSwipeItem.Reset() -> void
+XForms.Controls.ListViewSwipeItem.Text.get -> string
+XForms.Controls.MenuBar
+XForms.Controls.MenuBar.MenuBar() -> void
+XForms.Controls.MenuBar.MenuItems.get -> XForms.Controls.MenuItemCollection
+XForms.Controls.MenuButton
+XForms.Controls.MenuButton.CommandParameter.get -> object
+XForms.Controls.MenuButton.CommandParameter.set -> void
+XForms.Controls.MenuButton.MenuBar.get -> XForms.Controls.MenuBar
+XForms.Controls.MenuButton.MenuItem.get -> XForms.Controls.MenuItem
+XForms.Controls.MenuItem
+XForms.Controls.MenuItem.Command.get -> System.Windows.Input.ICommand
+XForms.Controls.MenuItem.Command.set -> void
+XForms.Controls.MenuItem.Icon.get -> XForms.Bitmap
+XForms.Controls.MenuItem.Icon.set -> void
+XForms.Controls.MenuItem.IsVisible.get -> bool
+XForms.Controls.MenuItem.IsVisible.set -> void
+XForms.Controls.MenuItem.MenuItem() -> void
+XForms.Controls.MenuItem.PropertyChanged -> System.ComponentModel.PropertyChangedEventHandler
+XForms.Controls.MenuItem.Text.get -> string
+XForms.Controls.MenuItem.Text.set -> void
+XForms.Controls.MenuItemCollection
+XForms.Controls.MenuItemCollection.Add(XForms.Controls.MenuItem menuItem) -> void
+XForms.Controls.MenuItemCollection.GetEnumerator() -> System.Collections.Generic.IEnumerator<XForms.Controls.MenuItem>
+XForms.Controls.MessageBox
+XForms.Controls.MessageBoxResult
+XForms.Controls.MessageBoxResult.Cancel = 0 -> XForms.Controls.MessageBoxResult
+XForms.Controls.MessageBoxResult.OK = 1 -> XForms.Controls.MessageBoxResult
+XForms.Controls.MessageBoxView
+XForms.Controls.MessageBoxView.Choose(XForms.Controls.MessageBoxResult result) -> void
+XForms.Controls.MessageBoxView.Message.get -> string
+XForms.Controls.MessageBoxView.Title.get -> string
+XForms.Controls.Motion
+XForms.Controls.Motion.<Clone>$() -> XForms.Controls.Motion
+XForms.Controls.Motion.Accelerate.get -> XForms.EasingFunction
+XForms.Controls.Motion.Accelerate.init -> void
+XForms.Controls.Motion.Decelerate.get -> XForms.EasingFunction
+XForms.Controls.Motion.Decelerate.init -> void
+XForms.Controls.Motion.Equals(XForms.Controls.Motion other) -> bool
+XForms.Controls.Motion.Long.get -> System.TimeSpan
+XForms.Controls.Motion.Long.init -> void
+XForms.Controls.Motion.Medium.get -> System.TimeSpan
+XForms.Controls.Motion.Medium.init -> void
+XForms.Controls.Motion.Motion() -> void
+XForms.Controls.Motion.Short.get -> System.TimeSpan
+XForms.Controls.Motion.Short.init -> void
+XForms.Controls.Motion.Spring.get -> XForms.EasingFunction
+XForms.Controls.Motion.Spring.init -> void
+XForms.Controls.Motion.Standard.get -> XForms.EasingFunction
+XForms.Controls.Motion.Standard.init -> void
+XForms.Controls.Panel
+XForms.Controls.Panel.ChildTransitions.get -> XForms.Controls.LayoutTransition
+XForms.Controls.Panel.ChildTransitions.set -> void
+XForms.Controls.Panel.LayoutChildren.get -> System.Collections.Generic.IReadOnlyList<XForms.View>
+XForms.Controls.Panel.Padding.get -> XForms.Thickness
+XForms.Controls.Panel.Padding.set -> void
+XForms.Controls.Panel.Panel() -> void
+XForms.Controls.PickerField
+XForms.Controls.PickerField.CreateTextFormat() -> XForms.TextFormat
+XForms.Controls.PickerField.PickerField() -> void
+XForms.Controls.PopupFrame
+XForms.Controls.PopupFrame.PopupFrame() -> void
+XForms.Controls.ProgressRing
+XForms.Controls.ProgressRing.IsActive.get -> bool
+XForms.Controls.ProgressRing.IsActive.set -> void
+XForms.Controls.ProgressRing.ProgressRing() -> void
+XForms.Controls.RadioButton
+XForms.Controls.RadioButton.Command.get -> System.Windows.Input.ICommand
+XForms.Controls.RadioButton.Command.set -> void
+XForms.Controls.RadioButton.IsChecked.get -> bool
+XForms.Controls.RadioButton.IsChecked.set -> void
+XForms.Controls.RadioButton.IsCheckedChanged -> System.EventHandler<XForms.Controls.ToggledEventArgs>
+XForms.Controls.RadioButton.RadioButtonItem.get -> XForms.Controls.RadioButtonItem
+XForms.Controls.RadioButton.RadioButtons.get -> XForms.Controls.RadioButtons
+XForms.Controls.RadioButtonItem
+XForms.Controls.RadioButtonItem.Icon.get -> XForms.Bitmap
+XForms.Controls.RadioButtonItem.Icon.set -> void
+XForms.Controls.RadioButtonItem.PropertyChanged -> System.ComponentModel.PropertyChangedEventHandler
+XForms.Controls.RadioButtonItem.RadioButtonItem() -> void
+XForms.Controls.RadioButtonItem.Text.get -> string
+XForms.Controls.RadioButtonItem.Text.set -> void
+XForms.Controls.RadioButtonItem.Value.get -> object
+XForms.Controls.RadioButtonItem.Value.set -> void
+XForms.Controls.RadioButtonItemCollection
+XForms.Controls.RadioButtonItemCollection.Add(XForms.Controls.RadioButtonItem radioButtonItem) -> void
+XForms.Controls.RadioButtonItemCollection.GetEnumerator() -> System.Collections.Generic.IEnumerator<XForms.Controls.RadioButtonItem>
+XForms.Controls.RadioButtons
+XForms.Controls.RadioButtons.Items.get -> XForms.Controls.RadioButtonItemCollection
+XForms.Controls.RadioButtons.RadioButtons() -> void
+XForms.Controls.RadioButtons.SelectedItem.get -> object
+XForms.Controls.RadioButtons.SelectedItem.set -> void
+XForms.Controls.RadioButtons.SelectionChanged -> System.EventHandler<XForms.Controls.SelectionChangedEventArgs>
+XForms.Controls.RelayCommand
+XForms.Controls.RelayCommand.CanExecute(object parameter) -> bool
+XForms.Controls.RelayCommand.CanExecuteChanged -> System.EventHandler
+XForms.Controls.RelayCommand.Execute(object parameter) -> void
+XForms.Controls.RelayCommand.NotifyCanExecuteChanged() -> void
+XForms.Controls.RelayCommand.RelayCommand(System.Action execute, System.Func<bool> canExecute = null) -> void
+XForms.Controls.RelayCommand.RelayCommand(System.Action<object> execute, System.Func<object, bool> canExecute = null) -> void
+XForms.Controls.SelectionChangedEventArgs
+XForms.Controls.SelectionChangedEventArgs.AddedItems.get -> System.Collections.Generic.IReadOnlyList<object>
+XForms.Controls.SelectionChangedEventArgs.NewItem.get -> object
+XForms.Controls.SelectionChangedEventArgs.OldItem.get -> object
+XForms.Controls.SelectionChangedEventArgs.RemovedItems.get -> System.Collections.Generic.IReadOnlyList<object>
+XForms.Controls.SelectionChangedEventArgs.SelectionChangedEventArgs(System.Collections.Generic.IReadOnlyList<object> removedItems, System.Collections.Generic.IReadOnlyList<object> addedItems, object oldItem, object newItem) -> void
+XForms.Controls.SelectionChangedEventArgs.SelectionChangedEventArgs(object oldItem, object newItem) -> void
+XForms.Controls.SelectionMode
+XForms.Controls.SelectionMode.Multiple = 2 -> XForms.Controls.SelectionMode
+XForms.Controls.SelectionMode.None = 0 -> XForms.Controls.SelectionMode
+XForms.Controls.SelectionMode.Single = 1 -> XForms.Controls.SelectionMode
+XForms.Controls.Shapes
+XForms.Controls.Shapes.<Clone>$() -> XForms.Controls.Shapes
+XForms.Controls.Shapes.Equals(XForms.Controls.Shapes other) -> bool
+XForms.Controls.Shapes.LargeCornerRadius.get -> float
+XForms.Controls.Shapes.LargeCornerRadius.init -> void
+XForms.Controls.Shapes.MediumCornerRadius.get -> float
+XForms.Controls.Shapes.MediumCornerRadius.init -> void
+XForms.Controls.Shapes.Shapes() -> void
+XForms.Controls.Shapes.SmallCornerRadius.get -> float
+XForms.Controls.Shapes.SmallCornerRadius.init -> void
+XForms.Controls.SwipeCommandCollection
+XForms.Controls.SwipeCommandCollection.IsLongSwipeRequiredForPrimaryCommands.get -> bool
+XForms.Controls.SwipeCommandCollection.IsLongSwipeRequiredForPrimaryCommands.set -> void
+XForms.Controls.SwipeCommandCollection.IsLongSwipeRequiredForSecondaryCommands.get -> bool
+XForms.Controls.SwipeCommandCollection.IsLongSwipeRequiredForSecondaryCommands.set -> void
+XForms.Controls.SwipeCommandCollection.PrimaryCommands.get -> System.Collections.Generic.List<XForms.Controls.UICommand>
+XForms.Controls.SwipeCommandCollection.SecondaryCommands.get -> System.Collections.Generic.List<XForms.Controls.UICommand>
+XForms.Controls.SwipeCommandCollection.SwipeCommandCollection() -> void
+XForms.Controls.TabSelectionChangedEventArgs
+XForms.Controls.TabSelectionChangedEventArgs.NavigationMode.get -> XForms.NavigationMode
+XForms.Controls.TabSelectionChangedEventArgs.PreviousSelection.get -> XForms.Page
+XForms.Controls.TabSelectionChangedEventArgs.Selection.get -> XForms.Page
+XForms.Controls.TabSelectionChangedEventArgs.TabSelectionChangedEventArgs(XForms.Page selection, XForms.Page previousSelection, XForms.NavigationMode navigationMode) -> void
+XForms.Controls.TabStrip
+XForms.Controls.TabStrip.AddButton(XForms.Controls.TabStripItem tabButton, XForms.Page tabPage) -> void
+XForms.Controls.TabStrip.SelectRelative(int direction) -> void
+XForms.Controls.TabStrip.SelectedPage.get -> XForms.Page
+XForms.Controls.TabStrip.SelectionChanged -> System.EventHandler<XForms.Controls.TabSelectionChangedEventArgs>
+XForms.Controls.TabStrip.TabStrip() -> void
+XForms.Controls.TabStripItem
+XForms.Controls.TabStripItem.Icon.get -> XForms.Bitmap
+XForms.Controls.TabStripItem.Icon.set -> void
+XForms.Controls.TabStripItem.IsChecked.get -> bool
+XForms.Controls.TabStripItem.IsChecked.set -> void
+XForms.Controls.TabStripItem.IsCheckedChanged -> System.EventHandler<XForms.Controls.ToggledEventArgs>
+XForms.Controls.TabStripItem.TabPage.get -> XForms.Page
+XForms.Controls.TabStripItem.TabStripItem() -> void
+XForms.Controls.TabStripItem.Text.get -> string
+XForms.Controls.TabStripItem.Text.set -> void
+XForms.Controls.TemplateContext
+XForms.Controls.TemplateContext.AddPart(XForms.View part) -> void
+XForms.Controls.TemplateContext.CreateDrawnAnimator() -> XForms.DrawnAnimator
+XForms.Controls.TemplateContext.CreateOwnAnimator() -> XForms.Animator
+XForms.Controls.TemplateContext.InvalidateMeasure() -> void
+XForms.Controls.TemplateContext.InvalidateVisual() -> void
+XForms.Controls.TemplateContext.RemovePart(XForms.View part) -> void
+XForms.Controls.TemplateContext.State.get -> object
+XForms.Controls.TemplateContext.State.set -> void
+XForms.Controls.TemplatedContentControl
+XForms.Controls.TemplatedContentControl.IsPressed.get -> bool
+XForms.Controls.TemplatedContentControl.IsPressed.set -> void
+XForms.Controls.TemplatedContentControl.OnStateChanged() -> void
+XForms.Controls.TemplatedContentControl.StateChanged -> System.EventHandler
+XForms.Controls.TemplatedContentControl.Template.get -> XForms.Controls.ControlTemplate
+XForms.Controls.TemplatedContentControl.TemplatedContentControl() -> void
+XForms.Controls.TemplatedControl
+XForms.Controls.TemplatedControl.IsPressed.get -> bool
+XForms.Controls.TemplatedControl.IsPressed.set -> void
+XForms.Controls.TemplatedControl.OnStateChanged() -> void
+XForms.Controls.TemplatedControl.StateChanged -> System.EventHandler
+XForms.Controls.TemplatedControl.Template.get -> XForms.Controls.ControlTemplate
+XForms.Controls.TemplatedControl.TemplatedControl() -> void
+XForms.Controls.TextStyle
+XForms.Controls.TextStyle.<Clone>$() -> XForms.Controls.TextStyle
+XForms.Controls.TextStyle.Equals(XForms.Controls.TextStyle other) -> bool
+XForms.Controls.TextStyle.FontFamily.get -> string
+XForms.Controls.TextStyle.FontFamily.init -> void
+XForms.Controls.TextStyle.FontSize.get -> float
+XForms.Controls.TextStyle.FontSize.init -> void
+XForms.Controls.TextStyle.FontWeight.get -> XForms.FontWeight
+XForms.Controls.TextStyle.FontWeight.init -> void
+XForms.Controls.TextStyle.TextStyle() -> void
+XForms.Controls.TextStyle.ToTextFormat() -> XForms.TextFormat
+XForms.Controls.ThemeTemplates
+XForms.Controls.ThemeTemplates.extension(XForms.Theme)
+XForms.Controls.ThemeTemplates.extension(XForms.Theme).GetTemplate(System.Type controlType) -> XForms.Controls.ControlTemplate
+XForms.Controls.ThemeTemplates.extension(XForms.Theme).WithTemplate(XForms.Controls.ControlTemplate template) -> XForms.Theme
+XForms.Controls.ThemeTokens
+XForms.Controls.ThemeTokens.extension(XForms.Theme)
+XForms.Controls.ThemeTokens.extension(XForms.Theme).Motion.get -> XForms.Controls.Motion
+XForms.Controls.ThemeTokens.extension(XForms.Theme).Shapes.get -> XForms.Controls.Shapes
+XForms.Controls.ThemeTokens.extension(XForms.Theme).Typography.get -> XForms.Controls.Typography
+XForms.Controls.ToggleButton
+XForms.Controls.ToggleButton.Icon.get -> XForms.Bitmap
+XForms.Controls.ToggleButton.Icon.set -> void
+XForms.Controls.ToggleButton.IsChecked.get -> bool
+XForms.Controls.ToggleButton.IsChecked.set -> void
+XForms.Controls.ToggleButton.IsCheckedChanged -> System.EventHandler<XForms.Controls.ToggledEventArgs>
+XForms.Controls.ToggleButton.Text.get -> string
+XForms.Controls.ToggleButton.Text.set -> void
+XForms.Controls.ToggleButton.ToggleButton() -> void
+XForms.Controls.ToggledEventArgs
+XForms.Controls.ToggledEventArgs.ToggledEventArgs(bool value) -> void
+XForms.Controls.ToggledEventArgs.Value.get -> bool
+XForms.Controls.Typography
+XForms.Controls.Typography.<Clone>$() -> XForms.Controls.Typography
+XForms.Controls.Typography.Body.get -> XForms.Controls.TextStyle
+XForms.Controls.Typography.Body.init -> void
+XForms.Controls.Typography.Caption.get -> XForms.Controls.TextStyle
+XForms.Controls.Typography.Caption.init -> void
+XForms.Controls.Typography.Display.get -> XForms.Controls.TextStyle
+XForms.Controls.Typography.Display.init -> void
+XForms.Controls.Typography.Equals(XForms.Controls.Typography other) -> bool
+XForms.Controls.Typography.Label.get -> XForms.Controls.TextStyle
+XForms.Controls.Typography.Label.init -> void
+XForms.Controls.Typography.Title.get -> XForms.Controls.TextStyle
+XForms.Controls.Typography.Title.init -> void
+XForms.Controls.Typography.Typography() -> void
+XForms.Controls.UICommand
+XForms.Controls.UICommand.AccentColor.get -> XForms.Color
+XForms.Controls.UICommand.AccentColor.set -> void
+XForms.Controls.UICommand.CanExecute(object parameter) -> bool
+XForms.Controls.UICommand.CanExecuteChanged -> System.EventHandler
+XForms.Controls.UICommand.Command.get -> System.Windows.Input.ICommand
+XForms.Controls.UICommand.Command.set -> void
+XForms.Controls.UICommand.Execute(object parameter) -> void
+XForms.Controls.UICommand.ForegroundColor.get -> XForms.Color
+XForms.Controls.UICommand.ForegroundColor.set -> void
+XForms.Controls.UICommand.Icon.get -> XForms.Bitmap
+XForms.Controls.UICommand.Icon.set -> void
+XForms.Controls.UICommand.Text.get -> string
+XForms.Controls.UICommand.Text.set -> void
+XForms.Controls.UICommand.UICommand() -> void
+XForms.Controls.UriNavigationCommand
+XForms.Controls.UriNavigationCommand.CanExecute(object parameter) -> bool
+XForms.Controls.UriNavigationCommand.CanExecuteChanged -> System.EventHandler
+XForms.Controls.UriNavigationCommand.Execute(object parameter) -> void
+XForms.Controls.UriNavigationCommand.NavigationUri.get -> System.Uri
+XForms.Controls.UriNavigationCommand.NavigationUri.set -> void
+XForms.Controls.UriNavigationCommand.UriNavigationCommand() -> void
+XForms.Controls.UserControl
+XForms.Controls.UserControl.Content.get -> XForms.View
+XForms.Controls.UserControl.Content.set -> void
+XForms.Controls.UserControl.UserControl() -> void
+XForms.Controls.ViewCollection
+XForms.Controls.ViewCollection.Add(XForms.View child) -> void
+XForms.Controls.ViewCollection.Clear() -> void
+XForms.Controls.ViewCollection.Contains(XForms.View child) -> bool
+XForms.Controls.ViewCollection.Count.get -> int
+XForms.Controls.ViewCollection.GetEnumerator() -> System.Collections.Generic.IEnumerator<XForms.View>
+XForms.Controls.ViewCollection.IndexOf(XForms.View child) -> int
+XForms.Controls.ViewCollection.Insert(int index, XForms.View child) -> void
+XForms.Controls.ViewCollection.Remove(XForms.View child) -> bool
+XForms.Controls.ViewCollection.RemoveAt(int index) -> void
+XForms.Controls.ViewCollection.Replace(int index, XForms.View child) -> void
+XForms.Controls.ViewCollection.ViewCollection(XForms.Controls.Panel owner) -> void
+XForms.Controls.ViewCollection.this[int index].get -> XForms.View
+XForms.Controls.ViewCollection<TLayout>
+XForms.Controls.ViewCollection<TLayout>.Add(XForms.View child, TLayout layout) -> void
+XForms.Controls.ViewCollection<TLayout>.GetLayout(XForms.View child) -> TLayout
+XForms.Controls.ViewCollection<TLayout>.Insert(int index, XForms.View child, TLayout layout) -> void
+XForms.Controls.ViewCollection<TLayout>.Replace(int index, XForms.View child, TLayout layout) -> void
+XForms.Controls.ViewCollection<TLayout>.SetLayout(XForms.View child, TLayout layout) -> void
+XForms.Controls.ViewCollection<TLayout>.ViewCollection(XForms.Controls.Panel owner, TLayout defaultLayout = default(TLayout)) -> void
+XForms.ImageProperties
+XForms.ImageProperties.extension(XForms.Primitives.Image)
+XForms.Input.HoldingEventArgs
+XForms.Input.HoldingEventArgs.HoldingEventArgs(XForms.Point position, XForms.Input.HoldingState state) -> void
+XForms.Input.HoldingEventArgs.HoldingState.get -> XForms.Input.HoldingState
+XForms.Input.HoldingEventArgs.Position.get -> XForms.Point
+XForms.Input.HoldingState
+XForms.Input.HoldingState.Canceled = 2 -> XForms.Input.HoldingState
+XForms.Input.HoldingState.Completed = 1 -> XForms.Input.HoldingState
+XForms.Input.HoldingState.Started = 0 -> XForms.Input.HoldingState
+XForms.Input.IPanGestureDelegate
+XForms.Input.IPanGestureDelegate.OnPanCanceled() -> void
+XForms.Input.IPanGestureDelegate.OnPanChanged(XForms.Point translation) -> void
+XForms.Input.IPanGestureDelegate.OnPanCompleted(XForms.Point translation) -> void
+XForms.Input.IPanGestureDelegate.OnPanStarted() -> void
+XForms.Input.IPinchGestureDelegate
+XForms.Input.IPinchGestureDelegate.OnPinchChanged(float scale, XForms.Point center) -> void
+XForms.Input.IPinchGestureDelegate.OnPinchCompleted(float scale) -> void
+XForms.Input.IPinchGestureDelegate.OnPinchStarted() -> void
+XForms.Input.ISwipeGestureDelegate
+XForms.Input.ISwipeGestureDelegate.OnSwipeBegan(int direction) -> bool
+XForms.Input.ISwipeGestureDelegate.OnSwipeCanceled(int direction) -> bool
+XForms.Input.ISwipeGestureDelegate.OnSwipeEnded(int direction, float dx) -> bool
+XForms.Input.ISwipeGestureDelegate.OnSwipeMoved(int direction, float dx) -> bool
+XForms.Input.ITapGestureDelegate
+XForms.Input.ITapGestureDelegate.OnTapBegan() -> void
+XForms.Input.ITapGestureDelegate.OnTapEnded() -> void
+XForms.Input.ITapGestureDelegate.OnTapped() -> void
+XForms.Input.PanDirections
+XForms.Input.PanDirections.Both = XForms.Input.PanDirections.Horizontal | XForms.Input.PanDirections.Vertical -> XForms.Input.PanDirections
+XForms.Input.PanDirections.Horizontal = 1 -> XForms.Input.PanDirections
+XForms.Input.PanDirections.Vertical = 2 -> XForms.Input.PanDirections
+XForms.Input.PanGestureRecognizer
+XForms.Input.PanGestureRecognizer.Directions.get -> XForms.Input.PanDirections
+XForms.Input.PanGestureRecognizer.Directions.set -> void
+XForms.Input.PanGestureRecognizer.PanGestureRecognizer(XForms.Input.IPanGestureDelegate gestureDelegate) -> void
+XForms.Input.PinchGestureRecognizer
+XForms.Input.PinchGestureRecognizer.PinchGestureRecognizer(XForms.Input.IPinchGestureDelegate gestureDelegate) -> void
+XForms.Input.SwipeGestureRecognizer
+XForms.Input.SwipeGestureRecognizer.SwipeGestureRecognizer(XForms.Input.ISwipeGestureDelegate swipeDelegate) -> void
+XForms.Input.TapGestureRecognizer
+XForms.Input.TapGestureRecognizer.DoubleTapped -> System.EventHandler<XForms.Input.TappedEventArgs>
+XForms.Input.TapGestureRecognizer.Holding -> System.EventHandler<XForms.Input.HoldingEventArgs>
+XForms.Input.TapGestureRecognizer.IsPressed.get -> bool
+XForms.Input.TapGestureRecognizer.TapGestureRecognizer() -> void
+XForms.Input.TapGestureRecognizer.TapGestureRecognizer(XForms.Input.ITapGestureDelegate gestureDelegate) -> void
+XForms.Input.TapGestureRecognizer.Tapped -> System.EventHandler<XForms.Input.TappedEventArgs>
+XForms.Input.TappedEventArgs
+XForms.Input.TappedEventArgs.DeviceType.get -> XForms.PointerDeviceType
+XForms.Input.TappedEventArgs.Position.get -> XForms.Point
+XForms.Input.TappedEventArgs.TappedEventArgs(XForms.Point position, XForms.PointerDeviceType deviceType) -> void
+XForms.Layouts.Canvas
+XForms.Layouts.Canvas.Canvas() -> void
+XForms.Layouts.Canvas.CanvasChildren
+XForms.Layouts.Canvas.CanvasChildren.Add(XForms.View child, float left, float top) -> void
+XForms.Layouts.Canvas.Children.get -> XForms.Layouts.Canvas.CanvasChildren
+XForms.Layouts.Dock
+XForms.Layouts.Dock.Bottom = 4 -> XForms.Layouts.Dock
+XForms.Layouts.Dock.BottomOverlay = 8 -> XForms.Layouts.Dock
+XForms.Layouts.Dock.CenterOverlay = 0 -> XForms.Layouts.Dock
+XForms.Layouts.Dock.Left = 1 -> XForms.Layouts.Dock
+XForms.Layouts.Dock.LeftOverlay = 5 -> XForms.Layouts.Dock
+XForms.Layouts.Dock.Right = 3 -> XForms.Layouts.Dock
+XForms.Layouts.Dock.RightOverlay = 7 -> XForms.Layouts.Dock
+XForms.Layouts.Dock.Top = 2 -> XForms.Layouts.Dock
+XForms.Layouts.Dock.TopOverlay = 6 -> XForms.Layouts.Dock
+XForms.Layouts.DockPanel
+XForms.Layouts.DockPanel.Children.get -> XForms.Controls.ViewCollection<XForms.Layouts.Dock>
+XForms.Layouts.DockPanel.DockPanel() -> void
+XForms.Layouts.Grid
+XForms.Layouts.Grid.Children.get -> XForms.Layouts.Grid.GridChildren
+XForms.Layouts.Grid.ColumnDefinitions.get -> XForms.Layouts.Grid.DefinitionCollection
+XForms.Layouts.Grid.ColumnSpacing.get -> float
+XForms.Layouts.Grid.ColumnSpacing.set -> void
+XForms.Layouts.Grid.DefinitionCollection
+XForms.Layouts.Grid.DefinitionCollection.AddRange(string definitions) -> void
+XForms.Layouts.Grid.Grid() -> void
+XForms.Layouts.Grid.GridChildren
+XForms.Layouts.Grid.GridChildren.Add(XForms.View child, int row, int column, int rowSpan = 1, int columnSpan = 1) -> void
+XForms.Layouts.Grid.RowDefinitions.get -> XForms.Layouts.Grid.DefinitionCollection
+XForms.Layouts.Grid.RowSpacing.get -> float
+XForms.Layouts.Grid.RowSpacing.set -> void
+XForms.Layouts.GridCell
+XForms.Layouts.GridCell.Column.get -> int
+XForms.Layouts.GridCell.ColumnSpan.get -> int
+XForms.Layouts.GridCell.GridCell() -> void
+XForms.Layouts.GridCell.GridCell(int row, int column, int rowSpan = 1, int columnSpan = 1) -> void
+XForms.Layouts.GridCell.Row.get -> int
+XForms.Layouts.GridCell.RowSpan.get -> int
+XForms.Layouts.GridLength
+XForms.Layouts.GridLength.Equals(XForms.Layouts.GridLength other) -> bool
+XForms.Layouts.GridLength.GridLength() -> void
+XForms.Layouts.GridLength.GridLength(float value, XForms.Layouts.GridUnitType unitType = XForms.Layouts.GridUnitType.Pixel) -> void
+XForms.Layouts.GridLength.GridUnitType.get -> XForms.Layouts.GridUnitType
+XForms.Layouts.GridLength.IsAbsolute.get -> bool
+XForms.Layouts.GridLength.IsAuto.get -> bool
+XForms.Layouts.GridLength.IsStar.get -> bool
+XForms.Layouts.GridLength.Value.get -> float
+XForms.Layouts.GridUnitType
+XForms.Layouts.GridUnitType.Auto = 0 -> XForms.Layouts.GridUnitType
+XForms.Layouts.GridUnitType.Pixel = 1 -> XForms.Layouts.GridUnitType
+XForms.Layouts.GridUnitType.Star = 2 -> XForms.Layouts.GridUnitType
+XForms.Layouts.StackPanel
+XForms.Layouts.StackPanel.Children.get -> XForms.Controls.ViewCollection
+XForms.Layouts.StackPanel.Orientation.get -> XForms.Orientation
+XForms.Layouts.StackPanel.Orientation.set -> void
+XForms.Layouts.StackPanel.Spacing.get -> float
+XForms.Layouts.StackPanel.Spacing.set -> void
+XForms.Layouts.StackPanel.StackPanel() -> void
+XForms.Layouts.UniformGrid
+XForms.Layouts.UniformGrid.Children.get -> XForms.Controls.ViewCollection
+XForms.Layouts.UniformGrid.UniformGrid() -> void
+XForms.Layouts.WrapPanel
+XForms.Layouts.WrapPanel.Children.get -> XForms.Controls.ViewCollection
+XForms.Layouts.WrapPanel.ItemSpacing.get -> float
+XForms.Layouts.WrapPanel.ItemSpacing.set -> void
+XForms.Layouts.WrapPanel.LineSpacing.get -> float
+XForms.Layouts.WrapPanel.LineSpacing.set -> void
+XForms.Layouts.WrapPanel.Orientation.get -> XForms.Orientation
+XForms.Layouts.WrapPanel.Orientation.set -> void
+XForms.Layouts.WrapPanel.WrapPanel() -> void
+XForms.TextBlockProperties
+XForms.TextBlockProperties.extension(XForms.Primitives.TextBlock)
+XForms.TextBoxProperties
+XForms.TextBoxProperties.extension(XForms.Primitives.TextBox)
+XForms.ViewBindingExtensions
+XForms.ViewProperties
+XForms.ViewProperties.extension(XForms.View)
+XForms.ViewProperty<TView, TValue>
+XForms.ViewProperty<TView, TValue>.GetValue(TView view) -> TValue
+XForms.ViewProperty<TView, TValue>.Name.get -> string
+XForms.ViewProperty<TView, TValue>.SetValue(TView view, TValue value) -> void
+XForms.ViewProperty<TView, TValue>.ViewProperty(string name, System.Func<TView, TValue> getValue, System.Action<TView, TValue> setValue) -> void
+XForms.XFormsApp
+abstract XForms.Binding.Dispose() -> void
+abstract XForms.Binding.Refresh() -> void
+abstract XForms.Controls.AppTheme.Apply(XForms.Theme theme) -> XForms.Theme
+abstract XForms.Controls.ControlTemplate.ControlType.get -> System.Type
+abstract XForms.Controls.Panel.ArrangeChildren(XForms.Size finalSize) -> void
+abstract XForms.Controls.Panel.MeasureChildren(XForms.Size availableSize) -> XForms.Size
+abstract XForms.Controls.PickerField.DisplayText.get -> string
+abstract XForms.Controls.PickerField.MaximumTextWidth.get -> float
+abstract XForms.Controls.PickerField.OpenPicker() -> void
+const XForms.Controls.CalendarView.CellSize = 40 -> float
+const XForms.Controls.ComboBoxItemsView.RowHeight = 36 -> float
+const XForms.Controls.PickerField.FontSize = 15 -> float
+const XForms.Controls.PickerField.GlyphWidth = 34 -> float
+const XForms.Controls.PickerField.TextInset = 11 -> float
+const XForms.Controls.PopupFrame.BorderThickness = 1 -> float
+override XForms.Controls.Border.BackgroundColor.get -> XForms.Color
+override XForms.Controls.Border.Padding.get -> XForms.Thickness
+override XForms.Controls.Border.Padding.set -> void
+override XForms.Controls.Border.Render(XForms.DrawingContext drawContext) -> void
+override XForms.Controls.Button.DefaultAccessibilityLabel.get -> string
+override XForms.Controls.Button.DefaultAccessibilityRole.get -> XForms.AccessibilityRole
+override XForms.Controls.CalendarDatePicker.ClosePicker() -> void
+override XForms.Controls.CalendarDatePicker.DefaultAccessibilityLabel.get -> string
+override XForms.Controls.CalendarDatePicker.DisplayText.get -> string
+override XForms.Controls.CalendarDatePicker.IsPickerOpen.get -> bool
+override XForms.Controls.CalendarDatePicker.IsPlaceholder.get -> bool
+override XForms.Controls.CalendarDatePicker.MaximumTextWidth.get -> float
+override XForms.Controls.CalendarDatePicker.OpenPicker() -> void
+override XForms.Controls.CalendarView.DefaultAccessibilityLabel.get -> string
+override XForms.Controls.CalendarView.DefaultAccessibilityRole.get -> XForms.AccessibilityRole
+override XForms.Controls.CalendarView.MeasureOverride(XForms.Size availableSize) -> XForms.Size
+override XForms.Controls.CalendarView.OnActivate() -> void
+override XForms.Controls.CalendarView.OnGotFocus() -> void
+override XForms.Controls.CalendarView.OnKeyDown(XForms.KeyEventArgs keyInputEvent) -> void
+override XForms.Controls.CalendarView.OnLostFocus() -> void
+override XForms.Controls.CalendarView.OnPointerCanceled(XForms.PointerEventArgs e) -> void
+override XForms.Controls.CalendarView.OnPointerPressed(XForms.PointerEventArgs e) -> void
+override XForms.Controls.CalendarView.OnPointerReleased(XForms.PointerEventArgs e) -> void
+override XForms.Controls.CalendarView.OnThemeChanged(XForms.Theme theme) -> void
+override XForms.Controls.ComboBox.ClosePicker() -> void
+override XForms.Controls.ComboBox.DefaultAccessibilityLabel.get -> string
+override XForms.Controls.ComboBox.DisplayText.get -> string
+override XForms.Controls.ComboBox.IsPickerOpen.get -> bool
+override XForms.Controls.ComboBox.MaximumTextWidth.get -> float
+override XForms.Controls.ComboBox.OnKeyDown(XForms.KeyEventArgs keyInputEvent) -> void
+override XForms.Controls.ComboBox.OpenPicker() -> void
+override XForms.Controls.ComboBoxItem.ToString() -> string
+override XForms.Controls.CommandListView.CreateItemContainer() -> XForms.Controls.ListViewItem
+override XForms.Controls.CommandListViewItemContainer.AddContent(XForms.View content) -> void
+override XForms.Controls.CommandListViewItemContainer.OnBind() -> void
+override XForms.Controls.CommandListViewItemContainer.OnRecycle() -> void
+override XForms.Controls.CommandListViewItemContainer.OnTapped() -> void
+override XForms.Controls.CommandListViewItemContainer.RemoveContent(XForms.View content) -> void
+override XForms.Controls.Control.GetBackgroundColor() -> XForms.Color
+override XForms.Controls.ControlTemplates.Equals(object obj) -> bool
+override XForms.Controls.ControlTemplates.GetHashCode() -> int
+override XForms.Controls.ControlTemplates.ToString() -> string
+override XForms.Controls.FloatingButton.DefaultAccessibilityRole.get -> XForms.AccessibilityRole
+override XForms.Controls.FlyoutButton.BackgroundColor.get -> XForms.Color
+override XForms.Controls.FlyoutButton.OnLightDismiss() -> void
+override XForms.Controls.ListView.CreateItemContainer() -> XForms.Controls.ListViewItem
+override XForms.Controls.ListView.OnContainerBound(XForms.Primitives.ItemContainer container) -> void
+override XForms.Controls.ListViewItem.AccessibilityIsSelected.get -> bool
+override XForms.Controls.ListViewItem.DefaultAccessibilityRole.get -> XForms.AccessibilityRole
+override XForms.Controls.ListViewItem.OnAttaching(XForms.Theme theme) -> void
+override XForms.Controls.ListViewItem.OnThemeChanged(XForms.Theme theme) -> void
+override XForms.Controls.ListViewItem.Render(XForms.DrawingContext drawingContext) -> void
+override XForms.Controls.ListViewSwipeItem.BackgroundColor.get -> XForms.Color
+override XForms.Controls.Motion.Equals(object obj) -> bool
+override XForms.Controls.Motion.GetHashCode() -> int
+override XForms.Controls.Motion.ToString() -> string
+override XForms.Controls.Panel.AnimatesChildren.get -> bool
+override XForms.Controls.PickerField.AccessibilityIsExpanded.get -> bool?
+override XForms.Controls.PickerField.AccessibilityValue.get -> string
+override XForms.Controls.PickerField.DefaultAccessibilityRole.get -> XForms.AccessibilityRole
+override XForms.Controls.PickerField.MeasureOverride(XForms.Size availableSize) -> XForms.Size
+override XForms.Controls.PickerField.OnActivate() -> void
+override XForms.Controls.PickerField.OnKeyDown(XForms.KeyEventArgs keyInputEvent) -> void
+override XForms.Controls.PickerField.OnPointerCanceled(XForms.PointerEventArgs e) -> void
+override XForms.Controls.PickerField.OnPointerPressed(XForms.PointerEventArgs e) -> void
+override XForms.Controls.PickerField.OnPointerReleased(XForms.PointerEventArgs e) -> void
+override XForms.Controls.PickerField.PerformAccessibilityAction(XForms.AccessibilityAction action) -> bool
+override XForms.Controls.RadioButton.AccessibilityIsSelected.get -> bool
+override XForms.Controls.Shapes.Equals(object obj) -> bool
+override XForms.Controls.Shapes.GetHashCode() -> int
+override XForms.Controls.Shapes.ToString() -> string
+override XForms.Controls.TabStripItem.AccessibilityIsSelected.get -> bool
+override XForms.Controls.TabStripItem.BackgroundColor.get -> XForms.Color
+override XForms.Controls.TabStripItem.DefaultAccessibilityLabel.get -> string
+override XForms.Controls.TabStripItem.DefaultAccessibilityRole.get -> XForms.AccessibilityRole
+override XForms.Controls.TemplatedContentControl.ArrangeOverride(XForms.Size finalSize) -> void
+override XForms.Controls.TemplatedContentControl.BackgroundColor.get -> XForms.Color
+override XForms.Controls.TemplatedContentControl.MeasureOverride(XForms.Size availableSize) -> XForms.Size
+override XForms.Controls.TemplatedContentControl.OnAttaching(XForms.Theme theme) -> void
+override XForms.Controls.TemplatedContentControl.OnGotFocus() -> void
+override XForms.Controls.TemplatedContentControl.OnLostFocus() -> void
+override XForms.Controls.TemplatedContentControl.OnPointerEntered(XForms.PointerEventArgs e) -> void
+override XForms.Controls.TemplatedContentControl.OnPointerExited(XForms.PointerEventArgs e) -> void
+override XForms.Controls.TemplatedContentControl.OnThemeChanged(XForms.Theme theme) -> void
+override XForms.Controls.TemplatedControl.ArrangeOverride(XForms.Size finalSize) -> void
+override XForms.Controls.TemplatedControl.MeasureOverride(XForms.Size availableSize) -> XForms.Size
+override XForms.Controls.TemplatedControl.OnAttaching(XForms.Theme theme) -> void
+override XForms.Controls.TemplatedControl.OnGotFocus() -> void
+override XForms.Controls.TemplatedControl.OnLostFocus() -> void
+override XForms.Controls.TemplatedControl.OnPointerEntered(XForms.PointerEventArgs e) -> void
+override XForms.Controls.TemplatedControl.OnPointerExited(XForms.PointerEventArgs e) -> void
+override XForms.Controls.TemplatedControl.OnThemeChanged(XForms.Theme theme) -> void
+override XForms.Controls.TemplatedControl.Render(XForms.DrawingContext drawingContext) -> void
+override XForms.Controls.TextStyle.Equals(object obj) -> bool
+override XForms.Controls.TextStyle.GetHashCode() -> int
+override XForms.Controls.TextStyle.ToString() -> string
+override XForms.Controls.ToggleButton.AccessibilityIsChecked.get -> bool?
+override XForms.Controls.Typography.Equals(object obj) -> bool
+override XForms.Controls.Typography.GetHashCode() -> int
+override XForms.Controls.Typography.ToString() -> string
+override XForms.Input.PanGestureRecognizer.OnPointerInput(XForms.PointerEventArgs e, ref XForms.GestureEventResult result) -> void
+override XForms.Input.PinchGestureRecognizer.OnPointerInput(XForms.PointerEventArgs e, ref XForms.GestureEventResult result) -> void
+override XForms.Input.PinchGestureRecognizer.Reset() -> void
+override XForms.Input.PinchGestureRecognizer.TracksMultiplePointers.get -> bool
+override XForms.Input.SwipeGestureRecognizer.OnAttached(XForms.View view) -> void
+override XForms.Input.SwipeGestureRecognizer.OnDetached(XForms.View view) -> void
+override XForms.Input.SwipeGestureRecognizer.OnPointerInput(XForms.PointerEventArgs touch, ref XForms.GestureEventResult result) -> void
+override XForms.Input.SwipeGestureRecognizer.Reset() -> void
+override XForms.Input.TapGestureRecognizer.OnAttached(XForms.View view) -> void
+override XForms.Input.TapGestureRecognizer.OnDetached(XForms.View view) -> void
+override XForms.Input.TapGestureRecognizer.OnPointerInput(XForms.PointerEventArgs touch, ref XForms.GestureEventResult result) -> void
+override XForms.Input.TapGestureRecognizer.Reset() -> void
+override XForms.Layouts.Canvas.ArrangeChildren(XForms.Size finalSize) -> void
+override XForms.Layouts.Canvas.MeasureChildren(XForms.Size availableSize) -> XForms.Size
+override XForms.Layouts.DockPanel.ArrangeChildren(XForms.Size finalSize) -> void
+override XForms.Layouts.DockPanel.MeasureChildren(XForms.Size availableSize) -> XForms.Size
+override XForms.Layouts.Grid.ArrangeChildren(XForms.Size finalSize) -> void
+override XForms.Layouts.Grid.MeasureChildren(XForms.Size availableSize) -> XForms.Size
+override XForms.Layouts.GridLength.Equals(object obj) -> bool
+override XForms.Layouts.GridLength.GetHashCode() -> int
+override XForms.Layouts.GridLength.ToString() -> string
+override XForms.Layouts.StackPanel.ArrangeChildren(XForms.Size finalSize) -> void
+override XForms.Layouts.StackPanel.MeasureChildren(XForms.Size availableSize) -> XForms.Size
+override XForms.Layouts.UniformGrid.ArrangeChildren(XForms.Size finalSize) -> void
+override XForms.Layouts.UniformGrid.MeasureChildren(XForms.Size availableSize) -> XForms.Size
+override XForms.Layouts.WrapPanel.ArrangeChildren(XForms.Size finalSize) -> void
+override XForms.Layouts.WrapPanel.MeasureChildren(XForms.Size availableSize) -> XForms.Size
+override XForms.ViewProperty<TView, TValue>.ToString() -> string
+override sealed XForms.Controls.ControlTemplate<TControl>.ControlType.get -> System.Type
+override sealed XForms.Controls.Panel.ArrangeOverride(XForms.Size finalSize) -> void
+override sealed XForms.Controls.Panel.MeasureOverride(XForms.Size availableSize) -> XForms.Size
+static XForms.Controls.CalendarView.NaturalSize.get -> XForms.Size
+static XForms.Controls.ControlTemplates.Empty.get -> XForms.Controls.ControlTemplates
+static XForms.Controls.ControlTemplates.operator !=(XForms.Controls.ControlTemplates left, XForms.Controls.ControlTemplates right) -> bool
+static XForms.Controls.ControlTemplates.operator ==(XForms.Controls.ControlTemplates left, XForms.Controls.ControlTemplates right) -> bool
+static XForms.Controls.ItemViewFactory<T>.Create<TView>(System.Func<TView> create, System.Action<TView, T> bind) -> XForms.Controls.ItemViewFactory<T>
+static XForms.Controls.ListViewItem.ContainerFromContent(XForms.View view) -> XForms.Controls.ListViewItem
+static XForms.Controls.MessageBox.ShowAsync(string message, string title) -> System.Threading.Tasks.Task<XForms.Controls.MessageBoxResult>
+static XForms.Controls.Motion.operator !=(XForms.Controls.Motion left, XForms.Controls.Motion right) -> bool
+static XForms.Controls.Motion.operator ==(XForms.Controls.Motion left, XForms.Controls.Motion right) -> bool
+static XForms.Controls.Shapes.operator !=(XForms.Controls.Shapes left, XForms.Controls.Shapes right) -> bool
+static XForms.Controls.Shapes.operator ==(XForms.Controls.Shapes left, XForms.Controls.Shapes right) -> bool
+static XForms.Controls.TextStyle.operator !=(XForms.Controls.TextStyle left, XForms.Controls.TextStyle right) -> bool
+static XForms.Controls.TextStyle.operator ==(XForms.Controls.TextStyle left, XForms.Controls.TextStyle right) -> bool
+static XForms.Controls.ThemeTemplates.GetTemplate(this XForms.Theme theme, System.Type controlType) -> XForms.Controls.ControlTemplate
+static XForms.Controls.ThemeTemplates.WithTemplate(this XForms.Theme theme, XForms.Controls.ControlTemplate template) -> XForms.Theme
+static XForms.Controls.ThemeTokens.get_Motion(XForms.Theme theme) -> XForms.Controls.Motion
+static XForms.Controls.ThemeTokens.get_Shapes(XForms.Theme theme) -> XForms.Controls.Shapes
+static XForms.Controls.ThemeTokens.get_Typography(XForms.Theme theme) -> XForms.Controls.Typography
+static XForms.Controls.Typography.operator !=(XForms.Controls.Typography left, XForms.Controls.Typography right) -> bool
+static XForms.Controls.Typography.operator ==(XForms.Controls.Typography left, XForms.Controls.Typography right) -> bool
+static XForms.ImageProperties.extension(XForms.Primitives.Image).SourceProperty.get -> XForms.ViewProperty<XForms.Primitives.Image, XForms.ImageSource>
+static XForms.ImageProperties.extension(XForms.Primitives.Image).TintProperty.get -> XForms.ViewProperty<XForms.Primitives.Image, XForms.Color>
+static XForms.ImageProperties.get_SourceProperty() -> XForms.ViewProperty<XForms.Primitives.Image, XForms.ImageSource>
+static XForms.ImageProperties.get_TintProperty() -> XForms.ViewProperty<XForms.Primitives.Image, XForms.Color>
+static XForms.Layouts.GridLength.Auto.get -> XForms.Layouts.GridLength
+static XForms.Layouts.GridLength.Parse(string text) -> XForms.Layouts.GridLength
+static XForms.Layouts.GridLength.Star.get -> XForms.Layouts.GridLength
+static XForms.Layouts.GridLength.operator !=(XForms.Layouts.GridLength a, XForms.Layouts.GridLength b) -> bool
+static XForms.Layouts.GridLength.operator ==(XForms.Layouts.GridLength a, XForms.Layouts.GridLength b) -> bool
+static XForms.TextBlockProperties.extension(XForms.Primitives.TextBlock).FontSizeProperty.get -> XForms.ViewProperty<XForms.Primitives.TextBlock, float>
+static XForms.TextBlockProperties.extension(XForms.Primitives.TextBlock).FontWeightProperty.get -> XForms.ViewProperty<XForms.Primitives.TextBlock, XForms.FontWeight>
+static XForms.TextBlockProperties.extension(XForms.Primitives.TextBlock).ForegroundProperty.get -> XForms.ViewProperty<XForms.Primitives.TextBlock, XForms.Color>
+static XForms.TextBlockProperties.extension(XForms.Primitives.TextBlock).StrikethroughProperty.get -> XForms.ViewProperty<XForms.Primitives.TextBlock, bool>
+static XForms.TextBlockProperties.extension(XForms.Primitives.TextBlock).TextProperty.get -> XForms.ViewProperty<XForms.Primitives.TextBlock, string>
+static XForms.TextBlockProperties.get_FontSizeProperty() -> XForms.ViewProperty<XForms.Primitives.TextBlock, float>
+static XForms.TextBlockProperties.get_FontWeightProperty() -> XForms.ViewProperty<XForms.Primitives.TextBlock, XForms.FontWeight>
+static XForms.TextBlockProperties.get_ForegroundProperty() -> XForms.ViewProperty<XForms.Primitives.TextBlock, XForms.Color>
+static XForms.TextBlockProperties.get_StrikethroughProperty() -> XForms.ViewProperty<XForms.Primitives.TextBlock, bool>
+static XForms.TextBlockProperties.get_TextProperty() -> XForms.ViewProperty<XForms.Primitives.TextBlock, string>
+static XForms.TextBoxProperties.extension(XForms.Primitives.TextBox).PlaceholderTextProperty.get -> XForms.ViewProperty<XForms.Primitives.TextBox, string>
+static XForms.TextBoxProperties.extension(XForms.Primitives.TextBox).TextProperty.get -> XForms.ViewProperty<XForms.Primitives.TextBox, string>
+static XForms.TextBoxProperties.get_PlaceholderTextProperty() -> XForms.ViewProperty<XForms.Primitives.TextBox, string>
+static XForms.TextBoxProperties.get_TextProperty() -> XForms.ViewProperty<XForms.Primitives.TextBox, string>
+static XForms.ViewBindingExtensions.Bind<TView, TValue, TSource>(this TView view, XForms.ViewProperty<TView, TValue> property, TSource source, System.Func<TSource, TValue> getValue) -> XForms.Binding
+static XForms.ViewBindingExtensions.Bind<TView, TValue, TSource>(this TView view, XForms.ViewProperty<TView, TValue> property, TSource source, System.Func<TSource, TValue> getValue, System.Action<TSource, TValue> setValue) -> XForms.Binding
+static XForms.ViewProperties.extension(XForms.View).AccessibilityLabelProperty.get -> XForms.ViewProperty<XForms.View, string>
+static XForms.ViewProperties.extension(XForms.View).HeightProperty.get -> XForms.ViewProperty<XForms.View, float>
+static XForms.ViewProperties.extension(XForms.View).IsHitTestVisibleProperty.get -> XForms.ViewProperty<XForms.View, bool>
+static XForms.ViewProperties.extension(XForms.View).IsVisibleProperty.get -> XForms.ViewProperty<XForms.View, bool>
+static XForms.ViewProperties.extension(XForms.View).MarginProperty.get -> XForms.ViewProperty<XForms.View, XForms.Thickness>
+static XForms.ViewProperties.extension(XForms.View).WidthProperty.get -> XForms.ViewProperty<XForms.View, float>
+static XForms.ViewProperties.get_AccessibilityLabelProperty() -> XForms.ViewProperty<XForms.View, string>
+static XForms.ViewProperties.get_HeightProperty() -> XForms.ViewProperty<XForms.View, float>
+static XForms.ViewProperties.get_IsHitTestVisibleProperty() -> XForms.ViewProperty<XForms.View, bool>
+static XForms.ViewProperties.get_IsVisibleProperty() -> XForms.ViewProperty<XForms.View, bool>
+static XForms.ViewProperties.get_MarginProperty() -> XForms.ViewProperty<XForms.View, XForms.Thickness>
+static XForms.ViewProperties.get_WidthProperty() -> XForms.ViewProperty<XForms.View, float>
+static readonly XForms.Controls.Border.BackgroundProperty -> XForms.ViewProperty<XForms.Controls.Border, XForms.Color>
+static readonly XForms.Controls.Border.BorderBrushProperty -> XForms.ViewProperty<XForms.Controls.Border, XForms.Color>
+static readonly XForms.Controls.Button.CommandProperty -> XForms.ViewProperty<XForms.Controls.Button, System.Windows.Input.ICommand>
+static readonly XForms.Controls.Button.IsEnabledProperty -> XForms.ViewProperty<XForms.Controls.Button, bool>
+static readonly XForms.Controls.Button.TextProperty -> XForms.ViewProperty<XForms.Controls.Button, string>
+static readonly XForms.Controls.CalendarDatePicker.SelectedDateProperty -> XForms.ViewProperty<XForms.Controls.CalendarDatePicker, System.DateTime?>
+static readonly XForms.Controls.ComboBox.SelectedIndexProperty -> XForms.ViewProperty<XForms.Controls.ComboBox, int>
+static readonly XForms.Controls.ComboBox.SelectedItemProperty -> XForms.ViewProperty<XForms.Controls.ComboBox, XForms.Controls.ComboBoxItem>
+static readonly XForms.Controls.RadioButtons.SelectedItemProperty -> XForms.ViewProperty<XForms.Controls.RadioButtons, object>
+static readonly XForms.Controls.ToggleButton.IsCheckedProperty -> XForms.ViewProperty<XForms.Controls.ToggleButton, bool>
+virtual XForms.Controls.CommandListViewItem.OnItemChanged() -> void
+virtual XForms.Controls.Control.BackgroundColor.get -> XForms.Color
+virtual XForms.Controls.ControlTemplate<TControl>.Apply(TControl control, XForms.Controls.TemplateContext context) -> void
+virtual XForms.Controls.ControlTemplate<TControl>.Arrange(TControl control, XForms.Size finalSize) -> bool
+virtual XForms.Controls.ControlTemplate<TControl>.Background(TControl control) -> XForms.Color?
+virtual XForms.Controls.ControlTemplate<TControl>.Measure(TControl control, XForms.Size availableSize) -> XForms.Size?
+virtual XForms.Controls.ControlTemplate<TControl>.OnStateChanged(TControl control, XForms.Controls.TemplateContext context) -> void
+virtual XForms.Controls.ControlTemplate<TControl>.OnThemeChanged(TControl control, XForms.Controls.TemplateContext context) -> void
+virtual XForms.Controls.ControlTemplate<TControl>.Render(TControl control, XForms.DrawingContext drawingContext) -> void
+virtual XForms.Controls.ControlTemplate<TControl>.Unapply(TControl control, XForms.Controls.TemplateContext context) -> void
+virtual XForms.Controls.FloatingButton.OnTapBegan() -> void
+virtual XForms.Controls.FloatingButton.OnTapEnded() -> void
+virtual XForms.Controls.LightDismissControl.OnLightDismiss() -> void
+virtual XForms.Controls.ListViewItem.OnIsSelectedChanged() -> void
+virtual XForms.Controls.ListViewItem.OnTapped() -> void
+virtual XForms.Controls.PickerField.ClosePicker() -> void
+virtual XForms.Controls.PickerField.IsPickerOpen.get -> bool
+virtual XForms.Controls.PickerField.IsPlaceholder.get -> bool
+virtual XForms.Controls.TemplatedControl.IsEnabled.get -> bool
+virtual XForms.Controls.TemplatedControl.IsEnabled.set -> void
+virtual XForms.Controls.UserControl.Padding.get -> XForms.Thickness
+virtual XForms.Controls.UserControl.Padding.set -> void
