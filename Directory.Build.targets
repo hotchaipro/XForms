@@ -28,6 +28,7 @@
       <_XFormsAllowedProject Include="$(XFormsAllowedReferences)" />
       <_XFormsDisallowedProject Include="@(_XFormsReferencedProject)" Exclude="@(_XFormsAllowedProject)" />
     </ItemGroup>
-    <Error Condition="'@(_XFormsDisallowedProject)' != ''" Code="XF0002" Text="$(MSBuildProjectName) mustn't reference @(_XFormsDisallowedProject, ', '): its layer may reference only $(XFormsAllowedReferences.Replace(';', ', ')). See docs/architecture.md." />
+    <Error Condition="'@(_XFormsDisallowedProject)' != '' and '$(XFormsAllowedReferences)' == '(none)'" Code="XF0002" Text="$(MSBuildProjectName) mustn't reference @(_XFormsDisallowedProject, ', '): it stands alone, referencing nothing of XForms. See docs/architecture.md." />
+    <Error Condition="'@(_XFormsDisallowedProject)' != '' and '$(XFormsAllowedReferences)' != '(none)'" Code="XF0002" Text="$(MSBuildProjectName) mustn't reference @(_XFormsDisallowedProject, ', '): its layer may reference only $(XFormsAllowedReferences.Replace(';', ', ')). See docs/architecture.md." />
   </Target>
 </Project>

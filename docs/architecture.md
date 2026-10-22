@@ -1,61 +1,64 @@
 # XForms architecture
 
-XForms is built in layers. The **framework** contains only what needs a
-platform: hosting, the views the platforms render natively, raw input,
-drawing, focus and accessibility. **XForms.Toolkit** has what apps use
-besides controls (platform services and data binding), for any set of
-controls; its platform assemblies (`XForms.Toolkit.Win32` and the others)
-implement the services. **XForms.Controls** is our controls, with the panels and gestures,
-built only on the framework's public API. **Apps** use all three.
+XForms is built in layers, and an app references two packages: **`XForms`**
+and a theme (**`XForms.Themes.Simple`** first). It starts with one call,
+`XFormsApp.Run`, that takes its theme.
+
+- **XForms** (`xforms/`) is the controls, with the panels, gestures and data
+  binding, built only on the framework's public API; and on each platform,
+  the app's entry point. It's multi-targeted (Windows, Android, iOS, and
+  plain `net10.0` for the browser), so one package serves every platform.
+- **A theme package** says how the controls look: a template for each, and
+  the tokens and styles they use.
+- **The framework** contains only what needs a platform: hosting, the views
+  the platforms render natively, raw input, drawing, focus and
+  accessibility. XForms uses it; apps don't reference it.
+- **XForms.Toolkit** is cross-platform services (the clipboard, the
+  launcher, preferences, secure storage, sharing, haptics, connectivity,
+  file pickers) with nothing about a UI in it, usable by any .NET app.
+  XForms registers it as an app starts; apps may call it, or use another
+  library.
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
 │ App (for example SoonerOrLater)                              │
+│   references XForms and a theme; starts with XFormsApp.Run   │
 ├──────────────────────────────────────────────────────────────┤
 │ Theme: XForms.Themes.Simple (chosen by the app)              │
 │   How the controls look: a template for each, and tokens     │
 ├──────────────────────────────────────────────────────────────┤
-│ Controls: XForms.Controls                                    │
+│ XForms (multi-targeted)                                      │
 │   Buttons, tabs, menus, pickers, calendar, lists, panels,    │
-│   gestures and their base classes: what they do, and their   │
-│   state; built only on the public framework API              │
-├──────────────────────────────────────────────────────────────┤
-│ Toolkit: XForms.Toolkit                                      │
-│   Platform services and data binding, for any set of         │
-│   controls; XForms.Toolkit.<Platform> implement the          │
-│   services, on the hosting API below                         │
-├──────────────────────────────────────────────────────────────┤
-│ Framework: XForms.Framework                                  │
-│   Application, pages, views and layout, raw input, focus,    │
-│   accessibility, drawing, popups, native primitives          │
-├──────────────────────────────────────────────────────────────┤
-│ Platform contract: XForms.Platform (internal)                │
-│   Renderer interfaces (implemented by the platforms) and     │
-│   hosts (ApplicationHost, LayerHost) they call               │
-├──────────────┬──────────────┬───────────────┬────────────────┤
-│ XForms.      │ XForms.      │ XForms.       │ XForms.        │
-│ Framework.   │ Framework.   │ Framework.    │ Framework.     │
-│ Android      │ iOS          │ Win32         │ Web            │
-│ Public: only │ Public: only │ Public: only  │ Public: only   │
-│ Android-     │ Ios-         │ Win32-        │ Web-           │
-│ Application  │ Application  │ Application   │ Application    │
-└──────────────┴──────────────┴───────────────┴────────────────┘
+│   gestures, binding: what they do, and their state; on each  │
+│   platform, XFormsApp.Run                                    │
+├────────────────────────────────────────────┬─────────────────┤
+│ Framework: XForms.Framework                │ Toolkit:        │
+│   Application, pages, views and layout,    │ XForms.Toolkit  │
+│   raw input, focus, accessibility, drawing,│   Services for  │
+│   popups, native primitives                │   any .NET app, │
+├────────────────────────────────────────────┤   standalone    │
+│ Platform contract: XForms.Platform         │                 │
+│ (internal): renderer interfaces and hosts  │                 │
+├───────────┬──────────┬──────────┬──────────┼─────────────────┤
+│ XForms.   │ XForms.  │ XForms.  │ XForms.  │ XForms.Toolkit. │
+│ Framework.│ Framework│ Framework│ Framework│ Win32, .Android,│
+│ Android   │ .iOS     │ .Win32   │ .Web     │ .iOS, .Web      │
+└───────────┴──────────┴──────────┴──────────┴─────────────────┘
 ```
 
 The goal is that any control library built on the framework runs on every
 supported platform with the same look and the same layout. All of the
 per-platform complexity stays inside the framework and the platforms.
 
-Planned ([alignment.md](alignment.md#layering), phases 25-28): a standalone
-XForms.Toolkit (services only, for any .NET app; binding moves to
-XForms.Controls), `XForms.Xaml` for markup, `XForms.Compat.WinUI` for
-WinUI's API, and embedding XForms in part of an existing app's UI; and more
-themes beside `XForms.Themes.Simple`.
+Planned ([alignment.md](alignment.md#layering), phases 26-28):
+`XForms.Xaml` for markup, `XForms.Compat.WinUI` for WinUI's API, and
+embedding XForms in part of an existing app's UI; and more themes beside
+`XForms.Themes.Simple`.
 
 ## The rule for what goes where
 
 **Something belongs in the framework only if the platforms need it.
-Everything else belongs in a control library such as XForms.Controls.**
+Everything else belongs in a control library such as XForms.**
 
 The framework holds two kinds of things:
 
@@ -76,7 +79,7 @@ The framework holds two kinds of things:
   - accessibility;
   - compositor animations.
 
-A control belongs in XForms.Controls when it can be written once on top of
+A control belongs in XForms when it can be written once on top of
 those pieces. Its Button, for example, reacts to a `TapGestureRecognizer`
 and says when it's pressed; its theme's template draws it in `Render`. It
 contains no platform code and looks identical everywhere. Panels, `Control`, `ContentControl` and `UserControl`, and the
@@ -85,7 +88,7 @@ way.
 
 The same rule decides which layer owns a new feature. For example, a
 repeating animation needs the compositor, so it goes in the framework. A
-spinner built from that animation goes in XForms.Controls.
+spinner built from that animation goes in XForms.
 
 ## Repository layout
 
@@ -96,9 +99,10 @@ spinner built from that animation goes in XForms.Controls.
 | `platform/ios/` | `XForms.Framework.iOS` | iOS implementation (UIKit) |
 | `platform/win32/` | `XForms.Framework.Win32` | Windows implementation (Win32, DirectComposition, Direct2D, DirectWrite, RichEdit) |
 | `platform/web/` | `XForms.Framework.Web` | Browser implementation (.NET on WebAssembly, DOM elements and canvases) |
-| `toolkit/` | `XForms.Toolkit` (net10.0) | Platform services and data binding |
-| `toolkit/platform/<platform>/` | `XForms.Toolkit.Android`, `.iOS`, `.Win32`, `.Web` | Each platform's services |
-| `controls/` | `XForms.Controls` (net10.0) | Controls, panels and gestures |
+| `toolkit/` | `XForms.Toolkit` (net10.0) | Cross-platform services, standalone |
+| `toolkit/platform/<platform>/` | `XForms.Toolkit.Android`, `.iOS`, `.Win32`, `.Web` | Each platform's services, and their registration |
+| `xforms/` | `XForms` (multi-targeted) | Controls, panels, gestures, binding; each platform's entry point in `Platforms/` |
+| `themes/simple/` | `XForms.Themes.Simple` (net10.0) | The Simple theme |
 | `analyzers/` | `XForms.Analyzers` | XF0001, which keeps the platforms to the platform contract |
 | `test/` | `XForms.Test.*` | Test apps (the pages are shared in `test/XForms.Test`) |
 
@@ -109,22 +113,26 @@ The dependency rules:
   `ApplicationHost`, `LayerHost`) and members marked `[PlatformContract]`.
   The framework gives them its internals (`InternalsVisibleTo`), and the
   XF0001 analyzer makes any other use a build error.
-- **XForms.Toolkit** references the framework only. Its platform
-  assemblies reference it and their framework platform, and implement its
-  services using only that platform's public hosting API.
-- **XForms.Controls**, and any other control library, references the
-  framework (and XForms.Toolkit, for binding). It uses **public API only**. This is enforced by the
-  compiler: it has no access to framework internals. Needing an internal is
-  a signal that the framework is missing a public API for control authors.
-- **An app** references the framework, one platform project (and its
-  toolkit platform, for services), and the control libraries it uses. Its
-  startup code runs the app on the platform (see Hosting).
+- **XForms.Toolkit** references nothing of XForms. Its platform assemblies
+  reference only it; what they need of the app (its window, activity or
+  view controller) comes from the registration, as functions.
+- **XForms**, and any other control library, references the framework
+  (and XForms the toolkit; on each platform, their platform assemblies). It
+  uses **public API only**. This is enforced by the compiler: it has no
+  access to framework internals. Needing an internal is a signal that the
+  framework is missing a public API for control authors.
+- **A theme package** references XForms.
+- **An app** references XForms and a theme package, and starts with
+  `XFormsApp.Run` (see Hosting). The framework and toolkit come with
+  XForms; an app can use their public types, but never references,
+  starts or registers them.
 
 The build enforces these rules:
 - a project that references a layer it mustn't fails to build (XF0002, in
   `Directory.Build.targets`);
-- the framework, its platforms, the toolkit and its platforms list their
-  public API in `PublicAPI.Shipped.txt` and `PublicAPI.Unshipped.txt`, and
+- XForms, the framework, the toolkit, their platforms and the themes list
+  their public API in `PublicAPI.Shipped.txt` and `PublicAPI.Unshipped.txt`
+  (XForms' per platform in `PublicAPI/<target>/`), and
   public API that isn't listed (RS0016), or listed API that's gone (RS0017),
   fails the build. A new public type or member shows in review as a change
   to those files, which is how the platforms stay down to their hosting
@@ -135,9 +143,9 @@ The build enforces these rules:
 
 Namespaces: the framework uses `XForms`, `XForms.Primitives` (the native
 primitives) and `XForms.Platform` (the contract). XForms.Toolkit uses
-`XForms`. XForms.Controls uses
-`XForms.Controls` (controls, `Panel` and the base classes), `XForms.Layouts`
-(the panels) and `XForms.Input` (the gesture recognizers).
+`XForms.Toolkit`. XForms uses `XForms` (`XFormsApp`, binding),
+`XForms.Controls` (controls, `Panel`, the base classes, `AppTheme`),
+`XForms.Layouts` (the panels) and `XForms.Input` (the gesture recognizers).
 
 ## Hosting
 
@@ -145,23 +153,28 @@ An app is an `Application` subclass. Its constructor runs before any
 platform exists, so it does nothing that needs one (the dispatcher, the
 windows, services); using them there throws. Its work starts in `OnStart`.
 
-Each platform's one public class runs the app. No app derives from an
-XForms type to host it; on Android and iOS the activity and the delegates
-are the app's own, with whatever base classes they need:
+An app starts with `XFormsApp.Run`, which takes the app and its theme. No
+app derives from an XForms type to host it; on Android and iOS the
+activity and the delegates are the app's own, with whatever base classes
+they need:
 
-| Platform | Run | Native objects |
-|---|---|---|
-| Win32 | `Win32Application.Run("Title", new App())` from `Main`: a window and its message loop | `MainWindowHandle` |
-| Browser | `await WebApplication.RunAsync("Title", new App())` from `Main`: the page | — |
-| iOS | `IosApplication.Run(args, new App())` from `Main`, with XForms' own app and scene delegates; or `IosApplication.Run(windowScene, new App())` from the app's own scene delegate | `WindowScene`, `Window`, `RootViewController` |
-| Android | `AndroidApplication.Run(this, new App())` from the app's own activity's `OnCreate` | `Activity` |
+| Platform | Start |
+|---|---|
+| Win32 | `XFormsApp.Run("Title", new App(), new SimpleTheme())` from `Main`: a window and its message loop |
+| Browser | `await XFormsApp.RunAsync("Title", new App(), new SimpleTheme())` from `Main`: the page |
+| iOS | `XFormsApp.Run(args, new App(), new SimpleTheme())` from `Main`, with XForms' own app and scene delegates; or `XFormsApp.Run(windowScene, new App(), new SimpleTheme())` from the app's own scene delegate |
+| Android | `XFormsApp.Run(this, new App(), new SimpleTheme())` from the app's own activity's `OnCreate` |
 
-`Current` on each gives the running app's host, and its native objects, to
-apps calling native APIs and to libraries adding platform features (the
-toolkit's platforms among them). Services are registered the same way,
-before `Run`: `Win32ToolkitServices.Register()`,
-`AndroidToolkitServices.Register()`, `IosToolkitServices.Register()`, or
-`await WebToolkitServices.InitializeAsync()`.
+`XFormsApp.Run`:
+- gives the app its theme (`Application.ThemeExtender`, see Themes);
+- registers XForms.Toolkit's services with what the host knows (the
+  window on Win32, the activity on Android, the view controller on iOS),
+  so the app can call `Clipboard.Default` and the others;
+- starts the framework's host: each framework platform's one public class
+  (`Win32Application`, `WebApplication`, `AndroidApplication`,
+  `IosApplication`), whose `Current` also gives native code the running
+  app's native objects (`MainWindowHandle`, `Activity`, `WindowScene`,
+  `RootViewController`).
 
 **Hosting rules.** XForms follows the host itself:
 - **What XForms observes on its own:**
@@ -287,7 +300,7 @@ That keeps native performance and native animation behavior.
 
 Any view can draw itself: it sets `DrawsContent` in its constructor,
 overrides `Render(DrawingContext)` and draws within its bounds, beneath its
-children. XForms.Controls' `UserControl` is that with one child. Each
+children. XForms' `UserControl` is that with one child. Each
 platform implements `DrawingContext`:
 - Android: `Canvas`.
 - iOS: Core Graphics.
@@ -344,7 +357,7 @@ animation finished or was interrupted. `Application.RequestAnimationFrame`
 calls back before the display's next frame, for drawing that changes every
 frame.
 
-XForms.Controls' `ProgressRing` is an arc drawn once and spun by its own
+XForms' `ProgressRing` is an arc drawn once and spun by its own
 animator.
 
 ## Input
@@ -419,7 +432,7 @@ and error, each with the color of content on it, plus subtle foreground,
 outline and disabled), and **extensions** that control libraries add
 (`GetExtension`, `WithExtension`), as Flutter's theme extensions. The
 framework knows only the mode and colors, which the platforms also fill
-from the system's high-contrast colors. XForms.Controls adds its
+from the system's high-contrast colors. XForms adds its
 `Typography`, `Shapes` and `Motion` (read as `theme.Typography` and so on)
 and its controls' templates (below); a theme package adds its own styles,
 such as XForms.Themes.Simple's `ButtonStyle`.
@@ -438,7 +451,7 @@ set (`TextBox.BackgroundColor`, `ForegroundColor`, `PlaceholderColor` and
 take those colors and never read the theme.
 
 **Templates.** A control says what it does and what state it's in; its
-theme says how it looks. Each XForms.Controls control with a look is a
+theme says how it looks. Each XForms control with a look is a
 `TemplatedControl` (owner-drawn) or `TemplatedContentControl` (a content
 control); `ListViewItem`, an `ItemContainer`, uses the same machinery. As
 the control is first attached (`Element.OnAttaching`: its theme is known,
@@ -459,14 +472,18 @@ depends on their geometry (the calendar's cells, a picker's text and glyph
 areas, a combo box's rows) keep that geometry and expose it, with their
 state, read-only; the template draws everything else.
 
-**Choosing a theme.** An app chooses its theme in `CreateTheme`, and there's
-no fallback: a templated control whose theme has no template for it throws
-when it's attached, saying so.
+**Choosing a theme.** An app passes its theme package to `XFormsApp.Run`
+(`new SimpleTheme()`, an `AppTheme`), and there's no fallback: a templated
+control whose theme has no template for it throws when it's attached,
+saying so. `XFormsApp.Run` sets the framework's `Application.ThemeExtender`
+to the package's `Apply`, which the framework's `CreateTheme` calls on the
+theme it builds; an app's own `CreateTheme` then adjusts that (its brand's
+colors, a type scale, a style):
 
 ```csharp
 protected override Theme CreateTheme(ThemeMode mode, Color accentColor)
 {
-    return SimpleTheme.Apply(base.CreateTheme(mode, accentColor));
+    return base.CreateTheme(mode, accentColor).WithExtension(new ButtonStyle { CornerRadius = 20 });
 }
 ```
 
@@ -486,7 +503,7 @@ properties say.
   Clicking outside the popup, pressing Escape or going back closes it, and
   navigating closes every open popup. When focus moved into a popup, closing
   it returns focus to where it was.
-- **Popups draw nothing themselves.** XForms.Controls' `Flyout` and pickers draw
+- **Popups draw nothing themselves.** XForms' `Flyout` and pickers draw
   their own frames, so popups look the same everywhere. The platforms differ
   in how they show popups:
   - Win32: a second, topmost composition target, so popups also cover native
@@ -516,7 +533,7 @@ how a list item can reveal more content. `Padding` puts space around the
 items inside the scrolling area, so the last item can scroll clear of a bar
 floating over the list.
 
-XForms.Controls' `ListView` adds selection and clicks, with `ListViewItem`
+XForms' `ListView` adds selection and clicks, with `ListViewItem`
 as its container. Control libraries customize every item by subclassing the
 container and overriding `CreateItemContainer`. Its `CommandListView` works
 this way: tapping an item reveals a command bar below it (one item at a
@@ -549,7 +566,7 @@ other threads.
 WinUI and Avalonia (and with MAUI for app services), and lists the gaps to
 fill.
 
-The split is in place: XForms.Controls, including its pickers, calendar,
+The split is in place: XForms, including its pickers, calendar,
 progress ring, panels and gestures, builds against public API only, no
 platform has picker-specific code, and the platforms keep to the platform
 contract. Still to do:

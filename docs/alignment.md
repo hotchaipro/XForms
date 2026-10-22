@@ -1863,8 +1863,8 @@ to go:
 | Assembly | Layer | Builds on |
 |---|---|---|
 | `XForms.Framework` (+ `.Win32`, `.Android`, `.iOS`, `.Web`) | The platform contract: elements, layout, drawing, raw input, and the views the platforms render | — |
-| `XForms.Toolkit` (+ `.Win32`, `.Android`, `.iOS`, `.Web`, phase 23) | Platform services and data binding, for any control set (phase 22) | Framework |
-| `XForms.Controls` | Functional controls (what they do, not how they look) and their base classes; panels and gestures | Framework, Toolkit |
+| `XForms.Toolkit` (+ `.Win32`, `.Android`, `.iOS`, `.Web`) | Cross-platform services for any .NET app, with nothing about a UI (phases 22, 23 and 25) | — |
+| `XForms` (was XForms.Controls; multi-targeted) | Functional controls (what they do, not how they look) and their base classes; panels, gestures and binding; the app's entry point (`XFormsApp.Run`, phase 25) | Framework, Toolkit |
 | `XForms.Themes.<Name>` | How the controls look: `Simple` first | Controls |
 | `XForms.Xaml` | Markup | Framework, Controls |
 | `XForms.Compat.WinUI` | WinUI's API over XForms' controls | Controls, Xaml |
@@ -2603,6 +2603,48 @@ Win32, Android and the browser, as before.
     starts or registers the framework or the toolkit, which are libraries
     XForms uses. The toolkit becomes a cross-platform services library with
     nothing about a UI in it, usable by any .NET app.
+
+    **Status: done,** as planned below, in four commits (and one that
+    completes the second: 0e2d70f has its description but only the move of
+    `controls/` to `xforms/`; 41ff83e has the rest):
+    - **A standalone toolkit:** services only, in `XForms.Toolkit`, with a
+      static entry point each (`Clipboard.Default` and the others) and
+      registration taking the host's window, activity or view controller as
+      functions. Binding moved into XForms. The toolkit references nothing
+      of XForms.
+    - **The `XForms` package** (`xforms/`): multi-targeted (`net10.0` for
+      the browser and anything neutral, `net10.0-windows`,
+      `net10.0-android`, `net10.0-ios`), with `XFormsApp.Run` per platform
+      in `Platforms/`. `AppTheme` is a theme package's entry
+      (`SimpleTheme` derives from it); the framework's
+      `Application.ThemeExtender` is the general hook `XFormsApp.Run` uses
+      to add it to every theme the app builds, before an app's own
+      `CreateTheme` adjusts that.
+    - **The apps** (the test apps and SoonerOrLater) reference `XForms` and
+      `XForms.Themes.Simple` only (and the test app the XAML spike), and
+      start with `XFormsApp.Run(..., new SimpleTheme())`.
+    - **Packages:** the twelve libraries pack on Windows (iOS included),
+      version 0.1.0-preview.1; a sample app referencing only the `XForms`
+      and `XForms.Themes.Simple` packages, from a local feed, builds and
+      runs on Win32, Android and in the browser.
+    - **Enforced:** the layer check allows the toolkit nothing of XForms,
+      its platforms only the toolkit, XForms the framework and toolkit
+      (and their platforms), and themes XForms; it now looks only at a
+      project's own references (not those that come through them). XForms
+      tracks its public API: what every platform shares in
+      `PublicAPI.Shipped.txt`, each platform's entry points in
+      `PublicAPI/<target>/`.
+    - **Verified:** every Win32 test page, light and dark, pixel for pixel;
+      the SoonerOrLater walk on Win32; preferences, secure storage, the
+      network and haptics on Win32, Android and in the browser; the Win32
+      file dialog owned by the app's window, and Android's document picker
+      started from the app's activity, through the providers; binding (the
+      binding page, typed into); Android's activity re-created;
+      SoonerOrLater's Android main page against phase 20's; the packaged
+      sample on all three; a deliberate XForms reference from the toolkit
+      failing the build.
+    - **Not done:** iOS builds and packs, but hasn't run. The sample isn't
+      in the repository (it needs a local feed).
 
     **Where things stand.**
     - **Apps reference five or six projects:** the framework, its
