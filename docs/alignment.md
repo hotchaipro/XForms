@@ -2164,9 +2164,46 @@ Win32, Android and the browser, as before.
 
 23. **Platform layers.** Each layer's platform code lives in its own
     platform assemblies, apps host XForms without deriving from XForms
-    types, and the layers are enforced, so they stay clean.
-
-    **Where things stand.**
+    types, and the layers are enforced, so they stay clean.
+
+    **Status: done.** As planned below, in four commits:
+    - **Hosting:** `Application()`, and `Run` on every platform, with no
+      native base classes; Android moves the running app to a re-created
+      activity.
+    - **The toolkit's platforms:** `XForms.Toolkit.Win32`, `.Android`,
+      `.iOS` and `.Web` (in `toolkit/platform/`), registered with
+      `Win32ToolkitServices.Register()` and the like; the framework's
+      platforms no longer reference the toolkit.
+    - **Internal:** the contract, and every platform type but its hosting
+      class.
+    - **Enforcement:** XF0002 for references, and the public API analyzer
+      with today's API as the shipped baseline. Each platform's public API
+      is its hosting class; each toolkit platform's, its registration.
+    - **Verified:**
+      - Win32: the test pages pixel for pixel against before (apart from
+        the spinning progress ring); preferences, secure storage, the
+        network and haptics; SoonerOrLater pixel for pixel.
+      - Android: re-creating the activity (`Activity.Recreate`, from a test
+        app button) twice, keeping the page and Back; Back by the key;
+        suspend and resume reaching the app, including across re-creation;
+        preferences, secure storage, the network and haptics; the document
+        picker starting through the toolkit's `ResultActivity`;
+        SoonerOrLater pixel for pixel.
+      - The browser: navigation and a modal page; preferences, secure
+        storage, the network and haptics through `xforms-toolkit.js`;
+        SoonerOrLater.
+      - The build: a framework platform referencing the toolkit fails with
+        XF0002; a new public type in a platform fails with RS0016.
+    - **Not done:**
+      - iOS builds only: its new hosting (`Run(args, ...)` with XForms'
+        delegates, or `Run(windowScene, ...)`) hasn't run.
+      - Not exercised: Back before Android 13 (the emulator runs Android
+        16), dark mode and text size changing in place on Android (that
+        needs the emulator's system settings), and a document picked on
+        Android coming back (that needs the system picker's UI). The file
+        dialogs and Copy and Share weren't run on Win32.
+
+    **Where things stood.**
     - **The framework's platforms implement the toolkit.** The services
       (clipboard, launcher, preferences, secure storage, sharing, haptics,
       connectivity, file pickers: about 1,850 lines across

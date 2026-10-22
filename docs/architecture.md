@@ -4,7 +4,8 @@ XForms is built in layers. The **framework** contains only what needs a
 platform: hosting, the views the platforms render natively, raw input,
 drawing, focus and accessibility. **XForms.Toolkit** has what apps use
 besides controls (platform services and data binding), for any set of
-controls. **XForms.Controls** is our controls, with the panels and gestures,
+controls; its platform assemblies (`XForms.Toolkit.Win32` and the others)
+implement the services. **XForms.Controls** is our controls, with the panels and gestures,
 built only on the framework's public API. **Apps** use all three.
 
 ```
@@ -17,20 +18,24 @@ built only on the framework's public API. **Apps** use all three.
 │   Built only on the public framework API                     │
 ├──────────────────────────────────────────────────────────────┤
 │ Toolkit: XForms.Toolkit                                      │
-│   Platform services (implemented by the platforms) and data  │
-│   binding, for any set of controls                           │
+│   Platform services and data binding, for any set of         │
+│   controls; XForms.Toolkit.<Platform> implement the          │
+│   services, on the hosting API below                         │
 ├──────────────────────────────────────────────────────────────┤
 │ Framework: XForms.Framework                                  │
 │   Application, pages, views and layout, raw input, focus,    │
 │   accessibility, drawing, popups, native primitives          │
 ├──────────────────────────────────────────────────────────────┤
-│ Platform contract: XForms.Platform                           │
+│ Platform contract: XForms.Platform (internal)                │
 │   Renderer interfaces (implemented by the platforms) and     │
 │   hosts (ApplicationHost, LayerHost) they call               │
 ├──────────────┬──────────────┬───────────────┬────────────────┤
 │ XForms.      │ XForms.      │ XForms.       │ XForms.        │
 │ Framework.   │ Framework.   │ Framework.    │ Framework.     │
 │ Android      │ iOS          │ Win32         │ Web            │
+│ Public: only │ Public: only │ Public: only  │ Public: only   │
+│ Android-     │ Ios-         │ Win32-        │ Web-           │
+│ Application  │ Application  │ Application   │ Application    │
 └──────────────┴──────────────┴───────────────┴────────────────┘
 ```
 
@@ -38,8 +43,7 @@ The goal is that any control library built on the framework runs on every
 supported platform with the same look and the same layout. All of the
 per-platform complexity stays inside the framework and the platforms.
 
-Planned layers ([alignment.md](alignment.md#layering), phases 23-27): the
-toolkit's own platform assemblies and an enforced layering, themes
+Planned layers ([alignment.md](alignment.md#layering), phases 24-27): themes
 (`XForms.Themes.Simple` first) for how the controls look, `XForms.Xaml` for
 markup, `XForms.Compat.WinUI` for WinUI's API, and embedding XForms in
 part of an existing app's UI.
@@ -88,7 +92,8 @@ spinner built from that animation goes in XForms.Controls.
 | `platform/ios/` | `XForms.Framework.iOS` | iOS implementation (UIKit) |
 | `platform/win32/` | `XForms.Framework.Win32` | Windows implementation (Win32, DirectComposition, Direct2D, DirectWrite, RichEdit) |
 | `platform/web/` | `XForms.Framework.Web` | Browser implementation (.NET on WebAssembly, DOM elements and canvases) |
-| `toolkit/` | `XForms.Toolkit` (net10.0) | Platform services (each platform implements them) and data binding |
+| `toolkit/` | `XForms.Toolkit` (net10.0) | Platform services and data binding |
+| `toolkit/platform/<platform>/` | `XForms.Toolkit.Android`, `.iOS`, `.Win32`, `.Web` | Each platform's services |
 | `controls/` | `XForms.Controls` (net10.0) | Controls, panels and gestures |
 | `analyzers/` | `XForms.Analyzers` | XF0001, which keeps the platforms to the platform contract |
 | `test/` | `XForms.Test.*` | Test apps (the pages are shared in `test/XForms.Test`) |
@@ -100,21 +105,82 @@ The dependency rules:
   `ApplicationHost`, `LayerHost`) and members marked `[PlatformContract]`.
   The framework gives them its internals (`InternalsVisibleTo`), and the
   XF0001 analyzer makes any other use a build error.
-- **XForms.Toolkit** references the framework only, and the platforms
-  reference it to implement its services.
+- **XForms.Toolkit** references the framework only. Its platform
+  assemblies reference it and their framework platform, and implement its
+  services using only that platform's public hosting API.
 - **XForms.Controls**, and any other control library, references the
   framework (and XForms.Toolkit, for binding). It uses **public API only**. This is enforced by the
   compiler: it has no access to framework internals. Needing an internal is
   a signal that the framework is missing a public API for control authors.
-- **An app** references the framework, one platform project, and the control
-  libraries it uses. Its startup code calls into the platform project, for
-  example `Win32Application.Run` or an `AndroidApplicationActivity` subclass.
+- **An app** references the framework, one platform project (and its
+  toolkit platform, for services), and the control libraries it uses. Its
+  startup code runs the app on the platform (see Hosting).
+
+The build enforces these rules:
+- a project that references a layer it mustn't fails to build (XF0002, in
+  `Directory.Build.targets`);
+- the framework, its platforms, the toolkit and its platforms list their
+  public API in `PublicAPI.Shipped.txt` and `PublicAPI.Unshipped.txt`, and
+  public API that isn't listed (RS0016), or listed API that's gone (RS0017),
+  fails the build. A new public type or member shows in review as a change
+  to those files, which is how the platforms stay down to their hosting
+  API;
+- the contract (`XForms.Platform`) is internal, visible only to the four
+  framework platforms (`InternalsVisibleTo`), and XF0001 keeps them to it;
+  nothing else sees the framework's or the toolkit's internals.
 
 Namespaces: the framework uses `XForms`, `XForms.Primitives` (the native
 primitives) and `XForms.Platform` (the contract). XForms.Toolkit uses
 `XForms`. XForms.Controls uses
 `XForms.Controls` (controls, `Panel` and the base classes), `XForms.Layouts`
 (the panels) and `XForms.Input` (the gesture recognizers).
+
+## Hosting
+
+An app is an `Application` subclass. Its constructor runs before any
+platform exists, so it does nothing that needs one (the dispatcher, the
+windows, services); using them there throws. Its work starts in `OnStart`.
+
+Each platform's one public class runs the app. No app derives from an
+XForms type to host it; on Android and iOS the activity and the delegates
+are the app's own, with whatever base classes they need:
+
+| Platform | Run | Native objects |
+|---|---|---|
+| Win32 | `Win32Application.Run("Title", new App())` from `Main`: a window and its message loop | `MainWindowHandle` |
+| Browser | `await WebApplication.RunAsync("Title", new App())` from `Main`: the page | — |
+| iOS | `IosApplication.Run(args, new App())` from `Main`, with XForms' own app and scene delegates; or `IosApplication.Run(windowScene, new App())` from the app's own scene delegate | `WindowScene`, `Window`, `RootViewController` |
+| Android | `AndroidApplication.Run(this, new App())` from the app's own activity's `OnCreate` | `Activity` |
+
+`Current` on each gives the running app's host, and its native objects, to
+apps calling native APIs and to libraries adding platform features (the
+toolkit's platforms among them). Services are registered the same way,
+before `Run`: `Win32ToolkitServices.Register()`,
+`AndroidToolkitServices.Register()`, `IosToolkitServices.Register()`, or
+`await WebToolkitServices.InitializeAsync()`.
+
+**Hosting rules.** XForms follows the host itself:
+- **What XForms observes on its own:**
+  - suspend and resume (Android's activity lifecycle callbacks, iOS's scene
+    activation);
+  - in-place configuration changes (dark mode, text size, size), through its
+    root view;
+  - Back (Android's back callbacks, and before Android 13 a wrapper on the
+    window's callback);
+  - the system bars and insets.
+- **What the app leaves alone:** handling Back, or intercepting keys,
+  before XForms sees them (overriding `OnBackPressed`, or the activity's
+  `DispatchKeyEvent`). Android's own activity results go through the
+  toolkit's `ResultActivity`, so the activity needn't forward them.
+- **What the app forwards:** nothing yet. (A deep-link API would take the
+  activity's `OnNewIntent`.)
+- **Android re-creates the activity** for configuration changes it doesn't
+  declare. The new activity's `Run` moves the running app to it, keeping
+  its state, and leaves the new app object unused; when the activity
+  finishes, the app stops, and the next launch runs a new one. Declare the
+  changes XForms handles in place (dark mode, text size, orientation and
+  screen size; SoonerOrLater's `MainActivity` is the pattern), so
+  re-creation is rare. Use a theme without an action bar.
 
 ## Elements and renderers
 
@@ -422,7 +488,7 @@ other threads.
 
 | | Android | iOS | Win32 | Web |
 |---|---|---|---|---|
-| Host | Activity with a root `ViewGroup`; edge-to-edge with insets | Scene-based `UIWindow`; safe area | Win32 window with a DirectComposition tree | A page: an element per layer, positioned absolutely |
+| Host | The app's activity, with a root `ViewGroup`; edge-to-edge with insets | Scene-based `UIWindow`; safe area | Win32 window with a DirectComposition tree | A page: an element per layer, positioned absolutely |
 | Drawing | `Canvas` | Core Graphics | Direct2D, DirectWrite | A `<canvas>` per layer, from a recorded command list |
 | Text entry | `EditText` | `UITextField` / `UITextView` | RichEdit (`RichEditD2DPT`) | `<input>` / `<textarea>` |
 | List | `ListView`; `RecyclerView` for rows and grids | `UITableView`; `UICollectionView` for rows and grids | Virtualized compositor list | A scrolling element, virtualized by lines |
