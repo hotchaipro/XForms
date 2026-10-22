@@ -5,8 +5,9 @@ using XForms.Primitives;
 namespace XForms.Controls
 {
     /// <summary>
-    /// A list's container for one item: it draws the row's background and
-    /// selection, and handles taps, which click and select the item. Control
+    /// A list's container for one item: it handles taps, which click and
+    /// select the item, and its theme's template draws the row's background
+    /// and selection. Control
     /// libraries derive from it (and override
     /// <see cref="ListView.CreateItemContainer"/>) to add behavior such as
     /// swipe gestures.
@@ -14,12 +15,14 @@ namespace XForms.Controls
     /// <remarks>
     /// The container, as WinUI's and Avalonia's <c>ListViewItem</c>.
     /// </remarks>
-    public class ListViewItem : ItemContainer, ITapGestureDelegate
+    public class ListViewItem : ItemContainer, ITapGestureDelegate, ITemplatedView
     {
+        private readonly TemplateHost _templateHost;
         private bool _isSelected;
 
         public ListViewItem()
         {
+            this._templateHost = new TemplateHost(this);
             this.GestureRecognizers.Add(new TapGestureRecognizer(this));
 
             // The container draws the row's background, beneath its children
@@ -78,7 +81,7 @@ namespace XForms.Controls
                 if (value != this._isSelected)
                 {
                     this._isSelected = value;
-                    this.InvalidateVisual();
+                    this._templateHost.OnStateChanged();
                     this.OnIsSelectedChanged();
                     this.NotifyAccessibilityStateChanged();
                 }
@@ -102,17 +105,56 @@ namespace XForms.Controls
             this.ListView?.OnItemTapped(this);
         }
 
-        // The row's background, tinted with the accent while selected
+        protected override void OnAttaching(
+            Theme theme)
+        {
+            base.OnAttaching(theme);
+            this._templateHost.Apply(theme);
+        }
+
+        protected override void OnThemeChanged(
+            Theme theme)
+        {
+            base.OnThemeChanged(theme);
+            this._templateHost.Apply(theme);
+        }
+
+        // The template draws the row, beneath its content
         protected override void Render(
             DrawingContext drawingContext)
         {
-            var colors = this.ActualTheme.Colors;
-            var bounds = new Rect(0, 0, this.Bounds.Width, this.Bounds.Height);
-            drawingContext.FillRectangle(bounds, colors.Background);
-            if (this._isSelected)
+            this._templateHost.Render(drawingContext);
+        }
+
+        TemplateHost ITemplatedView.TemplateHost
+        {
+            get
             {
-                drawingContext.FillRectangle(bounds, colors.Accent.MultiplyAlpha(0.18f));
+                return this._templateHost;
             }
+        }
+
+        void ITemplatedView.AddTemplatePart(
+            View part,
+            int index)
+        {
+            this.InsertVisualChild(index, part);
+        }
+
+        bool ITemplatedView.RemoveTemplatePart(
+            View part)
+        {
+            return this.RemoveVisualChild(part);
+        }
+
+        DrawnAnimator ITemplatedView.CreateTemplateDrawnAnimator()
+        {
+            return this.CreateDrawnAnimator();
+        }
+
+        Animator ITemplatedView.CreateTemplateOwnAnimator()
+        {
+            return this.CreateOwnAnimator();
         }
 
         void ITapGestureDelegate.OnTapBegan()

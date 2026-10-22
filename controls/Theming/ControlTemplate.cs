@@ -23,24 +23,24 @@ namespace XForms.Controls
         /// </summary>
         public abstract Type ControlType { get; }
 
-        internal abstract void ApplyCore(TemplatedControl control, TemplateContext context);
+        internal abstract void ApplyCore(View control, TemplateContext context);
 
-        internal abstract void UnapplyCore(TemplatedControl control, TemplateContext context);
+        internal abstract void UnapplyCore(View control, TemplateContext context);
 
-        internal abstract void RenderCore(TemplatedControl control, DrawingContext drawingContext);
+        internal abstract void RenderCore(View control, DrawingContext drawingContext);
 
-        internal abstract Size? MeasureCore(TemplatedControl control, Size availableSize);
+        internal abstract Size? MeasureCore(View control, Size availableSize);
 
-        internal abstract bool ArrangeCore(TemplatedControl control, Size finalSize);
+        internal abstract bool ArrangeCore(View control, Size finalSize);
 
-        internal abstract void OnStateChangedCore(TemplatedControl control);
+        internal abstract void OnStateChangedCore(View control, TemplateContext context);
     }
 
     /// <summary>
     /// How a <typeparamref name="TControl"/> looks.
     /// </summary>
     public abstract class ControlTemplate<TControl> : ControlTemplate
-        where TControl : TemplatedControl
+        where TControl : View
     {
         public sealed override Type ControlType
         {
@@ -116,17 +116,17 @@ namespace XForms.Controls
         {
         }
 
-        internal sealed override void ApplyCore(TemplatedControl control, TemplateContext context) => this.Apply((TControl)control, context);
+        internal sealed override void ApplyCore(View control, TemplateContext context) => this.Apply((TControl)control, context);
 
-        internal sealed override void UnapplyCore(TemplatedControl control, TemplateContext context) => this.Unapply((TControl)control, context);
+        internal sealed override void UnapplyCore(View control, TemplateContext context) => this.Unapply((TControl)control, context);
 
-        internal sealed override void RenderCore(TemplatedControl control, DrawingContext drawingContext) => this.Render((TControl)control, drawingContext);
+        internal sealed override void RenderCore(View control, DrawingContext drawingContext) => this.Render((TControl)control, drawingContext);
 
-        internal sealed override Size? MeasureCore(TemplatedControl control, Size availableSize) => this.Measure((TControl)control, availableSize);
+        internal sealed override Size? MeasureCore(View control, Size availableSize) => this.Measure((TControl)control, availableSize);
 
-        internal sealed override bool ArrangeCore(TemplatedControl control, Size finalSize) => this.Arrange((TControl)control, finalSize);
+        internal sealed override bool ArrangeCore(View control, Size finalSize) => this.Arrange((TControl)control, finalSize);
 
-        internal sealed override void OnStateChangedCore(TemplatedControl control) => this.OnStateChanged((TControl)control, control.TemplateContext);
+        internal sealed override void OnStateChangedCore(View control, TemplateContext context) => this.OnStateChanged((TControl)control, context);
     }
 
     /// <summary>
@@ -135,10 +135,10 @@ namespace XForms.Controls
     /// </summary>
     public sealed class TemplateContext
     {
-        private readonly TemplatedControl _control;
+        private readonly ITemplatedView _control;
 
         internal TemplateContext(
-            TemplatedControl control)
+            ITemplatedView control)
         {
             this._control = control;
         }
@@ -160,7 +160,7 @@ namespace XForms.Controls
         public void AddPart(
             View part)
         {
-            this._control.AddPart(part);
+            this._control.TemplateHost.AddPart(part);
         }
 
         /// <summary>
@@ -169,7 +169,7 @@ namespace XForms.Controls
         public void RemovePart(
             View part)
         {
-            this._control.RemovePart(part);
+            this._control.TemplateHost.RemovePart(part);
         }
 
         /// <summary>
@@ -196,7 +196,7 @@ namespace XForms.Controls
         /// </summary>
         public void InvalidateVisual()
         {
-            this._control.InvalidateVisual();
+            ((View)this._control).InvalidateVisual();
         }
 
         /// <summary>
@@ -204,7 +204,7 @@ namespace XForms.Controls
         /// </summary>
         public void InvalidateMeasure()
         {
-            this._control.InvalidateMeasure();
+            ((View)this._control).InvalidateMeasure();
         }
     }
 }

@@ -43,7 +43,9 @@ namespace XForms.Themes.Simple
             .With(new TabStripItemTemplate())
             .With(new FloatingButtonTemplate())
             .With(new CommandBarButtonTemplate())
-            .With(new DayOfWeekToggleButtonTemplate());
+            .With(new DayOfWeekToggleButtonTemplate())
+            .With(new ListViewItemTemplate())
+            .With(new ListViewSwipeItemTemplate());
 
         private static Theme WithDefault<TExtension>(
             Theme theme,

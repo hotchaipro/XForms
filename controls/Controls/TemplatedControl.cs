@@ -13,16 +13,15 @@ namespace XForms.Controls
     /// the app in <c>Application.CreateTheme</c>. A control whose theme has no
     /// template for it throws when it's attached.
     /// </remarks>
-    public abstract class TemplatedControl : UserControl
+    public abstract class TemplatedControl : UserControl, ITemplatedView
     {
-        private ControlTemplate _template;
-        private int _partCount;
+        private readonly TemplateHost _templateHost;
         private bool _isPressed;
         private bool _isEnabled = true;
 
         protected TemplatedControl()
         {
-            this.TemplateContext = new TemplateContext(this);
+            this._templateHost = new TemplateHost(this);
         }
 
         /// <summary>
@@ -38,13 +37,16 @@ namespace XForms.Controls
         {
             get
             {
-                return this._template;
+                return this._templateHost.Template;
             }
         }
 
-        internal TemplateContext TemplateContext
+        TemplateHost ITemplatedView.TemplateHost
         {
-            get;
+            get
+            {
+                return this._templateHost;
+            }
         }
 
         /// <summary>
@@ -96,8 +98,7 @@ namespace XForms.Controls
         /// </summary>
         protected void OnStateChanged()
         {
-            this._template?.OnStateChangedCore(this);
-            this.InvalidateVisual();
+            this._templateHost.OnStateChanged();
             this.StateChanged?.Invoke(this, EventArgs.Empty);
         }
 
@@ -133,39 +134,14 @@ namespace XForms.Controls
             Theme theme)
         {
             base.OnAttaching(theme);
-            this.ApplyTemplate(theme);
+            this._templateHost.Apply(theme);
         }
 
         protected override void OnThemeChanged(
             Theme theme)
         {
             base.OnThemeChanged(theme);
-            this.ApplyTemplate(theme);
-        }
-
-        private void ApplyTemplate(
-            Theme theme)
-        {
-            var template = theme.GetTemplate(this.GetType())
-                ?? throw new InvalidOperationException(
-                    $"{this.GetType().Name} has no template in its theme. Choose a theme with templates for XForms.Controls in Application.CreateTheme, such as XForms.Themes.Simple's SimpleTheme.Create(mode, accent).");
-
-            if (template == this._template)
-            {
-                return;
-            }
-
-            if (null != this._template)
-            {
-                this._template.UnapplyCore(this, this.TemplateContext);
-                this.TemplateContext.State = null;
-            }
-
-            this._template = template;
-            template.ApplyCore(this, this.TemplateContext);
-            template.OnStateChangedCore(this);
-            this.InvalidateMeasure();
-            this.InvalidateVisual();
+            this._templateHost.Apply(theme);
         }
 
         // The background (transparent unless the control gives it one), then
@@ -174,47 +150,43 @@ namespace XForms.Controls
             DrawingContext drawingContext)
         {
             base.Render(drawingContext);
-            this._template?.RenderCore(this, drawingContext);
+            this._templateHost.Render(drawingContext);
         }
 
         protected override Size MeasureOverride(
             Size availableSize)
         {
-            return this._template?.MeasureCore(this, availableSize) ?? base.MeasureOverride(availableSize);
+            return this._templateHost.Measure(availableSize) ?? base.MeasureOverride(availableSize);
         }
 
         protected override void ArrangeOverride(
             Size finalSize)
         {
-            if (!(this._template?.ArrangeCore(this, finalSize) ?? false))
+            if (!this._templateHost.Arrange(finalSize))
             {
                 base.ArrangeOverride(finalSize);
             }
         }
 
-        // The template's parts go beneath the content
-        internal void AddPart(
-            View part)
+        void ITemplatedView.AddTemplatePart(
+            View part,
+            int index)
         {
-            this.InsertVisualChild(this._partCount, part);
-            this._partCount += 1;
+            this.InsertVisualChild(index, part);
         }
 
-        internal void RemovePart(
+        bool ITemplatedView.RemoveTemplatePart(
             View part)
         {
-            if (this.RemoveVisualChild(part))
-            {
-                this._partCount -= 1;
-            }
+            return this.RemoveVisualChild(part);
         }
 
-        internal DrawnAnimator CreateTemplateDrawnAnimator()
+        DrawnAnimator ITemplatedView.CreateTemplateDrawnAnimator()
         {
             return this.CreateDrawnAnimator();
         }
 
-        internal Animator CreateTemplateOwnAnimator()
+        Animator ITemplatedView.CreateTemplateOwnAnimator()
         {
             return this.CreateOwnAnimator();
         }
