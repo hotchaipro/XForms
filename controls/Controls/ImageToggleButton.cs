@@ -20,7 +20,11 @@ namespace XForms.Controls
         }
     }
 
-    public class ImageToggleButton : UserControl, ITapGestureDelegate
+    /// <summary>
+    /// An icon that toggles between a checked and an unchecked image when
+    /// pressed. Its theme's template draws it.
+    /// </summary>
+    public class ImageToggleButton : TemplatedControl, ITapGestureDelegate
     {
         public event EventHandler<ToggledEventArgs> IsCheckedChanged;
 
@@ -64,8 +68,7 @@ namespace XForms.Controls
                 {
                     this._isChecked = value;
 
-                    this.InvalidateVisual();
-
+                    this.OnStateChanged();
                     this.IsCheckedChanged?.Invoke(this, new ToggledEventArgs(value));
                 }
                 else
@@ -132,33 +135,6 @@ namespace XForms.Controls
                 this._tintColor = value;
 
                 this.InvalidateVisual();
-            }
-        }
-
-        protected override void Render(
-            DrawingContext drawContext)
-        {
-            var bounds = new Rect(0, 0, this.Bounds.Width, this.Bounds.Height);
-            base.Render(drawContext);
-
-            Rect iconBounds = bounds;
-            if (this._iconSize.HasValue)
-            {
-                Size iconSize = this._iconSize.Value;
-                iconBounds = new Rect(
-                    bounds.Left + ((bounds.Width - iconSize.Width) / 2),
-                    bounds.Top + ((bounds.Height - iconSize.Height) / 2),
-                    iconSize.Width,
-                    iconSize.Height);
-            }
-
-            if (this._isChecked)
-            {
-                drawContext.DrawImage(this._checkedIcon, iconBounds, this._tintColor);
-            }
-            else
-            {
-                drawContext.DrawImage(this._uncheckedIcon, iconBounds, this._tintColor);
             }
         }
 

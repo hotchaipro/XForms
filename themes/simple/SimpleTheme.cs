@@ -34,7 +34,16 @@ namespace XForms.Themes.Simple
         }
 
         // The Simple look, for each control
-        private static readonly ControlTemplates Templates = ControlTemplates.Empty;
+        private static readonly ControlTemplates Templates = ControlTemplates.Empty
+            .With(new ButtonTemplate())
+            .With(new ToggleButtonTemplate())
+            .With(new RadioButtonTemplate())
+            .With(new ImageToggleButtonTemplate())
+            .With(new MenuButtonTemplate())
+            .With(new TabStripItemTemplate())
+            .With(new FloatingButtonTemplate())
+            .With(new CommandBarButtonTemplate())
+            .With(new DayOfWeekToggleButtonTemplate());
 
         private static Theme WithDefault<TExtension>(
             Theme theme,

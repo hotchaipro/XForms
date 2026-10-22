@@ -1,5 +1,6 @@
 using System;
 using XForms.Controls;
+using XForms.Themes.Simple;
 using XForms.Layouts;
 using XForms.Primitives;
 
@@ -13,6 +14,10 @@ namespace XForms.Test
     public class ThemePage : Page
     {
         private readonly TextBlock _status;
+        private readonly Button _ownStyleButton;
+
+        // One button's own look: the page's theme, with its own button style
+        private static readonly ButtonStyle OwnStyle = new ButtonStyle() { Background = Color.FromRgb(0xff9800), Foreground = Colors.Black, CornerRadius = 18 };
 
         public ThemePage()
         {
@@ -50,19 +55,14 @@ namespace XForms.Test
             var buttons = new WrapPanel() { ItemSpacing = 8, LineSpacing = 8 };
             buttons.Children.Add(new Button() { Text = "Accent", Width = 110, Height = 36 });
             buttons.Children.Add(new Button() { Text = "Alert", IsAlertStyle = true, Width = 110, Height = 36 });
-            buttons.Children.Add(new Button()
-            {
-                Text = "Own style",
-                Width = 110,
-                Height = 36,
-                Style = new ButtonStyle() { Background = Color.FromRgb(0xff9800), Foreground = Colors.Black, CornerRadius = 18 },
-            });
+            this._ownStyleButton = new Button() { Text = "Own style", Width = 110, Height = 36 };
+            buttons.Children.Add(this._ownStyleButton);
             buttons.Children.Add(new Button() { Text = "Disabled", IsEnabled = false, Width = 110, Height = 36 });
             layout.Children.Add(buttons);
 
             // A section with its own theme: dark, with pill-shaped buttons,
             // whatever the app's mode
-            var dark = Theme.Create(ThemeMode.Dark, Color.FromRgb(0xffc107))
+            var dark = SimpleTheme.Apply(Theme.Create(ThemeMode.Dark, Color.FromRgb(0xffc107)))
                 .WithExtension(new ButtonStyle() { CornerRadius = 18 });
             var sectionContent = new StackPanel() { Spacing = 8 };
             sectionContent.Children.Add(new TypeSample(t => t.Body, "A section with its own dark theme"));
@@ -85,6 +85,8 @@ namespace XForms.Test
             Theme theme)
         {
             base.OnThemeChanged(theme);
+
+            this._ownStyleButton.Theme = theme.WithExtension(OwnStyle);
 
             var application = this.Application;
             this._status.Text = $"Mode: {application.ActualThemeMode} (system: {application.SystemThemeMode}); accent: {application.ActualAccentColor}";

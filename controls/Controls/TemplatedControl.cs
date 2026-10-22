@@ -168,9 +168,12 @@ namespace XForms.Controls
             this.InvalidateVisual();
         }
 
+        // The background (transparent unless the control gives it one), then
+        // the template's drawing
         protected override void Render(
             DrawingContext drawingContext)
         {
+            base.Render(drawingContext);
             this._template?.RenderCore(this, drawingContext);
         }
 

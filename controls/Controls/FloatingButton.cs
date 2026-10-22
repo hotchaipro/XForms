@@ -5,7 +5,11 @@ using XForms.Primitives;
 
 namespace XForms.Controls
 {
-    public class FloatingButton : UserControl, ISwipeGestureDelegate
+    /// <summary>
+    /// A round button with an icon, floating over the content, which can also
+    /// be swiped. Its theme's template draws it.
+    /// </summary>
+    public class FloatingButton : TemplatedControl, ISwipeGestureDelegate
     {
         // Animates the button within a FlyoutButton
         private readonly Animator _flyoutAnimator;
@@ -22,7 +26,6 @@ namespace XForms.Controls
             }
         }
         private Bitmap _icon;
-        private bool _isTouchDown;
         private bool _isSubtleStyle;
 
         public event EventHandler Clicked;
@@ -33,7 +36,6 @@ namespace XForms.Controls
             this._flyoutAnimator = this.CreateOwnAnimator();
             this.GestureRecognizers.Add(new SwipeGestureRecognizer(this));
 
-            this.IsEnabled = true;
             this.Focusable = true;
         }
 
@@ -49,11 +51,7 @@ namespace XForms.Controls
             }
         }
 
-        public bool IsEnabled
-        {
-            get;
-            set;
-        }
+
 
         public bool IsSubtleStyle
         {
@@ -70,96 +68,6 @@ namespace XForms.Controls
             }
         }
 
-        public virtual Color AccentColor
-        {
-            get
-            {
-                return this.ActualTheme.Colors.Accent;
-            }
-        }
-
-        public override Color BackgroundColor
-        {
-            get
-            {
-                return Colors.Transparent;
-            }
-        }
-
-        private Color ForegroundColor
-        {
-            get
-            {
-                if (this.IsSubtleStyle)
-                {
-                    if (this.ActualTheme.Mode != ThemeMode.Light)
-                    {
-                        return this.ActualTheme.Colors.Foreground;
-                    }
-                    else
-                    {
-                        return this.ActualTheme.Colors.Foreground;
-                    }
-                }
-                else
-                {
-                    return Colors.White;
-                }
-            }
-        }
-
-        private Color ButtonBackgroundColor
-        {
-            get
-            {
-                if (this.IsSubtleStyle)
-                {
-                    if (this.ActualTheme.Mode != ThemeMode.Light)
-                    {
-                        return Color.FromRgb(0x33, 0x33, 0x33);
-                    }
-                    else
-                    {
-                        return this.ActualTheme.Colors.Background;
-                    }
-                }
-                else
-                {
-                    return this.ActualTheme.Colors.Accent;
-                }
-            }
-        }
-
-        private Color ButtonPressedBackgroundColor
-        {
-            get
-            {
-                if (this.IsSubtleStyle)
-                {
-                    return this.ButtonBackgroundColor;
-                }
-                else
-                {
-                    return Colors.White;
-                }
-            }
-        }
-
-        private Color ButtonPressedForegroundColor
-        {
-            get
-            {
-                if (this.IsSubtleStyle)
-                {
-                    return this.ForegroundColor;
-                }
-                else
-                {
-                    return Colors.Gray;
-                }
-            }
-        }
-
         public Bitmap Icon
         {
             get
@@ -170,41 +78,6 @@ namespace XForms.Controls
             set
             {
                 this._icon = value;
-            }
-        }
-
-        protected override void Render(
-            DrawingContext drawContext)
-        {
-            var bounds = new Rect(0, 0, this.Bounds.Width, this.Bounds.Height);
-            base.Render(drawContext);
-
-            if ((bounds.Height <= 0) || (bounds.Width <= 0))
-            {
-                return;
-            }
-
-            Size shadowPadding = new Size(bounds.Width / 10, bounds.Height / 10);
-            Size shadowThinPadding = new Size(shadowPadding.Width / 2, shadowPadding.Height / 2);
-            Rect buttonRect = bounds.Deflate(shadowPadding.Width, shadowPadding.Height);
-            Rect shadowRect = Rect.FromLTRB(bounds.X, buttonRect.Top - shadowThinPadding.Height, buttonRect.Right + shadowThinPadding.Width, bounds.Bottom);
-            Rect imageRect = buttonRect.Deflate(buttonRect.Width / 6, buttonRect.Height / 6);
-
-            float blurAmount = Math.Min(shadowPadding.Width, shadowPadding.Height) / 1.5f;
-
-            Color shadowColor = Colors.Gray;
-
-            if ((this._isTouchDown) || (!this.IsEnabled))
-            {
-                drawContext.FillEllipseShadow(shadowRect, shadowColor, blurAmount / 2);
-                drawContext.FillEllipse(buttonRect, this.ButtonPressedBackgroundColor);
-                drawContext.DrawImage(this._icon, imageRect, this.ButtonPressedForegroundColor);
-            }
-            else
-            {
-                drawContext.FillEllipseShadow(shadowRect, shadowColor, blurAmount);
-                drawContext.FillEllipse(buttonRect, this.ButtonBackgroundColor);
-                drawContext.DrawImage(this._icon, imageRect, this.ForegroundColor);
             }
         }
 
@@ -236,17 +109,13 @@ namespace XForms.Controls
             }
 
             this.OnTapBegan();
-
-            this._isTouchDown = true;
-            this.InvalidateVisual();
+            this.IsPressed = true;
         }
 
         void ITapGestureDelegate.OnTapEnded()
         {
             this.OnTapEnded();
-
-            this._isTouchDown = false;
-            this.InvalidateVisual();
+            this.IsPressed = false;
         }
 
         void ITapGestureDelegate.OnTapped()

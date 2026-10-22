@@ -5,21 +5,16 @@ using XForms.Primitives;
 
 namespace XForms.Controls
 {
-    internal sealed class MenuButton : UserControl, ITapGestureDelegate
+    /// <summary>
+    /// A <see cref="Controls.MenuBar"/>'s button, for one of its items. Its
+    /// theme's template draws it.
+    /// </summary>
+    public sealed class MenuButton : TemplatedControl, ITapGestureDelegate
     {
-        // Animates the control itself (press feedback, spinning)
-        private readonly DrawnAnimator _ownAnimator;
-
-        private const float TouchDownScale = 0.9f;
-
-        private TextFormat _textFormat;
-
         internal MenuButton(
             MenuBar menuBar,
             MenuItem menuItem)
         {
-            this._ownAnimator = this.CreateDrawnAnimator();
-
             if (null == menuBar)
             {
                 throw new ArgumentNullException(nameof(menuBar));
@@ -29,13 +24,6 @@ namespace XForms.Controls
             {
                 throw new ArgumentNullException(nameof(menuItem));
             }
-
-            this._textFormat = new TextFormat()
-            {
-                FontSize = 10.0f,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Bottom,
-            };
 
             this.Width = 72;
             this.Height = 50;
@@ -67,53 +55,6 @@ namespace XForms.Controls
             get;
         }
 
-        private Color ForegroundColor
-        {
-            get
-            {
-                if (this.ActualTheme.Mode != ThemeMode.Light)
-                {
-                    return this.ActualTheme.Colors.Foreground;
-                }
-                else
-                {
-                    return Colors.White;
-                }
-            }
-        }
-
-        public override Color BackgroundColor
-        {
-            get
-            {
-                return Colors.Transparent;
-            }
-        }
-
-        protected override void Render(
-            DrawingContext drawContext)
-        {
-            var bounds = new Rect(0, 0, this.Bounds.Width, this.Bounds.Height);
-            base.Render(drawContext);
-
-            float margin = Math.Min(bounds.Width, bounds.Height) * 0.1f;
-            bounds = bounds.Inflate(-margin, -margin);
-
-            float imageDimension = Math.Min(bounds.Width, bounds.Height) * 0.75f;
-            float textHeight = bounds.Height * 0.25f;
-
-            Rect imageBounds = new Rect(
-                bounds.Center.X - (imageDimension / 2f),
-                bounds.Center.Y - ((imageDimension + textHeight) / 2f),
-                imageDimension,
-                imageDimension);
-
-            Rect textBounds = new Rect(bounds.X, imageBounds.Bottom, bounds.Width, textHeight);
-
-            drawContext.DrawImage(this.MenuItem.Icon, imageBounds, this.ForegroundColor);
-            drawContext.DrawText(this.MenuItem.Text, textBounds, this.ForegroundColor, this._textFormat);
-        }
-
         #region ITapGestureDelegate implementation
 
         /// <summary>
@@ -128,12 +69,12 @@ namespace XForms.Controls
 
         void ITapGestureDelegate.OnTapBegan()
         {
-            this._ownAnimator.ScaleTo(TouchDownScale, TimeSpan.FromMilliseconds(25), new CubicEase(EasingMode.EaseIn));
+            this.IsPressed = true;
         }
 
         void ITapGestureDelegate.OnTapEnded()
         {
-            this._ownAnimator.ScaleTo(1.0f, this.ActualTheme.Motion.Short, new CubicEase(EasingMode.EaseIn));
+            this.IsPressed = false;
         }
 
         void ITapGestureDelegate.OnTapped()

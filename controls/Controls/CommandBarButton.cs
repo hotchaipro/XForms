@@ -51,11 +51,12 @@ namespace XForms.Controls
         }
     }
 
-    internal sealed class CommandBarButton : UserControl, ITapGestureDelegate
+    /// <summary>
+    /// A <see cref="CommandBar"/>'s button: an icon and a label, showing while
+    /// its command can run. Its theme's template draws it.
+    /// </summary>
+    public sealed class CommandBarButton : TemplatedControl, ITapGestureDelegate
     {
-        // Animates the control itself (press feedback, spinning)
-        private readonly DrawnAnimator _ownAnimator;
-
         protected override AccessibilityRole DefaultAccessibilityRole
         {
             get
@@ -72,25 +73,11 @@ namespace XForms.Controls
             }
         }
 
-        private const float PressedScale = 0.9f;
-
         private string _text;
-        private TextFormat _textFormat;
         private Bitmap _icon;
 
         public CommandBarButton()
         {
-            this._ownAnimator = this.CreateDrawnAnimator();
-
-            this._textFormat = new TextFormat()
-            {
-                FontSize = 9.0f,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Bottom,
-            };
-
-            this._ownAnimator.Scale = 1.0f;
-
             this.GestureRecognizers.Add(new TapGestureRecognizer(this));
         }
 
@@ -154,51 +141,11 @@ namespace XForms.Controls
             }
         }
 
-        private Color AccentColor
-        {
-            get
-            {
-                return this.ActualTheme.Colors.Accent;
-            }
-        }
-
-        public override Color BackgroundColor
-        {
-            get
-            {
-                return Colors.Transparent;
-            }
-        }
-
-
-
-        protected override void Render(
-            DrawingContext drawContext)
-        {
-            var bounds = new Rect(0, 0, this.Bounds.Width, this.Bounds.Height);
-            base.Render(drawContext);
-
-            float imageDimension = Math.Min(bounds.Width, bounds.Height) * 0.65f;
-            float textHeight = bounds.Height * 0.35f;
-
-            Rect imageBounds = new Rect(
-                bounds.Center.X - (imageDimension / 2f),
-                bounds.Center.Y - ((imageDimension + textHeight) / 2f),
-                imageDimension,
-                imageDimension);
-
-            drawContext.DrawImage(this._icon, imageBounds, this.AccentColor);
-
-            Rect textBounds = new Rect(bounds.X, imageBounds.Bottom, bounds.Width, bounds.Bottom - imageBounds.Bottom);
-
-            drawContext.DrawText(this.Text, textBounds, this.AccentColor, this._textFormat);
-        }
-
         #region ITapGestureDelegate implementation
 
         void ITapGestureDelegate.OnTapBegan()
         {
-            this._ownAnimator.ScaleTo(PressedScale, TimeSpan.FromMilliseconds(25), new CubicEase(EasingMode.EaseIn));
+            this.IsPressed = true;
         }
 
         void ITapGestureDelegate.OnTapped()
@@ -208,10 +155,7 @@ namespace XForms.Controls
 
         void ITapGestureDelegate.OnTapEnded()
         {
-            if (this._ownAnimator.Scale != 1.0f)
-            {
-                this._ownAnimator.ScaleTo(1.0f, this.ActualTheme.Motion.Short, new SpringEase(EasingMode.EaseOut));
-            }
+            this.IsPressed = false;
         }
 
         void IGestureRecognizerDelegate.OnTouchBegan()

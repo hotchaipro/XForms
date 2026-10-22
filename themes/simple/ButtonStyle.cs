@@ -1,18 +1,15 @@
-using System;
+﻿using System;
+using XForms.Controls;
 
-namespace XForms.Controls
+namespace XForms.Themes.Simple
 {
     /// <summary>
-    /// How a <see cref="Button"/> looks. Unset values come from the theme's
-    /// default <c>ButtonStyle</c> (<see cref="Theme.GetExtension{TExtension}"/>), and
-    /// then from the theme's tokens.
+    /// How the Simple theme draws a <see cref="Button"/>. Unset values come
+    /// from the theme's tokens. Set one on a theme for every button under a
+    /// view.
     /// </summary>
     /// <example>
     /// <code>
-    /// // One button
-    /// new Button { Text = "Delete", Style = new ButtonStyle { Background = Colors.Red } };
-    ///
-    /// // Every button under a view
     /// view.Theme = theme.WithExtension(new ButtonStyle { CornerRadius = 20 });
     /// </code>
     /// </example>
