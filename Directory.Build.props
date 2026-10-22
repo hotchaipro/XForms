@@ -36,4 +36,26 @@
     <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Shipped.txt" Condition="Exists('PublicAPI/$(TargetFramework)/PublicAPI.Shipped.txt')" />
     <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Unshipped.txt" Condition="Exists('PublicAPI/$(TargetFramework)/PublicAPI.Unshipped.txt')" />
   </ItemGroup>
+
+  <!--
+    Packages: what apps reference (XForms and a theme), and the libraries
+    XForms depends on (the framework and the toolkit, with their platforms;
+    the toolkit is also usable alone). Nothing else packs.
+  -->
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'XForms' or $(MSBuildProjectName.StartsWith('XForms.Framework')) or $(MSBuildProjectName.StartsWith('XForms.Toolkit')) or $(MSBuildProjectName.StartsWith('XForms.Themes.'))">
+    <IsPackable>true</IsPackable>
+    <Version>0.1.0-preview.1</Version>
+    <Authors>Hot Chai Games</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+  <PropertyGroup>
+    <Description Condition="'$(MSBuildProjectName)' == 'XForms'">Cross-platform UI for .NET: the controls, data binding, and the app's entry point (XFormsApp.Run). Apps reference this package and a theme package.</Description>
+    <Description Condition="$(MSBuildProjectName.StartsWith('XForms.Framework'))">XForms' platform layer, which the XForms package uses. Apps reference XForms instead.</Description>
+    <Description Condition="'$(MSBuildProjectName)' == 'XForms.Toolkit'">Cross-platform services for any .NET app: the clipboard, the launcher, preferences, secure storage, sharing, haptics, connectivity and file pickers.</Description>
+    <Description Condition="$(MSBuildProjectName.StartsWith('XForms.Toolkit.'))">XForms.Toolkit's services on one platform, which an app registers (an XForms app's XFormsApp.Run does).</Description>
+    <Description Condition="'$(MSBuildProjectName)' == 'XForms.Themes.Simple'">XForms' Simple theme: the controls in a plain, flat look. Pass new SimpleTheme() to XFormsApp.Run.</Description>
+  </PropertyGroup>
 </Project>
