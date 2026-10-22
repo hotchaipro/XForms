@@ -50,7 +50,8 @@ namespace XForms.Themes.Simple
             .With(new CalendarDatePickerTemplate())
             .With(new PopupFrameTemplate())
             .With(new ComboBoxItemsViewTemplate())
-            .With(new CalendarViewTemplate());
+            .With(new CalendarViewTemplate())
+            .With(new ProgressRingTemplate());
 
         private static Theme WithDefault<TExtension>(
             Theme theme,

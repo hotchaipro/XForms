@@ -5,9 +5,9 @@ using XForms.Primitives;
 namespace XForms.Controls
 {
     /// <summary>
-    /// A popup with the toolkit's look: its content on the app's background,
-    /// inside a thin border. Clicking outside it, pressing Escape or going back
-    /// closes it.
+    /// A popup with its content in a frame (a <see cref="PopupFrame"/>, which
+    /// its theme's template draws). Clicking outside it, pressing Escape or
+    /// going back closes it.
     /// </summary>
     public class Flyout : Popup
     {
@@ -43,12 +43,10 @@ namespace XForms.Controls
         }
 
         /// <summary>
-        /// Draws the popover's background and border around its content.
+        /// The frame around the popover's content.
         /// </summary>
-        private sealed class FlyoutFrame : UserControl
+        private sealed class FlyoutFrame : PopupFrame
         {
-            private const float BorderThickness = 1.0f;
-
             public View Body
             {
                 get
@@ -65,18 +63,6 @@ namespace XForms.Controls
 
                     this.Content = value;
                 }
-            }
-
-            protected override void Render(
-                DrawingContext drawContext)
-            {
-                var bounds = new Rect(0, 0, this.Bounds.Width, this.Bounds.Height);
-                var theme = this.ActualTheme;
-                drawContext.FillRectangle(bounds, theme.Colors.Background);
-                drawContext.DrawRectangle(
-                    bounds.Deflate(BorderThickness / 2, BorderThickness / 2),
-                    theme.Colors.SubtleForeground.MultiplyAlpha(0.4f),
-                    BorderThickness);
             }
         }
     }
