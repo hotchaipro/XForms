@@ -9,10 +9,18 @@ namespace XForms.iOS
     /// <summary>
     /// iOS's services for the application.
     /// </summary>
-    internal static class IosServices
+    public static class IosToolkitServices
     {
-        public static PlatformServices Create(
-            IosApplication application)
+        /// <summary>
+        /// Makes iOS's services the app's (<see cref="PlatformServices.Current"/>):
+        /// call it before <see cref="IosApplication"/>'s <c>Run</c>.
+        /// </summary>
+        public static void Register()
+        {
+            PlatformServices.Current ??= Create();
+        }
+
+        private static PlatformServices Create()
         {
             return new PlatformServices()
             {
@@ -20,10 +28,10 @@ namespace XForms.iOS
                 Launcher = new UrlLauncher(),
                 Preferences = new UserDefaultsPreferences(),
                 SecureStorage = new KeychainStorage(),
-                Share = new ActivityShare(application),
+                Share = new ActivityShare(),
                 HapticFeedback = new GeneratorHapticFeedback(),
                 Connectivity = new PathConnectivity(),
-                FilePicker = new DocumentPicker(application),
+                FilePicker = new DocumentPicker(),
             };
         }
     }
@@ -149,12 +157,8 @@ namespace XForms.iOS
 
     internal sealed class ActivityShare : IShare
     {
-        private readonly IosApplication _application;
-
-        public ActivityShare(
-            IosApplication application)
+        public ActivityShare()
         {
-            this._application = application;
         }
 
         public Task RequestAsync(
@@ -177,7 +181,7 @@ namespace XForms.iOS
             }
 
             var controller = new UIActivityViewController(items.ToArray(), null);
-            var presenter = this._application.RootViewController;
+            var presenter = IosApplication.Current?.RootViewController;
             if (null != presenter)
             {
                 // On iPad the sheet is a popover, anchored to the window

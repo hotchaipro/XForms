@@ -12,6 +12,8 @@
     <AssemblyName>XForms.Toolkit</AssemblyName>
     <IsTrimmable>true</IsTrimmable>
     <IsAotCompatible>true</IsAotCompatible>
+    <!-- Each platform's services are projects of their own, in platform/ -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);platform/**</DefaultItemExcludes>
   </PropertyGroup>
 
   <ItemGroup>

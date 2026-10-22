@@ -19,9 +19,6 @@ namespace XForms.iOS
             }
 
             this._nativeApplication = nativeApplication;
-
-            // The app's services are this platform's
-            PlatformServices.Current = IosServices.Create(nativeApplication);
         }
 
         public bool UsesLightweightRenderers => true;

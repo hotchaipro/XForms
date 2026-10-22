@@ -13,9 +13,6 @@ namespace XForms.Android
             AndroidApplication host)
         {
             this._host = host ?? throw new ArgumentNullException(nameof(host));
-
-            // The app's services are this platform's
-            PlatformServices.Current = AndroidServices.Create(host);
         }
 
         public bool UsesLightweightRenderers => true;
@@ -118,7 +115,7 @@ namespace XForms.Android
 
             var androidUri = global::Android.Net.Uri.Parse(uri.ToString());
             var intent = new global::Android.Content.Intent(global::Android.Content.Intent.ActionView, androidUri);
-            AndroidServices.StartActivity(this._host, intent);
+            this._host.StartActivity(intent);
         }
     }
 }

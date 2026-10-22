@@ -36,6 +36,7 @@ namespace XForms.Test
             }
 
             TestApp.RecreateHost = () => AndroidApplication.Current?.Activity?.Recreate();
+            AndroidToolkitServices.Register();
             AndroidApplication.Run(this, new TestApp());
         }
     }

@@ -12,9 +12,20 @@ namespace XForms.Web
     /// local storage too: don't keep real secrets in it on the web.
     /// </summary>
     [SupportedOSPlatform("browser")]
-    internal static class WebServices
+    public static class WebToolkitServices
     {
-        public static PlatformServices Create()
+        /// <summary>
+        /// Loads the services' script into the page and makes the page's
+        /// services the app's (<see cref="PlatformServices.Current"/>): call it
+        /// before <see cref="WebApplication.RunAsync"/>.
+        /// </summary>
+        public static async Task InitializeAsync()
+        {
+            await ToolkitJs.InitializeAsync();
+            PlatformServices.Current ??= Create();
+        }
+
+        private static PlatformServices Create()
         {
             return new PlatformServices()
             {
@@ -40,7 +51,7 @@ namespace XForms.Web
         {
             try
             {
-                return await Js.ClipboardReadAsync();
+                return await ToolkitJs.ClipboardReadAsync();
             }
             catch (Exception)
             {
@@ -52,7 +63,7 @@ namespace XForms.Web
         public Task SetTextAsync(
             string text)
         {
-            return Js.ClipboardWriteAsync(text ?? string.Empty);
+            return ToolkitJs.ClipboardWriteAsync(text ?? string.Empty);
         }
     }
 
@@ -67,7 +78,7 @@ namespace XForms.Web
                 throw new ArgumentNullException(nameof(uri));
             }
 
-            Js.OpenUrl(uri.AbsoluteUri);
+            ToolkitJs.OpenUrl(uri.AbsoluteUri);
             return Task.FromResult(true);
         }
     }
@@ -83,31 +94,31 @@ namespace XForms.Web
             this._prefix = prefix;
         }
 
-        public bool ContainsKey(string key) => null != Js.StorageGet(this._prefix + key);
+        public bool ContainsKey(string key) => null != ToolkitJs.StorageGet(this._prefix + key);
 
         public string Get(
             string key,
             string defaultValue = null)
         {
-            return Js.StorageGet(this._prefix + key) ?? defaultValue;
+            return ToolkitJs.StorageGet(this._prefix + key) ?? defaultValue;
         }
 
         public void Set(
             string key,
             string value)
         {
-            Js.StorageSet(this._prefix + key, value);
+            ToolkitJs.StorageSet(this._prefix + key, value);
         }
 
         public void Remove(
             string key)
         {
-            Js.StorageSet(this._prefix + key, null);
+            ToolkitJs.StorageSet(this._prefix + key, null);
         }
 
         public void Clear()
         {
-            Js.StorageClear(this._prefix);
+            ToolkitJs.StorageClear(this._prefix);
         }
     }
 
@@ -161,13 +172,13 @@ namespace XForms.Web
                 throw new ArgumentNullException(nameof(request));
             }
 
-            if (Js.CanShare())
+            if (ToolkitJs.CanShare())
             {
-                return Js.ShareAsync(request.Title, request.Text, request.Uri?.AbsoluteUri);
+                return ToolkitJs.ShareAsync(request.Title, request.Text, request.Uri?.AbsoluteUri);
             }
 
             string text = string.Join("\n", new[] { request.Text, request.Uri?.AbsoluteUri }.Where((part) => !string.IsNullOrEmpty(part)));
-            return Js.ClipboardWriteAsync(text);
+            return ToolkitJs.ClipboardWriteAsync(text);
         }
     }
 
@@ -179,7 +190,7 @@ namespace XForms.Web
         public void Perform(
             HapticFeedbackType type)
         {
-            Js.Vibrate((type == HapticFeedbackType.LongPress) ? 30 : 10);
+            ToolkitJs.Vibrate((type == HapticFeedbackType.LongPress) ? 30 : 10);
         }
     }
 
@@ -196,7 +207,7 @@ namespace XForms.Web
         {
             Current = this;
             this._networkAccess = Read();
-            Js.ListenOnline();
+            ToolkitJs.ListenOnline();
         }
 
         public static WebConnectivity Current
@@ -217,7 +228,7 @@ namespace XForms.Web
 
         private static NetworkAccess Read()
         {
-            return Js.IsOnline() ? NetworkAccess.Internet : NetworkAccess.None;
+            return ToolkitJs.IsOnline() ? NetworkAccess.Internet : NetworkAccess.None;
         }
 
         public void OnChanged()
@@ -242,7 +253,7 @@ namespace XForms.Web
             FilePickerOptions options = null)
         {
             string accept = string.Join(",", options?.FileTypes?.Select((type) => "." + type.TrimStart('.')) ?? Array.Empty<string>());
-            string picked = await Js.PickFilesAsync(accept, options?.AllowMultiple ?? false);
+            string picked = await ToolkitJs.PickFilesAsync(accept, options?.AllowMultiple ?? false);
             var names = string.IsNullOrEmpty(picked) ? Array.Empty<string>() : picked.Split('\n');
 
             var files = new List<PickedFile>();
@@ -251,8 +262,8 @@ namespace XForms.Web
                 int index = i;
                 files.Add(new PickedFile(names[i], async () =>
                 {
-                    var bytes = new byte[await Js.LoadPickedFileAsync(index)];
-                    Js.CopyPickedFile(index, bytes);
+                    var bytes = new byte[await ToolkitJs.LoadPickedFileAsync(index)];
+                    ToolkitJs.CopyPickedFile(index, bytes);
                     return (Stream)new MemoryStream(bytes);
                 }));
             }
@@ -273,7 +284,7 @@ namespace XForms.Web
             using (var stream = new MemoryStream())
             {
                 await write(stream);
-                Js.SaveFile(string.IsNullOrEmpty(suggestedName) ? "file" : suggestedName, stream.ToArray());
+                ToolkitJs.SaveFile(string.IsNullOrEmpty(suggestedName) ? "file" : suggestedName, stream.ToArray());
             }
 
             return true;

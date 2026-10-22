@@ -10,7 +10,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\framework\XForms.Framework.csproj" />
-    <ProjectReference Include="..\..\toolkit\XForms.Toolkit.csproj" />
   </ItemGroup>
 
 </Project>

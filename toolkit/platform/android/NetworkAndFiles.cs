@@ -20,17 +20,14 @@ namespace XForms.Android
     /// </summary>
     internal sealed class AndroidConnectivity : IConnectivity
     {
-        private readonly AndroidApplication _host;
         private readonly ConnectivityManager _manager;
         private NetworkAccess _networkAccess;
         private EventHandler _connectivityChanged;
         private Callback _callback;
 
-        public AndroidConnectivity(
-            AndroidApplication host)
+        public AndroidConnectivity()
         {
-            this._host = host;
-            this._manager = (ConnectivityManager)host.Context.GetSystemService(Context.ConnectivityService);
+            this._manager = (ConnectivityManager)AndroidHost.Context.GetSystemService(Context.ConnectivityService);
             this._networkAccess = this.Read();
         }
 
@@ -92,7 +89,7 @@ namespace XForms.Android
         private void OnChanged(
             NetworkAccess access)
         {
-            this._host.RunOnUiThread(() =>
+            AndroidHost.RunOnUiThread(() =>
             {
                 if (access != this._networkAccess)
                 {
@@ -126,12 +123,8 @@ namespace XForms.Android
     /// </summary>
     internal sealed class DocumentPicker : IFilePicker
     {
-        private readonly AndroidApplication _host;
-
-        public DocumentPicker(
-            AndroidApplication host)
+        public DocumentPicker()
         {
-            this._host = host;
         }
 
         public async Task<IReadOnlyList<PickedFile>> PickAsync(
@@ -153,7 +146,7 @@ namespace XForms.Android
             }
 
             var files = new List<PickedFile>();
-            var (result, data) = await this._host.StartActivityForResultAsync(intent);
+            var (result, data) = await AndroidHost.StartActivityForResultAsync(intent);
             if ((result != Result.Ok) || (null == data))
             {
                 return files;
@@ -172,7 +165,7 @@ namespace XForms.Android
                 uris.Add(data.Data);
             }
 
-            var resolver = this._host.Context.ContentResolver;
+            var resolver = AndroidHost.Context.ContentResolver;
             foreach (var uri in uris)
             {
                 files.Add(new PickedFile(this.DisplayName(uri), () => Task.FromResult(resolver.OpenInputStream(uri))));
@@ -199,13 +192,13 @@ namespace XForms.Android
                 intent.PutExtra(Intent.ExtraTitle, suggestedName);
             }
 
-            var (result, data) = await this._host.StartActivityForResultAsync(intent);
+            var (result, data) = await AndroidHost.StartActivityForResultAsync(intent);
             if ((result != Result.Ok) || (null == data?.Data))
             {
                 return false;
             }
 
-            using (var stream = this._host.Context.ContentResolver.OpenOutputStream(data.Data))
+            using (var stream = AndroidHost.Context.ContentResolver.OpenOutputStream(data.Data))
             {
                 await write(stream);
             }
@@ -231,7 +224,7 @@ namespace XForms.Android
         private string DisplayName(
             global::Android.Net.Uri uri)
         {
-            using (var cursor = this._host.Context.ContentResolver.Query(uri, new[] { IOpenableColumns.DisplayName }, null, null, null))
+            using (var cursor = AndroidHost.Context.ContentResolver.Query(uri, new[] { IOpenableColumns.DisplayName }, null, null, null))
             {
                 if ((null != cursor) && cursor.MoveToFirst())
                 {

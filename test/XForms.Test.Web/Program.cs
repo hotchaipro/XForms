@@ -15,6 +15,7 @@ namespace XForms.Test.Web
             TestApp.StartPage = WebApplication.GetQueryParameter("page");
             TestApp.ThemeModeSwitches = WebApplication.GetQueryParameter("themes");
 
+            await WebToolkitServices.InitializeAsync();
             await WebApplication.RunAsync("XForms Test (Web)", new TestApp());
         }
     }

@@ -8,6 +8,7 @@ namespace XForms.Test.iOS
         static void Main(
             string[] args)
         {
+            IosToolkitServices.Register();
             IosApplication.Run(args, new TestApp());
         }
     }

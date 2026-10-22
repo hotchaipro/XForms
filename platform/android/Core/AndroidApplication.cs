@@ -238,6 +238,22 @@ namespace XForms.Android
             this._hostView.AddView(view, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.MatchParent));
         }
 
+        // Starts an activity from the app's activity (or, without one, in a
+        // new task)
+        internal void StartActivity(
+            Intent intent)
+        {
+            var activity = this._activity;
+            if (null == activity)
+            {
+                intent.AddFlags(ActivityFlags.NewTask);
+                this.Context.StartActivity(intent);
+                return;
+            }
+
+            activity.StartActivity(intent);
+        }
+
         internal void Finish()
         {
             this._activity?.Finish();
@@ -249,45 +265,6 @@ namespace XForms.Android
             Action action)
         {
             MainThread.Post(action);
-        }
-
-        private readonly Dictionary<int, TaskCompletionSource<(Result, Intent)>> _pendingResults = new Dictionary<int, TaskCompletionSource<(Result, Intent)>>();
-        private int _nextRequestCode = 0x5800;
-
-        /// <summary>
-        /// Starts an activity (such as the document picker) and completes with
-        /// its result, through a short-lived activity of XForms' own, so the
-        /// app's activity needn't forward its results.
-        /// </summary>
-        internal Task<(Result Result, Intent Data)> StartActivityForResultAsync(
-            Intent intent)
-        {
-            int requestCode = this._nextRequestCode++;
-            var completion = new TaskCompletionSource<(Result, Intent)>();
-            this._pendingResults[requestCode] = completion;
-
-            var context = this._activity ?? this.Context;
-            var proxy = new Intent(context, typeof(ResultActivity));
-            proxy.PutExtra(ResultActivity.IntentExtra, intent);
-            proxy.PutExtra(ResultActivity.RequestCodeExtra, requestCode);
-            if (null == this._activity)
-            {
-                proxy.AddFlags(ActivityFlags.NewTask);
-            }
-
-            context.StartActivity(proxy);
-            return completion.Task;
-        }
-
-        internal void OnActivityResult(
-            int requestCode,
-            Result resultCode,
-            Intent data)
-        {
-            if (this._pendingResults.Remove(requestCode, out var completion))
-            {
-                completion.SetResult((resultCode, data));
-            }
         }
 
         /// <summary>
@@ -724,58 +701,6 @@ namespace XForms.Android
             public ActionMode OnWindowStartingActionMode(ActionMode.ICallback callback) => this.Inner.OnWindowStartingActionMode(callback);
 
             public ActionMode OnWindowStartingActionMode(ActionMode.ICallback callback, ActionModeType type) => this.Inner.OnWindowStartingActionMode(callback, type);
-        }
-    }
-
-    /// <summary>
-    /// Starts an activity for its result on XForms' behalf, then reports the
-    /// result and finishes, so the app's own activity needn't forward results.
-    /// </summary>
-    [Activity(
-        Exported = false,
-        NoHistory = false,
-        ConfigurationChanges = global::Android.Content.PM.ConfigChanges.Orientation | global::Android.Content.PM.ConfigChanges.ScreenSize | global::Android.Content.PM.ConfigChanges.UiMode,
-        Theme = "@android:style/Theme.Translucent.NoTitleBar")]
-    internal sealed class ResultActivity : Activity
-    {
-        public const string IntentExtra = "xforms.intent";
-        public const string RequestCodeExtra = "xforms.requestCode";
-
-        private bool _isStarted;
-
-        protected override void OnCreate(
-            Bundle savedInstanceState)
-        {
-            base.OnCreate(savedInstanceState);
-
-            this._isStarted = savedInstanceState?.GetBoolean(nameof(this._isStarted)) ?? false;
-            if (!this._isStarted)
-            {
-                this._isStarted = true;
-#pragma warning disable CA1422 // The typed overload needs Android 13
-                var intent = (Intent)this.Intent.GetParcelableExtra(IntentExtra);
-#pragma warning restore CA1422
-                this.StartActivityForResult(intent, 1);
-            }
-        }
-
-        protected override void OnSaveInstanceState(
-            Bundle outState)
-        {
-            base.OnSaveInstanceState(outState);
-            outState.PutBoolean(nameof(this._isStarted), this._isStarted);
-        }
-
-        protected override void OnActivityResult(
-            int requestCode,
-            [GeneratedEnum] Result resultCode,
-            Intent data)
-        {
-            base.OnActivityResult(requestCode, resultCode, data);
-
-            int xformsRequestCode = this.Intent.GetIntExtra(RequestCodeExtra, -1);
-            AndroidApplication.Current?.OnActivityResult(xformsRequestCode, resultCode, data);
-            this.Finish();
         }
     }
 }

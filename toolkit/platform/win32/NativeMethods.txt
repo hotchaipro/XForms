@@ -1,0 +1,8 @@
+CoCreateInstance
+CoTaskMemFree
+FileOpenDialog
+FileSaveDialog
+IFileOpenDialog
+IFileSaveDialog
+IShellItem
+IShellItemArray

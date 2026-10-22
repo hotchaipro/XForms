@@ -9,7 +9,11 @@
     <Project Path="platform/win32/XForms.Framework.Win32.csproj" />
   </Folder>
   <Folder Name="/toolkit/">
-    <Project Path="toolkit/XForms.Toolkit.csproj" />
+    <Project Path="toolkit/XForms.Toolkit.csproj" />
+    <Project Path="toolkit/platform/android/XForms.Toolkit.Android.csproj" />
+    <Project Path="toolkit/platform/ios/XForms.Toolkit.iOS.csproj" />
+    <Project Path="toolkit/platform/web/XForms.Toolkit.Web.csproj" />
+    <Project Path="toolkit/platform/win32/XForms.Toolkit.Win32.csproj" />
   </Folder>
   <Folder Name="/controls/">
     <Project Path="controls/XForms.Controls.csproj" />

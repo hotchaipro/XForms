@@ -13,9 +13,18 @@ namespace XForms.Win32
     /// <summary>
     /// Windows' services for the application.
     /// </summary>
-    internal static class Win32Services
+    public static class Win32ToolkitServices
     {
-        public static PlatformServices Create()
+        /// <summary>
+        /// Makes Windows' services the app's (<see cref="PlatformServices.Current"/>):
+        /// call it before <see cref="Win32Application.Run"/>.
+        /// </summary>
+        public static void Register()
+        {
+            PlatformServices.Current ??= Create();
+        }
+
+        private static PlatformServices Create()
         {
             var preferences = new FilePreferences(Path.Combine(AppDataFolder, "preferences.json"));
             return new PlatformServices()
@@ -27,7 +36,7 @@ namespace XForms.Win32
                 Share = new ClipboardShare(),
                 HapticFeedback = new NoHapticFeedback(),
                 Connectivity = new NetworkConnectivity(),
-                FilePicker = new CommonFileDialogs(Win32Host.Current),
+                FilePicker = new CommonFileDialogs(),
             };
         }
 

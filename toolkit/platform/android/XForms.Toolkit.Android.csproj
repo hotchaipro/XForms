@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- The toolkit's services on Android: the clipboard, intents, shared
+       preferences, the keystore, the network and the document picker. -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-android</TargetFramework>
+    <RootNamespace>XForms.Android</RootNamespace>
+    <AssemblyName>XForms.Toolkit.Android</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\XForms.Toolkit.csproj" />
+    <ProjectReference Include="..\..\..\platform\android\XForms.Framework.Android.csproj" />
+  </ItemGroup>
+
+</Project>

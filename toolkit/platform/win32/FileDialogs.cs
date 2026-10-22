@@ -20,15 +20,12 @@ namespace XForms.Win32
     /// </summary>
     internal sealed class CommonFileDialogs : IFilePicker
     {
+        // The dialogs belong to the app's window
+        private static unsafe HWND OwnerWindow => new HWND((void*)(Win32Application.Current?.MainWindowHandle ?? 0));
+
         private const int Canceled = unchecked((int)0x800704C7); // ERROR_CANCELLED
 
-        private readonly Win32Host _host;
 
-        public CommonFileDialogs(
-            Win32Host host)
-        {
-            this._host = host;
-        }
 
         public Task<IReadOnlyList<PickedFile>> PickAsync(
             FilePickerOptions options = null)
@@ -56,7 +53,7 @@ namespace XForms.Win32
                 dialog->SetOptions(flags);
                 Configure((IFileDialog*)dialog, options);
 
-                if (!Show((IFileDialog*)dialog, this._host.Hwnd))
+                if (!Show((IFileDialog*)dialog, OwnerWindow))
                 {
                     return files;
                 }
@@ -153,7 +150,7 @@ namespace XForms.Win32
                     }
                 }
 
-                if (!Show((IFileDialog*)dialog, this._host.Hwnd))
+                if (!Show((IFileDialog*)dialog, OwnerWindow))
                 {
                     return null;
                 }

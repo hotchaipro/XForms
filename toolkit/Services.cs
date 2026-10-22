@@ -279,7 +279,8 @@ namespace XForms
     {
         extension(Application application)
         {
-            public PlatformServices Services => PlatformServices.Current;
+            public PlatformServices Services => PlatformServices.Current
+                ?? throw new InvalidOperationException("The app has no platform services: call the platform's ToolkitServices (such as Win32ToolkitServices.Register()) before running the app.");
         }
     }
 }

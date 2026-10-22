@@ -138,10 +138,4 @@ MINMAXINFO
 GetWindowLong
 AdjustWindowRectExForDpi
 WINDOW_LONG_PTR_INDEX
-FileOpenDialog
-FileSaveDialog
-IFileOpenDialog
-IFileSaveDialog
-IShellItem
-IShellItemArray
 CoTaskMemFree
