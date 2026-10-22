@@ -2801,8 +2801,9 @@ Win32, Android and the browser, as before.
     page. Nothing is found by reflection or made from a `Type`, so it's
     safe for trimming and AOT.
 
-    **Status: steps 1 to 4 done** (step 2 came with step 1, since taking
-    `NavigateAsync(Page)` away needed the apps' routes):
+    **Status: done,** in four commits (step 2 came with step 1, since
+    taking `NavigateAsync(Page)` away needed the apps' routes), with a
+    "Navigation" section in `architecture.md` (step 5):
     - **Routes:** `Routes` and `Route` in the framework,
       `Application.OnConfigureRoutes`, `NavigateAsync(path)` and
       `NavigateAsync<TResult>(path)`, `ShowModalAsync(path)` and

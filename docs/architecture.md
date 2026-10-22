@@ -163,8 +163,8 @@ they need:
 |---|---|
 | Win32 | `XFormsApp.Run("Title", new App(), new SimpleTheme())` from `Main`: a window and its message loop |
 | Browser | `await XFormsApp.RunAsync("Title", new App(), new SimpleTheme())` from `Main`: the page |
-| iOS | `XFormsApp.Run(args, new App(), new SimpleTheme())` from `Main`, with XForms' own app and scene delegates; or `XFormsApp.Run(windowScene, new App(), new SimpleTheme())` from the app's own scene delegate |
-| Android | `XFormsApp.Run(this, new App(), new SimpleTheme())` from the app's own activity's `OnCreate` |
+| iOS | `XFormsApp.Run(args, new App(), new SimpleTheme())` from `Main`, with XForms' own app and scene delegates; or `XFormsApp.Run(windowScene, connectionOptions, new App(), new SimpleTheme())` from the app's own scene delegate's `WillConnect` |
+| Android | `XFormsApp.Run(this, savedInstanceState, new App(), new SimpleTheme())` from the app's own activity's `OnCreate` |
 
 `XFormsApp.Run`:
 - gives the app its theme (`Application.ThemeExtender`, see Themes);
@@ -190,8 +190,13 @@ they need:
   before XForms sees them (overriding `OnBackPressed`, or the activity's
   `DispatchKeyEvent`). Android's own activity results go through the
   toolkit's `ResultActivity`, so the activity needn't forward them.
-- **What the app forwards:** nothing yet. (A deep-link API would take the
-  activity's `OnNewIntent`.)
+- **What the app forwards:** on Android, the `savedInstanceState` its
+  `OnCreate` gets (a library can't read it later), so the back stack comes
+  back after Android ends the app. On iOS, an app with its own scene
+  delegate forwards the scene's connection options to `Run`, returns
+  `IosApplication.Current.CreateStateRestorationActivity()` from
+  `GetStateRestorationActivity`, and passes URLs from `OpenUrlContexts` to
+  `IosApplication.Current.OpenUrl` (XForms' own delegate does all three).
 - **Android re-creates the activity** for configuration changes it doesn't
   declare. The new activity's `Run` moves the running app to it, keeping
   its state, and leaves the new app object unused; when the activity
@@ -199,6 +204,78 @@ they need:
   changes XForms handles in place (dark mode, text size, orientation and
   screen size; SoonerOrLater's `MainActivity` is the pattern), so
   re-creation is rare. Use a theme without an action bar.
+
+## Navigation
+
+An app's pages are reached by **path**, such as `/item/42`. The app lists
+them in `Application.OnConfigureRoutes`, each with a function that makes
+the page from a path that matches:
+
+```csharp
+protected override void OnConfigureRoutes(Routes routes)
+{
+    routes.Add("/", _ => new MainPage());
+    routes.Add("/about", _ => new AboutPage());
+    routes.Add("/item/{id}", route => new ItemPage(route["id"]));
+    routes.Add("/item/new?category={category}", route => new ItemPage(category: route["category"]));
+}
+```
+
+Nothing is found by reflection or made from a `Type`: the app's own code
+makes each page, so navigation is safe for trimming and AOT. A page keeps
+an ordinary constructor with arguments; the route passes them.
+
+**Paths.** A route is fixed segments and `{name}` segments, then
+optionally query values (`?key={name}`). Fixed segments match regardless
+of case and win over a parameter wherever both match, whatever the order
+of the routes; a trailing slash doesn't matter. `route["id"]` is a value,
+decoded (a query value the path leaves out is null; a name the route
+doesn't have throws), and `GetInt32`, `GetInt64` and `GetGuid` parse one.
+Two routes that match the same paths throw when added. A route's function
+may return null (the item is gone), which counts as no match.
+
+**Navigating.**
+- `NavigateAsync("/item/42")` shows the page, keeping the current one in
+  the back stack; `GoBackAsync()` returns (closing a popup or a modal page
+  first). A path the app navigates to that matches nothing throws.
+- `ShowModalAsync("/pick-color")` shows a page over the current one,
+  sliding up, and completes when it closes (by Back, or
+  `Page.CloseModalAsync`).
+- **Results:** `await NavigateAsync<Color>(path)` and
+  `ShowModalAsync<Color>(path)` complete when the page leaves the back
+  stack, with what it set with `SetResult` (or the type's default, by
+  Back).
+- `OpenWindowAsync(path)` opens a window showing the page, on the desktop.
+- `NavigationStack` is the stack as paths, oldest first, and a page's
+  `NavigationPath` its own.
+- A `Frame` inside a page (tabs) shows pages the page makes itself: they
+  aren't in the back stack, have no path and aren't restored.
+
+**The start.** After `OnStart`, XForms shows the first pages: the stack the
+platform gives (restored, an address, a link), or the app's `StartPath`
+(`/` unless set). The app doesn't navigate to its first page itself. A path
+from outside that matches nothing shows what `OnRouteNotFound` chooses
+(`/` unless overridden).
+
+**Each platform:**
+- **The browser:** each page in the stack is a history entry whose
+  address is its path after a `#` (`https://host/#/item/42`), which any
+  static host serves; an open popup is one more entry. Back and Forward
+  bring the app to an entry's stack, making pages again by their routes;
+  the app's own going back moves back through the entries, so Forward
+  returns. A reload restores the whole stack, and a typed address shows its
+  page over the current one.
+- **Android:** the stack is saved with the activity's state, and restored
+  when Android brings back an app it ended in the background. A link the
+  activity starts with (its intent's data, `https://example.com/item/42`
+  or `myapp:///item/42`) opens the page for its path and query. Declaring
+  the link's scheme or domain stays the app's own (its manifest).
+- **iOS:** the stack is saved as the scene session's state-restoration
+  activity and restored with the session; a URL the scene opens with, or
+  is given while it runs, opens its page.
+- **Win32:** a desktop app starts fresh; nothing is restored.
+
+A modal page comes back from a restored stack as an ordinary page.
 
 ## Elements and renderers
 
