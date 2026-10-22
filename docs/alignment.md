@@ -2518,18 +2518,18 @@ Win32, Android and the browser, as before.
     Automation and Android accessibility for each group's controls.
     SoonerOrLater should look and behave the same.
 
-    **Decisions to make before starting:**
-    1. **Names:** `ControlTemplate` and `TemplatedControl` (WPF and
-       Avalonia's), or names of our own (`ControlLook`).
-    2. **A missing template:** throw when the control is attached
-       (recommended: a mistake shows at once, with a fix in the message), or
-       draw nothing.
-    3. **Per-control style properties** (`Button.Style`): remove them in
-       favor of per-view theme overrides (recommended: a control shouldn't
-       know one theme's style type), or keep them, typed as `object`.
-    4. **Switching theme packages at runtime:** not supported
-       (recommended for now), or supported by detaching and reattaching
-       every view so templates can ask for new animation layers.
+    **Decided** (2026-10-22):
+    1. **Names:** `ControlTemplate<TControl>` and `TemplatedControl`, as
+       WPF and Avalonia name them.
+    2. **A missing template** throws when the control is attached.
+    3. **Per-control style properties** (`Button.Style`) are removed, in
+       favor of per-view theme overrides.
+    4. **Switching theme packages at runtime** isn't supported for now;
+       the mode and accent color still change at runtime.
+
+    **Also:** `XForms.Themes.Simple` joins the build's layer check
+    (phase 23): it may reference XForms.Controls, XForms.Toolkit and the
+    framework, and tracks its public API like the other libraries.
 
     **Later, not in this phase:** more themes (Fluent, Material); templates
     in markup (phase 25).
