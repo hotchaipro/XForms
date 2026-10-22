@@ -24,6 +24,12 @@
     <Content Include="..\Content\**\*" Link="wwwroot\Content\%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
+  <!-- dotnet watch watches the folder the linked images appear in, so it
+       must exist (empty, so git ignores it) -->
+  <Target Name="CreateLinkedContentFolder" BeforeTargets="Build">
+    <MakeDir Directories="wwwroot\Content" />
+  </Target>
+
   <ItemGroup>
     <ProjectReference Include="..\..\xforms\XForms.csproj" />
     <ProjectReference Include="..\..\themes\simple\XForms.Themes.Simple.csproj" />

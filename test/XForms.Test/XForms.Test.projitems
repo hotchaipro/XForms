@@ -30,5 +30,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)DockPanelPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UniformGridPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ThemeManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HotReloadLog.cs" />
   </ItemGroup>
 </Project>

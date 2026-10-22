@@ -21,6 +21,20 @@
     <XFormsAllowedReferences Condition="$(MSBuildProjectName.StartsWith('XForms.Themes.'))">XForms</XFormsAllowedReferences>
   </PropertyGroup>
 
+  <!--
+    The web libraries (Razor class libraries, for their scripts) keep their
+    development manifest (*.staticwebassets.runtime.json) out of the apps that
+    reference them: the SDK copies it along, and an app's development server
+    (dotnet run, dotnet watch) reads the first one it finds, which can be a
+    library's, and then serves nothing. The app's own covers the libraries'
+    files.
+  -->
+  <Target Name="XFormsKeepLibraryManifestOut" AfterTargets="AddStaticWebAssetsManifest" Condition="'$(UsingMicrosoftNETSdkRazor)' == 'true' and '$(OutputType)' == 'Library'">
+    <ItemGroup>
+      <ContentWithTargetPath Remove="$(StaticWebAssetDevelopmentManifestPath)" />
+    </ItemGroup>
+  </Target>
+
   <!-- A project's own references (before the SDK adds those that come through them) -->
   <Target Name="XFormsCheckLayerReferences" BeforeTargets="IncludeTransitiveProjectReferences;ResolveProjectReferences;CoreCompile" Condition="'$(XFormsAllowedReferences)' != ''">
     <ItemGroup>

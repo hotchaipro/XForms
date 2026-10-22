@@ -2998,6 +2998,30 @@ Win32, Android and the browser, as before.
     focused). Release builds are unchanged. The aim is the experience
     Flutter sets: edit, save, see it, nothing lost.
 
+    **Status: step 1 done.** How updates reach a running XForms app, with
+    a handler in the test app that only logs (`HotReloadLog`):
+    - **Win32:** `dotnet watch` applies an edit in about two seconds after
+      the build, and the handler runs with the changed types (Visual
+      Studio's Hot Reload uses the same mechanism).
+    - **Android:** `dotnet watch` (SDK 10.0.402, Android 36.1) builds the
+      app without the hot reload agent and launches it with
+      `dotnet run --no-build`, so the agent never connects: an SDK
+      limitation. Visual Studio's Hot Reload is the way there; it can't be
+      driven here, so steps 3 and 4 check Android by calling the rebuild
+      directly.
+    - **The browser:** `dotnet watch` serves the app (`dotnet run`) and
+      sends updates to the page through its browser script, which applies
+      them only through Blazor's hooks (`Blazor._internal.
+      applyHotReloadDeltas` and `getApplyUpdateCapabilities`); without
+      them it reloads the page. XForms' web platform provides those hooks
+      (step 3), applying the deltas with `MetadataUpdater` and calling the
+      handlers, only when hot reload is on.
+    - **Fixed on the way:** the web libraries no longer copy their
+      development manifest into apps (an app's development server read a
+      library's and served nothing, so `dotnet run` had never worked for
+      the test app), and the test app's web project creates the folder its
+      linked images appear in, which `dotnet watch` watches.
+
     **What .NET gives, and what it doesn't.** .NET's hot reload patches
     the running app's methods and then calls every assembly's
     `[MetadataUpdateHandler]` with the types it changed. Code that runs
