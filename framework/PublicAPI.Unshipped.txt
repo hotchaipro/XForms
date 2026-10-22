@@ -1,3 +1,21 @@
-virtual XForms.Element.OnAttaching(XForms.Theme theme) -> void
+XForms.Application.NavigateAsync(string path, XForms.PageTransition transition = null) -> System.Threading.Tasks.Task
+XForms.Application.NavigateAsync<TResult>(string path, XForms.PageTransition transition = null) -> System.Threading.Tasks.Task<TResult>
+XForms.Application.NavigationStack.get -> System.Collections.Generic.IReadOnlyList<string>
+XForms.Application.OpenWindowAsync(string path, string title = null, XForms.Size? size = null) -> System.Threading.Tasks.Task<XForms.Window>
+XForms.Application.ShowModalAsync(string path) -> System.Threading.Tasks.Task
+XForms.Application.ShowModalAsync<TResult>(string path) -> System.Threading.Tasks.Task<TResult>
 XForms.Application.ThemeExtender.get -> System.Func<XForms.Theme, XForms.Theme>
 XForms.Application.ThemeExtender.set -> void
+XForms.Page.NavigationPath.get -> string
+XForms.Page.SetResult(object result) -> void
+XForms.Route
+XForms.Route.GetGuid(string name) -> System.Guid
+XForms.Route.GetInt32(string name) -> int
+XForms.Route.GetInt64(string name) -> long
+XForms.Route.Path.get -> string
+XForms.Route.Pattern.get -> string
+XForms.Route.this[string name].get -> string
+XForms.Routes
+XForms.Routes.Add(string pattern, System.Func<XForms.Route, XForms.Page> createPage) -> void
+virtual XForms.Application.OnConfigureRoutes(XForms.Routes routes) -> void
+virtual XForms.Element.OnAttaching(XForms.Theme theme) -> void

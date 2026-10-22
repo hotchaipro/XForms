@@ -205,8 +205,24 @@ namespace XForms
                 if (removeLeavingPage)
                 {
                     this.Detach(leaving);
+                    leaving.OnRemovedFromBackStack();
                 }
             }
+        }
+
+        /// <summary>
+        /// The pages in the back stack and the current one, oldest first.
+        /// </summary>
+        internal IEnumerable<Page> GetStack()
+        {
+            var pages = new List<Page>(this._backStack);
+            pages.Reverse();
+            if (null != this._currentPage)
+            {
+                pages.Add(this._currentPage);
+            }
+
+            return pages;
         }
 
         /// <summary>

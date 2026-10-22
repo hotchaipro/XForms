@@ -119,12 +119,52 @@ namespace XForms
 
 
         /// <summary>
+        /// The path the page was made from (see <see cref="Routes"/>), such as
+        /// <c>/item/42</c>; null for a page made otherwise (one shown in a
+        /// <see cref="Frame"/> inside a page).
+        /// </summary>
+        public string NavigationPath
+        {
+            get;
+            internal set;
+        }
+
+        /// <summary>
         /// Closes the page, when it's shown with
-        /// <see cref="Application.ShowModalAsync(Page)"/>.
+        /// <see cref="Application.ShowModalAsync(string)"/>.
         /// </summary>
         public Task CloseModalAsync()
         {
             return this.Application.CloseModalAsync(this);
+        }
+
+        private object _result;
+
+        // Completed when the page leaves the back stack, for whoever navigated
+        // to it waiting for a result
+        internal TaskCompletionSource<object> ResultCompletion
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Sets what the page gives back when it goes (by Back, or closing),
+        /// for <see cref="Application.NavigateAsync{TResult}"/> and
+        /// <see cref="Application.ShowModalAsync{TResult}"/>.
+        /// </summary>
+        protected void SetResult(
+            object result)
+        {
+            this._result = result;
+        }
+
+        // The page has left the back stack: it won't show again
+        internal void OnRemovedFromBackStack()
+        {
+            var completion = this.ResultCompletion;
+            this.ResultCompletion = null;
+            completion?.TrySetResult(this._result);
         }
 
         internal protected virtual bool OnNavigatingFrom(

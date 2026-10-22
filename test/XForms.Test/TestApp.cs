@@ -8,10 +8,10 @@ namespace XForms.Test
 
 
         /// <summary>
-        /// The page to start on: "pickers", "panels", "binding", "input", "drawing", "xaml", "benchmark-views" or
-        /// "benchmark-drawn" (otherwise the text and list page). Set by each
-        /// platform's entry point, for example from an environment variable or
-        /// an intent extra.
+        /// The page to start on, as a route without its leading slash
+        /// ("pickers", "lists", "app/2"; see <see cref="OnConfigureRoutes"/>),
+        /// or null for the text and list page. Set by each platform's entry
+        /// point, for example from an environment variable or an intent extra.
         /// </summary>
         public static string StartPage
         {
@@ -84,71 +84,31 @@ namespace XForms.Test
             }
             await ThemeResources.Default.LoadResourcesAsync();
 
-            switch (StartPage?.ToLowerInvariant())
-            {
-                case "pickers":
-                    _ = this.NavigateAsync(new PickersPage());
-                    return;
+            _ = this.NavigateAsync(string.IsNullOrEmpty(StartPage) ? "/" : "/" + StartPage.ToLowerInvariant());
+        }
 
-                case "benchmark-views":
-                    _ = this.NavigateAsync(new BenchmarkPage(drawAsOneView: false));
-                    return;
+        protected override void OnConfigureRoutes(
+            Routes routes)
+        {
+            base.OnConfigureRoutes(routes);
 
-                case "drawing":
-                    _ = this.NavigateAsync(new DrawingPage());
-                    return;
-
-                case "input":
-                    _ = this.NavigateAsync(new InputPage());
-                    return;
-
-                case "binding":
-                    _ = this.NavigateAsync(new BindingPage());
-                    return;
-
-                case "panels":
-                    _ = this.NavigateAsync(new PanelsPage());
-                    return;
-
-                case "text":
-                    _ = this.NavigateAsync(new TextEntryPage());
-                    return;
-
-                case "lists":
-                    _ = this.NavigateAsync(new ListsPage());
-                    return;
-
-                case "app":
-                    _ = this.NavigateAsync(new AppLayerPage());
-                    return;
-
-                case "a11y":
-                    _ = this.NavigateAsync(new AccessibilityPage());
-                    return;
-
-                case "theme":
-                    _ = this.NavigateAsync(new ThemePage());
-                    return;
-
-                case "animation":
-                    _ = this.NavigateAsync(new AnimationPage());
-                    return;
-
-                case "xaml":
-                    _ = this.NavigateAsync(new XamlPage());
-                    return;
-
-                case "benchmark-drawn":
-                    _ = this.NavigateAsync(new BenchmarkPage(drawAsOneView: true));
-                    return;
-            }
-
-            _ = this.NavigateAsync(new TextAndListPage());
-            //this.NavigateAsync(new DockLayoutPage());
-            //this.NavigateAsync(new DistributedStackLayoutPage());
-            //this.NavigateAsync(new TabbedPage());
-            //this.NavigateAsync(new MarginPage());
-            //this.NavigateAsync(new ControlPage());
+            routes.Add("/", _ => new TextAndListPage());
+            routes.Add("/pickers", _ => new PickersPage());
+            routes.Add("/drawing", _ => new DrawingPage());
+            routes.Add("/input", _ => new InputPage());
+            routes.Add("/binding", _ => new BindingPage());
+            routes.Add("/panels", _ => new PanelsPage());
+            routes.Add("/text", _ => new TextEntryPage());
+            routes.Add("/lists", _ => new ListsPage());
+            routes.Add("/app", _ => new AppLayerPage());
+            routes.Add("/app/{depth}", route => new AppLayerPage(route.GetInt32("depth")));
+            routes.Add("/pick-color", _ => new AppLayerPage.ColorPage());
+            routes.Add("/a11y", _ => new AccessibilityPage());
+            routes.Add("/theme", _ => new ThemePage());
+            routes.Add("/animation", _ => new AnimationPage());
+            routes.Add("/xaml", _ => new XamlPage());
+            routes.Add("/benchmark-views", _ => new BenchmarkPage(drawAsOneView: false));
+            routes.Add("/benchmark-drawn", _ => new BenchmarkPage(drawAsOneView: true));
         }
     }
 }

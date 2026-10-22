@@ -2801,6 +2801,39 @@ Win32, Android and the browser, as before.
     page. Nothing is found by reflection or made from a `Type`, so it's
     safe for trimming and AOT.
 
+    **Status: steps 1 and 2 done** (step 2 came with step 1, since taking
+    `NavigateAsync(Page)` away needed the apps' routes):
+    - **Routes:** `Routes` and `Route` in the framework,
+      `Application.OnConfigureRoutes`, `NavigateAsync(path)` and
+      `NavigateAsync<TResult>(path)`, `ShowModalAsync(path)` and
+      `ShowModalAsync<TResult>(path)`, `OpenWindowAsync(path)`,
+      `NavigationStack`, and a page's `NavigationPath` and `SetResult`.
+      The `Page` forms of `NavigateAsync`, `ShowModalAsync` and
+      `OpenWindowAsync` are gone; `Frame.NavigateAsync(Page)` stays, for
+      frames inside a page. A route's function may return null (the item
+      is gone), which counts as no match.
+    - **Changed from the plan:** a page's path is `NavigationPath`, not
+      `Path`, which would hide `System.IO.Path` in every page's code.
+    - **Tests:** a unit test project, `test/XForms.Tests` (xUnit), with 29
+      tests of matching: fixed text and parameters, case, trailing
+      slashes, decoding, which route wins, query values, typed values,
+      routes that clash and bad patterns.
+    - **The apps:** the test app's pages have routes, and its start page
+      (`XFORMS_TEST_PAGE`, the `page` extra, `?page=`) is a path;
+      SoonerOrLater's task page is made by its route, `/item/{id}` or
+      `/item/new?category={category}`, instead of being kept and reused
+      with a view model set on it.
+    - **Verified:** every Win32 test page, light and dark, pixel for pixel
+      (apart from the app page's two new buttons); the SoonerOrLater walk
+      on Win32, pixel for pixel; forward, the stack, Back, and results
+      from a modal page and a navigated page (chosen, and by Back) on
+      Win32, Android and in the browser (headless Edge, since a hidden
+      pane doesn't run animation frames); a window opened by path on
+      Win32; SoonerOrLater's new and edited tasks on Win32, Android and in
+      the browser; the trimming analyzers report nothing new.
+    - **Found, not changed:** in the browser, Escape goes back only while
+      a view has keyboard focus (as it did before this phase).
+
     **How the others do it.** Flutter's go_router, Jetpack Compose
     Navigation and SwiftUI register each route with a function (or
     closure) that makes the page, in ordinary code the compiler and

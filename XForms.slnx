@@ -26,5 +26,6 @@
     <Project Path="test/XForms.Test.iOS/XForms.Test.iOS.csproj" />
     <Project Path="test/XForms.Test.Web/XForms.Test.Web.csproj" />
     <Project Path="test/XForms.Test.Win32/XForms.Test.Win32.csproj" />
+    <Project Path="test/XForms.Tests/XForms.Tests.csproj" />
   </Folder>
 </Solution>

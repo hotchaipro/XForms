@@ -120,6 +120,9 @@ namespace XForms
             this.Renderer.ApplyTheme(theme);
             this.OnThemeChanged(theme);
 
+            // The routes, before the app navigates
+            _ = this.Routes;
+
             this.OnStart();
 
             this.OnLoadResources();
@@ -312,23 +315,109 @@ namespace XForms
             return this.Renderer.GetVersion();
         }
 
-        // The modal pages showing, newest last, with how to complete each
-        private readonly List<(Page Page, Action Complete)> _modals = new List<(Page Page, Action Complete)>();
+        // The modal pages showing, newest last
+        private readonly List<Page> _modals = new List<Page>();
+
+        private Routes _routes;
 
         /// <summary>
-        /// Shows a page (a new instance, or one kept for reuse), keeping the
-        /// current page in the back stack. Pass what the page needs to its
-        /// constructor. Completes when the transition has.
+        /// Lists the app's pages by path, each with a function that makes the
+        /// page from a path that matches (see <see cref="Routes"/>). Called
+        /// once, as the app starts, before <see cref="OnStart"/>.
         /// </summary>
-        public async Task NavigateAsync(
-            Page page,
+        /// <example>
+        /// <code>
+        /// routes.Add("/", _ => new MainPage());
+        /// routes.Add("/item/{id}", route => new ItemPage(route["id"]));
+        /// </code>
+        /// </example>
+        protected virtual void OnConfigureRoutes(
+            Routes routes)
+        {
+        }
+
+        private Routes Routes
+        {
+            get
+            {
+                if (null == this._routes)
+                {
+                    var routes = new Routes();
+                    this.OnConfigureRoutes(routes);
+                    this._routes = routes;
+                }
+
+                return this._routes;
+            }
+        }
+
+        // The page for a path, made by its route; throws when none matches,
+        // since the app navigated to it
+        private Page CreatePage(
+            string path)
+        {
+            ArgumentNullException.ThrowIfNull(path);
+            return this.Routes.CreatePage(path)
+                ?? throw new ArgumentException($"No route matches {path}: add one in OnConfigureRoutes.", nameof(path));
+        }
+
+        /// <summary>
+        /// The paths of the pages in the back stack and the page showing (modal
+        /// pages too), oldest first.
+        /// </summary>
+        public IReadOnlyList<string> NavigationStack
+        {
+            get
+            {
+                var paths = new List<string>();
+                foreach (var page in this._rootFrame.GetStack())
+                {
+                    paths.Add(page.NavigationPath);
+                }
+
+                return paths;
+            }
+        }
+
+        /// <summary>
+        /// Shows the page for a path (see <see cref="OnConfigureRoutes"/>),
+        /// keeping the current page in the back stack. Completes when the
+        /// transition has. Throws when no route matches.
+        /// </summary>
+        public Task NavigateAsync(
+            string path,
             PageTransition transition = null)
         {
-            if (null == page)
+            return this.ShowPageAsync(this.CreatePage(path), transition);
+        }
+
+        /// <summary>
+        /// Shows the page for a path, as <see cref="NavigateAsync(string, PageTransition)"/>,
+        /// and completes when the page leaves the back stack, with the result
+        /// it set (see <see cref="Page.SetResult"/>), or the type's default.
+        /// </summary>
+        public async Task<TResult> NavigateAsync<TResult>(
+            string path,
+            PageTransition transition = null)
+        {
+            var page = this.CreatePage(path);
+            var completion = new TaskCompletionSource<object>();
+            page.ResultCompletion = completion;
+
+            await this.ShowPageAsync(page, transition);
+            if (this._rootFrame.CurrentPage != page)
             {
-                throw new ArgumentNullException(nameof(page));
+                // The current page didn't let it show
+                page.OnRemovedFromBackStack();
             }
 
+            return ToResult<TResult>(await completion.Task, path);
+        }
+
+        private async Task ShowPageAsync(
+            Page page,
+            PageTransition transition)
+        {
             // Close any open popups before navigating
             while (this.TryClosePopup())
             {
@@ -336,6 +425,23 @@ namespace XForms
 
             await this._rootFrame.NavigateAsync(page, transition);
             this.OnNavigationComplete();
+        }
+
+        private static TResult ToResult<TResult>(
+            object result,
+            string path)
+        {
+            if (result is TResult typed)
+            {
+                return typed;
+            }
+
+            if (null == result)
+            {
+                return default;
+            }
+
+            throw new InvalidCastException($"The page for {path} gave a {result.GetType().Name}, not a {typeof(TResult).Name}.");
         }
 
         /// <summary>
@@ -352,8 +458,7 @@ namespace XForms
 
             if (0 < this._modals.Count)
             {
-                var modal = this._modals[this._modals.Count - 1];
-                return await this.CloseModalAsync(modal.Page);
+                return await this.CloseModalAsync(this._modals[this._modals.Count - 1]);
             }
 
             bool didGoBack = await this._rootFrame.GoBackAsync();
@@ -362,43 +467,53 @@ namespace XForms
         }
 
         /// <summary>
-        /// Shows a page over the current one, sliding up. Completes when it's
-        /// closed: by Back, or by the page (<see cref="Page.CloseModalAsync"/>).
+        /// Shows the page for a path over the current one, sliding up.
+        /// Completes when it's closed: by Back, or by the page
+        /// (<see cref="Page.CloseModalAsync"/>).
         /// </summary>
-        public async Task ShowModalAsync(
-            Page page)
+        public Task ShowModalAsync(
+            string path)
         {
-            if (null == page)
+            return this.ShowModalAsync<object>(path);
+        }
+
+        /// <summary>
+        /// Shows the page for a path over the current one, as
+        /// <see cref="ShowModalAsync(string)"/>, and completes with the result
+        /// it set (see <see cref="Page.SetResult"/>), or the type's default.
+        /// </summary>
+        public async Task<TResult> ShowModalAsync<TResult>(
+            string path)
+        {
+            var page = this.CreatePage(path);
+            var completion = new TaskCompletionSource<object>();
+            page.ResultCompletion = completion;
+            this._modals.Add(page);
+
+            await this.ShowPageAsync(page, PageTransition.SlideUp);
+            if (this._rootFrame.CurrentPage != page)
             {
-                throw new ArgumentNullException(nameof(page));
+                // The current page didn't let it show
+                this._modals.Remove(page);
+                page.OnRemovedFromBackStack();
             }
 
-            var completion = new TaskCompletionSource();
-            this._modals.Add((page, () => completion.TrySetResult()));
-
-            while (this.TryClosePopup())
-            {
-            }
-
-            await this._rootFrame.NavigateAsync(page, PageTransition.SlideUp);
-            this.OnNavigationComplete();
-            await completion.Task;
+            return ToResult<TResult>(await completion.Task, path);
         }
 
         /// <summary>
         /// Closes a modal page (and any pages shown after it), completing its
-        /// <see cref="ShowModalAsync(Page)"/>.
+        /// <see cref="ShowModalAsync(string)"/>.
         /// </summary>
         internal async Task<bool> CloseModalAsync(
             Page page)
         {
-            int index = this._modals.FindIndex((modal) => modal.Page == page);
+            int index = this._modals.IndexOf(page);
             if (index < 0)
             {
                 return false;
             }
 
-            var modal = this._modals[index];
             this._modals.RemoveAt(index);
 
             // Back to the page beneath the modal page
@@ -409,7 +524,6 @@ namespace XForms
 
             await this._rootFrame.GoBackAsync(PageTransition.SlideUp);
             this.OnNavigationComplete();
-            modal.Complete();
             return true;
         }
 
@@ -566,19 +680,16 @@ namespace XForms
         }
 
         /// <summary>
-        /// Opens a window showing the page, in a frame of its own. Throws where
+        /// Opens a window showing the page for a path (see
+        /// <see cref="OnConfigureRoutes"/>), in a frame of its own. Throws where
         /// the platform has one window (see <see cref="CanOpenWindows"/>).
         /// </summary>
         public async Task<Window> OpenWindowAsync(
-            Page page,
+            string path,
             string title = null,
             Size? size = null)
         {
-            if (null == page)
-            {
-                throw new ArgumentNullException(nameof(page));
-            }
-
+            var page = this.CreatePage(path);
             if (!this.CanOpenWindows)
             {
                 throw new PlatformNotSupportedException("This platform shows one window.");

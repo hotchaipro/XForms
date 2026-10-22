@@ -20,7 +20,7 @@ namespace XForms.Test
         {
         }
 
-        private AppLayerPage(
+        public AppLayerPage(
             int depth)
         {
             var layout = new StackPanel() { Spacing = 10, Padding = new Thickness(16) };
@@ -30,12 +30,23 @@ namespace XForms.Test
             this._status = new TextBlock() { FontSize = 13, TextWrapping = TextWrapping.Wrap };
             layout.Children.Add(this._status);
 
-            // Navigation: parameters go to the page's constructor
+            // Navigation: by path, which the page's route turns into its
+            // constructor's parameters
             var navigation = new WrapPanel() { ItemSpacing = 8, LineSpacing = 8 };
-            navigation.Children.Add(this.CreateButton("Next (slide)", () => _ = this.Application.NavigateAsync(new AppLayerPage(depth + 1))));
-            navigation.Children.Add(this.CreateButton("Next (fade)", () => _ = this.Application.NavigateAsync(new AppLayerPage(depth + 1), PageTransition.Fade)));
+            navigation.Children.Add(this.CreateButton("Next (slide)", () => _ = this.Application.NavigateAsync($"/app/{depth + 1}")));
+            navigation.Children.Add(this.CreateButton("Next (fade)", () => _ = this.Application.NavigateAsync($"/app/{depth + 1}", PageTransition.Fade)));
             navigation.Children.Add(this.CreateButton("Back", async () => this.Show($"Went back: {await this.Application.GoBackAsync()}")));
-            navigation.Children.Add(this.CreateButton("Pick a color", this.PickColorAsync));
+            navigation.Children.Add(this.CreateButton("Stack", () => this.Show($"Stack: {string.Join(" ", this.Application.NavigationStack)}")));
+            navigation.Children.Add(this.CreateButton("Pick a color", async () =>
+            {
+                string color = await this.Application.ShowModalAsync<string>("/pick-color");
+                this.Show($"Modal result: {color ?? "(closed)"}");
+            }));
+            navigation.Children.Add(this.CreateButton("Pick (page)", async () =>
+            {
+                string color = await this.Application.NavigateAsync<string>("/pick-color");
+                this.Show($"Page result: {color ?? "(went back)"}");
+            }));
             navigation.Children.Add(this.CreateButton("Message box", async () => this.Show($"Message box: {await MessageBox.ShowAsync("Delete everything?", "Confirm")}")));
             if (null != TestApp.RecreateHost)
             {
@@ -97,7 +108,7 @@ namespace XForms.Test
                     return;
                 }
 
-                var opened = await this.Application.OpenWindowAsync(new AppLayerPage(depth + 1), $"XForms Test, window {this.Application.Windows.Count + 1}", new Size(520, 420));
+                var opened = await this.Application.OpenWindowAsync($"/app/{depth + 1}",$"XForms Test, window {this.Application.Windows.Count + 1}", new Size(520, 420));
                 opened.Closed += (sender, e) => this.Show($"A window closed; {this.Application.Windows.Count} open");
                 this.Show($"{this.Application.Windows.Count} windows open");
             }));
@@ -160,13 +171,6 @@ namespace XForms.Test
             this.ShowWindow();
         }
 
-        private async void PickColorAsync()
-        {
-            var page = new ColorPage();
-            await this.Application.ShowModalAsync(page);
-            this.Show($"Modal result: {page.Color ?? "(closed)"}");
-        }
-
         private void ShowWindow()
         {
             var window = this.Application.MainWindow;
@@ -195,17 +199,10 @@ namespace XForms.Test
             return button;
         }
 
-        // A modal page that closes with the color chosen
-        private sealed class ColorPage : Page
+        // A page that gives back the color chosen (or nothing, by Back), shown
+        // as a modal page or navigated to
+        internal sealed class ColorPage : Page
         {
-            /// <summary>
-            /// The color chosen, or null if the page was closed by Back.
-            /// </summary>
-            public string Color
-            {
-                get;
-                private set;
-            }
             public ColorPage()
             {
                 var layout = new StackPanel() { Spacing = 10, Padding = new Thickness(24) };
@@ -215,8 +212,9 @@ namespace XForms.Test
                     var button = new Button() { Text = name, Width = 140, Height = 40, HorizontalAlignment = HorizontalAlignment.Left };
                     button.Clicked += (sender, e) =>
                     {
-                        this.Color = name;
-                        _ = this.CloseModalAsync();
+                        // Back closes it as a modal page, or returns from it
+                        this.SetResult(name);
+                        _ = this.Application.GoBackAsync();
                     };
                     layout.Children.Add(button);
                 }

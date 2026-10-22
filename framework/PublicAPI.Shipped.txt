@@ -94,16 +94,13 @@ XForms.Application.GoBackAsync() -> System.Threading.Tasks.Task<bool>
 XForms.Application.InvalidateTheme() -> void
 XForms.Application.IsStarted.get -> bool
 XForms.Application.MainWindow.get -> XForms.Window
-XForms.Application.NavigateAsync(XForms.Page page, XForms.PageTransition transition = null) -> System.Threading.Tasks.Task
 XForms.Application.OpenUri(System.Uri uri) -> void
-XForms.Application.OpenWindowAsync(XForms.Page page, string title = null, XForms.Size? size = null) -> System.Threading.Tasks.Task<XForms.Window>
 XForms.Application.PreviewKeyDown -> System.EventHandler<XForms.KeyEventArgs>
 XForms.Application.PreviewPointerInput -> System.EventHandler<XForms.PointerEventArgs>
 XForms.Application.RegisterFont(string familyName, string fileName) -> void
 XForms.Application.RequestAnimationFrame(System.Action<System.TimeSpan> callback) -> void
 XForms.Application.RequestedThemeMode.get -> XForms.ThemeMode?
 XForms.Application.RequestedThemeMode.set -> void
-XForms.Application.ShowModalAsync(XForms.Page page) -> System.Threading.Tasks.Task
 XForms.Application.SystemThemeMode.get -> XForms.ThemeMode
 XForms.Application.TextScale.get -> float
 XForms.Application.TextScaleChanged -> System.EventHandler
