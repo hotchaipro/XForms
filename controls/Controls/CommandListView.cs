@@ -86,7 +86,7 @@ namespace XForms.Controls
     /// An item view in a <see cref="CommandListView"/>, which can show or hide
     /// its command bar.
     /// </summary>
-    public class CommandListViewItem : ContentControl
+    public class CommandListViewItem : TemplatedContentControl
     {
         private object _item;
 
@@ -119,14 +119,7 @@ namespace XForms.Controls
         {
         }
 
-        // An opaque row, so the swipe commands beneath show only when it moves
-        public override Color BackgroundColor
-        {
-            get
-            {
-                return this.ActualTheme.Colors.Background;
-            }
-        }
+
 
         private CommandListViewItemContainer CommandContainer
         {
@@ -447,8 +440,8 @@ namespace XForms.Controls
 
             this._contentLayout.Animator.Translation = new Point(position, 0);
             this._swipeItem.Animator.Translation = new Point(position - (direction * this.Bounds.Size.Width), 0);
-            float dimmedOpacity = (this.ActualTheme.Mode == ThemeMode.Light ? 0.1f : 0.25f);
-            this._swipeItem.Animator.Opacity = (this._swipeEnabled ? 1.0f : dimmedOpacity);
+            // Dimmed while a longer swipe is needed
+            this._swipeItem.IsEnabled = this._swipeEnabled;
 
             return true;
         }

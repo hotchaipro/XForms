@@ -22,10 +22,25 @@ namespace XForms.Themes.Simple
     }
 
     // What shows behind a swiped row: the command's icon and text, in white,
-    // on its color (the control's background)
+    // on its color (the control's background), dimmed while the swipe isn't
+    // long enough to run it (the item isn't enabled)
     internal sealed class ListViewSwipeItemTemplate : ControlTemplate<ListViewSwipeItem>
     {
         private const float Padding = 10.0f;
+
+        protected override void OnStateChanged(
+            ListViewSwipeItem control,
+            TemplateContext context)
+        {
+            // NOTE: The row's container moves the item with its animator; the
+            // whole layer dims
+            var animator = control.Animator;
+            if (null != animator)
+            {
+                float dimmed = (control.ActualTheme.Mode == ThemeMode.Light) ? 0.1f : 0.25f;
+                animator.Opacity = control.IsEnabled ? 1.0f : dimmed;
+            }
+        }
 
         private static readonly TextFormat PrimaryFormat = new TextFormat()
         {

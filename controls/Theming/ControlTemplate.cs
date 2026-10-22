@@ -34,6 +34,10 @@ namespace XForms.Controls
         internal abstract bool ArrangeCore(View control, Size finalSize);
 
         internal abstract void OnStateChangedCore(View control, TemplateContext context);
+
+        internal abstract Color? BackgroundCore(View control);
+
+        internal abstract void OnThemeChangedCore(View control, TemplateContext context);
     }
 
     /// <summary>
@@ -76,11 +80,33 @@ namespace XForms.Controls
         }
 
         /// <summary>
-        /// Draws the control (beneath its parts and content).
+        /// Draws the control (beneath its parts and content), for a control
+        /// that draws itself (such as a <see cref="TemplatedControl"/>).
         /// </summary>
-        protected abstract void Render(
+        protected virtual void Render(
             TControl control,
-            DrawingContext drawingContext);
+            DrawingContext drawingContext)
+        {
+        }
+
+        /// <summary>
+        /// Called when the control's theme changes but keeps this template
+        /// (such as a new mode or accent color), to restyle its parts.
+        /// </summary>
+        protected virtual void OnThemeChanged(
+            TControl control,
+            TemplateContext context)
+        {
+        }
+
+        /// <summary>
+        /// The control's background, or null for none (transparent).
+        /// </summary>
+        protected virtual Color? Background(
+            TControl control)
+        {
+            return null;
+        }
 
         /// <summary>
         /// The size the control needs, within its padding; or null for the
@@ -127,6 +153,10 @@ namespace XForms.Controls
         internal sealed override bool ArrangeCore(View control, Size finalSize) => this.Arrange((TControl)control, finalSize);
 
         internal sealed override void OnStateChangedCore(View control, TemplateContext context) => this.OnStateChanged((TControl)control, context);
+
+        internal sealed override Color? BackgroundCore(View control) => this.Background((TControl)control);
+
+        internal sealed override void OnThemeChangedCore(View control, TemplateContext context) => this.OnThemeChanged((TControl)control, context);
     }
 
     /// <summary>

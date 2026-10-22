@@ -12,12 +12,13 @@ namespace XForms.Controls
         OK = 1,
     }
 
+    /// <summary>
+    /// A flyout asking the user to confirm something, with OK and Cancel.
+    /// </summary>
     public class MessageBox : Flyout
     {
         private TaskCompletionSource<MessageBoxResult> _task;
-        private string _message, _title;
         private MessageBoxResult _result;
-        private TextBlock _messageView;
 
         public static async Task<MessageBoxResult> ShowAsync(
             string message,
@@ -25,6 +26,7 @@ namespace XForms.Controls
         {
             var messageBox = new MessageBox(message, title);
             var result = await messageBox.ShowMessageBoxAsync();
+
             return result;
         }
 
@@ -42,74 +44,14 @@ namespace XForms.Controls
                 throw new ArgumentNullException(nameof(title));
             }
 
-            this._message = message;
-            this._title = title;
             this._result = MessageBoxResult.Cancel;
-
-            var contentLayout = new DockPanel()
-            {
-                MaxWidth = 300f,
-            };
-
-            this._messageView = new TextBlock()
-            {
-                Text = this._message,
-                Foreground = Colors.White,
-                FontSize = 14f,
-                TextWrapping = TextWrapping.Wrap,
-                HorizontalAlignment = HorizontalAlignment.Stretch,
-                VerticalAlignment = VerticalAlignment.Stretch,
-                Margin = new Thickness(20),
-            };
-            contentLayout.Children.Add(this._messageView, Dock.Top);
-
-            var buttonsLayout = new UniformGrid()
-            {
-                HorizontalAlignment = HorizontalAlignment.Stretch,
-                VerticalAlignment = VerticalAlignment.Bottom,
-            };
-            contentLayout.Children.Add(buttonsLayout, Dock.Top);
-
-            var cancelButton = new Button()
-            {
-                Text = "Cancel",
-                IsAlertStyle = true,
-                Width = 100,
-                Height = 30,
-                Margin = new Thickness(5),
-                HorizontalAlignment = HorizontalAlignment.Center,
-            };
-            cancelButton.Clicked += CancelButton_Clicked;
-            buttonsLayout.Children.Add(cancelButton);
-
-            var okButton = new Button()
-            {
-                Text = "Ok",
-                IsAlertStyle = true,
-                Width = 100,
-                Height = 30,
-                Margin = new Thickness(5),
-                HorizontalAlignment = HorizontalAlignment.Center,
-            };
-            okButton.Clicked += OkButton_Clicked;
-            buttonsLayout.Children.Add(okButton);
-
-            this.Content = contentLayout;
+            this.Content = new MessageBoxView(this, message, title);
         }
 
-        private void CancelButton_Clicked(
-            object sender,
-            EventArgs e)
+        internal void Choose(
+            MessageBoxResult result)
         {
-            this._result = MessageBoxResult.Cancel;
-            this.Close();
-        }
-
-        private void OkButton_Clicked(
-            object sender,
-            EventArgs e)
-        {
-            this._result = MessageBoxResult.OK;
+            this._result = result;
             this.Close();
         }
 
@@ -124,19 +66,50 @@ namespace XForms.Controls
             return result;
         }
 
-        protected override void OnThemeChanged(
-            Theme theme)
-        {
-            base.OnThemeChanged(theme);
-
-            this._messageView.Foreground = theme.Colors.OnSurface;
-        }
-
         protected override void OnClosed()
         {
             base.OnClosed();
 
             this._task?.SetResult(this._result);
+        }
+    }
+
+    /// <summary>
+    /// A <see cref="MessageBox"/>'s content: its message, and the choices. Its
+    /// theme's template lays it out, with buttons that call
+    /// <see cref="Choose"/>.
+    /// </summary>
+    public sealed class MessageBoxView : TemplatedContentControl
+    {
+        private readonly MessageBox _messageBox;
+
+        internal MessageBoxView(
+            MessageBox messageBox,
+            string message,
+            string title)
+        {
+            this._messageBox = messageBox;
+            this.Message = message;
+            this.Title = title;
+        }
+
+        public string Message
+        {
+            get;
+        }
+
+        public string Title
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Closes the message box with the user's choice.
+        /// </summary>
+        public void Choose(
+            MessageBoxResult result)
+        {
+            this._messageBox.Choose(result);
         }
     }
 }

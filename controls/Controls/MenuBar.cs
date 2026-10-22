@@ -5,7 +5,7 @@ using XForms.Primitives;
 
 namespace XForms.Controls
 {
-    public class MenuBar : ContentControl, IMenuItemContainer
+    public class MenuBar : TemplatedContentControl, IMenuItemContainer
     {
         private DockPanel _buttonsLayout;
 
@@ -30,21 +30,6 @@ namespace XForms.Controls
         public MenuItemCollection MenuItems
         {
             get;
-        }
-
-        public override Color BackgroundColor
-        {
-            get
-            {
-                if (this.ActualTheme.Mode != ThemeMode.Light)
-                {
-                    return this.ActualTheme.Colors.Surface;
-                }
-                else
-                {
-                    return this.ActualTheme.Colors.Accent;
-                }
-            }
         }
 
         void IMenuItemContainer.Add(

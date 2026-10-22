@@ -51,7 +51,12 @@ namespace XForms.Themes.Simple
             .With(new PopupFrameTemplate())
             .With(new ComboBoxItemsViewTemplate())
             .With(new CalendarViewTemplate())
-            .With(new ProgressRingTemplate());
+            .With(new ProgressRingTemplate())
+            .With(new MenuBarTemplate())
+            .With(new TabStripTemplate())
+            .With(new CommandListViewItemTemplate())
+            .With(new HyperlinkButtonTemplate())
+            .With(new MessageBoxTemplate());
 
         private static Theme WithDefault<TExtension>(
             Theme theme,

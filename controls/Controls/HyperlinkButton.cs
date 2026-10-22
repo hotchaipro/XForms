@@ -5,19 +5,16 @@ using XForms.Primitives;
 
 namespace XForms.Controls
 {
-    public class HyperlinkButton : ContentControl, ITapGestureDelegate
+    /// <summary>
+    /// Content that opens a URI when tapped. Its theme's template gives it
+    /// its feedback.
+    /// </summary>
+    public class HyperlinkButton : TemplatedContentControl, ITapGestureDelegate
     {
-        // Animates the control itself (press feedback, spinning)
-        private readonly Animator _ownAnimator;
-
-        private const float TouchDownScale = 0.9f;
-
         private UriNavigationCommand _command;
 
         public HyperlinkButton()
         {
-            this._ownAnimator = this.CreateOwnAnimator();
-
             this.GestureRecognizers.Add(new TapGestureRecognizer(this));
         }
 
@@ -56,12 +53,12 @@ namespace XForms.Controls
 
         void ITapGestureDelegate.OnTapBegan()
         {
-            this._ownAnimator.ScaleTo(TouchDownScale, TimeSpan.FromMilliseconds(25), new CubicEase(EasingMode.EaseIn));
+            this.IsPressed = true;
         }
 
         void ITapGestureDelegate.OnTapEnded()
         {
-            this._ownAnimator.ScaleTo(1.0f, this.ActualTheme.Motion.Short, new CubicEase(EasingMode.EaseIn));
+            this.IsPressed = false;
         }
 
         void ITapGestureDelegate.OnTapped()

@@ -36,7 +36,7 @@ namespace XForms.Controls
         }
     }
 
-    public class TabStrip : ContentControl
+    public class TabStrip : TemplatedContentControl
     {
         private UniformGrid _buttonsLayout;
         private TabStripItem _selection;
@@ -63,21 +63,6 @@ namespace XForms.Controls
             get
             {
                 return this._selection?.TabPage;
-            }
-        }
-
-        public override Color BackgroundColor
-        {
-            get
-            {
-                if (this.ActualTheme.Mode != ThemeMode.Light)
-                {
-                    return this.ActualTheme.Colors.Surface;
-                }
-                else
-                {
-                    return this.ActualTheme.Colors.Accent;
-                }
             }
         }
 

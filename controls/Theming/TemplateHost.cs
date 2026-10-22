@@ -62,6 +62,7 @@ namespace XForms.Controls
 
             if (template == this._template)
             {
+                template.OnThemeChangedCore(this._view, this.Context);
                 return;
             }
 
@@ -76,6 +77,17 @@ namespace XForms.Controls
             template.OnStateChangedCore(this._view, this.Context);
             this._view.InvalidateMeasure();
             this._view.InvalidateVisual();
+        }
+
+        /// <summary>
+        /// The template's background for the view, or null.
+        /// </summary>
+        public Color? Background
+        {
+            get
+            {
+                return this._template?.BackgroundCore(this._view);
+            }
         }
 
         public void OnStateChanged()
