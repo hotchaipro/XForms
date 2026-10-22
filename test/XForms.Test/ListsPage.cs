@@ -22,12 +22,12 @@ namespace XForms.Test
         };
 
         private readonly ObservableCollection<string> _fruits = new ObservableCollection<string>(Fruits);
-        private readonly ListView<string> _list;
-        private readonly TextBlock _status;
+        private ListView<string> _list;
+        private TextBlock _status;
         private string _lastClick = "none";
         private int _added;
 
-        public ListsPage()
+        protected override View Build()
         {
             var page = new DockPanel();
 
@@ -77,8 +77,8 @@ namespace XForms.Test
             };
             page.Children.Add(this._list, Dock.CenterOverlay);
 
-            this.Content = page;
             this.UpdateStatus();
+            return page;
         }
 
         private Button CreateButton(

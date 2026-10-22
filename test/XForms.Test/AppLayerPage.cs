@@ -13,7 +13,8 @@ namespace XForms.Test
     /// </summary>
     public class AppLayerPage : Page
     {
-        private readonly TextBlock _status;
+        private readonly int _depth;
+        private TextBlock _status;
 
         public AppLayerPage()
             : this(1)
@@ -23,6 +24,16 @@ namespace XForms.Test
         public AppLayerPage(
             int depth)
         {
+            this._depth = depth;
+
+            // Once, not on every build
+            this.Application.MainWindow.SizeChanged += (sender, e) => this.ShowWindow();
+            this.Application.TextScaleChanged += (sender, e) => this.ShowWindow();
+        }
+
+        protected override View Build()
+        {
+            int depth = this._depth;
             var layout = new StackPanel() { Spacing = 10, Padding = new Thickness(16) };
 
             layout.Children.Add(new TextBlock() { Text = $"Page {depth}", FontSize = 22, FontWeight = FontWeight.SemiBold });
@@ -157,12 +168,9 @@ namespace XForms.Test
             }));
             layout.Children.Add(system);
 
-            this.Application.MainWindow.SizeChanged += (sender, e) => this.ShowWindow();
-            this.Application.TextScaleChanged += (sender, e) => this.ShowWindow();
-
             var page = new DockPanel();
             page.Children.Add(layout, Dock.CenterOverlay);
-            this.Content = page;
+            return page;
         }
 
         protected override void OnAttached()
@@ -184,10 +192,15 @@ namespace XForms.Test
             this.Show($"Network changed: {Connectivity.Default.NetworkAccess}");
         }
 
+        // Before the page is built (the window resized first), there's
+        // nowhere to show it
         private void Show(
             string message)
         {
-            this._status.Text = message;
+            if (null != this._status)
+            {
+                this._status.Text = message;
+            }
         }
 
         private Button CreateButton(
@@ -203,7 +216,7 @@ namespace XForms.Test
         // as a modal page or navigated to
         internal sealed class ColorPage : Page
         {
-            public ColorPage()
+            protected override View Build()
             {
                 var layout = new StackPanel() { Spacing = 10, Padding = new Thickness(24) };
                 layout.Children.Add(new TextBlock() { Text = "Pick a color", FontSize = 22 });
@@ -221,7 +234,7 @@ namespace XForms.Test
 
                 var page = new DockPanel();
                 page.Children.Add(layout, Dock.CenterOverlay);
-                this.Content = page;
+                return page;
             }
         }
     }

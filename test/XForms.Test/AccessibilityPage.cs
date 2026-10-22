@@ -12,9 +12,9 @@ namespace XForms.Test
     /// </summary>
     public class AccessibilityPage : Page
     {
-        private readonly TextBlock _status;
+        private TextBlock _status;
 
-        public AccessibilityPage()
+        protected override View Build()
         {
             var layout = new StackPanel() { Spacing = 10, Padding = new Thickness(16) };
 
@@ -70,7 +70,7 @@ namespace XForms.Test
             var page = new DockPanel();
             page.Children.Add(layout, Dock.Top);
             page.Children.Add(list, Dock.CenterOverlay);
-            this.Content = page;
+            return page;
         }
 
         private void Show(

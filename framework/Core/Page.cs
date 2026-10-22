@@ -78,7 +78,8 @@ namespace XForms
         }
 
         /// <summary>
-        /// The page's content, which fills it.
+        /// The page's content, which fills it: what <see cref="Build"/>
+        /// returns.
         /// </summary>
         public View Content
         {
@@ -87,7 +88,7 @@ namespace XForms
                 return this._content;
             }
 
-            set
+            protected set
             {
                 if (value == this._content)
                 {
@@ -104,6 +105,52 @@ namespace XForms
                 {
                     this.AddVisualChild(value);
                 }
+            }
+        }
+
+        private bool _isBuilt;
+
+        /// <summary>
+        /// Builds the page's views, and returns its content. XForms calls it
+        /// once, as the page is first shown (before its native object exists),
+        /// and again after an edit while the app runs with hot reload.
+        /// </summary>
+        /// <remarks>
+        /// The page's views are built here, not in its constructor, which sets
+        /// up only its state (a view model, the item it shows). A field that
+        /// refers to a view is assigned here, so after a rebuild it refers to
+        /// the new view. Subscriptions to objects outside the page (the
+        /// window, a view model) belong in the constructor or
+        /// <see cref="View.OnAttached"/>, which run once.
+        /// </remarks>
+        protected virtual View Build()
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// Whether <see cref="Build"/> has run: the page's views exist.
+        /// </summary>
+        protected bool IsBuilt
+        {
+            get
+            {
+                return this._isBuilt;
+            }
+        }
+
+        internal override void OnBuilding()
+        {
+            if (this._isBuilt)
+            {
+                return;
+            }
+
+            this._isBuilt = true;
+            var content = this.Build();
+            if (null != content)
+            {
+                this.Content = content;
             }
         }
 

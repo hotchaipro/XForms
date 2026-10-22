@@ -12,11 +12,11 @@ namespace XForms.Test
     /// </summary>
     public class TextAndListPage : Page
     {
-        private readonly ObservableCollection<string> _tasks;
-        private readonly TextBox _titleEntry;
-        private readonly TextBox _notesEntry;
+        private ObservableCollection<string> _tasks;
+        private TextBox _titleEntry;
+        private TextBox _notesEntry;
 
-        public TextAndListPage()
+        protected override View Build()
         {
             var pageLayout = new DockPanel();
 
@@ -81,7 +81,7 @@ namespace XForms.Test
             };
             pageLayout.Children.Add(listView, Dock.CenterOverlay);
 
-            this.Content = pageLayout;
+            return pageLayout;
         }
 
         private void AddButton_Clicked(

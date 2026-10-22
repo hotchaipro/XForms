@@ -53,14 +53,15 @@ namespace XForms.Test
   </StackPanel>
 </Page>";
 
-        public XamlPage()
+        // The page's state, kept when it's built again
+        private readonly GreetingViewModel _viewModel = new GreetingViewModel();
+
+        protected override View Build()
         {
-            var viewModel = new GreetingViewModel();
-            var view = XamlLoader.Load(Markup, viewModel);
+            var view = XamlLoader.Load(Markup, this._viewModel);
 
             var layout = new DockPanel();
             layout.Children.Add(view.Root, Dock.CenterOverlay);
-            this.Content = layout;
 
             // GAP: Views have no "attached" or "loaded" event. WORKAROUND: start
             // the storyboard once the UI thread has finished building the page.
@@ -68,6 +69,8 @@ namespace XForms.Test
             {
                 this.Application.Dispatcher.Post(storyboard.Begin);
             }
+
+            return layout;
         }
 
         private sealed class GreetingViewModel : INotifyPropertyChanged
@@ -105,7 +108,7 @@ namespace XForms.Test
 
         private sealed class DelegateCommand : ICommand
         {
-            private readonly Action _execute;
+            private Action _execute;
 
             public DelegateCommand(Action execute)
             {

@@ -13,13 +13,13 @@ namespace XForms.Test
     /// </summary>
     public class ThemePage : Page
     {
-        private readonly TextBlock _status;
-        private readonly Button _ownStyleButton;
+        private TextBlock _status;
+        private Button _ownStyleButton;
 
         // One button's own look: the page's theme, with its own button style
         private static readonly ButtonStyle OwnStyle = new ButtonStyle() { Background = Color.FromRgb(0xff9800), Foreground = Colors.Black, CornerRadius = 18 };
 
-        public ThemePage()
+        protected override View Build()
         {
             var layout = new StackPanel()
             {
@@ -78,7 +78,7 @@ namespace XForms.Test
 
             var page = new DockPanel();
             page.Children.Add(layout, Dock.CenterOverlay);
-            this.Content = page;
+            return page;
         }
 
         protected override void OnThemeChanged(
@@ -113,7 +113,7 @@ namespace XForms.Test
         // A line of text in one of the theme's text styles
         private sealed class TypeSample : TextBlock
         {
-            private readonly Func<Typography, TextStyle> _style;
+            private Func<Typography, TextStyle> _style;
 
             public TypeSample(
                 Func<Typography, TextStyle> style,

@@ -8,7 +8,7 @@ namespace XForms.Test
 {
     public class ControlPage : Page, ITapGestureDelegate
     {
-        public ControlPage()
+        protected override View Build()
         {
             var pageLayout = new DockPanel()
             {
@@ -104,7 +104,7 @@ namespace XForms.Test
             scrollView.Content = contentLayout;
             pageLayout.Children.Add(scrollView, Dock.CenterOverlay);
 
-            this.Content = pageLayout;
+            return pageLayout;
         }
 
         void ITapGestureDelegate.OnTapBegan()

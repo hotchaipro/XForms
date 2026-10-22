@@ -14,9 +14,12 @@ namespace XForms.Test
     {
         private static readonly TimeSpan Second = TimeSpan.FromSeconds(1);
 
-        private readonly TextBlock _status;
+        private TextBlock _status;
 
-        public AnimationPage()
+        // Counts builds, so a frame loop stops once a newer build replaces it
+        private int _builds;
+
+        protected override View Build()
         {
             var layout = new StackPanel()
             {
@@ -111,6 +114,7 @@ namespace XForms.Test
             layout.Children.Add(frames);
             int count = 0;
             TimeSpan start = TimeSpan.Zero;
+            int build = ++this._builds;
             void OnFrame(TimeSpan time)
             {
                 if (start == TimeSpan.Zero)
@@ -126,17 +130,18 @@ namespace XForms.Test
                     start = time;
                 }
 
-                if (null != this.Parent)
+                if ((null != this.Parent) && (build == this._builds))
                 {
                     this.Application.RequestAnimationFrame(OnFrame);
                 }
             }
 
-            this.Attached += (sender, e) => this.Application.RequestAnimationFrame(OnFrame);
+            // Build runs as the page is attached
+            this.Application.RequestAnimationFrame(OnFrame);
 
             var page = new DockPanel();
             page.Children.Add(layout, Dock.CenterOverlay);
-            this.Content = page;
+            return page;
         }
 
         private View CreateChip(

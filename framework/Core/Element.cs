@@ -159,7 +159,9 @@ namespace XForms
 
         private void CreateRendererNow()
         {
-            // The element knows its theme, and has no native object yet
+            // The element knows its theme, and has no native object yet: it
+            // builds its views (a page's Build), then sets up the rest
+            this.OnBuilding();
             this.OnAttaching(this.ActualTheme);
 
             var renderer = this.CreateRenderer();
@@ -286,6 +288,12 @@ namespace XForms
         /// </summary>
         protected virtual void OnAttaching(
             Theme theme)
+        {
+        }
+
+        // As the element is first attached, before OnAttaching: it builds its
+        // views (a page calls its Build)
+        internal virtual void OnBuilding()
         {
         }
 

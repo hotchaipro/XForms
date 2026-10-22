@@ -13,7 +13,7 @@ namespace XForms.Test
     /// </summary>
     public class DrawingPage : Page
     {
-        public DrawingPage()
+        protected override View Build()
         {
             var layout = new StackPanel()
             {
@@ -65,7 +65,7 @@ namespace XForms.Test
 
             var page = new DockPanel();
             page.Children.Add(layout, Dock.CenterOverlay);
-            this.Content = page;
+            return page;
         }
 
         private static string RegisterTestFont(

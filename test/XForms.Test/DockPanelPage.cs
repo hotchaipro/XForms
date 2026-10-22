@@ -7,7 +7,7 @@ namespace XForms.Test
 {
     public class DockPanelPage : Page
     {
-        public DockPanelPage()
+        protected override View Build()
         {
             Color backgroundColor = Color.FromArgb(0x80, 0xff, 0, 0);
             Size wideSize = new Size(150, Dimension.Auto);
@@ -476,7 +476,7 @@ namespace XForms.Test
             };
             pageLayout.Children.Add(image, Dock.CenterOverlay);
 
-            this.Content = pageLayout;
+            return pageLayout;
         }
     }
 }

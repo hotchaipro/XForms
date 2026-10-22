@@ -13,7 +13,7 @@ namespace XForms.Test
     /// </summary>
     public class BindingPage : Page
     {
-        public BindingPage()
+        protected override View Build()
         {
             var viewModel = new PersonViewModel();
 
@@ -64,7 +64,7 @@ namespace XForms.Test
 
             var page = new DockPanel();
             page.Children.Add(layout, Dock.CenterOverlay);
-            this.Content = page;
+            return page;
         }
 
         private sealed class PersonViewModel : INotifyPropertyChanged

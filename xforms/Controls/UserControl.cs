@@ -32,6 +32,55 @@ namespace XForms.Controls
             }
         }
 
+        private bool _isBuilt;
+
+        /// <summary>
+        /// Builds the control's views, and returns its content. XForms calls
+        /// it once, as the control is first attached (before its native object
+        /// exists), and again after an edit while the app runs with hot reload.
+        /// A control whose content is given to it instead (as a border's
+        /// child) sets <see cref="Content"/>.
+        /// </summary>
+        /// <remarks>
+        /// The control's views are built here, not in its constructor, which
+        /// sets up only its state. A field that refers to a view is assigned
+        /// here, so after a rebuild it refers to the new view.
+        /// </remarks>
+        protected virtual View Build()
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// Whether <see cref="Build"/> has run: the control's views exist.
+        /// </summary>
+        protected bool IsBuilt
+        {
+            get
+            {
+                return this._isBuilt;
+            }
+        }
+
+        protected override void OnAttaching(
+            Theme theme)
+        {
+            base.OnAttaching(theme);
+            if (!this._isBuilt)
+            {
+                this._isBuilt = true;
+                var content = this.Build();
+                if (null != content)
+                {
+                    this.Content = content;
+                }
+            }
+        }
+
+        /// <summary>
+        /// The control's content: what <see cref="Build"/> returns, or what
+        /// the control is given.
+        /// </summary>
         protected View Content
         {
             get

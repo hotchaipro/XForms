@@ -7,7 +7,7 @@ namespace XForms.Test
 {
     public class UniformGridPage : Page
     {
-        public UniformGridPage()
+        protected override View Build()
         {
             var stackLayout = new UniformGrid()
             {
@@ -79,7 +79,7 @@ namespace XForms.Test
             pageLayout.Children.Add(stackLayout, Dock.Top);
             pageLayout.Children.Add(distributedStackLayout, Dock.Top);
 
-            this.Content = pageLayout;
+            return pageLayout;
         }
     }
 }

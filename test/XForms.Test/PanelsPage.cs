@@ -17,7 +17,7 @@ namespace XForms.Test
         private static readonly Color Purple = Color.FromArgb(0xFF9C27B0);
         private static readonly Color Gray = Color.FromArgb(0xFFE0E0E0);
 
-        public PanelsPage()
+        protected override View Build()
         {
             var sections = new StackPanel()
             {
@@ -106,7 +106,7 @@ namespace XForms.Test
             var scroll = new ScrollViewer() { Content = sections };
             var layout = new DockPanel();
             layout.Children.Add(scroll, Dock.CenterOverlay);
-            this.Content = layout;
+            return layout;
         }
 
         private static TextBlock Heading(string text)

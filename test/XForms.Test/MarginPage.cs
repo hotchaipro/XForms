@@ -5,7 +5,7 @@ namespace XForms.Test
 {
     public class MarginPage : Page
     {
-        public MarginPage()
+        protected override View Build()
         {
             var pageLayout = new DockPanel()
             {
@@ -24,7 +24,7 @@ namespace XForms.Test
             };
             dockLayout1.Children.Add(dockLayout2);
 
-            this.Content = pageLayout;
+            return pageLayout;
         }
     }
 }

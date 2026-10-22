@@ -9,7 +9,7 @@ namespace XForms.Test
     {
         private TabPage1 _tabPage1;
 
-        public TabbedPage()
+        protected override View Build()
         {
             Size tabButtonSize = new Size(60, 60);
 
@@ -92,7 +92,7 @@ namespace XForms.Test
                 Icon = ThemeResources.Default.AboutLogo,
             });
 
-            this.Content = pageLayout;
+            return pageLayout;
         }
     }
 

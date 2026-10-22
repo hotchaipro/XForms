@@ -12,12 +12,12 @@ namespace XForms.Test
     /// </summary>
     public class InputPage : Page
     {
-        private readonly TextBlock _log;
-        private readonly TextBlock _gestures;
+        private TextBlock _log;
+        private TextBlock _gestures;
         private int _taps, _doubleTaps;
         private string _holding = "none";
 
-        public InputPage()
+        protected override View Build()
         {
             var layout = new StackPanel()
             {
@@ -67,7 +67,7 @@ namespace XForms.Test
 
             var page = new DockPanel();
             page.Children.Add(layout, Dock.CenterOverlay);
-            this.Content = page;
+            return page;
         }
 
         internal void Log(
@@ -110,8 +110,8 @@ namespace XForms.Test
         // Moves with the pointer while panned, then springs back
         private sealed class PanBox : Border, IPanGestureDelegate
         {
-            private readonly InputPage _page;
-            private readonly Animator _ownAnimator;
+            private InputPage _page;
+            private Animator _ownAnimator;
 
             public PanBox(InputPage page)
             {
@@ -150,8 +150,8 @@ namespace XForms.Test
         // Scales with two fingers
         private sealed class PinchBox : Border, IPinchGestureDelegate
         {
-            private readonly InputPage _page;
-            private readonly Animator _ownAnimator;
+            private InputPage _page;
+            private Animator _ownAnimator;
 
             public PinchBox(InputPage page)
             {
@@ -188,8 +188,8 @@ namespace XForms.Test
         // Takes focus when tapped and shows the keys it gets
         private sealed class KeyBox : Border
         {
-            private readonly InputPage _page;
-            private readonly TextBlock _text;
+            private InputPage _page;
+            private TextBlock _text;
 
             public KeyBox(InputPage page)
             {

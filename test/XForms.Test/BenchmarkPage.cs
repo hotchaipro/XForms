@@ -26,12 +26,19 @@ namespace XForms.Test
         private static readonly Stopwatch Clock = new Stopwatch();
         private static long _lastFirstDrawTicks;
 
-        private readonly TextBlock _status;
-        private readonly long _builtTicks;
+        private readonly bool _drawAsOneView;
+        private TextBlock _status;
+        private long _builtTicks;
 
         public BenchmarkPage(
             bool drawAsOneView)
         {
+            this._drawAsOneView = drawAsOneView;
+        }
+
+        protected override View Build()
+        {
+            bool drawAsOneView = this._drawAsOneView;
             Clock.Restart();
             _lastFirstDrawTicks = 0;
 
@@ -88,8 +95,6 @@ namespace XForms.Test
             };
             pageLayout.Children.Add(scrollView, Dock.CenterOverlay);
 
-            this.Content = pageLayout;
-
             this._builtTicks = Clock.ElapsedTicks;
 
             // Report once the first frames have drawn
@@ -100,6 +105,8 @@ namespace XForms.Test
                 this.Report();
             };
             timer.Start();
+
+            return pageLayout;
         }
 
         private void Report()

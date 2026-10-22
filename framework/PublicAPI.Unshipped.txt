@@ -8,6 +8,7 @@ XForms.Application.StartPath.get -> string
 XForms.Application.StartPath.set -> void
 XForms.Application.ThemeExtender.get -> System.Func<XForms.Theme, XForms.Theme>
 XForms.Application.ThemeExtender.set -> void
+XForms.Page.IsBuilt.get -> bool
 XForms.Page.NavigationPath.get -> string
 XForms.Page.SetResult(object result) -> void
 XForms.Route
@@ -22,3 +23,4 @@ XForms.Routes.Add(string pattern, System.Func<XForms.Route, XForms.Page> createP
 virtual XForms.Application.OnConfigureRoutes(XForms.Routes routes) -> void
 virtual XForms.Application.OnRouteNotFound(string path) -> string
 virtual XForms.Element.OnAttaching(XForms.Theme theme) -> void
+virtual XForms.Page.Build() -> XForms.View

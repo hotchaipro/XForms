@@ -2998,8 +2998,29 @@ Win32, Android and the browser, as before.
     focused). Release builds are unchanged. The aim is the experience
     Flutter sets: edit, save, see it, nothing lost.
 
-    **Status: step 1 done.** How updates reach a running XForms app, with
-    a handler in the test app that only logs (`HotReloadLog`):
+    **Status: steps 1 and 2 done.**
+
+    Step 2, `Build()`: `Page.Build()` and `UserControl.Build()` (with
+    `IsBuilt`), called once before the native object exists; `Page.Content`
+    is set from it (its setter is now protected). Every test app page and
+    every SoonerOrLater page builds in `Build()`: constructors keep state
+    (a page's depth, a view model) and subscriptions to objects outside the
+    page, which a rebuild mustn't repeat; SoonerOrLater's task list pages
+    add their parts to what their base's `Build()` returns, and its task
+    page applies a task given before it's built at the end of `Build()`.
+    Every Win32 test page, light and dark, the navigation walk and the
+    SoonerOrLater walk are pixel for pixel the same; both apps work on
+    Android and in the browser. Changed from the plan: templates keep
+    `Apply` and `Unapply`, which already build their parts and run again
+    when a template is applied again, so they need no build method of
+    their own; and `UserControl.Content` stays settable by the control,
+    for content given to it (a border's child, the XAML spike's presenter)
+    rather than built. XForms' own composite controls (the command bar,
+    the menu bar) still build in their constructors: they're library code,
+    not edited while an app runs.
+
+    Step 1, how updates reach a running XForms app, with a handler in the
+    test app that only logs (`HotReloadLog`):
     - **Win32:** `dotnet watch` applies an edit in about two seconds after
       the build, and the handler runs with the changed types (Visual
       Studio's Hot Reload uses the same mechanism).

@@ -1,0 +1,3 @@
+XForms.Controls.UserControl.IsBuilt.get -> bool
+override XForms.Controls.UserControl.OnAttaching(XForms.Theme theme) -> void
+virtual XForms.Controls.UserControl.Build() -> XForms.View

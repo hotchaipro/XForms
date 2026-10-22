@@ -11,11 +11,11 @@ namespace XForms.Test
     /// </summary>
     public class TextEntryPage : Page
     {
-        private readonly TextBlock _status;
-        private readonly TextBox _selectable;
+        private TextBlock _status;
+        private TextBox _selectable;
         private int _submits;
 
-        public TextEntryPage()
+        protected override View Build()
         {
             var layout = new StackPanel()
             {
@@ -69,7 +69,7 @@ namespace XForms.Test
 
             var page = new DockPanel();
             page.Children.Add(layout, Dock.CenterOverlay);
-            this.Content = page;
+            return page;
         }
 
         private void ShowSelection()

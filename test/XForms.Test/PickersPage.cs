@@ -10,9 +10,9 @@ namespace XForms.Test
     /// </summary>
     public class PickersPage : Page
     {
-        private readonly TextBlock _status;
+        private TextBlock _status;
 
-        public PickersPage()
+        protected override View Build()
         {
             var layout = new DockPanel()
             {
@@ -110,12 +110,12 @@ namespace XForms.Test
                 },
                 Dock.Left);
 
-            this.Content = layout;
+            return layout;
         }
 
         private sealed class ScheduleFlyout : Flyout
         {
-            private readonly TextBlock _status;
+            private TextBlock _status;
 
             public ScheduleFlyout(
                 TextBlock status)
