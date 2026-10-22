@@ -2871,7 +2871,7 @@ Win32, Android and the browser, as before.
       clean, and the published web app (trimmed) navigates every route.
     - **Not routes:** what a page shows inside itself, such as
       SoonerOrLater's tabs in a `Frame` inside its main page, and popups
-      and flyouts. See the decisions.
+      and flyouts (decided below).
 
     **Steps,** each built for every platform and verified on Win32,
     Android and the browser:
@@ -2909,24 +2909,18 @@ Win32, Android and the browser, as before.
     - The trimming and AOT analyzers report nothing new, and the
       published web app navigates every route.
 
-    **To decide:**
-    - **Where routes are registered:** (recommended) an override on
-      `Application`, `OnConfigureRoutes(Routes routes)`, so they're with
-      the app's other startup code; or a `Routes` object passed to
-      `XFormsApp.Run`.
-    - **Frames inside a page** (SoonerOrLater's tabs): (recommended) they
-      stay what they are, a view that shows one page of the page's own
-      choosing, outside the back stack and not restored; or nested routes
-      (`/main/soon`), as go_router's shell routes, so a tab is in the
-      address and restored too, at the cost of more to learn and build.
-      Nested routes can come later without changing apps' other routes.
-    - **The browser's address:** (recommended) after a `#`
-      (`https://host/#/item/42`), which any static host serves, as
-      Flutter's default; or the path itself (`https://host/item/42`),
-      which looks cleaner but needs the host to send every path to
-      `index.html`.
-    - **Restoring on Win32:** (recommended) never, as desktop apps start
-      fresh; or the last stack when the app starts again, as an option.
+    **Decided** (2026-10-22):
+    - Routes are registered in an override on `Application`,
+      `OnConfigureRoutes(Routes routes)`, with the app's other startup
+      code.
+    - Frames inside a page (such as SoonerOrLater's tabs) stay what they
+      are: a view showing one page of the page's own choosing, outside the
+      back stack and not restored. Nested routes (`/main/soon`, as
+      go_router's shell routes) can come later without changing apps'
+      other routes.
+    - The browser's address carries the path after a `#`
+      (`https://host/#/item/42`), which any static host serves.
+    - Win32 never restores the stack: a desktop app starts fresh.
 
 27. **Hot reload.** An app running under the debugger (or `dotnet watch`)
     shows an edit to its C# without restarting: a page's layout, a
