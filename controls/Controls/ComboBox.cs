@@ -64,7 +64,7 @@ namespace XForms.Controls
             }
         }
 
-        protected override string DisplayText
+        public override string DisplayText
         {
             get
             {
@@ -132,14 +132,6 @@ namespace XForms.Controls
             {
                 this.SelectionChanged?.Invoke(this, this.Items[index]);
             }
-        }
-
-        protected override void DrawGlyph(
-            DrawingContext drawContext,
-            Rect bounds,
-            Color color)
-        {
-            DrawChevronDown(drawContext, bounds, color);
         }
 
         protected override void OnKeyDown(
@@ -231,7 +223,7 @@ namespace XForms.Controls
         /// <summary>
         /// The popup's frame: a scrolling list of the items.
         /// </summary>
-        private sealed class ComboBoxDropDown : UserControl
+        private sealed class ComboBoxDropDown : PopupFrame
         {
             private const float VerticalPadding = 4.0f;
 
@@ -257,7 +249,7 @@ namespace XForms.Controls
             {
                 get
                 {
-                    return PopupBorderThickness + VerticalPadding;
+                    return BorderThickness + VerticalPadding;
                 }
             }
 
@@ -266,7 +258,7 @@ namespace XForms.Controls
             {
                 float width = Math.Max(
                     this._picker.Bounds.Width,
-                    this._picker.MaximumTextWidth + (2 * TextInset) + (2 * PopupBorderThickness));
+                    this._picker.MaximumTextWidth + (2 * PickerField.TextInset) + (2 * BorderThickness));
                 width = Math.Min(width, availableSize.Width);
 
                 // As tall as the items, up to the space available
@@ -275,7 +267,7 @@ namespace XForms.Controls
                     availableSize.Height);
 
                 this._scrollView.Measure(new Size(
-                    Math.Max(0, width - (2 * PopupBorderThickness)),
+                    Math.Max(0, width - (2 * BorderThickness)),
                     Math.Max(0, height - (2 * Inset))));
 
                 return new Size(width, height);
@@ -285,238 +277,209 @@ namespace XForms.Controls
                 Size finalSize)
             {
                 this._scrollView.Arrange(new Rect(
-                    PopupBorderThickness,
+                    BorderThickness,
                     Inset,
-                    Math.Max(0, finalSize.Width - (2 * PopupBorderThickness)),
+                    Math.Max(0, finalSize.Width - (2 * BorderThickness)),
                     Math.Max(0, finalSize.Height - (2 * Inset))));
             }
+        }
+    }
 
-            protected override void Render(
-                DrawingContext drawContext)
+    /// <summary>
+    /// A combo box's list of items, in its popup: picks the row under a click;
+    /// Up and Down move the highlight, and Enter or Space chooses it. Its
+    /// theme's template draws the rows, each <see cref="RowHeight"/> tall.
+    /// </summary>
+    public sealed class ComboBoxItemsView : TemplatedControl
+    {
+        public const float RowHeight = 36.0f;
+
+        private readonly ComboBox _picker;
+        private int _highlightIndex;
+        private int _pressedIndex = -1;
+
+        internal ComboBoxItemsView(
+            ComboBox picker)
+        {
+            this._picker = picker;
+            this.Focusable = true;
+            this.AccessibilityRole = AccessibilityRole.List;
+        }
+
+        /// <summary>
+        /// The combo box whose items it shows.
+        /// </summary>
+        public ComboBox ComboBox
+        {
+            get
             {
-                var bounds = new Rect(0, 0, this.Bounds.Width, this.Bounds.Height);
-                drawContext.Clear(Colors.Transparent);
-                DrawPopupFrame(drawContext, bounds, this.ActualTheme);
+                return this._picker;
             }
         }
 
         /// <summary>
-        /// Draws the rows, and picks the row under a click. Up and Down move the
-        /// highlight; Enter or Space chooses it.
+        /// The row the keyboard is on.
         /// </summary>
-        private sealed class ComboBoxItemsView : UserControl
+        public int HighlightedIndex
         {
-            public const float RowHeight = 36.0f;
-
-            private readonly ComboBox _picker;
-            private int _highlightIndex;
-            private int _pressedIndex = -1;
-
-            public ComboBoxItemsView(
-                ComboBox picker)
+            get
             {
-                this._picker = picker;
-                this.Focusable = true;
-                this.AccessibilityRole = AccessibilityRole.List;
+                return this._highlightIndex;
+            }
+        }
+
+        /// <summary>
+        /// The row being pressed, or -1.
+        /// </summary>
+        public int PressedIndex
+        {
+            get
+            {
+                return this._pressedIndex;
+            }
+        }
+
+        internal ScrollViewer ScrollViewer
+        {
+            get;
+            set;
+        }
+
+        internal void Reset()
+        {
+            this._highlightIndex = Math.Max(0, this._picker.SelectedIndex);
+            this._pressedIndex = -1;
+            this.InvalidateMeasure();
+            this.InvalidateVisual();
+        }
+
+        protected override Size MeasureOverride(
+            Size availableSize)
+        {
+            float width = float.IsInfinity(availableSize.Width) ? 0 : availableSize.Width;
+            return new Size(width, this._picker.Items.Count * RowHeight);
+        }
+
+        private int RowAt(
+            Point point)
+        {
+            int index = (int)Math.Floor(point.Y / RowHeight);
+            return ((point.X >= 0) && (point.X < this.Bounds.Width) && (index >= 0) && (index < this._picker.Items.Count)) ? index : -1;
+        }
+
+        // NOTE: Moves aren't claimed, so a touch drag scrolls the list
+
+        protected override void OnPointerPressed(
+            PointerEventArgs e)
+        {
+            this._pressedIndex = this.RowAt(e.Position);
+            this.InvalidateVisual();
+            e.Handled = (this._pressedIndex >= 0);
+        }
+
+        protected override void OnPointerReleased(
+            PointerEventArgs e)
+        {
+            int index = this.RowAt(e.Position);
+            bool isChosen = (index >= 0) && (index == this._pressedIndex);
+            this._pressedIndex = -1;
+            this.InvalidateVisual();
+            e.Handled = true;
+
+            if (isChosen)
+            {
+                this._picker.Choose(index);
+            }
+        }
+
+        protected override void OnPointerCanceled(
+            PointerEventArgs e)
+        {
+            this._pressedIndex = -1;
+            this.InvalidateVisual();
+            e.Handled = true;
+        }
+
+        protected override void OnKeyDown(
+            KeyEventArgs keyInputEvent)
+        {
+            int count = this._picker.Items.Count;
+
+            switch (keyInputEvent.Key)
+            {
+                case Key.Up:
+                    this.Highlight(Math.Max(0, this._highlightIndex - 1));
+                    keyInputEvent.Handled = true;
+                    return;
+
+                case Key.Down:
+                    this.Highlight(Math.Min(count - 1, this._highlightIndex + 1));
+                    keyInputEvent.Handled = true;
+                    return;
+
+                case Key.Home:
+                    this.Highlight(0);
+                    keyInputEvent.Handled = true;
+                    return;
+
+                case Key.End:
+                    this.Highlight(count - 1);
+                    keyInputEvent.Handled = true;
+                    return;
+
+                case Key.Enter:
+                case Key.Space:
+                    this._picker.Choose(this._highlightIndex);
+                    keyInputEvent.Handled = true;
+                    return;
+
+                case Key.Tab:
+                    // Close, and let focus move on
+                    this._picker.ClosePopup();
+                    return;
             }
 
-            public ScrollViewer ScrollViewer
+            return;
+        }
+
+        protected override void OnActivate()
+        {
+            this._picker.Choose(this._highlightIndex);
+        }
+
+        private void Highlight(
+            int index)
+        {
+            this._highlightIndex = index;
+            this.InvalidateVisual();
+            this.BringHighlightIntoView(animated: true);
+        }
+
+        internal void BringHighlightIntoView(
+            bool animated)
+        {
+            var scrollView = this.ScrollViewer;
+            if (null == scrollView)
             {
-                get;
-                set;
-            }
-
-            public void Reset()
-            {
-                this._highlightIndex = Math.Max(0, this._picker.SelectedIndex);
-                this._pressedIndex = -1;
-                this.InvalidateMeasure();
-                this.InvalidateVisual();
-            }
-
-            protected override Size MeasureOverride(
-                Size availableSize)
-            {
-                float width = float.IsInfinity(availableSize.Width) ? 0 : availableSize.Width;
-                return new Size(width, this._picker.Items.Count * RowHeight);
-            }
-
-            private int RowAt(
-                Point point)
-            {
-                int index = (int)Math.Floor(point.Y / RowHeight);
-                return ((point.X >= 0) && (point.X < this.Bounds.Width) && (index >= 0) && (index < this._picker.Items.Count)) ? index : -1;
-            }
-
-            // NOTE: Moves aren't claimed, so a touch drag scrolls the list
-
-            protected override void OnPointerPressed(
-                PointerEventArgs e)
-            {
-                this._pressedIndex = this.RowAt(e.Position);
-                this.InvalidateVisual();
-                e.Handled = (this._pressedIndex >= 0);
-            }
-
-            protected override void OnPointerReleased(
-                PointerEventArgs e)
-            {
-                int index = this.RowAt(e.Position);
-                bool isChosen = (index >= 0) && (index == this._pressedIndex);
-                this._pressedIndex = -1;
-                this.InvalidateVisual();
-                e.Handled = true;
-
-                if (isChosen)
-                {
-                    this._picker.Choose(index);
-                }
-            }
-
-            protected override void OnPointerCanceled(
-                PointerEventArgs e)
-            {
-                this._pressedIndex = -1;
-                this.InvalidateVisual();
-                e.Handled = true;
-            }
-
-            protected override void OnKeyDown(
-                KeyEventArgs keyInputEvent)
-            {
-                int count = this._picker.Items.Count;
-
-                switch (keyInputEvent.Key)
-                {
-                    case Key.Up:
-                        this.Highlight(Math.Max(0, this._highlightIndex - 1));
-                        keyInputEvent.Handled = true;
-                        return;
-
-                    case Key.Down:
-                        this.Highlight(Math.Min(count - 1, this._highlightIndex + 1));
-                        keyInputEvent.Handled = true;
-                        return;
-
-                    case Key.Home:
-                        this.Highlight(0);
-                        keyInputEvent.Handled = true;
-                        return;
-
-                    case Key.End:
-                        this.Highlight(count - 1);
-                        keyInputEvent.Handled = true;
-                        return;
-
-                    case Key.Enter:
-                    case Key.Space:
-                        this._picker.Choose(this._highlightIndex);
-                        keyInputEvent.Handled = true;
-                        return;
-
-                    case Key.Tab:
-                        // Close, and let focus move on
-                        this._picker.ClosePopup();
-                        return;
-                }
-
                 return;
             }
 
-            protected override void OnActivate()
+            float top = this._highlightIndex * RowHeight;
+            float viewport = scrollView.Bounds.Height;
+            float offset = scrollView.VerticalOffset;
+
+            if (!animated)
             {
-                this._picker.Choose(this._highlightIndex);
+                // Opening: center the item in the list
+                scrollView.ScrollToVerticalOffset(Math.Max(0, top - ((viewport - RowHeight) / 2)), animated: false);
             }
-
-            private void Highlight(
-                int index)
+            else if (top < offset)
             {
-                this._highlightIndex = index;
-                this.InvalidateVisual();
-                this.BringHighlightIntoView(animated: true);
+                scrollView.ScrollToVerticalOffset(top, animated: true);
             }
-
-            public void BringHighlightIntoView(
-                bool animated)
+            else if (top + RowHeight > offset + viewport)
             {
-                var scrollView = this.ScrollViewer;
-                if (null == scrollView)
-                {
-                    return;
-                }
-
-                float top = this._highlightIndex * RowHeight;
-                float viewport = scrollView.Bounds.Height;
-                float offset = scrollView.VerticalOffset;
-
-                if (!animated)
-                {
-                    // Opening: center the item in the list
-                    scrollView.ScrollToVerticalOffset(Math.Max(0, top - ((viewport - RowHeight) / 2)), animated: false);
-                }
-                else if (top < offset)
-                {
-                    scrollView.ScrollToVerticalOffset(top, animated: true);
-                }
-                else if (top + RowHeight > offset + viewport)
-                {
-                    scrollView.ScrollToVerticalOffset(top + RowHeight - viewport, animated: true);
-                }
-            }
-
-            protected override void Render(
-                DrawingContext drawContext)
-            {
-                var bounds = new Rect(0, 0, this.Bounds.Width, this.Bounds.Height);
-                var theme = this.ActualTheme;
-                var items = this._picker.Items;
-                int selectedIndex = this._picker.SelectedIndex;
-
-                drawContext.Clear(Colors.Transparent);
-
-                var textFormat = this._picker.CreateTextFormat();
-
-                for (int i = 0; i < items.Count; i += 1)
-                {
-                    var row = new Rect(0, i * RowHeight, bounds.Width, RowHeight);
-                    var highlight = new Rect(4, row.Y + 2, Math.Max(0, bounds.Width - 8), RowHeight - 4);
-
-                    if (i == this._pressedIndex)
-                    {
-                        drawContext.FillRectangle(highlight, theme.Colors.Foreground.MultiplyAlpha(0.12f));
-                    }
-                    else if ((i == selectedIndex) || ((i == this._highlightIndex) && this.IsFocused))
-                    {
-                        drawContext.FillRectangle(highlight, theme.Colors.Surface);
-                    }
-
-                    if (i == selectedIndex)
-                    {
-                        // The selected item's accent mark
-                        drawContext.FillRectangle(new Rect(4, row.Y + ((RowHeight - 16) / 2), 3, 16), theme.Colors.Accent);
-                    }
-
-                    drawContext.DrawText(
-                        items[i].Text,
-                        new Rect(TextInset, row.Y, Math.Max(0, bounds.Width - (2 * TextInset)), RowHeight),
-                        theme.Colors.Foreground,
-                        textFormat);
-                }
-            }
-
-            protected override void OnGotFocus()
-            {
-                this.OnFocusChanged();
-            }
-
-            protected override void OnLostFocus()
-            {
-                this.OnFocusChanged();
-            }
-
-            private void OnFocusChanged()
-            {
-                this.InvalidateVisual();
+                scrollView.ScrollToVerticalOffset(top + RowHeight - viewport, animated: true);
             }
         }
     }

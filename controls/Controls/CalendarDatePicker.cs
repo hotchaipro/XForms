@@ -67,7 +67,7 @@ namespace XForms.Controls
             }
         }
 
-        protected override string DisplayText
+        public override string DisplayText
         {
             get
             {
@@ -75,7 +75,7 @@ namespace XForms.Controls
             }
         }
 
-        protected override bool IsPlaceholder
+        public override bool IsPlaceholder
         {
             get
             {
@@ -94,22 +94,6 @@ namespace XForms.Controls
                     TextLayout.Measure(longDate, format).Width,
                     TextLayout.Measure(this.PlaceholderText, format).Width);
             }
-        }
-
-        /// <summary>
-        /// A calendar page: a box with a band across the top and two rings.
-        /// </summary>
-        protected override void DrawGlyph(
-            DrawingContext drawContext,
-            Rect bounds,
-            Color color)
-        {
-            var center = bounds.Center;
-            var page = new Rect(center.X - 7, center.Y - 5.5f, 14, 12);
-            drawContext.DrawRectangle(page, color, 1.0f);
-            drawContext.DrawLine(new Point(page.X, page.Y + 3.5f), new Point(page.Right, page.Y + 3.5f), color, 1.0f);
-            drawContext.DrawLine(new Point(page.X + 3.5f, page.Y - 2), new Point(page.X + 3.5f, page.Y + 1), color, 1.0f);
-            drawContext.DrawLine(new Point(page.Right - 3.5f, page.Y - 2), new Point(page.Right - 3.5f, page.Y + 1), color, 1.0f);
         }
 
         protected override bool IsPickerOpen
@@ -172,21 +156,13 @@ namespace XForms.Controls
         /// <summary>
         /// The popup's frame around the calendar.
         /// </summary>
-        private sealed class CalendarFrame : UserControl
+        private sealed class CalendarFrame : PopupFrame
         {
             public CalendarFrame(
                 CalendarView calendar)
             {
-                calendar.Margin = new Thickness(PopupBorderThickness);
+                calendar.Margin = new Thickness(BorderThickness);
                 this.Content = calendar;
-            }
-
-            protected override void Render(
-                DrawingContext drawContext)
-            {
-                var bounds = new Rect(0, 0, this.Bounds.Width, this.Bounds.Height);
-                drawContext.Clear(Colors.Transparent);
-                DrawPopupFrame(drawContext, bounds, this.ActualTheme);
             }
         }
     }

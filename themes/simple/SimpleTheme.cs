@@ -45,7 +45,12 @@ namespace XForms.Themes.Simple
             .With(new CommandBarButtonTemplate())
             .With(new DayOfWeekToggleButtonTemplate())
             .With(new ListViewItemTemplate())
-            .With(new ListViewSwipeItemTemplate());
+            .With(new ListViewSwipeItemTemplate())
+            .With(new ComboBoxTemplate())
+            .With(new CalendarDatePickerTemplate())
+            .With(new PopupFrameTemplate())
+            .With(new ComboBoxItemsViewTemplate())
+            .With(new CalendarViewTemplate());
 
         private static Theme WithDefault<TExtension>(
             Theme theme,

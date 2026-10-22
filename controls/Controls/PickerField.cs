@@ -7,16 +7,25 @@ namespace XForms.Controls
     /// <summary>
     /// The field of a picker: shows the current value (or a placeholder) like a
     /// text entry, with a glyph at the end, and opens the picker's popup when
-    /// clicked, or with Enter, Space, F4 or Alt+Down.
+    /// clicked, or with Enter, Space, F4 or Alt+Down. Its theme's template
+    /// draws it, in the layout the field measures: the text from
+    /// <see cref="TextInset"/>, and the glyph in the last
+    /// <see cref="GlyphWidth"/>.
     /// </summary>
-    public abstract class PickerField : UserControl
+    public abstract class PickerField : TemplatedControl
     {
         protected const float FontSize = 15.0f;
-        protected const float TextInset = 11.0f;
         private const float VerticalPadding = 7.0f;
-        private const float GlyphWidth = 34.0f;
 
-        private bool _isPressed;
+        /// <summary>
+        /// Where the text starts.
+        /// </summary>
+        public const float TextInset = 11.0f;
+
+        /// <summary>
+        /// The width of the glyph's area, at the end of the field.
+        /// </summary>
+        public const float GlyphWidth = 34.0f;
 
         protected PickerField()
         {
@@ -86,12 +95,12 @@ namespace XForms.Controls
         /// <summary>
         /// The text shown in the field.
         /// </summary>
-        protected abstract string DisplayText { get; }
+        public abstract string DisplayText { get; }
 
         /// <summary>
-        /// Whether the text is a placeholder (drawn in the subtle color).
+        /// Whether the text is a placeholder (drawn subtly).
         /// </summary>
-        protected virtual bool IsPlaceholder
+        public virtual bool IsPlaceholder
         {
             get
             {
@@ -110,11 +119,9 @@ namespace XForms.Controls
         protected abstract void OpenPicker();
 
         /// <summary>
-        /// Draws the glyph at the end of the field, centered in the bounds.
+        /// The field's text format, which it measures with.
         /// </summary>
-        protected abstract void DrawGlyph(DrawingContext drawContext, Rect bounds, Color color);
-
-        protected TextFormat CreateTextFormat()
+        public TextFormat CreateTextFormat()
         {
             return new TextFormat()
             {
@@ -135,50 +142,19 @@ namespace XForms.Controls
                 Math.Min(lineHeight + (2 * VerticalPadding), availableSize.Height));
         }
 
-        protected override void Render(
-            DrawingContext drawContext)
-        {
-            var bounds = new Rect(0, 0, this.Bounds.Width, this.Bounds.Height);
-            var theme = this.ActualTheme;
-
-            drawContext.Clear(Colors.Transparent);
-            drawContext.FillRectangle(bounds, theme.Colors.Surface);
-            if (this._isPressed)
-            {
-                drawContext.FillRectangle(bounds, theme.Colors.Foreground.MultiplyAlpha(0.08f));
-            }
-
-            var textBounds = new Rect(TextInset, 0, Math.Max(0, bounds.Width - TextInset - GlyphWidth), bounds.Height);
-            drawContext.DrawText(
-                this.DisplayText,
-                textBounds,
-                this.IsPlaceholder ? theme.Colors.SubtleForeground : theme.Colors.Foreground,
-                this.CreateTextFormat());
-
-            this.DrawGlyph(drawContext, new Rect(bounds.Width - GlyphWidth, 0, GlyphWidth, bounds.Height), theme.Colors.SubtleForeground);
-        }
-
-        protected override void OnThemeChanged(
-            Theme theme)
-        {
-            base.OnThemeChanged(theme);
-
-            this.InvalidateVisual();
-        }
-
         // NOTE: Moves aren't claimed, so a drag that starts here can still scroll
 
         protected override void OnPointerPressed(
             PointerEventArgs e)
         {
-            this.SetPressed(true);
+            this.IsPressed = true;
             e.Handled = true;
         }
 
         protected override void OnPointerReleased(
             PointerEventArgs e)
         {
-            this.SetPressed(false);
+            this.IsPressed = false;
             var point = e.Position;
             if ((point.X >= 0) && (point.Y >= 0) && (point.X < this.Bounds.Width) && (point.Y < this.Bounds.Height))
             {
@@ -191,18 +167,8 @@ namespace XForms.Controls
         protected override void OnPointerCanceled(
             PointerEventArgs e)
         {
-            this.SetPressed(false);
+            this.IsPressed = false;
             e.Handled = true;
-        }
-
-        private void SetPressed(
-            bool isPressed)
-        {
-            if (isPressed != this._isPressed)
-            {
-                this._isPressed = isPressed;
-                this.InvalidateVisual();
-            }
         }
 
         protected override void OnActivate()
@@ -222,50 +188,5 @@ namespace XForms.Controls
 
             return;
         }
-
-        protected override void OnGotFocus()
-        {
-            this.OnFocusChanged();
-        }
-
-        protected override void OnLostFocus()
-        {
-            this.OnFocusChanged();
-        }
-
-        private void OnFocusChanged()
-        {
-            this.InvalidateVisual();
-        }
-
-        /// <summary>
-        /// Draws a downward chevron centered in the bounds.
-        /// </summary>
-        protected static void DrawChevronDown(
-            DrawingContext drawContext,
-            Rect bounds,
-            Color color)
-        {
-            var center = bounds.Center;
-            drawContext.DrawLine(new Point(center.X - 5, center.Y - 2.5f), new Point(center.X, center.Y + 2.5f), color, 1.25f);
-            drawContext.DrawLine(new Point(center.X, center.Y + 2.5f), new Point(center.X + 5, center.Y - 2.5f), color, 1.25f);
-        }
-
-        /// <summary>
-        /// A frame for a picker's popup: the app's background inside a thin border.
-        /// </summary>
-        protected internal static void DrawPopupFrame(
-            DrawingContext drawContext,
-            Rect bounds,
-            Theme theme)
-        {
-            drawContext.FillRectangle(bounds, theme.Colors.Background);
-            drawContext.DrawRectangle(
-                bounds.Deflate(PopupBorderThickness / 2, PopupBorderThickness / 2),
-                theme.Colors.SubtleForeground.MultiplyAlpha(0.4f),
-                PopupBorderThickness);
-        }
-
-        protected internal const float PopupBorderThickness = 1.0f;
     }
 }

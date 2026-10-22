@@ -12,27 +12,22 @@ namespace XForms.Controls
     /// keys move between days, Page Up and Page Down change the month, and Enter
     /// or Space chooses the day.
     /// </summary>
-    public class CalendarView : UserControl
+    public class CalendarView : TemplatedControl
     {
         private const float Inset = 8.0f;
         private const float HeaderHeight = 40.0f;
         private const float WeekdayHeight = 28.0f;
-        private const float CellSize = 40.0f;
-        private const float DayFontSize = 14.0f;
 
-        private enum Part
-        {
-            None,
-            PreviousMonth,
-            NextMonth,
-            Day,
-        }
+        /// <summary>
+        /// The size of a day's cell.
+        /// </summary>
+        public const float CellSize = 40.0f;
 
         private DateTime _month;
         private DateTime? _selectedDate;
         private DateTime _minimumDate = DateTime.MinValue;
         private DateTime _keyboardDate;
-        private Part _pressedPart;
+        private CalendarViewPart _pressedPart;
         private DateTime _pressedDate;
 
         public CalendarView()
@@ -130,7 +125,7 @@ namespace XForms.Controls
         /// <summary>
         /// The first day shown: the Monday on or before the first of the month.
         /// </summary>
-        private DateTime FirstShownDay
+        public DateTime FirstShownDay
         {
             get
             {
@@ -139,13 +134,19 @@ namespace XForms.Controls
             }
         }
 
-        private bool IsEnabled(
+        /// <summary>
+        /// Whether the day can be chosen (it's on or after the minimum date).
+        /// </summary>
+        public bool IsDateEnabled(
             DateTime date)
         {
             return date >= this._minimumDate;
         }
 
-        private bool CanShowPreviousMonth
+        /// <summary>
+        /// Whether there's an earlier month to show.
+        /// </summary>
+        public bool CanShowPreviousMonth
         {
             get
             {
@@ -172,7 +173,10 @@ namespace XForms.Controls
             }
         }
 
-        private Rect PreviousButtonBounds
+        /// <summary>
+        /// Where the button for the previous month is.
+        /// </summary>
+        public Rect PreviousButtonBounds
         {
             get
             {
@@ -181,7 +185,10 @@ namespace XForms.Controls
             }
         }
 
-        private Rect NextButtonBounds
+        /// <summary>
+        /// Where the button for the next month is.
+        /// </summary>
+        public Rect NextButtonBounds
         {
             get
             {
@@ -190,7 +197,83 @@ namespace XForms.Controls
             }
         }
 
-        private Part PartAt(
+        /// <summary>
+        /// Where the month's name is, in the header.
+        /// </summary>
+        public Rect HeaderBounds
+        {
+            get
+            {
+                return new Rect(this.GridLeft + 8, Inset, (5 * CellSize) - 8, HeaderHeight);
+            }
+        }
+
+        /// <summary>
+        /// Where the name of the day of the week in the column (from 0,
+        /// Monday) is.
+        /// </summary>
+        public Rect GetWeekdayBounds(
+            int column)
+        {
+            return new Rect(this.GridLeft + (column * CellSize), Inset + HeaderHeight, CellSize, WeekdayHeight);
+        }
+
+        /// <summary>
+        /// Where the day in the row and column (from 0) is: the days start
+        /// with <see cref="FirstShownDay"/>.
+        /// </summary>
+        public Rect GetDayBounds(
+            int row,
+            int column)
+        {
+            return new Rect(this.GridLeft + (column * CellSize), this.GridTop + (row * CellSize), CellSize, CellSize);
+        }
+
+        /// <summary>
+        /// The month shown (its first day).
+        /// </summary>
+        public DateTime DisplayedMonth
+        {
+            get
+            {
+                return this._month;
+            }
+        }
+
+        /// <summary>
+        /// The day the keyboard is on.
+        /// </summary>
+        public DateTime FocusedDate
+        {
+            get
+            {
+                return this._keyboardDate;
+            }
+        }
+
+        /// <summary>
+        /// The part of the calendar being pressed.
+        /// </summary>
+        public CalendarViewPart PressedPart
+        {
+            get
+            {
+                return this._pressedPart;
+            }
+        }
+
+        /// <summary>
+        /// The day being pressed, when <see cref="PressedPart"/> is a day.
+        /// </summary>
+        public DateTime PressedDate
+        {
+            get
+            {
+                return this._pressedDate;
+            }
+        }
+
+        private CalendarViewPart PartAt(
             Point point,
             out DateTime date)
         {
@@ -198,12 +281,12 @@ namespace XForms.Controls
 
             if (Contains(this.PreviousButtonBounds, point))
             {
-                return Part.PreviousMonth;
+                return CalendarViewPart.PreviousMonth;
             }
 
             if (Contains(this.NextButtonBounds, point))
             {
-                return Part.NextMonth;
+                return CalendarViewPart.NextMonth;
             }
 
             float x = point.X - this.GridLeft;
@@ -213,10 +296,10 @@ namespace XForms.Controls
                 int column = (int)(x / CellSize);
                 int row = (int)(y / CellSize);
                 date = this.FirstShownDay.AddDays((row * 7) + column);
-                return Part.Day;
+                return CalendarViewPart.Day;
             }
 
-            return Part.None;
+            return CalendarViewPart.None;
         }
 
         private static bool Contains(
@@ -231,7 +314,7 @@ namespace XForms.Controls
         {
             this._pressedPart = this.PartAt(e.Position, out this._pressedDate);
             this.InvalidateVisual();
-            e.Handled = (this._pressedPart != Part.None);
+            e.Handled = (this._pressedPart != CalendarViewPart.None);
         }
 
         protected override void OnPointerReleased(
@@ -240,7 +323,7 @@ namespace XForms.Controls
             var part = this.PartAt(e.Position, out var date);
             var pressedPart = this._pressedPart;
             var pressedDate = this._pressedDate;
-            this._pressedPart = Part.None;
+            this._pressedPart = CalendarViewPart.None;
             this.InvalidateVisual();
             e.Handled = true;
 
@@ -251,15 +334,15 @@ namespace XForms.Controls
 
             switch (part)
             {
-                case Part.PreviousMonth:
+                case CalendarViewPart.PreviousMonth:
                     this.ShowMonth(-1);
                     break;
 
-                case Part.NextMonth:
+                case CalendarViewPart.NextMonth:
                     this.ShowMonth(1);
                     break;
 
-                case Part.Day:
+                case CalendarViewPart.Day:
                     if (date == pressedDate)
                     {
                         this.Choose(date);
@@ -271,7 +354,7 @@ namespace XForms.Controls
         protected override void OnPointerCanceled(
             PointerEventArgs e)
         {
-            this._pressedPart = Part.None;
+            this._pressedPart = CalendarViewPart.None;
             this.InvalidateVisual();
             e.Handled = true;
         }
@@ -323,7 +406,7 @@ namespace XForms.Controls
 
         protected override void OnActivate()
         {
-            if (this.IsEnabled(this._keyboardDate))
+            if (this.IsDateEnabled(this._keyboardDate))
             {
                 this.Choose(this._keyboardDate);
             }
@@ -355,7 +438,7 @@ namespace XForms.Controls
         private void MoveKeyboardDate(
             DateTime date)
         {
-            if (!this.IsEnabled(date))
+            if (!this.IsDateEnabled(date))
             {
                 return;
             }
@@ -378,7 +461,7 @@ namespace XForms.Controls
             // Keep the keyboard day in the shown month
             int day = Math.Min(this._keyboardDate.Day, DateTime.DaysInMonth(this._month.Year, this._month.Month));
             var date = new DateTime(this._month.Year, this._month.Month, day);
-            this._keyboardDate = this.IsEnabled(date) ? date : this._minimumDate;
+            this._keyboardDate = this.IsDateEnabled(date) ? date : this._minimumDate;
 
             this.InvalidateVisual();
         }
@@ -386,7 +469,7 @@ namespace XForms.Controls
         private void Choose(
             DateTime date)
         {
-            if (!this.IsEnabled(date))
+            if (!this.IsDateEnabled(date))
             {
                 return;
             }
@@ -398,129 +481,16 @@ namespace XForms.Controls
 
             this.SelectedDateChanged?.Invoke(this, date);
         }
+    }
 
-        protected override void Render(
-            DrawingContext drawContext)
-        {
-            var bounds = new Rect(0, 0, this.Bounds.Width, this.Bounds.Height);
-            var theme = this.ActualTheme;
-            var culture = CultureInfo.CurrentCulture;
-            float gridLeft = this.GridLeft;
-
-            drawContext.Clear(Colors.Transparent);
-
-            // Header: the month, and the arrows to change it
-            drawContext.DrawText(
-                this._month.ToString("MMMM yyyy", culture),
-                new Rect(gridLeft + 8, Inset, (5 * CellSize) - 8, HeaderHeight),
-                theme.Colors.Foreground,
-                new TextFormat()
-                {
-                    FontSize = 16,
-                    FontWeight = FontWeight.SemiBold,
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment = VerticalAlignment.Center,
-                });
-
-            this.DrawArrowButton(drawContext, this.PreviousButtonBounds, -1, this.CanShowPreviousMonth, Part.PreviousMonth);
-            this.DrawArrowButton(drawContext, this.NextButtonBounds, 1, true, Part.NextMonth);
-
-            // Days of the week, starting on Monday
-            var weekdayFormat = new TextFormat()
-            {
-                FontSize = 12,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center,
-            };
-
-            for (int column = 0; column < 7; column += 1)
-            {
-                var dayOfWeek = (DayOfWeek)((column + 1) % 7);
-                drawContext.DrawText(
-                    culture.DateTimeFormat.GetShortestDayName(dayOfWeek),
-                    new Rect(gridLeft + (column * CellSize), Inset + HeaderHeight, CellSize, WeekdayHeight),
-                    theme.Colors.SubtleForeground,
-                    weekdayFormat);
-            }
-
-            // Days
-            var dayFormat = new TextFormat()
-            {
-                FontSize = DayFontSize,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center,
-            };
-
-            var today = DateTime.Today;
-            var date = this.FirstShownDay;
-
-            for (int row = 0; row < 6; row += 1)
-            {
-                for (int column = 0; column < 7; column += 1, date = date.AddDays(1))
-                {
-                    var cell = new Rect(gridLeft + (column * CellSize), this.GridTop + (row * CellSize), CellSize, CellSize);
-                    var center = cell.Center;
-                    const float Radius = (CellSize / 2) - 3;
-
-                    bool isEnabled = this.IsEnabled(date);
-                    bool isInMonth = date.Month == this._month.Month;
-                    bool isSelected = this._selectedDate == date;
-
-                    var textColor = isInMonth ? theme.Colors.Foreground : theme.Colors.SubtleForeground;
-                    if (!isEnabled)
-                    {
-                        textColor = theme.Colors.SubtleForeground.MultiplyAlpha(0.45f);
-                    }
-
-                    if (isSelected)
-                    {
-                        drawContext.FillEllipse(center, Radius, Radius, theme.Colors.Accent);
-                        textColor = theme.Colors.Background;
-                    }
-                    else if ((this._pressedPart == Part.Day) && (this._pressedDate == date) && isEnabled)
-                    {
-                        drawContext.FillEllipse(center, Radius, Radius, theme.Colors.Foreground.MultiplyAlpha(0.12f));
-                    }
-
-                    if (date == today)
-                    {
-                        drawContext.DrawEllipse(center, Radius, Radius, isSelected ? theme.Colors.Background : theme.Colors.Accent, 1.5f);
-                    }
-
-                    if (this.IsFocused && (date == this._keyboardDate))
-                    {
-                        drawContext.DrawEllipse(center, Radius + 1.5f, Radius + 1.5f, theme.Colors.Foreground, 2);
-                    }
-
-                    drawContext.DrawText(date.Day.ToString(culture), cell, textColor, dayFormat);
-                }
-            }
-        }
-
-        /// <summary>
-        /// The month arrows, which point up and down as the months scroll in
-        /// Windows' calendar.
-        /// </summary>
-        private void DrawArrowButton(
-            DrawingContext drawContext,
-            Rect bounds,
-            int direction,
-            bool isEnabled,
-            Part part)
-        {
-            var theme = this.ActualTheme;
-            var center = bounds.Center;
-
-            if (isEnabled && (this._pressedPart == part))
-            {
-                drawContext.FillEllipse(center, 16, 16, theme.Colors.Foreground.MultiplyAlpha(0.12f));
-            }
-
-            var color = isEnabled ? theme.Colors.Foreground : theme.Colors.SubtleForeground.MultiplyAlpha(0.45f);
-            float tip = center.Y + (direction * 2.5f);
-            float tail = center.Y - (direction * 2.5f);
-            drawContext.DrawLine(new Point(center.X - 5, tail), new Point(center.X, tip), color, 1.25f);
-            drawContext.DrawLine(new Point(center.X, tip), new Point(center.X + 5, tail), color, 1.25f);
-        }
+    /// <summary>
+    /// A part of a <see cref="CalendarView"/> that can be pressed.
+    /// </summary>
+    public enum CalendarViewPart
+    {
+        None,
+        PreviousMonth,
+        NextMonth,
+        Day,
     }
 }
