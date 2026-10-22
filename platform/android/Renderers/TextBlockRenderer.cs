@@ -6,7 +6,7 @@ using XForms.Platform;
 
 namespace XForms.Android.Renderers
 {
-    public class TextBlockRenderer : ViewRenderer<AndroidTextView>, ITextBlockRenderer
+    internal class TextBlockRenderer : ViewRenderer<AndroidTextView>, ITextBlockRenderer
     {
         private AndroidTextView _nativeTextView;
 

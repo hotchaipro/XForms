@@ -61,7 +61,7 @@ namespace XForms.Web
             }
         }
 
-        public sealed class Entry
+        internal sealed class Entry
         {
             private readonly TaskCompletionSource<Size> _loaded = new TaskCompletionSource<Size>();
             private List<Action> _onLoaded = new List<Action>();

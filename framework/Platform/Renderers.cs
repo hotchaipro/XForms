@@ -5,7 +5,7 @@ using XForms.Primitives;
 
 namespace XForms.Platform
 {
-    public interface IElementRenderer
+    internal interface IElementRenderer
     {
         Element Element
         {
@@ -24,7 +24,7 @@ namespace XForms.Platform
         void OnThemeChanged(Theme theme);
     }
 
-    public interface IViewRenderer : IElementRenderer
+    internal interface IViewRenderer : IElementRenderer
     {
         bool IsVisible { get; set; }
 
@@ -92,7 +92,7 @@ namespace XForms.Platform
     /// <see cref="LayerHost.DrawsContent"/> (through
     /// <see cref="LayerHost.Render"/>) beneath its children.
     /// </summary>
-    public interface IContainerRenderer : IViewRenderer
+    internal interface IContainerRenderer : IViewRenderer
     {
         /// <summary>
         /// Fills the view beneath its children (transparent when the view draws
@@ -116,7 +116,7 @@ namespace XForms.Platform
         void ClearChildren();
     }
 
-    public interface IFrameRenderer : IViewRenderer
+    internal interface IFrameRenderer : IViewRenderer
     {
         /// <summary>
         /// Adds a page's native view, above the frame's other pages, if it
@@ -133,7 +133,7 @@ namespace XForms.Platform
         void BringToFront(Page page);
     }
 
-    public interface ITextBlockRenderer : IViewRenderer
+    internal interface ITextBlockRenderer : IViewRenderer
     {
         string Text { get; set; }
 
@@ -164,7 +164,7 @@ namespace XForms.Platform
         IReadOnlyList<TextSpan> Spans { set; }
     }
 
-    public interface ITextBoxRenderer : IViewRenderer
+    internal interface ITextBoxRenderer : IViewRenderer
     {
         Color BackgroundColor { get; set; }
 
@@ -213,7 +213,7 @@ namespace XForms.Platform
         new void Focus();
     }
 
-    public interface ITextBoxDelegate
+    internal interface ITextBoxDelegate
     {
         /// <summary>
         /// Called by the platform after the user changes the text.
@@ -232,14 +232,14 @@ namespace XForms.Platform
         void OnNativeSelectionChanged();
     }
 
-    public interface IImageRenderer : IViewRenderer
+    internal interface IImageRenderer : IViewRenderer
     {
         void SetTint(Color color);
 
         void SetSource(ImageSource source);
     }
 
-    public interface IScrollViewerRenderer : IViewRenderer
+    internal interface IScrollViewerRenderer : IViewRenderer
     {
         View Content { get; set; }
 
@@ -252,7 +252,7 @@ namespace XForms.Platform
         void ScrollTo(float verticalOffset, bool animated);
     }
 
-    public interface IItemsViewRenderer : IElementRenderer
+    internal interface IItemsViewRenderer : IElementRenderer
     {
         Color BackgroundColor { get; set; }
 
@@ -290,7 +290,7 @@ namespace XForms.Platform
         bool IsRefreshing { set; }
     }
 
-    public interface IPopupRenderer : IElementRenderer
+    internal interface IPopupRenderer : IElementRenderer
     {
         View Content { get; set; }
 
@@ -301,7 +301,7 @@ namespace XForms.Platform
         void Close();
     }
 
-    public interface IPopupDelegate
+    internal interface IPopupDelegate
     {
         /// <summary>
         /// Called by the platform when the popup closes, including when the user
@@ -310,12 +310,12 @@ namespace XForms.Platform
         void NotifyClosed();
     }
 
-    public interface IBitmapRenderer : IElementRenderer
+    internal interface IBitmapRenderer : IElementRenderer
     {
         Task LoadAsync();
     }
 
-    public interface ITextLayoutRenderer : IDisposable
+    internal interface ITextLayoutRenderer : IDisposable
     {
         Size Size { get; }
 

@@ -5,7 +5,7 @@ using AndroidViewGroup = global::Android.Views.ViewGroup;
 
 namespace XForms.Android.Renderers
 {
-    public abstract class PanelRenderer<TNativeLayout> : ViewRenderer<TNativeLayout>
+    internal abstract class PanelRenderer<TNativeLayout> : ViewRenderer<TNativeLayout>
         where TNativeLayout : AndroidViewGroup
     {
         protected PanelRenderer(

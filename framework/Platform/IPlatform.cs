@@ -3,7 +3,7 @@ using XForms.Primitives;
 
 namespace XForms.Platform
 {
-    public interface IPlatform
+    internal interface IPlatform
     {
         /// <summary>
         /// Whether the framework draws lightweight views into their layer with

@@ -9,7 +9,7 @@ using AndroidView = global::Android.Views.View;
 
 namespace XForms.Android.Renderers
 {
-    public abstract class ViewRenderer<TNativeElement> : ElementRenderer<TNativeElement>, IViewRenderer
+    internal abstract class ViewRenderer<TNativeElement> : ElementRenderer<TNativeElement>, IViewRenderer
         where TNativeElement : AndroidView
     {
         private AndroidView _nativeView;

@@ -687,7 +687,7 @@ namespace XForms
         /// view's children (and draws it, if it <see cref="DrawsContent"/>).
         /// Views the platforms render natively override it.
         /// </summary>
-        protected override IElementRenderer CreateRenderer()
+        private protected override IElementRenderer CreateRenderer()
         {
             var platform = this.Application.Platform;
             return (platform.UsesLightweightRenderers && this.CanBeLightweight)

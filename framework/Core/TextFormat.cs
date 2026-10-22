@@ -248,7 +248,8 @@ namespace XForms
         /// <summary>
         /// The platform's layout, for drawing.
         /// </summary>
-        public ITextLayoutRenderer Native
+        [PlatformContract]
+        internal ITextLayoutRenderer Native
         {
             get
             {

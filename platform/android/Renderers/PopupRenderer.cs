@@ -12,7 +12,7 @@ namespace XForms.Android.Renderers
     /// without room, above) its placement target. Touching outside it or
     /// pressing Back dismisses it.
     /// </summary>
-    public class PopupRenderer : ElementRenderer<AndroidPopupWindow>, IPopupRenderer
+    internal class PopupRenderer : ElementRenderer<AndroidPopupWindow>, IPopupRenderer
     {
         private const float AnchorGap = 4.0f;
 

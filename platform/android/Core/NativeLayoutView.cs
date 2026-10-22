@@ -10,7 +10,7 @@ namespace XForms.Android
     /// tracking), and it hands the measuring and positioning to the shared layout
     /// engine in Core.
     /// </summary>
-    public class NativeLayoutView : ViewGroup
+    internal class NativeLayoutView : ViewGroup
     {
         private readonly XForms.View _owner;
 

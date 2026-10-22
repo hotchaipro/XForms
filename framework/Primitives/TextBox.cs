@@ -502,7 +502,7 @@ namespace XForms.Primitives
             }
         }
 
-        protected override IElementRenderer CreateRenderer()
+        private protected override IElementRenderer CreateRenderer()
         {
             return this.Application.Platform.CreateTextBoxRenderer(this);
         }

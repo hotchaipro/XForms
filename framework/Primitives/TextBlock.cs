@@ -422,7 +422,7 @@ namespace XForms.Primitives
             }
         }
 
-        protected override IElementRenderer CreateRenderer()
+        private protected override IElementRenderer CreateRenderer()
         {
             var platform = this.Application.Platform;
             return (platform.UsesLightweightRenderers && this.CanBeLightweight)

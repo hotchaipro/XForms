@@ -5,7 +5,7 @@ using AndroidScrollView = global::Android.Widget.ScrollView;
 
 namespace XForms.Android.Renderers
 {
-    public class ScrollViewerRenderer : ViewRenderer<AndroidScrollView>, IScrollViewerRenderer
+    internal class ScrollViewerRenderer : ViewRenderer<AndroidScrollView>, IScrollViewerRenderer
     {
         public float VerticalOffset
         {

@@ -8,7 +8,7 @@ using XForms.iOS.Renderers;
 
 namespace XForms.iOS
 {
-    public sealed class DrawContext : DrawingContext
+    internal sealed class DrawContext : DrawingContext
     {
         private CGContext _graphicsContext;
         private CGRect _bounds;

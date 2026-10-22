@@ -5,7 +5,7 @@ using NativeView = UIKit.UIView;
 
 namespace XForms.iOS.Renderers
 {
-    public class FrameRenderer : ViewRenderer<NativeView>, IFrameRenderer
+    internal class FrameRenderer : ViewRenderer<NativeView>, IFrameRenderer
     {
         private UIViewController _viewController;
 

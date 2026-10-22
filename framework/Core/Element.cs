@@ -270,7 +270,7 @@ namespace XForms
 
 
 
-        protected abstract IElementRenderer CreateRenderer();
+        private protected abstract IElementRenderer CreateRenderer();
 
         internal abstract IEnumerable<Element> GetChildElements();
 

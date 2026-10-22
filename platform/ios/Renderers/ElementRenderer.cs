@@ -3,7 +3,7 @@ using XForms.Platform;
 
 namespace XForms.iOS.Renderers
 {
-    public abstract class ElementRenderer<TNativeElement> : IElementRenderer
+    internal abstract class ElementRenderer<TNativeElement> : IElementRenderer
         where TNativeElement : class
     {
         private Element _element;

@@ -91,7 +91,7 @@ namespace XForms
         private Dispatcher _dispatcher;
         private Window _mainWindow;
 
-        public IApplicationRenderer Renderer
+        internal IApplicationRenderer Renderer
         {
             get
             {

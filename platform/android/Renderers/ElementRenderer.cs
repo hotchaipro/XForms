@@ -4,7 +4,7 @@ using AndroidContext = Android.Content.Context;
 
 namespace XForms.Android.Renderers
 {
-    public abstract class ElementRenderer<TNativeElement> : IElementRenderer
+    internal abstract class ElementRenderer<TNativeElement> : IElementRenderer
         where TNativeElement : class
     {
         private Element _element;

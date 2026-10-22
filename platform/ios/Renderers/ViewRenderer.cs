@@ -5,7 +5,7 @@ using XForms.Platform;
 
 namespace XForms.iOS.Renderers
 {
-    public abstract class ViewRenderer<TNativeElement> : ElementRenderer<TNativeElement>, IViewRenderer
+    internal abstract class ViewRenderer<TNativeElement> : ElementRenderer<TNativeElement>, IViewRenderer
         where TNativeElement : UIView
     {
         private UIView _nativeView;

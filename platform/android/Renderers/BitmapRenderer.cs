@@ -7,7 +7,7 @@ using AndroidBitmap = global::Android.Graphics.Bitmap;
 
 namespace XForms.Android.Renderers
 {
-    public class BitmapRenderer : ElementRenderer<AndroidBitmap>, IBitmapRenderer
+    internal class BitmapRenderer : ElementRenderer<AndroidBitmap>, IBitmapRenderer
     {
         private AndroidBitmap _nativeBitmap;
 

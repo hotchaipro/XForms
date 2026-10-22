@@ -81,7 +81,7 @@ namespace XForms
             }
         }
 
-        protected override IElementRenderer CreateRenderer()
+        private protected override IElementRenderer CreateRenderer()
         {
             return this.Application.Platform.CreateFrameRenderer(this);
         }

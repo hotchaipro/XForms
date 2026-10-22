@@ -9,7 +9,7 @@ namespace XForms.Android.Renderers
     /// platform only keeps the native child list, and draws a view that draws
     /// itself beneath it.
     /// </summary>
-    public class ContainerRenderer : PanelRenderer<NativeLayoutView>, IContainerRenderer
+    internal class ContainerRenderer : PanelRenderer<NativeLayoutView>, IContainerRenderer
     {
         private readonly bool _drawsContent;
 

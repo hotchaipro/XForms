@@ -3,7 +3,7 @@ using XForms.Platform;
 
 namespace XForms.iOS.Renderers
 {
-    public class ApplicationRenderer : IApplicationRenderer
+    internal class ApplicationRenderer : IApplicationRenderer
     {
         private Application _application;
         private Frame _rootFrame;

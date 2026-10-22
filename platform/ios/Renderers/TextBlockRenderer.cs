@@ -8,7 +8,7 @@ using XForms.Platform;
 
 namespace XForms.iOS.Renderers
 {
-    public class TextBlockRenderer : ViewRenderer<UILabel>, ITextBlockRenderer
+    internal class TextBlockRenderer : ViewRenderer<UILabel>, ITextBlockRenderer
     {
         private UILabel _nativeTextView;
 

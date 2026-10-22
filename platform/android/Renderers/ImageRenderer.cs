@@ -8,7 +8,7 @@ using XForms.Platform;
 
 namespace XForms.Android.Renderers
 {
-    public class ImageRenderer : ViewRenderer<AndroidImageView>, IImageRenderer
+    internal class ImageRenderer : ViewRenderer<AndroidImageView>, IImageRenderer
     {
         private AndroidImageView _nativeImageView;
         private ImageSource _imageSource;

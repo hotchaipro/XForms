@@ -5,7 +5,7 @@ using AndroidFrameLayout = global::Android.Widget.FrameLayout;
 
 namespace XForms.Android.Renderers
 {
-    public class FrameRenderer : ViewRenderer<AndroidFrameLayout>, IFrameRenderer
+    internal class FrameRenderer : ViewRenderer<AndroidFrameLayout>, IFrameRenderer
     {
         private AndroidFrameLayout _nativeFrame;
 

@@ -6,7 +6,7 @@ using XForms.Platform;
 
 namespace XForms.iOS.Renderers
 {
-    public class BitmapRenderer : ElementRenderer<UIImage>, IBitmapRenderer
+    internal class BitmapRenderer : ElementRenderer<UIImage>, IBitmapRenderer
     {
         private UIImage _nativeImage;
 

@@ -8,7 +8,7 @@ using XForms.Platform;
 
 namespace XForms.iOS.Renderers
 {
-    public class ImageRenderer : ViewRenderer<UIImageView>, IImageRenderer
+    internal class ImageRenderer : ViewRenderer<UIImageView>, IImageRenderer
     {
         private UIImageView _nativeImageView;
         private ImageSource _imageSource;

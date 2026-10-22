@@ -5,7 +5,7 @@ using XForms.Primitives;
 
 namespace XForms.Platform
 {
-    public interface IApplicationRenderer
+    internal interface IApplicationRenderer
     {
         void SetRootFrame(Frame frame);
 
@@ -84,7 +84,7 @@ namespace XForms.Platform
     /// <summary>
     /// A window other than the main one (on the desktop).
     /// </summary>
-    public interface IWindowRenderer
+    internal interface IWindowRenderer
     {
         string Title { set; }
 

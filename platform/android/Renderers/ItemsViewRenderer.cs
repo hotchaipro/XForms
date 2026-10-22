@@ -14,7 +14,7 @@ namespace XForms.Android.Renderers
     /// vertical list, and a <c>RecyclerView</c> for a horizontal list or a
     /// grid.
     /// </summary>
-    public class ItemsViewRenderer : ViewRenderer<SwipeRefreshLayout>, IItemsViewRenderer
+    internal class ItemsViewRenderer : ViewRenderer<SwipeRefreshLayout>, IItemsViewRenderer
     {
         private readonly SwipeRefreshLayout _refreshLayout;
 

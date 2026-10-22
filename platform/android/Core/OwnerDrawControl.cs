@@ -5,7 +5,7 @@ using XForms.Platform;
 
 namespace XForms.Android
 {
-    public sealed class OwnerDrawControl : NativeLayoutView
+    internal sealed class OwnerDrawControl : NativeLayoutView
     {
         private View _drawDelegate;
 

@@ -302,7 +302,7 @@ namespace XForms.Web
             }
         }
 
-        public sealed class WebSynchronizationContext : SynchronizationContext
+        internal sealed class WebSynchronizationContext : SynchronizationContext
         {
             private readonly WebHost _host;
 

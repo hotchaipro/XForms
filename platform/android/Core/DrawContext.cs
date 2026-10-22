@@ -5,7 +5,7 @@ using XForms.Android.Renderers;
 
 namespace XForms.Android
 {
-    public sealed class DrawContext : DrawingContext
+    internal sealed class DrawContext : DrawingContext
     {
         private static Typeface[] TypefaceWeightRamp;
         private static readonly object InitSyncObject = new object();
