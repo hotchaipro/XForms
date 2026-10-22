@@ -2597,113 +2597,167 @@ Win32, Android and the browser, as before.
     **Later, not in this phase:** more themes (Fluent, Material); templates
     in markup (phase 26).
 
-25. **A standalone toolkit.** XForms.Toolkit becomes what it was meant
-    to be: a cross-platform interface to common services (the clipboard,
-    the launcher, preferences, secure storage, sharing, haptics,
-    connectivity, file pickers), usable by any .NET app that wants them
-    without platform code of its own, and with nothing about a UI
-    framework in it. As Xamarin.Essentials and MAUI Essentials are.
+25. **One package for apps, and a standalone toolkit.** An app
+    references two things: the `XForms` package and a theme package. It
+    starts with one call that takes its theme, and never references,
+    starts or registers the framework or the toolkit, which are libraries
+    XForms uses. The toolkit becomes a cross-platform services library with
+    nothing about a UI in it, usable by any .NET app.
 
     **Where things stand.**
-    - **Binding is in the toolkit** (since phase 22): `Binding`,
-      `ViewBindingExtensions.Bind`, `ViewProperty<TView, TValue>`, and the
-      framework views' descriptors (`TextBlock.TextProperty` and the rest,
-      `ViewProperties.cs`). They're about XForms' views, not services.
-    - **`Application.Services`** is a toolkit extension on XForms'
-      `Application`.
-    - **The toolkit references the framework** for those two alone; the
-      services themselves use only .NET types.
-    - **The toolkit's platforms reference XForms' platforms,** to find what
-      the services need of the app: Win32's file dialogs ask
-      `Win32Application.Current` for their owner window, Android's services
-      `AndroidApplication.Current` for the activity, and iOS's share sheet
-      and document picker `IosApplication.Current` for the view controller
-      to present on. The browser's needs nothing of XForms (its JavaScript
-      is its own module).
-    - **Apps reach a service** through `PlatformServices.Current.Clipboard`
-      (or `Application.Services.Clipboard`).
+    - **Apps reference five or six projects:** the framework, its
+      platform, the toolkit's platform, XForms.Controls, the theme (and
+      the XAML spike, in the test app).
+    - **Apps start through the framework's platforms**
+      (`Win32Application.Run`, `AndroidApplication.Run` and the others),
+      register the toolkit's services themselves
+      (`Win32ToolkitServices.Register()` and the others), and choose their
+      theme by overriding `CreateTheme` (`SimpleTheme.Apply(...)`).
+    - **XForms.Controls is platform-neutral** (`net10.0`), so it can't
+      start apps or register services: only a platform's build can.
+    - **The toolkit holds binding** (`Binding`, `ViewProperty`, the
+      framework views' descriptors) and `Application.Services`, and so
+      references the framework. Its platforms find the window, activity or
+      view controller through XForms' hosting classes.
+
+    **How services are usually organized,** which this follows: those tied
+    to the window system (file pickers need an owner window, the share
+    sheet a view controller, the clipboard on Win32 a window) are wired up
+    by the UI framework, since only it knows the window; Avalonia puts its
+    clipboard and storage provider on its top-level window, and WinUI's
+    pickers need the window's handle. Device and OS services
+    (preferences, secure storage, connectivity, the launcher, haptics) have
+    nothing to do with UI. Either way, the services library stays
+    independent: XForms wires it up, and an app may use it, or another.
 
     **The model:**
 
-    | Assembly | Holds | References |
+    | Package (project) | What it is | Referenced by |
     |---|---|---|
-    | `XForms.Toolkit` | The services' interfaces and their static entry points | — |
-    | `XForms.Toolkit.<Platform>` | Each platform's services, and their registration | `XForms.Toolkit` |
-    | `XForms.Controls` | The controls, and now data binding | `XForms.Framework` |
-    | an XForms app | Registers the toolkit's services (if it uses them) with what they need of its host | its platform's XForms and toolkit assemblies |
+    | **`XForms`** (today's XForms.Controls, multi-targeted) | The controls and binding; on each platform, the app's entry point (`XFormsApp.Run`), which starts the framework's host with the app and its theme, and registers the toolkit's services with the host's window, activity or view controller | **apps** |
+    | **`XForms.Themes.Simple`** | The first theme | **apps** |
+    | `XForms.Framework` (+ `.Win32`, `.Android`, `.iOS`, `.Web`) | The platform layer, as now | `XForms` |
+    | `XForms.Toolkit` (+ `.Win32`, `.Android`, `.iOS`, `.Web`) | Cross-platform services, standalone, with nothing about UI | `XForms`; any other .NET app, directly |
 
-    - **Binding moves to XForms.Controls:** `Binding.cs`, `ViewProperty.cs`
-      and `ViewProperties.cs`, with their namespace (`XForms`) unchanged,
-      so app code stays the same. XForms.Controls then references only the
-      framework.
-    - **A static entry point per service,** as MAUI Essentials:
-      `Clipboard.Default`, `Launcher.Default`, `Preferences.Default`,
-      `SecureStorage.Default`, `Share.Default`, `HapticFeedback.Default`,
-      `Connectivity.Default` and `FilePicker.Default`, each typed as its
-      interface (`IClipboard` and so on). A platform's registration sets
-      them all; one that isn't registered throws, naming the call to make.
-      An app or a test can set any of them itself. `PlatformServices` and
-      `Application.Services` go.
-    - **Registration takes what the services need of the host,** as
-      functions read when a service is used (the window or activity can
-      change):
-      - Win32: `Win32ToolkitServices.Register(Func<nint> ownerWindow)`,
-        the window that owns the file dialogs (or null, for none).
-      - Android: `AndroidToolkitServices.Register(Func<Activity> activity)`,
-        the activity to start the document picker, share sheet and
-        launcher from, and to give haptic feedback on. Without one,
-        intents start in a new task.
-      - iOS: `IosToolkitServices.Register(Func<UIViewController> presenter)`,
-        the view controller to present the share sheet and document picker
-        on.
-      - The browser: `WebToolkitServices.InitializeAsync()`, as now.
+    - **`XForms` builds per platform:** `net10.0-windows` (Win32),
+      `net10.0-android`, `net10.0-ios`, and `net10.0` (the browser, whose
+      apps and XForms assemblies target plain `net10.0`, and anything
+      platform-neutral, such as tests). Each platform's build references
+      that platform's framework and toolkit assemblies. Almost all of its
+      code (the controls, binding) is shared; only the entry points are
+      per platform. Everything builds on Windows: `net10.0-ios` libraries
+      (and the iOS test app) already do here, with the iOS workload; a Mac
+      is needed only to sign and run an iOS app.
+    - **One reference on every platform.** NuGet (or a project reference)
+      picks the app's platform's build, so an app references `XForms` and
+      a theme, whatever its platform.
+    - **Starting an app takes its theme:**
 
-      An XForms app passes its hosting class's objects, for example
-      `Win32ToolkitServices.Register(() => Win32Application.Current.MainWindowHandle)`.
-      Any other app passes its own: a WinForms form's `Handle`, a MAUI
-      page's activity, an Avalonia window's handle.
-    - **The toolkit's platforms keep their own plumbing** that has nothing
-      to do with XForms: Android's `ResultActivity` (for activity results)
-      and main-thread handler, the browser's module.
-    - **Enforced:** the layer check (XF0002) allows XForms.Toolkit no
-      references, each toolkit platform only XForms.Toolkit, and
-      XForms.Controls only the framework. The public API files record the
-      change (the static entry points and registrations in, the
-      binding types and `PlatformServices` out).
+      ```csharp
+      // Win32, from Main
+      XFormsApp.Run("Sooner or Later", new App(), new SimpleTheme());
+
+      // Android, from the app's own activity (any base class)
+      XFormsApp.Run(this, new App(), new SimpleTheme());
+
+      // iOS, from Main (XForms' delegates), or the app's own scene delegate
+      XFormsApp.Run(args, new App(), new SimpleTheme());
+      XFormsApp.Run(windowScene, new App(), new SimpleTheme());
+
+      // The browser, from Main
+      await XFormsApp.RunAsync("Sooner or Later", new App(), new SimpleTheme());
+      ```
+
+      `XFormsApp.Run` starts the framework's host (`Win32Application.Run`
+      and the others, which stay public but become what XForms uses, not
+      what apps call), registers the toolkit's services with what the host
+      knows (its window, activity or view controller), and gives the app
+      its theme. Android's re-created activity and iOS's scenes work as in
+      phase 23.
+    - **Themes are objects.** A theme package's entry is a class (Simple's
+      `SimpleTheme`) deriving from an XForms base class (proposed:
+      `ControlTheme`), which adds its tokens, styles and templates to the
+      theme the framework builds for the mode and accent color (the
+      system's high-contrast colors included). `SimpleTheme.Apply` becomes
+      its method. An app overrides `Application.CreateTheme` only to adjust
+      a brand (its colors, a type scale, a style), and no longer to choose
+      the theme package. The framework gets one general hook for this: a
+      host's way to add to every theme the app builds.
+    - **The toolkit stands alone:**
+      - Namespace `XForms.Toolkit` (decided), so its `Clipboard` doesn't
+        meet `System.Windows.Forms.Clipboard` in a WinForms app's usings.
+      - A static entry point per service, as MAUI Essentials:
+        `Clipboard.Default`, `Launcher.Default`, `Preferences.Default`,
+        `SecureStorage.Default`, `Share.Default`, `HapticFeedback.Default`,
+        `Connectivity.Default`, `FilePicker.Default`; one that isn't
+        registered throws, naming the registration. `PlatformServices` and
+        `Application.Services` go.
+      - Registration takes what the services need of the host, read when a
+        service is used: Win32 the owner window (`Func<nint>`), Android the
+        activity (`Func<Activity>`), iOS the view controller to present on
+        (`Func<UIViewController>`); the browser nothing. XForms passes its
+        hosting classes' objects; any other app (WinForms, MAUI, Avalonia)
+        passes its own.
+      - Binding moves into `XForms` (decided), with its namespace
+        unchanged, so app code stays the same.
+      - The toolkit references nothing of XForms; its platforms reference
+        only the toolkit.
+    - **Apps may use the services** (`Clipboard.Default.SetTextAsync(...)`,
+      as SoonerOrLater does for backups and settings) without referencing
+      or registering anything, or use another library instead.
+
+    **Keeping it clean:** the layer check (XF0002) allows the toolkit no
+    references, each toolkit platform only the toolkit, `XForms` the
+    framework and toolkit (and on each platform, their platform
+    assemblies), and themes `XForms`. `XForms` tracks its public API, like
+    the framework and toolkit, since it's what apps use.
 
     **Steps,** each built for every platform and verified on Win32,
     Android and the browser:
-    1. **Binding moves** to XForms.Controls, and the toolkit's framework
-       reference goes (with `Application.Services`; apps use
-       `PlatformServices.Current` for this step).
-    2. **Static entry points** replace `PlatformServices`; the test app
-       and SoonerOrLater use them.
-    3. **Host providers:** each platform's registration takes its
-       provider, its services use it, and the toolkit's platforms drop
-       their XForms references; the apps register with their hosting
-       classes' objects.
-    4. **Enforcement and docs:** the layer check's new rules, the public API
-       files, `architecture.md` (the toolkit as its own stack, beside
-       XForms), this document.
+    1. **The standalone toolkit:** binding moves into XForms.Controls;
+       namespace `XForms.Toolkit`; the static entry points; registration
+       with host providers; no XForms references. The apps register with
+       their hosting classes' objects for now.
+    2. **The `XForms` package:** XForms.Controls becomes `XForms`
+       (project and assembly), multi-targeted, with `XFormsApp.Run` per
+       platform; the theme base class and the framework's theme hook;
+       `SimpleTheme` derives from it.
+    3. **The apps:** the test apps and SoonerOrLater reference only
+       `XForms` and `XForms.Themes.Simple` (and the test app the XAML
+       spike), start with `XFormsApp.Run`, and drop their registrations
+       and `CreateTheme` overrides.
+    4. **Packages:** `dotnet pack` for every library, on Windows; a local
+       feed; a small app that references only the `XForms` and
+       `XForms.Themes.Simple` packages builds for Win32, Android and the
+       browser.
+    5. **Enforcement and docs:** the layer check's rules, the public API
+       files (`XForms` added), `architecture.md` (the packages and the
+       app's view of them), this document.
 
-    **Verifying:** every service on every platform, as phase 23 did
-    (network, preferences, secure storage, haptics; the file dialogs'
-    owner on Win32; the document picker starting on Android; Copy and
-    Share only in the browser and on Android, never in the Win32 test
-    app); binding (the test app's binding page, and SoonerOrLater's
-    bound views) pixel for pixel; a deliberate XForms reference from the
-    toolkit failing the build.
+    **Verifying:** every Win32 test page, light and dark, pixel for pixel;
+    a SoonerOrLater walk on Win32; every service on every platform, as
+    phase 23 did (the file dialogs' owner on Win32; the document picker
+    starting on Android; Copy and Share only in the browser and on
+    Android); binding (the test app's binding page); Android's activity
+    re-created; the packed app from step 4; and a deliberate XForms
+    reference from the toolkit failing the build.
 
-    **Decided** (2026-10-22): binding goes to XForms.Controls (not a new
-    assembly, nor the framework); the toolkit keeps its name; services
-    are reached through a static entry point each.
+    **Decided** (2026-10-22): the toolkit's namespace is `XForms.Toolkit`;
+    services are reached through static entry points; binding goes into
+    `XForms`; apps reference one `XForms` package (multi-targeted) and a
+    theme package, and pass the theme to `XFormsApp.Run`.
 
-    **Decision to make before starting:**
-    1. **The toolkit's namespace:** `XForms.Toolkit` (recommended: its
-       static `Clipboard`, `Preferences` and `Share` would otherwise meet
-       `System.Windows.Forms.Clipboard` and the like in a WinForms or WPF
-       app's `using XForms;`, and the toolkit isn't XForms' UI), or keep
-       `XForms`, as now.
+    **Decisions to make before starting:**
+    1. **Names:** the entry point `XFormsApp.Run` (recommended: one name on
+       every platform, and no clash with the framework's `Application`), or
+       another; the theme base class `ControlTheme` (recommended), or
+       `ThemePackage`.
+    2. **The folder:** keep `controls/` for the `XForms` project
+       (recommended: less churn), or rename it `xforms/`.
+    3. **Framework and toolkit packages:** published as their own packages
+       that `XForms` depends on (recommended: the toolkit must be, to stand
+       alone; the framework too, for another control library), or bundled
+       into the `XForms` package.
 
 26. **Later: `XForms.Xaml`.** The proof of concept in `spikes/XForms.Xaml`
     becomes a layer over the framework and controls, including templates
