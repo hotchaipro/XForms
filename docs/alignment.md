@@ -2863,6 +2863,22 @@ Win32, Android and the browser, as before.
       - **Everything is measured and drawn again.**
       - **`Application.HotReloaded`** (an event) tells the app, for
         anything else it built once (a cache).
+    - **Writable as an initializer** (a rule for the API, kept from now
+      on): everything a view can be given (its properties, its children,
+      its place in a panel, such as a grid's cell) can be written in C#'s
+      object and collection initializers, so a page's `Build()` can be one
+      expression: a tree of `new` with values and children. Event
+      handlers, which C# doesn't allow in an initializer, follow the tree
+      in one fixed form (`button.Click += this.OnSave;`). A grid's cell is
+      already written this way, `Children = { { button, 0, 1 } }`, through
+      its `Add(view, row, column)`; a setting that has only a method form
+      gets a property or an `Add` overload. This keeps a future designer
+      possible that reads and writes C# instead of XAML, as the WinForms
+      designer does: it previews any `Build()` by running it, edits the
+      code with Roslyn and shows the edit through hot reload, and can
+      write back a `Build()` in this form (pages written freely are
+      previewed but not edited). Where the code a designer owns lives (a
+      file of its own, or a marked `Build()`) is decided with the designer.
     - **No declarative model.** Flutter and React keep state for free
       because their views are descriptions that the framework compares
       and patches. XForms keeps WinUI's retained views, which code holds
@@ -2935,6 +2951,9 @@ Win32, Android and the browser, as before.
       and type, or by a key; the user's state wins over the code's.
     - XForms keeps retained views: no declarative model, and no patching
       of old views in place.
+    - Everything a view can be given is writable in a C# initializer,
+      with event handlers in one fixed form after the tree, so that a
+      designer writing C# stays possible.
     - Navigating by page type and parameter (as WinUI's
       `Frame.Navigate(typeof(Page), parameter)`), which would let an app
       restore its back stack after a restart, isn't needed for hot reload
