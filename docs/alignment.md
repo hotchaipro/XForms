@@ -2274,8 +2274,8 @@ Win32, Android and the browser, as before.
 
       | Platform | XForms creates the host | The app's own host |
       |---|---|---|
-      | Win32 | `Win32Application.Run("Title", new App())`: its window and message loop | — (embedding in a caller's window is phase 30) |
-      | Browser | `await WebApplication.RunAsync("Title", new App())`: the page | — (embedding in an element is phase 30) |
+      | Win32 | `Win32Application.Run("Title", new App())`: its window and message loop | — (embedding in a caller's window is phase 31) |
+      | Browser | `await WebApplication.RunAsync("Title", new App())`: the page | — (embedding in an element is phase 31) |
       | iOS | `IosApplication.Run(args, new App())` from `Main`: XForms' internal app and scene delegates | `IosApplication.Run(windowScene, new App())` from the app's own scene delegate, with any base class |
       | Android | — | `AndroidApplication.Run(this, new App())` from the app's own activity's `OnCreate`, with any base class |
 
@@ -2502,7 +2502,7 @@ Win32, Android and the browser, as before.
     WPF and Avalonia call these `ControlTemplate` and (in Avalonia)
     `TemplatedControl`, and a markup layer will want to write templates, so
     the names follow them. Unlike theirs, a template here is code first:
-    small enough (draw, add parts, react to state) that phase 28 can
+    small enough (draw, add parts, react to state) that phase 29 can
     express one in markup.
 
     - **Templates in the theme.** The templates are a theme extension of
@@ -2595,7 +2595,7 @@ Win32, Android and the browser, as before.
     framework, and tracks its public API like the other libraries.
 
     **Later, not in this phase:** more themes (Fluent, Material); templates
-    in markup (phase 28).
+    in markup (phase 29).
 
 25. **One package for apps, and a standalone toolkit.** An app
     references two things: the `XForms` package and a theme package. It
@@ -2998,7 +2998,7 @@ Win32, Android and the browser, as before.
       - A template builds its parts in its own build method, apart from
         what `Apply` and `Unapply` subscribe to; its drawing (`Render`)
         and layout already run again by themselves.
-      - Compiled XAML (phase 28) will produce a `Build()`, so markup and
+      - Compiled XAML (phase 29) will produce a `Build()`, so markup and
         C# reload the same way.
     - **Controls declare their user state:** what changed through input
       since the control was created. A text box declares its text and
@@ -3044,8 +3044,8 @@ Win32, Android and the browser, as before.
     - **No declarative model.** Flutter and React keep state for free
       because their views are descriptions that the framework compares
       and patches. XForms keeps WinUI's retained views, which code holds
-      references to and which XAML (phase 28) and WinUI compatibility
-      (phase 29) are built on. Patching old views in place instead of
+      references to and which XAML (phase 29) and WinUI compatibility
+      (phase 30) are built on. Patching old views in place instead of
       replacing them was rejected for the same reason: fields assigned in
       `Build()` would refer to discarded views, and handlers and bindings
       would have to be moved across one by one. Replacing the views and
@@ -3120,18 +3120,86 @@ Win32, Android and the browser, as before.
       after an edit that needs a restart the app can come back on the same
       page by its stack of paths.
 
-28. **Later: `XForms.Xaml`.** The proof of concept in `spikes/XForms.Xaml`
+28. **Common controls.** The controls apps expect from MAUI, Avalonia,
+    Uno or WinUI and XForms doesn't have yet, so an app doesn't have to
+    build them itself. It comes after hot reload, so each is written once
+    in the shape phase 27 sets (`Build()`, declared user state), and
+    before XAML, so markup has them to use.
+
+    **The controls,** with WinUI's names (decided in phase 24), in three
+    groups:
+    - **Forms:** `CheckBox` (with a third, indeterminate state),
+      `ToggleSwitch`, `Slider`, `ProgressBar` (a value, or indeterminate),
+      `TimePicker` (beside `CalendarDatePicker`), `NumberBox` (typed,
+      with a range, a step and arrows), `PasswordBox` (over the text box's
+      password mode, with a reveal button) and `AutoSuggestBox` (a text
+      box with a list of suggestions the app gives as the user types).
+    - **Feedback and disclosure:** `ToolTip` (on hover, on keyboard focus,
+      and on a long press where there's no hover), `InfoBar` (a message
+      in the page, with a severity and an action), a context menu
+      (`ContextFlyout` on any view: a right-click, a long press or the
+      Menu key, showing `MenuItem`s), and `Expander` (a header that shows
+      and hides its content, animated).
+    - **Structure:** `NavigationView` (a pane of navigation items, a
+      drawer on narrow windows and a side pane on wide ones, as Android's
+      and iOS's apps and Windows' Settings do), `RefreshContainer` (pull
+      to refresh, around a list), `FlipView` with `PipsPager` (pages swiped
+      one at a time, and dots showing where), and `TreeView` (nested items
+      that expand, with keyboard and selection as `ListView`'s).
+
+    **For each control:**
+    - A functional control in XForms, and its template in
+      `XForms.Themes.Simple`; no look in the control (phase 24).
+    - Its accessibility role, name and value on every platform (UI
+      Automation, TalkBack, VoiceOver, the browser's ARIA), and its
+      keyboard behavior as WinUI's.
+    - Right to left, the system's text scale, light, dark and high
+      contrast.
+    - Everything it takes writable in an initializer (phase 27's rule),
+      its user state declared (phase 27), and a section on a test app page
+      that shows every state.
+
+    **Not in this phase,** each a phase of its own when it's wanted:
+    `DataGrid` (columns, sorting, editing; large on its own), and the
+    controls that host a platform's native component (`WebView`, a media
+    player, maps), which need the platforms to embed native views, as
+    phase 31 does in the other direction.
+
+    **Steps,** each built for every platform and verified on Win32,
+    Android and the browser:
+    1. **Forms:** the eight form controls.
+    2. **Feedback and disclosure:** tooltips, the info bar, context menus
+       and the expander.
+    3. **Structure:** the navigation view, pull to refresh, the flip view
+       and pips, and the tree view.
+    4. **Docs:** `architecture.md`'s list of controls, and this document.
+
+    **Verifying,** for each control on Win32, Android and in the browser:
+    every state on its test page, light, dark and high contrast, against
+    WinUI's behavior for the same input (pointer, touch, keyboard); the
+    screen reader's announcement (Narrator through UI Automation,
+    TalkBack, and the browser's accessibility tree); right to left; and a
+    SoonerOrLater walk unchanged (it uses none of them yet).
+
+    **To decide:**
+    - **Scope:** (recommended) the three groups above; or only forms and
+      feedback now, with structure (navigation view, pull to refresh, flip
+      view, tree view) as a later phase.
+    - **The time picker:** (recommended) drawn, as XForms' date picker
+      is, so it looks the same everywhere; or the platform's own picker on
+      Android and iOS, as MAUI does.
+29. **Later: `XForms.Xaml`.** The proof of concept in `spikes/XForms.Xaml`
     becomes a layer over the framework and controls, including templates
     written in markup. To be planned in detail when it's next.
 
-29. **Later: `XForms.Compat.WinUI`.** Adapters giving WinUI's names and a
+30. **Later: `XForms.Compat.WinUI`.** Adapters giving WinUI's names and a
     `DependencyProperty`-style API over XForms' controls, with XAML
     namespace mappings so existing markup loads. It stays separate from any
     Fluent theme, so neither requires the other, and keeps its types in
     `XForms.Compat.WinUI` rather than Microsoft's namespaces. To be planned
     in detail when it's next.
 
-30. **Later: embedding.** XForms inside part of an existing app's UI,
+31. **Later: embedding.** XForms inside part of an existing app's UI,
     beside native content, with `Attach` beside each platform's `Run`
     (phase 23): `Run` shows the app in a whole host; `Attach` puts it in
     a container the caller owns and keeps running its own UI.
@@ -3162,32 +3230,32 @@ chained modifiers (a second way to set what an initializer sets, phase
 What developers praise in SwiftUI is mostly apart from that, and these
 carry over. Observation and environment values would come first:
 
-31. **Candidate: observation.** A view model marked with an attribute
+32. **Candidate: observation.** A view model marked with an attribute
     notifies of its changes without hand-written `INotifyPropertyChanged`,
     as SwiftUI's `@Observable`, so binding updates whatever reads it. A
     source generator writes the notifications at compile time, so it's
     safe for trimming and AOT. The largest day-to-day gain.
 
-32. **Candidate: environment values.** Typed values that flow down the
+33. **Candidate: environment values.** Typed values that flow down the
     tree and that any subtree can override, as SwiftUI's `@Environment`:
     one mechanism for what XForms passes down case by case today (the
     theme, flow direction), and for more, such as navigation reachable
     from any view, a subtree disabled, or a subtree styled differently.
     Keys are typed objects, not strings or reflection.
 
-33. **Candidate: roles.** Say what a control means, not only how it
+34. **Candidate: roles.** Say what a control means, not only how it
     looks, as SwiftUI's `ButtonRole` and text styles: a button that is
     primary, destructive or cancel, which themes and platforms present
     (a destructive button in red, Escape for cancel, Enter for the
     default), beside the theme's text styles, which already follow the
     system's text scale.
 
-34. **Candidate: previews.** A preview is a few lines of code beside a
+35. **Candidate: previews.** A preview is a few lines of code beside a
     page or control that show it with sample data, as SwiftUI's
     `#Preview`, run by the future designer (phase 27's rule) and shown
     live through hot reload. Cheap once `Build()` and hot reload exist.
 
-35. **Candidate: implicit animation.** "Animate whatever this change
+36. **Candidate: implicit animation.** "Animate whatever this change
     causes", as SwiftUI's `withAnimation { ... }`: property and layout
     changes made inside it animate with the theme's motion, without an
     animation written for each. XForms' animator and layout transitions

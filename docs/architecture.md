@@ -50,8 +50,9 @@ The goal is that any control library built on the framework runs on every
 supported platform with the same look and the same layout. All of the
 per-platform complexity stays inside the framework and the platforms.
 
-Planned ([alignment.md](alignment.md#layering), phases 26-30):
-navigation by path, hot reload, `XForms.Xaml` for markup, `XForms.Compat.WinUI` for WinUI's API, and
+Planned ([alignment.md](alignment.md#layering), phases 26-31):
+navigation by path, hot reload, the common controls XForms lacks,
+`XForms.Xaml` for markup, `XForms.Compat.WinUI` for WinUI's API, and
 embedding XForms in part of an existing app's UI; and more themes beside
 `XForms.Themes.Simple`.
 
