@@ -9,4 +9,27 @@
   <ItemGroup Condition="$(MSBuildProjectName.StartsWith('XForms.Framework.'))">
     <ProjectReference Include="$(MSBuildThisFileDirectory)analyzers\XForms.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="all" />
   </ItemGroup>
+
+  <!--
+    The framework, its platforms, the toolkit and its platforms track their
+    public API in PublicAPI.Shipped.txt and PublicAPI.Unshipped.txt: public
+    API that isn't listed (RS0016), or listed API that's gone (RS0017), fails
+    the build, so every change to it shows in review.
+  -->
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'XForms.Framework' or $(MSBuildProjectName.StartsWith('XForms.Framework.')) or '$(MSBuildProjectName)' == 'XForms.Toolkit' or $(MSBuildProjectName.StartsWith('XForms.Toolkit.'))">
+    <XFormsTracksPublicApi>true</XFormsTracksPublicApi>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(XFormsTracksPublicApi)' == 'true'">
+    <WarningsAsErrors>$(WarningsAsErrors);RS0016;RS0017</WarningsAsErrors>
+    <!-- Nullable annotations aren't used (RS0037, RS0041), and the overload
+         rules for optional parameters aren't followed (RS0026, RS0027) -->
+    <NoWarn>$(NoWarn);RS0026;RS0027;RS0037;RS0041</NoWarn>
+    <!-- Android's generated Resource class isn't API -->
+    <AndroidResourceDesignerClassModifier>internal</AndroidResourceDesignerClassModifier>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(XFormsTracksPublicApi)' == 'true'">
+    <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="5.0.0" PrivateAssets="all" />
+    <AdditionalFiles Include="PublicAPI.Shipped.txt" />
+    <AdditionalFiles Include="PublicAPI.Unshipped.txt" />
+  </ItemGroup>
 </Project>

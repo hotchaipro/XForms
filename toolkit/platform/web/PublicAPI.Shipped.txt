@@ -1,0 +1,2 @@
+XForms.Web.WebToolkitServices
+static XForms.Web.WebToolkitServices.InitializeAsync() -> System.Threading.Tasks.Task

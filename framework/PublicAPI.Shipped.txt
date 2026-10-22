@@ -1,0 +1,1169 @@
+XForms.AccessibilityAction
+XForms.AccessibilityAction.Collapse = 4 -> XForms.AccessibilityAction
+XForms.AccessibilityAction.Expand = 3 -> XForms.AccessibilityAction
+XForms.AccessibilityAction.Invoke = 0 -> XForms.AccessibilityAction
+XForms.AccessibilityAction.Select = 2 -> XForms.AccessibilityAction
+XForms.AccessibilityAction.Toggle = 1 -> XForms.AccessibilityAction
+XForms.AccessibilityRole
+XForms.AccessibilityRole.Button = 2 -> XForms.AccessibilityRole
+XForms.AccessibilityRole.ComboBox = 11 -> XForms.AccessibilityRole
+XForms.AccessibilityRole.Group = 9 -> XForms.AccessibilityRole
+XForms.AccessibilityRole.Heading = 12 -> XForms.AccessibilityRole
+XForms.AccessibilityRole.Image = 7 -> XForms.AccessibilityRole
+XForms.AccessibilityRole.List = 5 -> XForms.AccessibilityRole
+XForms.AccessibilityRole.ListItem = 6 -> XForms.AccessibilityRole
+XForms.AccessibilityRole.None = 0 -> XForms.AccessibilityRole
+XForms.AccessibilityRole.RadioButton = 10 -> XForms.AccessibilityRole
+XForms.AccessibilityRole.TabItem = 4 -> XForms.AccessibilityRole
+XForms.AccessibilityRole.Text = 1 -> XForms.AccessibilityRole
+XForms.AccessibilityRole.TextBox = 8 -> XForms.AccessibilityRole
+XForms.AccessibilityRole.ToggleButton = 3 -> XForms.AccessibilityRole
+XForms.Angle
+XForms.Angle.Angle() -> void
+XForms.Angle.Degrees.get -> float
+XForms.Angle.Radians.get -> float
+XForms.AnimationChannel
+XForms.AnimationChannel.ClipBottom = 9 -> XForms.AnimationChannel
+XForms.AnimationChannel.ClipLeft = 6 -> XForms.AnimationChannel
+XForms.AnimationChannel.ClipRight = 8 -> XForms.AnimationChannel
+XForms.AnimationChannel.ClipTop = 7 -> XForms.AnimationChannel
+XForms.AnimationChannel.Opacity = 5 -> XForms.AnimationChannel
+XForms.AnimationChannel.Rotation = 4 -> XForms.AnimationChannel
+XForms.AnimationChannel.ScaleX = 2 -> XForms.AnimationChannel
+XForms.AnimationChannel.ScaleY = 3 -> XForms.AnimationChannel
+XForms.AnimationChannel.TranslationX = 0 -> XForms.AnimationChannel
+XForms.AnimationChannel.TranslationY = 1 -> XForms.AnimationChannel
+XForms.AnimationHandle
+XForms.AnimationHandle.Cancel() -> void
+XForms.AnimationHandle.Completion.get -> System.Threading.Tasks.Task<bool>
+XForms.AnimationHandle.GetAwaiter() -> System.Runtime.CompilerServices.TaskAwaiter<bool>
+XForms.AnimationHandle.IsRunning.get -> bool
+XForms.AnimationTiming
+XForms.AnimationTiming.AnimationTiming() -> void
+XForms.AnimationTiming.AutoReverse.get -> bool
+XForms.AnimationTiming.AutoReverse.init -> void
+XForms.AnimationTiming.Delay.get -> System.TimeSpan
+XForms.AnimationTiming.Delay.init -> void
+XForms.AnimationTiming.Duration.get -> System.TimeSpan
+XForms.AnimationTiming.Duration.init -> void
+XForms.AnimationTiming.Easing.get -> XForms.EasingFunction
+XForms.AnimationTiming.Easing.init -> void
+XForms.AnimationTiming.Loop.get -> bool
+XForms.AnimationTiming.Loop.init -> void
+XForms.Animator
+XForms.Animator.Animator() -> void
+XForms.Animator.Clip.get -> XForms.Rect?
+XForms.Animator.Clip.set -> void
+XForms.Animator.FadeFrom(float opacity, System.TimeSpan duration, XForms.EasingFunction easing = null, System.TimeSpan delay = default(System.TimeSpan)) -> XForms.AnimationHandle
+XForms.Animator.FadeTo(float opacity, System.TimeSpan duration, XForms.EasingFunction easing = null, System.TimeSpan delay = default(System.TimeSpan), bool loop = false, bool autoReverse = false) -> XForms.AnimationHandle
+XForms.Animator.Opacity.get -> float
+XForms.Animator.Opacity.set -> void
+XForms.Animator.RevealFrom(XForms.Rect clip, System.TimeSpan duration, XForms.EasingFunction easing = null, System.TimeSpan delay = default(System.TimeSpan)) -> XForms.AnimationHandle
+XForms.Animator.RevealTo(XForms.Rect clip, System.TimeSpan duration, XForms.EasingFunction easing = null, System.TimeSpan delay = default(System.TimeSpan)) -> XForms.AnimationHandle
+XForms.Animator.RotateFrom(XForms.Angle from, XForms.Angle to, System.TimeSpan duration, XForms.EasingFunction easing = null, System.TimeSpan delay = default(System.TimeSpan), bool loop = false, bool autoReverse = false) -> XForms.AnimationHandle
+XForms.Animator.RotateTo(XForms.Angle angle, System.TimeSpan duration, XForms.EasingFunction easing = null, System.TimeSpan delay = default(System.TimeSpan), bool loop = false, bool autoReverse = false) -> XForms.AnimationHandle
+XForms.Animator.Rotation.get -> XForms.Angle
+XForms.Animator.Rotation.set -> void
+XForms.Animator.Scale.get -> float
+XForms.Animator.Scale.set -> void
+XForms.Animator.ScaleFrom(float scale, System.TimeSpan duration, XForms.EasingFunction easing = null, System.TimeSpan delay = default(System.TimeSpan)) -> XForms.AnimationHandle
+XForms.Animator.ScaleTo(float scale, System.TimeSpan duration, XForms.EasingFunction easing = null, System.TimeSpan delay = default(System.TimeSpan), bool loop = false, bool autoReverse = false) -> XForms.AnimationHandle
+XForms.Animator.ScaleX.get -> float
+XForms.Animator.ScaleX.set -> void
+XForms.Animator.ScaleY.get -> float
+XForms.Animator.ScaleY.set -> void
+XForms.Animator.Stop() -> void
+XForms.Animator.TransformOrigin.get -> XForms.Point
+XForms.Animator.TransformOrigin.set -> void
+XForms.Animator.TranslateByOffset(XForms.Point offset, System.TimeSpan duration, XForms.EasingFunction easing = null) -> XForms.AnimationHandle
+XForms.Animator.TranslateFrom(XForms.Point point, System.TimeSpan duration, XForms.EasingFunction easing = null, System.TimeSpan delay = default(System.TimeSpan)) -> XForms.AnimationHandle
+XForms.Animator.TranslateTo(XForms.Point point, System.TimeSpan duration, XForms.EasingFunction easing = null, System.TimeSpan delay = default(System.TimeSpan), bool loop = false, bool autoReverse = false) -> XForms.AnimationHandle
+XForms.Animator.Translation.get -> XForms.Point
+XForms.Animator.Translation.set -> void
+XForms.Application
+XForms.Application.AccentColor.get -> XForms.Color?
+XForms.Application.AccentColor.set -> void
+XForms.Application.ActualAccentColor.get -> XForms.Color
+XForms.Application.ActualThemeMode.get -> XForms.ThemeMode
+XForms.Application.Application() -> void
+XForms.Application.CanGoBack.get -> bool
+XForms.Application.CanOpenWindows.get -> bool
+XForms.Application.Dispatcher.get -> XForms.Dispatcher
+XForms.Application.GetVersion() -> System.Version
+XForms.Application.GoBackAsync() -> System.Threading.Tasks.Task<bool>
+XForms.Application.InvalidateTheme() -> void
+XForms.Application.IsStarted.get -> bool
+XForms.Application.MainWindow.get -> XForms.Window
+XForms.Application.NavigateAsync(XForms.Page page, XForms.PageTransition transition = null) -> System.Threading.Tasks.Task
+XForms.Application.OpenUri(System.Uri uri) -> void
+XForms.Application.OpenWindowAsync(XForms.Page page, string title = null, XForms.Size? size = null) -> System.Threading.Tasks.Task<XForms.Window>
+XForms.Application.PreviewKeyDown -> System.EventHandler<XForms.KeyEventArgs>
+XForms.Application.PreviewPointerInput -> System.EventHandler<XForms.PointerEventArgs>
+XForms.Application.RegisterFont(string familyName, string fileName) -> void
+XForms.Application.RequestAnimationFrame(System.Action<System.TimeSpan> callback) -> void
+XForms.Application.RequestedThemeMode.get -> XForms.ThemeMode?
+XForms.Application.RequestedThemeMode.set -> void
+XForms.Application.ShowModalAsync(XForms.Page page) -> System.Threading.Tasks.Task
+XForms.Application.SystemThemeMode.get -> XForms.ThemeMode
+XForms.Application.TextScale.get -> float
+XForms.Application.TextScaleChanged -> System.EventHandler
+XForms.Application.Theme.get -> XForms.Theme
+XForms.Application.ThemeChanged -> System.EventHandler
+XForms.Application.TitleBar.get -> XForms.TitleBar
+XForms.Application.Windows.get -> System.Collections.Generic.IReadOnlyList<XForms.Window>
+XForms.Bitmap
+XForms.Bitmap.Bitmap(XForms.ImageSource source) -> void
+XForms.Bitmap.LoadAsync() -> System.Threading.Tasks.Task
+XForms.Bitmap.Source.get -> XForms.ImageSource
+XForms.BitmapImageSource
+XForms.BitmapImageSource.Bitmap.get -> XForms.Bitmap
+XForms.BitmapImageSource.BitmapImageSource(XForms.Bitmap bitmap) -> void
+XForms.Brush
+XForms.Color
+XForms.Color.A.get -> byte
+XForms.Color.A.set -> void
+XForms.Color.B.get -> byte
+XForms.Color.B.set -> void
+XForms.Color.Color() -> void
+XForms.Color.G.get -> byte
+XForms.Color.G.set -> void
+XForms.Color.IsTransparent.get -> bool
+XForms.Color.MultiplyAlpha(float multiplier) -> XForms.Color
+XForms.Color.R.get -> byte
+XForms.Color.R.set -> void
+XForms.Color.ToArgb() -> uint
+XForms.Color.ToString(System.Globalization.CultureInfo cultureInfo) -> string
+XForms.ColorScheme
+XForms.ColorScheme.<Clone>$() -> XForms.ColorScheme
+XForms.ColorScheme.Accent.get -> XForms.Color
+XForms.ColorScheme.Accent.init -> void
+XForms.ColorScheme.Background.get -> XForms.Color
+XForms.ColorScheme.Background.init -> void
+XForms.ColorScheme.ColorScheme() -> void
+XForms.ColorScheme.Disabled.get -> XForms.Color
+XForms.ColorScheme.Disabled.init -> void
+XForms.ColorScheme.Equals(XForms.ColorScheme other) -> bool
+XForms.ColorScheme.Error.get -> XForms.Color
+XForms.ColorScheme.Error.init -> void
+XForms.ColorScheme.Foreground.get -> XForms.Color
+XForms.ColorScheme.Foreground.init -> void
+XForms.ColorScheme.OnAccent.get -> XForms.Color
+XForms.ColorScheme.OnAccent.init -> void
+XForms.ColorScheme.OnError.get -> XForms.Color
+XForms.ColorScheme.OnError.init -> void
+XForms.ColorScheme.OnSurface.get -> XForms.Color
+XForms.ColorScheme.OnSurface.init -> void
+XForms.ColorScheme.Outline.get -> XForms.Color
+XForms.ColorScheme.Outline.init -> void
+XForms.ColorScheme.SubtleForeground.get -> XForms.Color
+XForms.ColorScheme.SubtleForeground.init -> void
+XForms.ColorScheme.Surface.get -> XForms.Color
+XForms.ColorScheme.Surface.init -> void
+XForms.Colors
+XForms.CubicEase
+XForms.CubicEase.CubicEase(XForms.EasingMode easingMode) -> void
+XForms.Dimension
+XForms.Dimension.Dimension() -> void
+XForms.Dimension.Dimension(float value) -> void
+XForms.Dimension.Value -> float
+XForms.Dispatcher
+XForms.Dispatcher.CheckAccess() -> bool
+XForms.Dispatcher.InvokeAsync(System.Action action) -> System.Threading.Tasks.Task
+XForms.Dispatcher.InvokeAsync(System.Func<System.Threading.Tasks.Task> function) -> System.Threading.Tasks.Task
+XForms.Dispatcher.InvokeAsync<TResult>(System.Func<TResult> function) -> System.Threading.Tasks.Task<TResult>
+XForms.Dispatcher.Post(System.Action action) -> void
+XForms.DispatcherTimer
+XForms.DispatcherTimer.DispatcherTimer() -> void
+XForms.DispatcherTimer.DispatcherTimer(System.TimeSpan interval, System.Action action) -> void
+XForms.DispatcherTimer.Interval.get -> System.TimeSpan
+XForms.DispatcherTimer.Interval.set -> void
+XForms.DispatcherTimer.IsEnabled.get -> bool
+XForms.DispatcherTimer.Start() -> void
+XForms.DispatcherTimer.Stop() -> void
+XForms.DispatcherTimer.Tick -> System.EventHandler
+XForms.DrawingContext
+XForms.DrawingContext.Clear(XForms.Color color) -> void
+XForms.DrawingContext.DrawingContext() -> void
+XForms.DrawingContext.PushClip(XForms.Rect clip) -> XForms.DrawingContextState
+XForms.DrawingContext.PushOpacity(float opacity) -> XForms.DrawingContextState
+XForms.DrawingContext.PushTransform(System.Numerics.Matrix3x2 transform) -> XForms.DrawingContextState
+XForms.DrawingContextState
+XForms.DrawingContextState.Dispose() -> void
+XForms.DrawingContextState.DrawingContextState() -> void
+XForms.DrawnAnimator
+XForms.DrawnAnimator.FadeTo(float opacity, System.TimeSpan duration, XForms.EasingFunction easing = null) -> XForms.AnimationHandle
+XForms.DrawnAnimator.Opacity.get -> float
+XForms.DrawnAnimator.Opacity.set -> void
+XForms.DrawnAnimator.Scale.get -> float
+XForms.DrawnAnimator.Scale.set -> void
+XForms.DrawnAnimator.ScaleTo(float scale, System.TimeSpan duration, XForms.EasingFunction easing = null) -> XForms.AnimationHandle
+XForms.DrawnAnimator.Stop() -> void
+XForms.EasingFunction
+XForms.EasingFunction.Ease(float t) -> float
+XForms.EasingFunction.EasingFunction(XForms.EasingMode easingMode) -> void
+XForms.EasingFunction.EasingMode.get -> XForms.EasingMode
+XForms.EasingMode
+XForms.EasingMode.EaseIn = 0 -> XForms.EasingMode
+XForms.EasingMode.EaseInOut = 2 -> XForms.EasingMode
+XForms.EasingMode.EaseOut = 1 -> XForms.EasingMode
+XForms.Element
+XForms.Element.ActualTheme.get -> XForms.Theme
+XForms.Element.Application.get -> XForms.Application
+XForms.Element.AttachedProperty<TValue>
+XForms.Element.AttachedProperty<TValue>.AttachedProperty() -> void
+XForms.Element.AttachedProperty<TValue>.GetValue(XForms.Element element, TValue defaultValue = default(TValue)) -> TValue
+XForms.Element.AttachedProperty<TValue>.SetValue(XForms.Element element, TValue value) -> void
+XForms.Element.AttachedProperty<TValue>.TryGetValue(XForms.Element element, out TValue value) -> bool
+XForms.Element.Element() -> void
+XForms.Element.HasDescendant(XForms.Element element) -> bool
+XForms.Element.IAttachedProperty
+XForms.FileImageSource
+XForms.FileImageSource.FileImageSource(string path) -> void
+XForms.FileImageSource.Path.get -> string
+XForms.FlowDirection
+XForms.FlowDirection.LeftToRight = 0 -> XForms.FlowDirection
+XForms.FlowDirection.RightToLeft = 1 -> XForms.FlowDirection
+XForms.FontFamilies
+XForms.FontStyle
+XForms.FontStyle.Italic = 1 -> XForms.FontStyle
+XForms.FontStyle.Normal = 0 -> XForms.FontStyle
+XForms.FontWeight
+XForms.FontWeight.Bold = 700 -> XForms.FontWeight
+XForms.FontWeight.Light = 300 -> XForms.FontWeight
+XForms.FontWeight.Medium = 500 -> XForms.FontWeight
+XForms.FontWeight.Normal = 400 -> XForms.FontWeight
+XForms.FontWeight.SemiBold = 600 -> XForms.FontWeight
+XForms.Frame
+XForms.Frame.CurrentPage.get -> XForms.Page
+XForms.Frame.Frame() -> void
+XForms.Frame.Push(XForms.Page page) -> void
+XForms.Frame.TransitionDuration.get -> System.TimeSpan
+XForms.Frame.TransitionDuration.set -> void
+XForms.GestureEventResult
+XForms.GestureEventResult.DidHandleEvent -> bool
+XForms.GestureEventResult.GestureEventResult() -> void
+XForms.GestureRecognizer
+XForms.GestureRecognizer.GestureRecognizer() -> void
+XForms.GestureRecognizer.GestureRecognizer(XForms.IGestureRecognizerDelegate gestureRecognizerDelegate) -> void
+XForms.GestureRecognizer.HandlePointerInput(XForms.PointerEventArgs inputEvent, ref XForms.GestureEventResult result) -> void
+XForms.GestureRecognizer.State.get -> XForms.GestureState
+XForms.GestureRecognizer.State.set -> void
+XForms.GestureRecognizer.View.get -> XForms.View
+XForms.GestureState
+XForms.GestureState.Began = 2 -> XForms.GestureState
+XForms.GestureState.Canceled = 5 -> XForms.GestureState
+XForms.GestureState.Changed = 3 -> XForms.GestureState
+XForms.GestureState.Failed = 1 -> XForms.GestureState
+XForms.GestureState.Possible = 0 -> XForms.GestureState
+XForms.GestureState.Recognized = 4 -> XForms.GestureState
+XForms.GradientStop
+XForms.GradientStop.Color.get -> XForms.Color
+XForms.GradientStop.GradientStop() -> void
+XForms.GradientStop.GradientStop(XForms.Color color, float offset) -> void
+XForms.GradientStop.Offset.get -> float
+XForms.HorizontalAlignment
+XForms.HorizontalAlignment.Center = 1 -> XForms.HorizontalAlignment
+XForms.HorizontalAlignment.Left = 0 -> XForms.HorizontalAlignment
+XForms.HorizontalAlignment.Right = 2 -> XForms.HorizontalAlignment
+XForms.HorizontalAlignment.Stretch = 3 -> XForms.HorizontalAlignment
+XForms.IAnimationLayer
+XForms.IAnimationLayer.Animate(XForms.AnimationChannel channel, float from, float to, XForms.AnimationTiming timing) -> void
+XForms.IAnimationLayer.IsClipEnabled.set -> void
+XForms.IAnimationLayer.SetValue(XForms.AnimationChannel channel, float value) -> void
+XForms.IAnimationLayer.TransformOrigin.set -> void
+XForms.IGestureRecognizerDelegate
+XForms.IGestureRecognizerDelegate.OnTouchBegan() -> void
+XForms.IGestureRecognizerDelegate.OnTouchCanceled() -> void
+XForms.IGestureRecognizerDelegate.OnTouchEnded() -> void
+XForms.ImageSource
+XForms.Key
+XForms.Key.A = 28 -> XForms.Key
+XForms.Key.B = 29 -> XForms.Key
+XForms.Key.Back = 14 -> XForms.Key
+XForms.Key.C = 30 -> XForms.Key
+XForms.Key.D = 31 -> XForms.Key
+XForms.Key.D0 = 54 -> XForms.Key
+XForms.Key.D1 = 55 -> XForms.Key
+XForms.Key.D2 = 56 -> XForms.Key
+XForms.Key.D3 = 57 -> XForms.Key
+XForms.Key.D4 = 58 -> XForms.Key
+XForms.Key.D5 = 59 -> XForms.Key
+XForms.Key.D6 = 60 -> XForms.Key
+XForms.Key.D7 = 61 -> XForms.Key
+XForms.Key.D8 = 62 -> XForms.Key
+XForms.Key.D9 = 63 -> XForms.Key
+XForms.Key.Delete = 15 -> XForms.Key
+XForms.Key.Down = 8 -> XForms.Key
+XForms.Key.E = 32 -> XForms.Key
+XForms.Key.End = 10 -> XForms.Key
+XForms.Key.Enter = 2 -> XForms.Key
+XForms.Key.Escape = 4 -> XForms.Key
+XForms.Key.F = 33 -> XForms.Key
+XForms.Key.F1 = 17 -> XForms.Key
+XForms.Key.F10 = 25 -> XForms.Key
+XForms.Key.F11 = 26 -> XForms.Key
+XForms.Key.F12 = 27 -> XForms.Key
+XForms.Key.F2 = 18 -> XForms.Key
+XForms.Key.F3 = 19 -> XForms.Key
+XForms.Key.F4 = 13 -> XForms.Key
+XForms.Key.F5 = 20 -> XForms.Key
+XForms.Key.F6 = 21 -> XForms.Key
+XForms.Key.F7 = 22 -> XForms.Key
+XForms.Key.F8 = 23 -> XForms.Key
+XForms.Key.F9 = 24 -> XForms.Key
+XForms.Key.G = 34 -> XForms.Key
+XForms.Key.H = 35 -> XForms.Key
+XForms.Key.Home = 9 -> XForms.Key
+XForms.Key.I = 36 -> XForms.Key
+XForms.Key.Insert = 16 -> XForms.Key
+XForms.Key.J = 37 -> XForms.Key
+XForms.Key.K = 38 -> XForms.Key
+XForms.Key.L = 39 -> XForms.Key
+XForms.Key.Left = 5 -> XForms.Key
+XForms.Key.M = 40 -> XForms.Key
+XForms.Key.N = 41 -> XForms.Key
+XForms.Key.None = 0 -> XForms.Key
+XForms.Key.O = 42 -> XForms.Key
+XForms.Key.P = 43 -> XForms.Key
+XForms.Key.PageDown = 12 -> XForms.Key
+XForms.Key.PageUp = 11 -> XForms.Key
+XForms.Key.Q = 44 -> XForms.Key
+XForms.Key.R = 45 -> XForms.Key
+XForms.Key.Right = 7 -> XForms.Key
+XForms.Key.S = 46 -> XForms.Key
+XForms.Key.Space = 3 -> XForms.Key
+XForms.Key.T = 47 -> XForms.Key
+XForms.Key.Tab = 1 -> XForms.Key
+XForms.Key.U = 48 -> XForms.Key
+XForms.Key.Up = 6 -> XForms.Key
+XForms.Key.V = 49 -> XForms.Key
+XForms.Key.W = 50 -> XForms.Key
+XForms.Key.X = 51 -> XForms.Key
+XForms.Key.Y = 52 -> XForms.Key
+XForms.Key.Z = 53 -> XForms.Key
+XForms.KeyEventArgs
+XForms.KeyEventArgs.Handled.get -> bool
+XForms.KeyEventArgs.Handled.set -> void
+XForms.KeyEventArgs.IsAltDown.get -> bool
+XForms.KeyEventArgs.IsShiftDown.get -> bool
+XForms.KeyEventArgs.Key.get -> XForms.Key
+XForms.KeyEventArgs.KeyEventArgs(XForms.Key key, XForms.KeyModifiers keyModifiers) -> void
+XForms.KeyEventArgs.KeyEventArgs(XForms.Key key, bool isShiftDown, bool isAltDown) -> void
+XForms.KeyEventArgs.KeyModifiers.get -> XForms.KeyModifiers
+XForms.KeyEventArgs.OriginalSource.get -> XForms.View
+XForms.KeyModifiers
+XForms.KeyModifiers.Alt = 4 -> XForms.KeyModifiers
+XForms.KeyModifiers.Control = 2 -> XForms.KeyModifiers
+XForms.KeyModifiers.Meta = 8 -> XForms.KeyModifiers
+XForms.KeyModifiers.None = 0 -> XForms.KeyModifiers
+XForms.KeyModifiers.Shift = 1 -> XForms.KeyModifiers
+XForms.LinearGradientBrush
+XForms.LinearGradientBrush.EndPoint.get -> XForms.Point
+XForms.LinearGradientBrush.GetAbsolutePoints(XForms.Rect bounds, out XForms.Point start, out XForms.Point end) -> void
+XForms.LinearGradientBrush.LinearGradientBrush(XForms.Point startPoint, XForms.Point endPoint, params XForms.GradientStop[] stops) -> void
+XForms.LinearGradientBrush.StartPoint.get -> XForms.Point
+XForms.LinearGradientBrush.Stops.get -> System.Collections.Generic.IReadOnlyList<XForms.GradientStop>
+XForms.NavigationEventArgs
+XForms.NavigationEventArgs.NavigationEventArgs(XForms.NavigationMode navigationMode) -> void
+XForms.NavigationEventArgs.NavigationMode.get -> XForms.NavigationMode
+XForms.NavigationMode
+XForms.NavigationMode.Back = 1 -> XForms.NavigationMode
+XForms.NavigationMode.Forward = 0 -> XForms.NavigationMode
+XForms.Orientation
+XForms.Orientation.Horizontal = 0 -> XForms.Orientation
+XForms.Orientation.Vertical = 1 -> XForms.Orientation
+XForms.Origin
+XForms.Origin.Origin() -> void
+XForms.Origin.Origin(float x, float y) -> void
+XForms.Origin.X.get -> float
+XForms.Origin.Y.get -> float
+XForms.Page
+XForms.Page.BackgroundColor.get -> XForms.Color
+XForms.Page.BackgroundColor.set -> void
+XForms.Page.CloseModalAsync() -> System.Threading.Tasks.Task
+XForms.Page.Content.get -> XForms.View
+XForms.Page.Content.set -> void
+XForms.Page.Page() -> void
+XForms.Page.UsesSafeArea.get -> bool
+XForms.Page.UsesSafeArea.set -> void
+XForms.PageTransition
+XForms.PageTransition.PageTransition() -> void
+XForms.PageTransitionContext
+XForms.PageTransitionContext.Animator.get -> XForms.Animator
+XForms.PageTransitionContext.Duration.get -> System.TimeSpan
+XForms.PageTransitionContext.FromStart.get -> bool
+XForms.PageTransitionContext.IsLeaving.get -> bool
+XForms.PageTransitionContext.Page.get -> XForms.Page
+XForms.PageTransitionContext.Size.get -> XForms.Size
+XForms.PathGeometry
+XForms.PathGeometry.ArcTo(XForms.Point point, float radiusX, float radiusY, bool isLargeArc, bool isClockwise) -> XForms.PathGeometry
+XForms.PathGeometry.Bounds.get -> XForms.Rect
+XForms.PathGeometry.Close() -> XForms.PathGeometry
+XForms.PathGeometry.CubicTo(XForms.Point control1, XForms.Point control2, XForms.Point point) -> XForms.PathGeometry
+XForms.PathGeometry.LineTo(XForms.Point point) -> XForms.PathGeometry
+XForms.PathGeometry.MoveTo(XForms.Point point) -> XForms.PathGeometry
+XForms.PathGeometry.PathGeometry() -> void
+XForms.PathGeometry.QuadraticTo(XForms.Point control, XForms.Point point) -> XForms.PathGeometry
+XForms.PathGeometry.Segments.get -> System.Collections.Generic.IReadOnlyList<XForms.PathSegment>
+XForms.PathSegment
+XForms.PathSegment.Control1.get -> XForms.Point
+XForms.PathSegment.Control2.get -> XForms.Point
+XForms.PathSegment.Kind.get -> XForms.PathSegmentKind
+XForms.PathSegment.PathSegment() -> void
+XForms.PathSegment.Point.get -> XForms.Point
+XForms.PathSegmentKind
+XForms.PathSegmentKind.Close = 4 -> XForms.PathSegmentKind
+XForms.PathSegmentKind.CubicTo = 3 -> XForms.PathSegmentKind
+XForms.PathSegmentKind.LineTo = 1 -> XForms.PathSegmentKind
+XForms.PathSegmentKind.MoveTo = 0 -> XForms.PathSegmentKind
+XForms.PathSegmentKind.QuadraticTo = 2 -> XForms.PathSegmentKind
+XForms.Point
+XForms.Point.DistanceSquaredTo(XForms.Point other) -> float
+XForms.Point.DistanceTo(XForms.Point other) -> float
+XForms.Point.Point() -> void
+XForms.Point.Point(float x, float y) -> void
+XForms.Point.Translate(XForms.Angle angle, float distance) -> XForms.Point
+XForms.Point.Translate(float dx, float dy) -> XForms.Point
+XForms.Point.X.get -> float
+XForms.Point.Y.get -> float
+XForms.PointerDeviceType
+XForms.PointerDeviceType.Mouse = 1 -> XForms.PointerDeviceType
+XForms.PointerDeviceType.Pen = 2 -> XForms.PointerDeviceType
+XForms.PointerDeviceType.Touch = 0 -> XForms.PointerDeviceType
+XForms.PointerEventArgs
+XForms.PointerEventArgs.DeviceType.get -> XForms.PointerDeviceType
+XForms.PointerEventArgs.Handled.get -> bool
+XForms.PointerEventArgs.Handled.set -> void
+XForms.PointerEventArgs.IsHovering.get -> bool
+XForms.PointerEventArgs.IsInContact.get -> bool
+XForms.PointerEventArgs.KeyModifiers.get -> XForms.KeyModifiers
+XForms.PointerEventArgs.OriginalSource.get -> XForms.View
+XForms.PointerEventArgs.PointerEventArgs(XForms.Point position, XForms.PointerInputState state, bool isInContact) -> void
+XForms.PointerEventArgs.PointerEventArgs(int pointerId, XForms.PointerDeviceType deviceType, XForms.Point position, XForms.PointerInputState state, bool isInContact, XForms.KeyModifiers keyModifiers, float wheelDelta = 0) -> void
+XForms.PointerEventArgs.PointerId.get -> int
+XForms.PointerEventArgs.Position.get -> XForms.Point
+XForms.PointerEventArgs.State.get -> XForms.PointerInputState
+XForms.PointerEventArgs.WheelDelta.get -> float
+XForms.PointerInputState
+XForms.PointerInputState.Began = 0 -> XForms.PointerInputState
+XForms.PointerInputState.Canceled = 3 -> XForms.PointerInputState
+XForms.PointerInputState.Ended = 2 -> XForms.PointerInputState
+XForms.PointerInputState.Moved = 1 -> XForms.PointerInputState
+XForms.Primitives.Image
+XForms.Primitives.Image.Image() -> void
+XForms.Primitives.Image.Source.get -> XForms.ImageSource
+XForms.Primitives.Image.Source.set -> void
+XForms.Primitives.Image.Tint.get -> XForms.Color
+XForms.Primitives.Image.Tint.set -> void
+XForms.Primitives.ItemContainer
+XForms.Primitives.ItemContainer.Content.get -> XForms.View
+XForms.Primitives.ItemContainer.Item.get -> object
+XForms.Primitives.ItemContainer.ItemContainer() -> void
+XForms.Primitives.ItemContainer.ItemsView.get -> XForms.Primitives.ItemsView
+XForms.Primitives.ItemContainer.Recycle() -> void
+XForms.Primitives.ItemsView
+XForms.Primitives.ItemsView.AccentColor.get -> XForms.Color
+XForms.Primitives.ItemsView.AccentColor.set -> void
+XForms.Primitives.ItemsView.BackgroundColor.get -> XForms.Color
+XForms.Primitives.ItemsView.BackgroundColor.set -> void
+XForms.Primitives.ItemsView.Bind(XForms.Primitives.ItemsViewSource source) -> void
+XForms.Primitives.ItemsView.ContainerFromItem(object item) -> XForms.Primitives.ItemContainer
+XForms.Primitives.ItemsView.IsRefreshEnabled.get -> bool
+XForms.Primitives.ItemsView.IsRefreshEnabled.set -> void
+XForms.Primitives.ItemsView.IsRefreshing.get -> bool
+XForms.Primitives.ItemsView.IsRefreshing.set -> void
+XForms.Primitives.ItemsView.ItemsView() -> void
+XForms.Primitives.ItemsView.Layout.get -> XForms.Primitives.ListLayout
+XForms.Primitives.ItemsView.Layout.set -> void
+XForms.Primitives.ItemsView.Padding.get -> XForms.Thickness
+XForms.Primitives.ItemsView.Padding.set -> void
+XForms.Primitives.ItemsView.RealizedContainers.get -> System.Collections.Generic.IReadOnlyCollection<XForms.Primitives.ItemContainer>
+XForms.Primitives.ItemsView.RefreshRequested -> System.EventHandler
+XForms.Primitives.ItemsView.RequestRefresh() -> void
+XForms.Primitives.ItemsView.ScrollToItem(object item) -> void
+XForms.Primitives.ItemsViewSource
+XForms.Primitives.ItemsViewSource.CollectionChanged -> System.Collections.Specialized.NotifyCollectionChangedEventHandler
+XForms.Primitives.ItemsViewSource.GetEnumerator() -> System.Collections.IEnumerator
+XForms.Primitives.ItemsViewSource.ItemsViewSource() -> void
+XForms.Primitives.KeyboardOptions
+XForms.Primitives.KeyboardOptions.All = XForms.Primitives.KeyboardOptions.SpellCheck | XForms.Primitives.KeyboardOptions.Suggestions -> XForms.Primitives.KeyboardOptions
+XForms.Primitives.KeyboardOptions.None = 0 -> XForms.Primitives.KeyboardOptions
+XForms.Primitives.KeyboardOptions.SpellCheck = 1 -> XForms.Primitives.KeyboardOptions
+XForms.Primitives.KeyboardOptions.Suggestions = 2 -> XForms.Primitives.KeyboardOptions
+XForms.Primitives.ListLayout
+XForms.Primitives.ListLayout.Columns.get -> int
+XForms.Primitives.ListLayout.IsGrid.get -> bool
+XForms.Primitives.ListLayout.Orientation.get -> XForms.Orientation
+XForms.Primitives.Popup
+XForms.Primitives.Popup.Close() -> void
+XForms.Primitives.Popup.Closed -> System.EventHandler
+XForms.Primitives.Popup.Content.get -> XForms.View
+XForms.Primitives.Popup.Content.set -> void
+XForms.Primitives.Popup.IsOpen.get -> bool
+XForms.Primitives.Popup.PlacementTarget.get -> XForms.View
+XForms.Primitives.Popup.PlacementTarget.set -> void
+XForms.Primitives.Popup.Popup() -> void
+XForms.Primitives.Popup.Show() -> void
+XForms.Primitives.Run
+XForms.Primitives.Run.FontStyle.get -> XForms.FontStyle?
+XForms.Primitives.Run.FontStyle.init -> void
+XForms.Primitives.Run.FontWeight.get -> XForms.FontWeight?
+XForms.Primitives.Run.FontWeight.init -> void
+XForms.Primitives.Run.Foreground.get -> XForms.Color?
+XForms.Primitives.Run.Foreground.init -> void
+XForms.Primitives.Run.Run() -> void
+XForms.Primitives.Run.Run(string text) -> void
+XForms.Primitives.Run.Strikethrough.get -> bool
+XForms.Primitives.Run.Strikethrough.init -> void
+XForms.Primitives.Run.Text.get -> string
+XForms.Primitives.Run.Text.init -> void
+XForms.Primitives.Run.Underline.get -> bool
+XForms.Primitives.Run.Underline.init -> void
+XForms.Primitives.ScrollViewer
+XForms.Primitives.ScrollViewer.Content.get -> XForms.View
+XForms.Primitives.ScrollViewer.Content.set -> void
+XForms.Primitives.ScrollViewer.IsHorizontalScrollingEnabled.get -> bool
+XForms.Primitives.ScrollViewer.IsHorizontalScrollingEnabled.set -> void
+XForms.Primitives.ScrollViewer.IsVerticalScrollingEnabled.get -> bool
+XForms.Primitives.ScrollViewer.IsVerticalScrollingEnabled.set -> void
+XForms.Primitives.ScrollViewer.ScrollToVerticalOffset(float verticalOffset, bool animated) -> void
+XForms.Primitives.ScrollViewer.ScrollViewer() -> void
+XForms.Primitives.ScrollViewer.VerticalOffset.get -> float
+XForms.Primitives.TextBlock
+XForms.Primitives.TextBlock.BackgroundColor.get -> XForms.Color
+XForms.Primitives.TextBlock.BackgroundColor.set -> void
+XForms.Primitives.TextBlock.FontFamily.get -> string
+XForms.Primitives.TextBlock.FontFamily.set -> void
+XForms.Primitives.TextBlock.FontSize.get -> float
+XForms.Primitives.TextBlock.FontSize.set -> void
+XForms.Primitives.TextBlock.FontStyle.get -> XForms.FontStyle
+XForms.Primitives.TextBlock.FontStyle.set -> void
+XForms.Primitives.TextBlock.FontWeight.get -> XForms.FontWeight
+XForms.Primitives.TextBlock.FontWeight.set -> void
+XForms.Primitives.TextBlock.Foreground.get -> XForms.Color
+XForms.Primitives.TextBlock.Foreground.set -> void
+XForms.Primitives.TextBlock.Inlines.get -> System.Collections.Generic.IList<XForms.Primitives.Run>
+XForms.Primitives.TextBlock.MaxLines.get -> int
+XForms.Primitives.TextBlock.MaxLines.set -> void
+XForms.Primitives.TextBlock.Strikethrough.get -> bool
+XForms.Primitives.TextBlock.Strikethrough.set -> void
+XForms.Primitives.TextBlock.Text.get -> string
+XForms.Primitives.TextBlock.Text.set -> void
+XForms.Primitives.TextBlock.TextAlignment.get -> XForms.TextAlignment
+XForms.Primitives.TextBlock.TextAlignment.set -> void
+XForms.Primitives.TextBlock.TextBlock() -> void
+XForms.Primitives.TextBlock.TextTrimming.get -> XForms.TextTrimming
+XForms.Primitives.TextBlock.TextTrimming.set -> void
+XForms.Primitives.TextBlock.TextWrapping.get -> XForms.TextWrapping
+XForms.Primitives.TextBlock.TextWrapping.set -> void
+XForms.Primitives.TextBlock.VerticalTextAlignment.get -> XForms.TextAlignment
+XForms.Primitives.TextBlock.VerticalTextAlignment.set -> void
+XForms.Primitives.TextBox
+XForms.Primitives.TextBox.AccentColor.get -> XForms.Color
+XForms.Primitives.TextBox.AccentColor.set -> void
+XForms.Primitives.TextBox.AcceptsReturn.get -> bool
+XForms.Primitives.TextBox.AcceptsReturn.set -> void
+XForms.Primitives.TextBox.BackgroundColor.get -> XForms.Color
+XForms.Primitives.TextBox.BackgroundColor.set -> void
+XForms.Primitives.TextBox.Focus() -> void
+XForms.Primitives.TextBox.ForegroundColor.get -> XForms.Color
+XForms.Primitives.TextBox.ForegroundColor.set -> void
+XForms.Primitives.TextBox.IsPassword.get -> bool
+XForms.Primitives.TextBox.IsPassword.set -> void
+XForms.Primitives.TextBox.IsReadOnly.get -> bool
+XForms.Primitives.TextBox.IsReadOnly.set -> void
+XForms.Primitives.TextBox.KeyboardOptions.get -> XForms.Primitives.KeyboardOptions
+XForms.Primitives.TextBox.KeyboardOptions.set -> void
+XForms.Primitives.TextBox.MaxLength.get -> int
+XForms.Primitives.TextBox.MaxLength.set -> void
+XForms.Primitives.TextBox.PlaceholderColor.get -> XForms.Color
+XForms.Primitives.TextBox.PlaceholderColor.set -> void
+XForms.Primitives.TextBox.PlaceholderText.get -> string
+XForms.Primitives.TextBox.PlaceholderText.set -> void
+XForms.Primitives.TextBox.Select(int start, int length) -> void
+XForms.Primitives.TextBox.SelectAll() -> void
+XForms.Primitives.TextBox.SelectedText.get -> string
+XForms.Primitives.TextBox.SelectionChanged -> System.EventHandler
+XForms.Primitives.TextBox.SelectionLength.get -> int
+XForms.Primitives.TextBox.SelectionLength.set -> void
+XForms.Primitives.TextBox.SelectionStart.get -> int
+XForms.Primitives.TextBox.SelectionStart.set -> void
+XForms.Primitives.TextBox.Submitted -> System.EventHandler
+XForms.Primitives.TextBox.Text.get -> string
+XForms.Primitives.TextBox.Text.set -> void
+XForms.Primitives.TextBox.TextBox() -> void
+XForms.Primitives.TextBox.TextChanged -> System.EventHandler
+XForms.Rect
+XForms.Rect.Bottom.get -> float
+XForms.Rect.Center.get -> XForms.Point
+XForms.Rect.Deflate(float dx, float dy) -> XForms.Rect
+XForms.Rect.Height.get -> float
+XForms.Rect.Height.set -> void
+XForms.Rect.Inflate(float dx, float dy) -> XForms.Rect
+XForms.Rect.Left.get -> float
+XForms.Rect.Left.set -> void
+XForms.Rect.Location.get -> XForms.Point
+XForms.Rect.Offset(float x, float y) -> XForms.Rect
+XForms.Rect.Rect() -> void
+XForms.Rect.Rect(float x, float y, float width, float height) -> void
+XForms.Rect.Right.get -> float
+XForms.Rect.Size.get -> XForms.Size
+XForms.Rect.Top.get -> float
+XForms.Rect.Top.set -> void
+XForms.Rect.Union(XForms.Rect other) -> XForms.Rect
+XForms.Rect.Width.get -> float
+XForms.Rect.Width.set -> void
+XForms.Rect.X.get -> float
+XForms.Rect.X.set -> void
+XForms.Rect.Y.get -> float
+XForms.Rect.Y.set -> void
+XForms.Size
+XForms.Size.Height.get -> float
+XForms.Size.Size() -> void
+XForms.Size.Size(XForms.Dimension size) -> void
+XForms.Size.Size(XForms.Dimension width, XForms.Dimension height) -> void
+XForms.Size.Width.get -> float
+XForms.SolidColorBrush
+XForms.SolidColorBrush.Color.get -> XForms.Color
+XForms.SolidColorBrush.SolidColorBrush(XForms.Color color) -> void
+XForms.SpringEase
+XForms.SpringEase.Oscillations.get -> int
+XForms.SpringEase.Oscillations.set -> void
+XForms.SpringEase.SpringEase(XForms.EasingMode easingMode) -> void
+XForms.SpringEase.Springiness.get -> float
+XForms.SpringEase.Springiness.set -> void
+XForms.TextAlignment
+XForms.TextAlignment.Center = 1 -> XForms.TextAlignment
+XForms.TextAlignment.End = 2 -> XForms.TextAlignment
+XForms.TextAlignment.Start = 0 -> XForms.TextAlignment
+XForms.TextFormat
+XForms.TextFormat.FontFamily.get -> string
+XForms.TextFormat.FontFamily.set -> void
+XForms.TextFormat.FontSize.get -> float
+XForms.TextFormat.FontSize.set -> void
+XForms.TextFormat.FontStyle.get -> XForms.FontStyle
+XForms.TextFormat.FontStyle.set -> void
+XForms.TextFormat.FontWeight.get -> XForms.FontWeight
+XForms.TextFormat.FontWeight.set -> void
+XForms.TextFormat.HorizontalAlignment.get -> XForms.HorizontalAlignment
+XForms.TextFormat.HorizontalAlignment.set -> void
+XForms.TextFormat.MaxLines.get -> int
+XForms.TextFormat.MaxLines.set -> void
+XForms.TextFormat.TextFormat() -> void
+XForms.TextFormat.TextTrimming.get -> XForms.TextTrimming
+XForms.TextFormat.TextTrimming.set -> void
+XForms.TextFormat.TextWrapping.get -> XForms.TextWrapping
+XForms.TextFormat.TextWrapping.set -> void
+XForms.TextFormat.VerticalAlignment.get -> XForms.VerticalAlignment
+XForms.TextFormat.VerticalAlignment.set -> void
+XForms.TextLayout
+XForms.TextLayout.Dispose() -> void
+XForms.TextLayout.Format.get -> XForms.TextFormat
+XForms.TextLayout.LineCount.get -> int
+XForms.TextLayout.MaxHeight.get -> float
+XForms.TextLayout.MaxWidth.get -> float
+XForms.TextLayout.Size.get -> XForms.Size
+XForms.TextLayout.Spans.get -> System.Collections.Generic.IReadOnlyList<XForms.TextSpan>
+XForms.TextLayout.Text.get -> string
+XForms.TextLayout.TextLayout(string text, XForms.TextFormat format, float maxWidth = Infinity, float maxHeight = Infinity, System.Collections.Generic.IReadOnlyList<XForms.TextSpan> spans = null) -> void
+XForms.TextSpan
+XForms.TextSpan.FontStyle.get -> XForms.FontStyle?
+XForms.TextSpan.FontWeight.get -> XForms.FontWeight?
+XForms.TextSpan.Foreground.get -> XForms.Color?
+XForms.TextSpan.Length.get -> int
+XForms.TextSpan.Start.get -> int
+XForms.TextSpan.Strikethrough.get -> bool
+XForms.TextSpan.TextSpan() -> void
+XForms.TextSpan.TextSpan(int start, int length, XForms.FontWeight? fontWeight = null, XForms.FontStyle? fontStyle = null, XForms.Color? foreground = null, bool underline = false, bool strikethrough = false) -> void
+XForms.TextSpan.Underline.get -> bool
+XForms.TextTrimming
+XForms.TextTrimming.CharacterEllipsis = 1 -> XForms.TextTrimming
+XForms.TextTrimming.None = 0 -> XForms.TextTrimming
+XForms.TextWrapping
+XForms.TextWrapping.NoWrap = 0 -> XForms.TextWrapping
+XForms.TextWrapping.Wrap = 1 -> XForms.TextWrapping
+XForms.Theme
+XForms.Theme.<Clone>$() -> XForms.Theme
+XForms.Theme.Colors.get -> XForms.ColorScheme
+XForms.Theme.Colors.init -> void
+XForms.Theme.Equals(XForms.Theme other) -> bool
+XForms.Theme.Extensions.get -> System.Collections.Immutable.ImmutableDictionary<System.Type, object>
+XForms.Theme.Extensions.init -> void
+XForms.Theme.GetExtension<TExtension>() -> TExtension
+XForms.Theme.Mode.get -> XForms.ThemeMode
+XForms.Theme.Mode.init -> void
+XForms.Theme.Theme() -> void
+XForms.Theme.WithExtension<TExtension>(TExtension extension) -> XForms.Theme
+XForms.ThemeMode
+XForms.ThemeMode.Dark = 1 -> XForms.ThemeMode
+XForms.ThemeMode.HighContrast = 2 -> XForms.ThemeMode
+XForms.ThemeMode.Light = 0 -> XForms.ThemeMode
+XForms.Thickness
+XForms.Thickness.Bottom -> float
+XForms.Thickness.Horizontal.get -> float
+XForms.Thickness.Left -> float
+XForms.Thickness.Right -> float
+XForms.Thickness.Thickness() -> void
+XForms.Thickness.Thickness(float all) -> void
+XForms.Thickness.Thickness(float left, float top, float right, float bottom) -> void
+XForms.Thickness.Thickness(float leftAndRight, float topAndBottom) -> void
+XForms.Thickness.Top -> float
+XForms.Thickness.Vertical.get -> float
+XForms.TitleBar
+XForms.TitleBar.AccentColor.get -> XForms.Color?
+XForms.TitleBar.AccentColor.set -> void
+XForms.TitleBar.ForegroundColor.get -> XForms.Color?
+XForms.TitleBar.ForegroundColor.set -> void
+XForms.TitleBar.TitleBar(XForms.Application application) -> void
+XForms.VerticalAlignment
+XForms.VerticalAlignment.Bottom = 2 -> XForms.VerticalAlignment
+XForms.VerticalAlignment.Center = 1 -> XForms.VerticalAlignment
+XForms.VerticalAlignment.Stretch = 3 -> XForms.VerticalAlignment
+XForms.VerticalAlignment.Top = 0 -> XForms.VerticalAlignment
+XForms.View
+XForms.View.AccessibilityLabel.get -> string
+XForms.View.AccessibilityLabel.set -> void
+XForms.View.AccessibilityRole.get -> XForms.AccessibilityRole
+XForms.View.AccessibilityRole.set -> void
+XForms.View.Activated -> System.EventHandler
+XForms.View.AddVisualChild(XForms.View child) -> void
+XForms.View.Animator.get -> XForms.Animator
+XForms.View.Animator.init -> void
+XForms.View.Arrange(XForms.Rect finalRect) -> void
+XForms.View.ArrangeContent(XForms.Size size) -> void
+XForms.View.Attached -> System.EventHandler
+XForms.View.Bounds.get -> XForms.Rect
+XForms.View.CapturePointer(XForms.PointerEventArgs e) -> bool
+XForms.View.ClearVisualChildren() -> void
+XForms.View.ClipToBounds.get -> bool
+XForms.View.ClipToBounds.set -> void
+XForms.View.ContentPadding.get -> XForms.Thickness
+XForms.View.ContentPadding.set -> void
+XForms.View.CreateDrawnAnimator() -> XForms.DrawnAnimator
+XForms.View.CreateOwnAnimator() -> XForms.Animator
+XForms.View.DesiredSize.get -> XForms.Size
+XForms.View.Detached -> System.EventHandler
+XForms.View.DrawsContent.get -> bool
+XForms.View.DrawsContent.set -> void
+XForms.View.FlowDirection.get -> XForms.FlowDirection
+XForms.View.FlowDirection.set -> void
+XForms.View.Focus() -> bool
+XForms.View.Focusable.get -> bool
+XForms.View.Focusable.set -> void
+XForms.View.GestureRecognizers.get -> System.Collections.Generic.IList<XForms.GestureRecognizer>
+XForms.View.GotFocus -> System.EventHandler
+XForms.View.HasPointerCapture(int pointerId) -> bool
+XForms.View.Height.get -> float
+XForms.View.Height.set -> void
+XForms.View.HorizontalAlignment.get -> XForms.HorizontalAlignment
+XForms.View.HorizontalAlignment.set -> void
+XForms.View.InsertVisualChild(int index, XForms.View child) -> void
+XForms.View.InvalidateArrange() -> void
+XForms.View.InvalidateBackground() -> void
+XForms.View.InvalidateMeasure() -> void
+XForms.View.IsFocused.get -> bool
+XForms.View.IsHitTestVisible.get -> bool
+XForms.View.IsHitTestVisible.set -> void
+XForms.View.IsPointerOver.get -> bool
+XForms.View.IsVisible.get -> bool
+XForms.View.IsVisible.set -> void
+XForms.View.KeyDown -> System.EventHandler<XForms.KeyEventArgs>
+XForms.View.KeyUp -> System.EventHandler<XForms.KeyEventArgs>
+XForms.View.LayoutContent(XForms.Size size) -> void
+XForms.View.LostFocus -> System.EventHandler
+XForms.View.Margin.get -> XForms.Thickness
+XForms.View.Margin.set -> void
+XForms.View.MaxHeight.get -> float
+XForms.View.MaxHeight.set -> void
+XForms.View.MaxWidth.get -> float
+XForms.View.MaxWidth.set -> void
+XForms.View.Measure(XForms.Size availableSize) -> void
+XForms.View.MeasureContent(XForms.Size availableSize) -> XForms.Size
+XForms.View.MinHeight.get -> float
+XForms.View.MinHeight.set -> void
+XForms.View.MinWidth.get -> float
+XForms.View.MinWidth.set -> void
+XForms.View.NotifyAccessibilityStateChanged() -> void
+XForms.View.OnPropertyChanged(string propertyName = null) -> void
+XForms.View.Parent.get -> XForms.Element
+XForms.View.PointerCanceled -> System.EventHandler<XForms.PointerEventArgs>
+XForms.View.PointerEntered -> System.EventHandler<XForms.PointerEventArgs>
+XForms.View.PointerExited -> System.EventHandler<XForms.PointerEventArgs>
+XForms.View.PointerMoved -> System.EventHandler<XForms.PointerEventArgs>
+XForms.View.PointerPressed -> System.EventHandler<XForms.PointerEventArgs>
+XForms.View.PointerReleased -> System.EventHandler<XForms.PointerEventArgs>
+XForms.View.PointerWheelChanged -> System.EventHandler<XForms.PointerEventArgs>
+XForms.View.PropertyChanged -> System.ComponentModel.PropertyChangedEventHandler
+XForms.View.ReleasePointerCapture(XForms.PointerEventArgs e) -> void
+XForms.View.RemoveVisualChild(XForms.View child) -> bool
+XForms.View.RemoveVisualChildAt(int index) -> void
+XForms.View.ReplaceVisualChild(int index, XForms.View child) -> void
+XForms.View.SetProperty<T>(ref T field, T value, string propertyName = null) -> bool
+XForms.View.Theme.get -> XForms.Theme
+XForms.View.Theme.set -> void
+XForms.View.VerticalAlignment.get -> XForms.VerticalAlignment
+XForms.View.VerticalAlignment.set -> void
+XForms.View.View() -> void
+XForms.View.VisualChildren.get -> System.Collections.Generic.IReadOnlyList<XForms.View>
+XForms.View.Width.get -> float
+XForms.View.Width.set -> void
+XForms.View.ZIndex.get -> int
+XForms.View.ZIndex.set -> void
+XForms.Window
+XForms.Window.CanResize.get -> bool
+XForms.Window.Close() -> void
+XForms.Window.Closed -> System.EventHandler
+XForms.Window.IsMainWindow.get -> bool
+XForms.Window.MinimumSize.get -> XForms.Size
+XForms.Window.MinimumSize.set -> void
+XForms.Window.Resize(XForms.Size size) -> void
+XForms.Window.SafeAreaInsets.get -> XForms.Thickness
+XForms.Window.SafeAreaInsetsChanged -> System.EventHandler
+XForms.Window.Size.get -> XForms.Size
+XForms.Window.SizeChanged -> System.EventHandler
+XForms.Window.Title.get -> string
+XForms.Window.Title.set -> void
+abstract XForms.DrawingContext.ClearCore(XForms.Color color) -> void
+abstract XForms.DrawingContext.DrawArc(XForms.Point center, float radius, float startDegrees, float sweepDegrees, XForms.Color color, float strokeWidth = 1) -> void
+abstract XForms.DrawingContext.DrawEllipse(XForms.Point point, float radiusX, float radiusY, XForms.Color color, float strokeWidth = 1) -> void
+abstract XForms.DrawingContext.DrawGeometry(XForms.PathGeometry geometry, XForms.Color color, float strokeWidth = 1) -> void
+abstract XForms.DrawingContext.DrawImage(XForms.Bitmap bitmap, XForms.Rect destinationRectangle, XForms.Color tint) -> void
+abstract XForms.DrawingContext.DrawLine(XForms.Point start, XForms.Point end, XForms.Color color, float strokeWidth = 1) -> void
+abstract XForms.DrawingContext.DrawRectangle(XForms.Rect rectangle, XForms.Color color, float strokeWidth = 1) -> void
+abstract XForms.DrawingContext.DrawRoundedRectangle(XForms.Rect rectangle, float cornerRadius, XForms.Color color, float strokeWidth = 1) -> void
+abstract XForms.DrawingContext.DrawText(XForms.TextLayout layout, XForms.Point origin, XForms.Color color) -> void
+abstract XForms.DrawingContext.FillEllipse(XForms.Point point, float radiusX, float radiusY, XForms.Color color) -> void
+abstract XForms.DrawingContext.FillEllipse(XForms.Rect rectangle, XForms.Brush brush) -> void
+abstract XForms.DrawingContext.FillEllipse(XForms.Rect rectangle, XForms.Color color) -> void
+abstract XForms.DrawingContext.FillEllipseShadow(XForms.Rect rectangle, XForms.Color color, float blurAmount = 8) -> void
+abstract XForms.DrawingContext.FillGeometry(XForms.PathGeometry geometry, XForms.Brush brush) -> void
+abstract XForms.DrawingContext.FillRectangle(XForms.Rect rectangle, XForms.Brush brush) -> void
+abstract XForms.DrawingContext.FillRectangle(XForms.Rect rectangle, XForms.Color color) -> void
+abstract XForms.DrawingContext.FillRoundedRectangle(XForms.Rect rectangle, float cornerRadius, XForms.Brush brush) -> void
+abstract XForms.DrawingContext.FillRoundedRectangle(XForms.Rect rectangle, float cornerRadius, XForms.Color color) -> void
+abstract XForms.DrawingContext.Pop() -> void
+abstract XForms.DrawingContext.PushClipCore(XForms.Rect clip) -> void
+abstract XForms.DrawingContext.PushOpacityCore(float opacity) -> void
+abstract XForms.DrawingContext.PushTransformCore(System.Numerics.Matrix3x2 transform) -> void
+abstract XForms.EasingFunction.EaseInCore(float t) -> float
+abstract XForms.GestureRecognizer.OnPointerInput(XForms.PointerEventArgs inputEvent, ref XForms.GestureEventResult result) -> void
+abstract XForms.PageTransition.PlayAsync(XForms.PageTransitionContext context) -> System.Threading.Tasks.Task
+abstract XForms.Primitives.ItemsViewSource.Count.get -> int
+abstract XForms.Primitives.ItemsViewSource.GetItemView(XForms.View reuseView, object item) -> XForms.View
+abstract XForms.Primitives.ItemsViewSource.IndexOf(object item) -> int
+abstract XForms.Primitives.ItemsViewSource.this[int index].get -> object
+const XForms.FontFamilies.Monospace = "monospace" -> string
+const XForms.FontFamilies.SansSerif = "sans-serif" -> string
+const XForms.FontFamilies.Serif = "serif" -> string
+override XForms.Angle.Equals(object obj) -> bool
+override XForms.Angle.GetHashCode() -> int
+override XForms.Color.Equals(object obj) -> bool
+override XForms.Color.GetHashCode() -> int
+override XForms.Color.ToString() -> string
+override XForms.ColorScheme.Equals(object obj) -> bool
+override XForms.ColorScheme.GetHashCode() -> int
+override XForms.ColorScheme.ToString() -> string
+override XForms.CubicEase.EaseInCore(float t) -> float
+override XForms.Dimension.Equals(object obj) -> bool
+override XForms.Dimension.GetHashCode() -> int
+override XForms.Origin.Equals(object obj) -> bool
+override XForms.Origin.GetHashCode() -> int
+override XForms.Page.GetBackgroundColor() -> XForms.Color
+override XForms.Point.Equals(object obj) -> bool
+override XForms.Point.GetHashCode() -> int
+override XForms.Point.ToString() -> string
+override XForms.Primitives.Image.DefaultAccessibilityRole.get -> XForms.AccessibilityRole
+override XForms.Primitives.ItemsView.DefaultAccessibilityRole.get -> XForms.AccessibilityRole
+override XForms.Primitives.ItemsView.OnThemeChanged(XForms.Theme theme) -> void
+override XForms.Primitives.TextBlock.DefaultAccessibilityLabel.get -> string
+override XForms.Primitives.TextBlock.DefaultAccessibilityRole.get -> XForms.AccessibilityRole
+override XForms.Primitives.TextBlock.OnThemeChanged(XForms.Theme theme) -> void
+override XForms.Primitives.TextBox.DefaultAccessibilityLabel.get -> string
+override XForms.Primitives.TextBox.DefaultAccessibilityRole.get -> XForms.AccessibilityRole
+override XForms.Primitives.TextBox.OnAttached() -> void
+override XForms.Primitives.TextBox.OnThemeChanged(XForms.Theme theme) -> void
+override XForms.Rect.Equals(object obj) -> bool
+override XForms.Rect.GetHashCode() -> int
+override XForms.Size.Equals(object obj) -> bool
+override XForms.Size.GetHashCode() -> int
+override XForms.SpringEase.EaseInCore(float t) -> float
+override XForms.Theme.Equals(object obj) -> bool
+override XForms.Theme.GetHashCode() -> int
+override XForms.Theme.ToString() -> string
+override XForms.Thickness.Equals(object obj) -> bool
+override XForms.Thickness.GetHashCode() -> int
+override XForms.Thickness.ToString() -> string
+override XForms.View.OnThemeChanged(XForms.Theme theme) -> void
+static XForms.Angle.FromDegrees(float degrees) -> XForms.Angle
+static XForms.Angle.FromRadians(float radians) -> XForms.Angle
+static XForms.Angle.operator !=(XForms.Angle a, XForms.Angle b) -> bool
+static XForms.Angle.operator ==(XForms.Angle a, XForms.Angle b) -> bool
+static XForms.Application.Current.get -> XForms.Application
+static XForms.Application.TouchSlop -> float
+static XForms.Color.FromArgb(byte a, byte r, byte g, byte b) -> XForms.Color
+static XForms.Color.FromArgb(float a, float r, float g, float b) -> XForms.Color
+static XForms.Color.FromArgb(float r, float g, float b) -> XForms.Color
+static XForms.Color.FromArgb(uint argb) -> XForms.Color
+static XForms.Color.FromRgb(byte r, byte g, byte b) -> XForms.Color
+static XForms.Color.FromRgb(uint rgb) -> XForms.Color
+static XForms.Color.FromString(string colorString) -> XForms.Color
+static XForms.Color.operator !=(XForms.Color a, XForms.Color b) -> bool
+static XForms.Color.operator ==(XForms.Color a, XForms.Color b) -> bool
+static XForms.ColorScheme.operator !=(XForms.ColorScheme left, XForms.ColorScheme right) -> bool
+static XForms.ColorScheme.operator ==(XForms.ColorScheme left, XForms.ColorScheme right) -> bool
+static XForms.Dimension.implicit operator XForms.Dimension(float value) -> XForms.Dimension
+static XForms.Dimension.implicit operator float(XForms.Dimension dimension) -> float
+static XForms.Dimension.operator !=(XForms.Dimension a, XForms.Dimension b) -> bool
+static XForms.Dimension.operator ==(XForms.Dimension a, XForms.Dimension b) -> bool
+static XForms.ImageSource.implicit operator XForms.ImageSource(XForms.Bitmap source) -> XForms.ImageSource
+static XForms.ImageSource.implicit operator XForms.ImageSource(string source) -> XForms.ImageSource
+static XForms.LinearGradientBrush.Vertical(XForms.Color top, XForms.Color bottom) -> XForms.LinearGradientBrush
+static XForms.Origin.BottomCenter -> XForms.Origin
+static XForms.Origin.BottomLeft -> XForms.Origin
+static XForms.Origin.BottomRight -> XForms.Origin
+static XForms.Origin.Center -> XForms.Origin
+static XForms.Origin.MiddleLeft -> XForms.Origin
+static XForms.Origin.MiddleRight -> XForms.Origin
+static XForms.Origin.TopCenter -> XForms.Origin
+static XForms.Origin.TopLeft -> XForms.Origin
+static XForms.Origin.TopRight -> XForms.Origin
+static XForms.Origin.operator !=(XForms.Origin a, XForms.Origin b) -> bool
+static XForms.Origin.operator ==(XForms.Origin a, XForms.Origin b) -> bool
+static XForms.PageTransition.Fade.get -> XForms.PageTransition
+static XForms.PageTransition.None.get -> XForms.PageTransition
+static XForms.PageTransition.Slide.get -> XForms.PageTransition
+static XForms.PageTransition.SlideUp.get -> XForms.PageTransition
+static XForms.Point.Translate(XForms.Point point, XForms.Angle angle, float distance) -> XForms.Point
+static XForms.Point.Translate(XForms.Point point, float dx, float dy) -> XForms.Point
+static XForms.Point.operator !=(XForms.Point a, XForms.Point b) -> bool
+static XForms.Point.operator *(XForms.Point a, float v) -> XForms.Point
+static XForms.Point.operator *(float v, XForms.Point a) -> XForms.Point
+static XForms.Point.operator +(XForms.Point a, XForms.Point v) -> XForms.Point
+static XForms.Point.operator -(XForms.Point a) -> XForms.Point
+static XForms.Point.operator -(XForms.Point a, XForms.Point v) -> XForms.Point
+static XForms.Point.operator /(XForms.Point a, float v) -> XForms.Point
+static XForms.Point.operator ==(XForms.Point a, XForms.Point b) -> bool
+static XForms.Primitives.ItemContainer.ContainerFromContent(XForms.View view) -> XForms.Primitives.ItemContainer
+static XForms.Primitives.ListLayout.Grid(int columns) -> XForms.Primitives.ListLayout
+static XForms.Primitives.ListLayout.Horizontal.get -> XForms.Primitives.ListLayout
+static XForms.Primitives.ListLayout.Vertical.get -> XForms.Primitives.ListLayout
+static XForms.Rect.FromLTRB(float left, float top, float right, float bottom) -> XForms.Rect
+static XForms.Rect.operator !=(XForms.Rect a, XForms.Rect b) -> bool
+static XForms.Rect.operator ==(XForms.Rect a, XForms.Rect b) -> bool
+static XForms.Size.operator !=(XForms.Size a, XForms.Size b) -> bool
+static XForms.Size.operator ==(XForms.Size a, XForms.Size b) -> bool
+static XForms.TextLayout.Measure(string text, XForms.TextFormat format, float maxWidth = Infinity) -> XForms.Size
+static XForms.Theme.ContrastingColor(XForms.Color color) -> XForms.Color
+static XForms.Theme.Create(XForms.ThemeMode mode, XForms.Color? accentColor = null) -> XForms.Theme
+static XForms.Theme.CreateColors(XForms.ThemeMode mode, XForms.Color accentColor) -> XForms.ColorScheme
+static XForms.Theme.operator !=(XForms.Theme left, XForms.Theme right) -> bool
+static XForms.Theme.operator ==(XForms.Theme left, XForms.Theme right) -> bool
+static XForms.Thickness.operator !=(XForms.Thickness a, XForms.Thickness b) -> bool
+static XForms.Thickness.operator ==(XForms.Thickness a, XForms.Thickness b) -> bool
+static readonly XForms.Angle.Zero -> XForms.Angle
+static readonly XForms.Colors.AliceBlue -> XForms.Color
+static readonly XForms.Colors.AntiqueWhite -> XForms.Color
+static readonly XForms.Colors.Aqua -> XForms.Color
+static readonly XForms.Colors.Aquamarine -> XForms.Color
+static readonly XForms.Colors.Azure -> XForms.Color
+static readonly XForms.Colors.Beige -> XForms.Color
+static readonly XForms.Colors.Bisque -> XForms.Color
+static readonly XForms.Colors.Black -> XForms.Color
+static readonly XForms.Colors.BlanchedAlmond -> XForms.Color
+static readonly XForms.Colors.Blue -> XForms.Color
+static readonly XForms.Colors.BlueViolet -> XForms.Color
+static readonly XForms.Colors.Brown -> XForms.Color
+static readonly XForms.Colors.BurlyWood -> XForms.Color
+static readonly XForms.Colors.CadetBlue -> XForms.Color
+static readonly XForms.Colors.Chartreuse -> XForms.Color
+static readonly XForms.Colors.Chocolate -> XForms.Color
+static readonly XForms.Colors.Coral -> XForms.Color
+static readonly XForms.Colors.CornflowerBlue -> XForms.Color
+static readonly XForms.Colors.Cornsilk -> XForms.Color
+static readonly XForms.Colors.Crimson -> XForms.Color
+static readonly XForms.Colors.Cyan -> XForms.Color
+static readonly XForms.Colors.DarkBlue -> XForms.Color
+static readonly XForms.Colors.DarkCyan -> XForms.Color
+static readonly XForms.Colors.DarkGoldenrod -> XForms.Color
+static readonly XForms.Colors.DarkGray -> XForms.Color
+static readonly XForms.Colors.DarkGreen -> XForms.Color
+static readonly XForms.Colors.DarkKhaki -> XForms.Color
+static readonly XForms.Colors.DarkMagenta -> XForms.Color
+static readonly XForms.Colors.DarkOliveGreen -> XForms.Color
+static readonly XForms.Colors.DarkOrange -> XForms.Color
+static readonly XForms.Colors.DarkOrchid -> XForms.Color
+static readonly XForms.Colors.DarkRed -> XForms.Color
+static readonly XForms.Colors.DarkSalmon -> XForms.Color
+static readonly XForms.Colors.DarkSeaGreen -> XForms.Color
+static readonly XForms.Colors.DarkSlateBlue -> XForms.Color
+static readonly XForms.Colors.DarkSlateGray -> XForms.Color
+static readonly XForms.Colors.DarkTurquoise -> XForms.Color
+static readonly XForms.Colors.DarkViolet -> XForms.Color
+static readonly XForms.Colors.DeepPink -> XForms.Color
+static readonly XForms.Colors.DeepSkyBlue -> XForms.Color
+static readonly XForms.Colors.DimGray -> XForms.Color
+static readonly XForms.Colors.DodgerBlue -> XForms.Color
+static readonly XForms.Colors.Firebrick -> XForms.Color
+static readonly XForms.Colors.FloralWhite -> XForms.Color
+static readonly XForms.Colors.ForestGreen -> XForms.Color
+static readonly XForms.Colors.Fuchsia -> XForms.Color
+static readonly XForms.Colors.Gainsboro -> XForms.Color
+static readonly XForms.Colors.GhostWhite -> XForms.Color
+static readonly XForms.Colors.Gold -> XForms.Color
+static readonly XForms.Colors.Goldenrod -> XForms.Color
+static readonly XForms.Colors.Gray -> XForms.Color
+static readonly XForms.Colors.Green -> XForms.Color
+static readonly XForms.Colors.GreenYellow -> XForms.Color
+static readonly XForms.Colors.Honeydew -> XForms.Color
+static readonly XForms.Colors.HotPink -> XForms.Color
+static readonly XForms.Colors.IndianRed -> XForms.Color
+static readonly XForms.Colors.Indigo -> XForms.Color
+static readonly XForms.Colors.Ivory -> XForms.Color
+static readonly XForms.Colors.Khaki -> XForms.Color
+static readonly XForms.Colors.Lavender -> XForms.Color
+static readonly XForms.Colors.LavenderBlush -> XForms.Color
+static readonly XForms.Colors.LawnGreen -> XForms.Color
+static readonly XForms.Colors.LemonChiffon -> XForms.Color
+static readonly XForms.Colors.LightBlue -> XForms.Color
+static readonly XForms.Colors.LightCoral -> XForms.Color
+static readonly XForms.Colors.LightCyan -> XForms.Color
+static readonly XForms.Colors.LightGoldenrodYellow -> XForms.Color
+static readonly XForms.Colors.LightGray -> XForms.Color
+static readonly XForms.Colors.LightGreen -> XForms.Color
+static readonly XForms.Colors.LightPink -> XForms.Color
+static readonly XForms.Colors.LightSalmon -> XForms.Color
+static readonly XForms.Colors.LightSeaGreen -> XForms.Color
+static readonly XForms.Colors.LightSkyBlue -> XForms.Color
+static readonly XForms.Colors.LightSlateGray -> XForms.Color
+static readonly XForms.Colors.LightSteelBlue -> XForms.Color
+static readonly XForms.Colors.LightYellow -> XForms.Color
+static readonly XForms.Colors.Lime -> XForms.Color
+static readonly XForms.Colors.LimeGreen -> XForms.Color
+static readonly XForms.Colors.Linen -> XForms.Color
+static readonly XForms.Colors.Magenta -> XForms.Color
+static readonly XForms.Colors.Maroon -> XForms.Color
+static readonly XForms.Colors.MediumAquamarine -> XForms.Color
+static readonly XForms.Colors.MediumBlue -> XForms.Color
+static readonly XForms.Colors.MediumOrchid -> XForms.Color
+static readonly XForms.Colors.MediumPurple -> XForms.Color
+static readonly XForms.Colors.MediumSeaGreen -> XForms.Color
+static readonly XForms.Colors.MediumSlateBlue -> XForms.Color
+static readonly XForms.Colors.MediumSpringGreen -> XForms.Color
+static readonly XForms.Colors.MediumTurquoise -> XForms.Color
+static readonly XForms.Colors.MediumVioletRed -> XForms.Color
+static readonly XForms.Colors.MidnightBlue -> XForms.Color
+static readonly XForms.Colors.MintCream -> XForms.Color
+static readonly XForms.Colors.MistyRose -> XForms.Color
+static readonly XForms.Colors.Moccasin -> XForms.Color
+static readonly XForms.Colors.NavajoWhite -> XForms.Color
+static readonly XForms.Colors.Navy -> XForms.Color
+static readonly XForms.Colors.OldLace -> XForms.Color
+static readonly XForms.Colors.Olive -> XForms.Color
+static readonly XForms.Colors.OliveDrab -> XForms.Color
+static readonly XForms.Colors.Orange -> XForms.Color
+static readonly XForms.Colors.OrangeRed -> XForms.Color
+static readonly XForms.Colors.Orchid -> XForms.Color
+static readonly XForms.Colors.PaleGoldenrod -> XForms.Color
+static readonly XForms.Colors.PaleGreen -> XForms.Color
+static readonly XForms.Colors.PaleTurquoise -> XForms.Color
+static readonly XForms.Colors.PaleVioletRed -> XForms.Color
+static readonly XForms.Colors.PapayaWhip -> XForms.Color
+static readonly XForms.Colors.PeachPuff -> XForms.Color
+static readonly XForms.Colors.Peru -> XForms.Color
+static readonly XForms.Colors.Pink -> XForms.Color
+static readonly XForms.Colors.Plum -> XForms.Color
+static readonly XForms.Colors.PowderBlue -> XForms.Color
+static readonly XForms.Colors.Purple -> XForms.Color
+static readonly XForms.Colors.Red -> XForms.Color
+static readonly XForms.Colors.RosyBrown -> XForms.Color
+static readonly XForms.Colors.RoyalBlue -> XForms.Color
+static readonly XForms.Colors.SaddleBrown -> XForms.Color
+static readonly XForms.Colors.Salmon -> XForms.Color
+static readonly XForms.Colors.SandyBrown -> XForms.Color
+static readonly XForms.Colors.SeaGreen -> XForms.Color
+static readonly XForms.Colors.SeaShell -> XForms.Color
+static readonly XForms.Colors.Sienna -> XForms.Color
+static readonly XForms.Colors.Silver -> XForms.Color
+static readonly XForms.Colors.SkyBlue -> XForms.Color
+static readonly XForms.Colors.SlateBlue -> XForms.Color
+static readonly XForms.Colors.SlateGray -> XForms.Color
+static readonly XForms.Colors.Snow -> XForms.Color
+static readonly XForms.Colors.SpringGreen -> XForms.Color
+static readonly XForms.Colors.SteelBlue -> XForms.Color
+static readonly XForms.Colors.Tan -> XForms.Color
+static readonly XForms.Colors.Teal -> XForms.Color
+static readonly XForms.Colors.Thistle -> XForms.Color
+static readonly XForms.Colors.Tomato -> XForms.Color
+static readonly XForms.Colors.Transparent -> XForms.Color
+static readonly XForms.Colors.TransparentBlack -> XForms.Color
+static readonly XForms.Colors.TransparentWhite -> XForms.Color
+static readonly XForms.Colors.Turquoise -> XForms.Color
+static readonly XForms.Colors.Violet -> XForms.Color
+static readonly XForms.Colors.Wheat -> XForms.Color
+static readonly XForms.Colors.White -> XForms.Color
+static readonly XForms.Colors.WhiteSmoke -> XForms.Color
+static readonly XForms.Colors.Yellow -> XForms.Color
+static readonly XForms.Colors.YellowGreen -> XForms.Color
+static readonly XForms.Dimension.Auto -> XForms.Dimension
+static readonly XForms.EasingFunction.Linear -> XForms.EasingFunction
+static readonly XForms.Point.Zero -> XForms.Point
+static readonly XForms.Size.Empty -> XForms.Size
+static readonly XForms.Theme.DefaultAccentColor -> XForms.Color
+static readonly XForms.Thickness.Zero -> XForms.Thickness
+virtual XForms.Application.CreateTheme(XForms.ThemeMode mode, XForms.Color accentColor) -> XForms.Theme
+virtual XForms.Application.Exit() -> void
+virtual XForms.Application.OnLoadResources() -> void
+virtual XForms.Application.OnResume() -> void
+virtual XForms.Application.OnStart() -> void
+virtual XForms.Application.OnSuspend() -> void
+virtual XForms.Application.OnThemeChanged(XForms.Theme theme) -> void
+virtual XForms.DrawingContext.DrawText(string text, XForms.Rect bounds, XForms.Color color, XForms.TextFormat textFormat) -> void
+virtual XForms.Element.OnThemeChanged(XForms.Theme theme) -> void
+virtual XForms.Frame.CanGoBack.get -> bool
+virtual XForms.Frame.GoBackAsync(XForms.PageTransition transition = null) -> System.Threading.Tasks.Task<bool>
+virtual XForms.Frame.NavigateAsync(XForms.Page page, XForms.PageTransition transition = null) -> System.Threading.Tasks.Task
+virtual XForms.Frame.ReplaceAsync(XForms.Page page, XForms.NavigationMode mode = XForms.NavigationMode.Forward, XForms.PageTransition transition = null) -> System.Threading.Tasks.Task
+virtual XForms.GestureRecognizer.OnAttached(XForms.View view) -> void
+virtual XForms.GestureRecognizer.OnDetached(XForms.View view) -> void
+virtual XForms.GestureRecognizer.Reset() -> void
+virtual XForms.GestureRecognizer.TracksMultiplePointers.get -> bool
+virtual XForms.Page.OnNavigatedFrom(XForms.NavigationEventArgs navigationEventArgs) -> void
+virtual XForms.Page.OnNavigatedTo(XForms.NavigationEventArgs navigationEventArgs) -> void
+virtual XForms.Page.OnNavigatingFrom(XForms.NavigationEventArgs navigationEventArgs) -> bool
+virtual XForms.Primitives.ItemContainer.AddContent(XForms.View content) -> void
+virtual XForms.Primitives.ItemContainer.OnBind() -> void
+virtual XForms.Primitives.ItemContainer.OnRecycle() -> void
+virtual XForms.Primitives.ItemContainer.RemoveContent(XForms.View content) -> void
+virtual XForms.Primitives.ItemsView.CreateItemContainer() -> XForms.Primitives.ItemContainer
+virtual XForms.Primitives.ItemsView.OnContainerBound(XForms.Primitives.ItemContainer container) -> void
+virtual XForms.Primitives.ItemsViewSource.GetItemContainer(XForms.Primitives.ItemsView itemsView, XForms.Primitives.ItemContainer reuseContainer, object item) -> XForms.Primitives.ItemContainer
+virtual XForms.Primitives.ItemsViewSource.NotifyCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) -> void
+virtual XForms.Primitives.Popup.OnClosed() -> void
+virtual XForms.View.AccessibilityIsChecked.get -> bool?
+virtual XForms.View.AccessibilityIsExpanded.get -> bool?
+virtual XForms.View.AccessibilityIsSelected.get -> bool
+virtual XForms.View.AccessibilityValue.get -> string
+virtual XForms.View.AnimatesChildren.get -> bool
+virtual XForms.View.ArrangeOverride(XForms.Size finalSize) -> void
+virtual XForms.View.DefaultAccessibilityLabel.get -> string
+virtual XForms.View.DefaultAccessibilityRole.get -> XForms.AccessibilityRole
+virtual XForms.View.GetBackgroundColor() -> XForms.Color
+virtual XForms.View.InvalidateVisual() -> void
+virtual XForms.View.IsAccessibilityActionSupported(XForms.AccessibilityAction action) -> bool
+virtual XForms.View.MeasureOverride(XForms.Size availableSize) -> XForms.Size
+virtual XForms.View.OnActivate() -> void
+virtual XForms.View.OnAttached() -> void
+virtual XForms.View.OnDetached() -> void
+virtual XForms.View.OnGotFocus() -> void
+virtual XForms.View.OnKeyDown(XForms.KeyEventArgs e) -> void
+virtual XForms.View.OnKeyUp(XForms.KeyEventArgs e) -> void
+virtual XForms.View.OnLostFocus() -> void
+virtual XForms.View.OnPointerCanceled(XForms.PointerEventArgs e) -> void
+virtual XForms.View.OnPointerEntered(XForms.PointerEventArgs e) -> void
+virtual XForms.View.OnPointerExited(XForms.PointerEventArgs e) -> void
+virtual XForms.View.OnPointerMoved(XForms.PointerEventArgs e) -> void
+virtual XForms.View.OnPointerPressed(XForms.PointerEventArgs e) -> void
+virtual XForms.View.OnPointerReleased(XForms.PointerEventArgs e) -> void
+virtual XForms.View.OnPointerWheelChanged(XForms.PointerEventArgs e) -> void
+virtual XForms.View.PerformAccessibilityAction(XForms.AccessibilityAction action) -> bool
+virtual XForms.View.Render(XForms.DrawingContext drawingContext) -> void

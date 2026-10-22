@@ -4,4 +4,25 @@
     <SupportedOSPlatformVersion Condition="'$(TargetPlatformIdentifier)' == 'ios'">15.0</SupportedOSPlatformVersion>
     <SupportedOSPlatformVersion Condition="'$(TargetPlatformIdentifier)' == 'android'">24.0</SupportedOSPlatformVersion>
   </PropertyGroup>
+
+  <!--
+    The layers (docs/architecture.md): each references only the layers below
+    it. A reference to any other XForms project fails the build (XF0002).
+  -->
+  <PropertyGroup>
+    <XFormsAllowedReferences Condition="'$(MSBuildProjectName)' == 'XForms.Framework'">XForms.Analyzers</XFormsAllowedReferences>
+    <XFormsAllowedReferences Condition="$(MSBuildProjectName.StartsWith('XForms.Framework.'))">XForms.Framework;XForms.Analyzers</XFormsAllowedReferences>
+    <XFormsAllowedReferences Condition="'$(MSBuildProjectName)' == 'XForms.Toolkit'">XForms.Framework</XFormsAllowedReferences>
+    <XFormsAllowedReferences Condition="$(MSBuildProjectName.StartsWith('XForms.Toolkit.'))">XForms.Toolkit;XForms.Framework;XForms.Framework.$(MSBuildProjectName.Substring(15))</XFormsAllowedReferences>
+    <XFormsAllowedReferences Condition="'$(MSBuildProjectName)' == 'XForms.Controls'">XForms.Framework;XForms.Toolkit</XFormsAllowedReferences>
+  </PropertyGroup>
+
+  <Target Name="XFormsCheckLayerReferences" BeforeTargets="ResolveProjectReferences;CoreCompile" Condition="'$(XFormsAllowedReferences)' != ''">
+    <ItemGroup>
+      <_XFormsReferencedProject Include="@(ProjectReference->'%(Filename)')" />
+      <_XFormsAllowedProject Include="$(XFormsAllowedReferences)" />
+      <_XFormsDisallowedProject Include="@(_XFormsReferencedProject)" Exclude="@(_XFormsAllowedProject)" />
+    </ItemGroup>
+    <Error Condition="'@(_XFormsDisallowedProject)' != ''" Code="XF0002" Text="$(MSBuildProjectName) mustn't reference @(_XFormsDisallowedProject, ', '): its layer may reference only $(XFormsAllowedReferences.Replace(';', ', ')). See docs/architecture.md." />
+  </Target>
 </Project>

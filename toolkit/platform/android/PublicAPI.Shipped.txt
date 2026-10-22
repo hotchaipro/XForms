@@ -1,0 +1,2 @@
+XForms.Android.AndroidToolkitServices
+static XForms.Android.AndroidToolkitServices.Register() -> void

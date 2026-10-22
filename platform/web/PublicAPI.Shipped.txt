@@ -1,0 +1,5 @@
+XForms.Web.WebApplication
+static XForms.Web.WebApplication.Current.get -> XForms.Web.WebApplication
+static XForms.Web.WebApplication.GetQueryParameter(string name) -> string
+static XForms.Web.WebApplication.InitializeAsync() -> System.Threading.Tasks.Task
+static XForms.Web.WebApplication.RunAsync(string title, XForms.Application application) -> System.Threading.Tasks.Task

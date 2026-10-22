@@ -1,0 +1,133 @@
+XForms.ApplicationServicesExtensions
+XForms.ApplicationServicesExtensions.extension(XForms.Application)
+XForms.ApplicationServicesExtensions.extension(XForms.Application).Services.get -> XForms.PlatformServices
+XForms.Binding
+XForms.FilePickerOptions
+XForms.FilePickerOptions.AllowMultiple.get -> bool
+XForms.FilePickerOptions.AllowMultiple.init -> void
+XForms.FilePickerOptions.FilePickerOptions() -> void
+XForms.FilePickerOptions.FileTypes.get -> System.Collections.Generic.IReadOnlyList<string>
+XForms.FilePickerOptions.FileTypes.init -> void
+XForms.FilePickerOptions.Title.get -> string
+XForms.FilePickerOptions.Title.init -> void
+XForms.HapticFeedbackType
+XForms.HapticFeedbackType.Click = 0 -> XForms.HapticFeedbackType
+XForms.HapticFeedbackType.LongPress = 1 -> XForms.HapticFeedbackType
+XForms.IClipboard
+XForms.IClipboard.GetTextAsync() -> System.Threading.Tasks.Task<string>
+XForms.IClipboard.HasText.get -> bool
+XForms.IClipboard.SetTextAsync(string text) -> System.Threading.Tasks.Task
+XForms.IConnectivity
+XForms.IConnectivity.ConnectivityChanged -> System.EventHandler
+XForms.IConnectivity.NetworkAccess.get -> XForms.NetworkAccess
+XForms.IFilePicker
+XForms.IFilePicker.PickAsync(XForms.FilePickerOptions options = null) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<XForms.PickedFile>>
+XForms.IFilePicker.SaveAsync(string suggestedName, System.Func<System.IO.Stream, System.Threading.Tasks.Task> write, XForms.FilePickerOptions options = null) -> System.Threading.Tasks.Task<bool>
+XForms.IHapticFeedback
+XForms.IHapticFeedback.IsSupported.get -> bool
+XForms.IHapticFeedback.Perform(XForms.HapticFeedbackType type) -> void
+XForms.ILauncher
+XForms.ILauncher.OpenAsync(System.Uri uri) -> System.Threading.Tasks.Task<bool>
+XForms.IPreferences
+XForms.IPreferences.Clear() -> void
+XForms.IPreferences.ContainsKey(string key) -> bool
+XForms.IPreferences.Get(string key, string defaultValue = null) -> string
+XForms.IPreferences.Remove(string key) -> void
+XForms.IPreferences.Set(string key, string value) -> void
+XForms.ISecureStorage
+XForms.ISecureStorage.GetAsync(string key) -> System.Threading.Tasks.Task<string>
+XForms.ISecureStorage.Remove(string key) -> bool
+XForms.ISecureStorage.RemoveAll() -> void
+XForms.ISecureStorage.SetAsync(string key, string value) -> System.Threading.Tasks.Task
+XForms.IShare
+XForms.IShare.RequestAsync(XForms.ShareRequest request) -> System.Threading.Tasks.Task
+XForms.ImageProperties
+XForms.ImageProperties.extension(XForms.Primitives.Image)
+XForms.NetworkAccess
+XForms.NetworkAccess.Internet = 3 -> XForms.NetworkAccess
+XForms.NetworkAccess.Local = 2 -> XForms.NetworkAccess
+XForms.NetworkAccess.None = 1 -> XForms.NetworkAccess
+XForms.NetworkAccess.Unknown = 0 -> XForms.NetworkAccess
+XForms.PickedFile
+XForms.PickedFile.Name.get -> string
+XForms.PickedFile.OpenReadAsync() -> System.Threading.Tasks.Task<System.IO.Stream>
+XForms.PickedFile.PickedFile(string name, System.Func<System.Threading.Tasks.Task<System.IO.Stream>> open) -> void
+XForms.PlatformServices
+XForms.PlatformServices.Clipboard.get -> XForms.IClipboard
+XForms.PlatformServices.Clipboard.set -> void
+XForms.PlatformServices.Connectivity.get -> XForms.IConnectivity
+XForms.PlatformServices.Connectivity.set -> void
+XForms.PlatformServices.FilePicker.get -> XForms.IFilePicker
+XForms.PlatformServices.FilePicker.set -> void
+XForms.PlatformServices.HapticFeedback.get -> XForms.IHapticFeedback
+XForms.PlatformServices.HapticFeedback.set -> void
+XForms.PlatformServices.Launcher.get -> XForms.ILauncher
+XForms.PlatformServices.Launcher.set -> void
+XForms.PlatformServices.PlatformServices() -> void
+XForms.PlatformServices.Preferences.get -> XForms.IPreferences
+XForms.PlatformServices.Preferences.set -> void
+XForms.PlatformServices.SecureStorage.get -> XForms.ISecureStorage
+XForms.PlatformServices.SecureStorage.set -> void
+XForms.PlatformServices.Share.get -> XForms.IShare
+XForms.PlatformServices.Share.set -> void
+XForms.PreferencesExtensions
+XForms.ShareRequest
+XForms.ShareRequest.ShareRequest() -> void
+XForms.ShareRequest.Text.get -> string
+XForms.ShareRequest.Text.init -> void
+XForms.ShareRequest.Title.get -> string
+XForms.ShareRequest.Title.init -> void
+XForms.ShareRequest.Uri.get -> System.Uri
+XForms.ShareRequest.Uri.init -> void
+XForms.TextBlockProperties
+XForms.TextBlockProperties.extension(XForms.Primitives.TextBlock)
+XForms.TextBoxProperties
+XForms.TextBoxProperties.extension(XForms.Primitives.TextBox)
+XForms.ViewBindingExtensions
+XForms.ViewProperties
+XForms.ViewProperties.extension(XForms.View)
+XForms.ViewProperty<TView, TValue>
+XForms.ViewProperty<TView, TValue>.GetValue(TView view) -> TValue
+XForms.ViewProperty<TView, TValue>.Name.get -> string
+XForms.ViewProperty<TView, TValue>.SetValue(TView view, TValue value) -> void
+XForms.ViewProperty<TView, TValue>.ViewProperty(string name, System.Func<TView, TValue> getValue, System.Action<TView, TValue> setValue) -> void
+abstract XForms.Binding.Dispose() -> void
+abstract XForms.Binding.Refresh() -> void
+override XForms.ViewProperty<TView, TValue>.ToString() -> string
+static XForms.ApplicationServicesExtensions.get_Services(XForms.Application application) -> XForms.PlatformServices
+static XForms.ImageProperties.extension(XForms.Primitives.Image).SourceProperty.get -> XForms.ViewProperty<XForms.Primitives.Image, XForms.ImageSource>
+static XForms.ImageProperties.extension(XForms.Primitives.Image).TintProperty.get -> XForms.ViewProperty<XForms.Primitives.Image, XForms.Color>
+static XForms.ImageProperties.get_SourceProperty() -> XForms.ViewProperty<XForms.Primitives.Image, XForms.ImageSource>
+static XForms.ImageProperties.get_TintProperty() -> XForms.ViewProperty<XForms.Primitives.Image, XForms.Color>
+static XForms.PlatformServices.Current.get -> XForms.PlatformServices
+static XForms.PlatformServices.Current.set -> void
+static XForms.PreferencesExtensions.Get<T>(this XForms.IPreferences preferences, string key, T defaultValue) -> T
+static XForms.PreferencesExtensions.Set<T>(this XForms.IPreferences preferences, string key, T value) -> void
+static XForms.TextBlockProperties.extension(XForms.Primitives.TextBlock).FontSizeProperty.get -> XForms.ViewProperty<XForms.Primitives.TextBlock, float>
+static XForms.TextBlockProperties.extension(XForms.Primitives.TextBlock).FontWeightProperty.get -> XForms.ViewProperty<XForms.Primitives.TextBlock, XForms.FontWeight>
+static XForms.TextBlockProperties.extension(XForms.Primitives.TextBlock).ForegroundProperty.get -> XForms.ViewProperty<XForms.Primitives.TextBlock, XForms.Color>
+static XForms.TextBlockProperties.extension(XForms.Primitives.TextBlock).StrikethroughProperty.get -> XForms.ViewProperty<XForms.Primitives.TextBlock, bool>
+static XForms.TextBlockProperties.extension(XForms.Primitives.TextBlock).TextProperty.get -> XForms.ViewProperty<XForms.Primitives.TextBlock, string>
+static XForms.TextBlockProperties.get_FontSizeProperty() -> XForms.ViewProperty<XForms.Primitives.TextBlock, float>
+static XForms.TextBlockProperties.get_FontWeightProperty() -> XForms.ViewProperty<XForms.Primitives.TextBlock, XForms.FontWeight>
+static XForms.TextBlockProperties.get_ForegroundProperty() -> XForms.ViewProperty<XForms.Primitives.TextBlock, XForms.Color>
+static XForms.TextBlockProperties.get_StrikethroughProperty() -> XForms.ViewProperty<XForms.Primitives.TextBlock, bool>
+static XForms.TextBlockProperties.get_TextProperty() -> XForms.ViewProperty<XForms.Primitives.TextBlock, string>
+static XForms.TextBoxProperties.extension(XForms.Primitives.TextBox).PlaceholderTextProperty.get -> XForms.ViewProperty<XForms.Primitives.TextBox, string>
+static XForms.TextBoxProperties.extension(XForms.Primitives.TextBox).TextProperty.get -> XForms.ViewProperty<XForms.Primitives.TextBox, string>
+static XForms.TextBoxProperties.get_PlaceholderTextProperty() -> XForms.ViewProperty<XForms.Primitives.TextBox, string>
+static XForms.TextBoxProperties.get_TextProperty() -> XForms.ViewProperty<XForms.Primitives.TextBox, string>
+static XForms.ViewBindingExtensions.Bind<TView, TValue, TSource>(this TView view, XForms.ViewProperty<TView, TValue> property, TSource source, System.Func<TSource, TValue> getValue) -> XForms.Binding
+static XForms.ViewBindingExtensions.Bind<TView, TValue, TSource>(this TView view, XForms.ViewProperty<TView, TValue> property, TSource source, System.Func<TSource, TValue> getValue, System.Action<TSource, TValue> setValue) -> XForms.Binding
+static XForms.ViewProperties.extension(XForms.View).AccessibilityLabelProperty.get -> XForms.ViewProperty<XForms.View, string>
+static XForms.ViewProperties.extension(XForms.View).HeightProperty.get -> XForms.ViewProperty<XForms.View, float>
+static XForms.ViewProperties.extension(XForms.View).IsHitTestVisibleProperty.get -> XForms.ViewProperty<XForms.View, bool>
+static XForms.ViewProperties.extension(XForms.View).IsVisibleProperty.get -> XForms.ViewProperty<XForms.View, bool>
+static XForms.ViewProperties.extension(XForms.View).MarginProperty.get -> XForms.ViewProperty<XForms.View, XForms.Thickness>
+static XForms.ViewProperties.extension(XForms.View).WidthProperty.get -> XForms.ViewProperty<XForms.View, float>
+static XForms.ViewProperties.get_AccessibilityLabelProperty() -> XForms.ViewProperty<XForms.View, string>
+static XForms.ViewProperties.get_HeightProperty() -> XForms.ViewProperty<XForms.View, float>
+static XForms.ViewProperties.get_IsHitTestVisibleProperty() -> XForms.ViewProperty<XForms.View, bool>
+static XForms.ViewProperties.get_IsVisibleProperty() -> XForms.ViewProperty<XForms.View, bool>
+static XForms.ViewProperties.get_MarginProperty() -> XForms.ViewProperty<XForms.View, XForms.Thickness>
+static XForms.ViewProperties.get_WidthProperty() -> XForms.ViewProperty<XForms.View, float>

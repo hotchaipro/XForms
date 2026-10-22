@@ -1,0 +1,4 @@
+XForms.Android.AndroidApplication
+XForms.Android.AndroidApplication.Activity.get -> Android.App.Activity
+static XForms.Android.AndroidApplication.Current.get -> XForms.Android.AndroidApplication
+static XForms.Android.AndroidApplication.Run(Android.App.Activity activity, XForms.Application application) -> XForms.Android.AndroidApplication

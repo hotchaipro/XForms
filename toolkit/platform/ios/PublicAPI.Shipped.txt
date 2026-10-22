@@ -1,0 +1,2 @@
+XForms.iOS.IosToolkitServices
+static XForms.iOS.IosToolkitServices.Register() -> void

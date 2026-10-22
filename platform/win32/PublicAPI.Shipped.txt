@@ -1,0 +1,4 @@
+XForms.Win32.Win32Application
+XForms.Win32.Win32Application.MainWindowHandle.get -> nint
+static XForms.Win32.Win32Application.Current.get -> XForms.Win32.Win32Application
+static XForms.Win32.Win32Application.Run(string title, XForms.Application application) -> void
