@@ -2796,36 +2796,82 @@ Win32, Android and the browser, as before.
 26. **Hot reload.** An app running under the debugger (or `dotnet watch`)
     shows an edit to its C# without restarting: a page's layout, a
     handler, a theme's colors, a template's drawing. It keeps its place
-    (the page it's on, the back stack, what the page holds). Release
-    builds are unchanged.
+    (the page it's on, the back stack, what the page holds) and what the
+    user did (text typed, where a list is scrolled, what's selected and
+    focused). Release builds are unchanged. The aim is the experience
+    Flutter sets: edit, save, see it, nothing lost.
 
     **What .NET gives, and what it doesn't.** .NET's hot reload patches
     the running app's methods and then calls every assembly's
     `[MetadataUpdateHandler]` with the types it changed. Code that runs
     again picks up the edit by itself: a click handler, a template's
     `Render` the next time it draws. Code that already ran doesn't: a
-    page's constructor that built its views, a theme's `Apply` that built
-    the theme, a template's `Apply` that added its parts. So what's on
-    screen stays as it was until XForms runs that code again, and that's
-    this phase's work.
+    constructor that built a page's views, a theme's `Apply` that built
+    the theme, a template's `Apply` that added its parts. So XForms has to
+    run that code again, and keep what the user did when it does.
+
+    **How the others do it.** Flutter re-runs every widget's `build()`
+    and keeps state, which lives apart from the widgets; React's Fast
+    Refresh does the same. MAUI's guidance for UI in C# is a `Build()`
+    method that sets a page's content, called again by a hot reload
+    handler the app writes and registers. Uno and WinUI create a new
+    version of a changed class and swap a new page in, which needs pages
+    made by type without arguments. XForms takes Flutter's shape (a build
+    method run again, state kept) within its retained views: no handler
+    for the app to write, and nothing lost.
 
     **The plan:**
+    - **`Build()` is the one way to build views.** A page, a
+      `UserControl` and a template build what they show in a build
+      method, which XForms calls when they're first shown and again after
+      every edit:
+      - A page overrides `protected override View Build()` and returns its
+        content; a `UserControl` the same. Their constructors set up only
+        fields and state (a view model, the item shown), never views.
+        `Page.Content` and `UserControl.Content` are set by XForms from
+        `Build()`, not by the app.
+      - A field that refers to a view (`this._list = new ListView()`) is
+        assigned in `Build()`, so after a rebuild it refers to the new
+        view. Event handlers are methods, so they pick up edits anyway.
+      - A template builds its parts in its own build method, apart from
+        what `Apply` and `Unapply` subscribe to; its drawing (`Render`)
+        and layout already run again by themselves.
+      - Compiled XAML (phase 27) will produce a `Build()`, so markup and
+        C# reload the same way.
+    - **Controls declare their user state:** what changed through input
+      since the control was created. A text box declares its text and
+      selection, a scroll viewer its offset, a list its selection and
+      scroll position, a toggle or picker its value, and any view whether
+      it has focus. An app's own controls take part the same way. When a
+      build runs again, each new view takes the user state of the old view
+      in the same place with the same type; a view given a key (as
+      Flutter's `Key`) is matched by its key instead, for views that move.
+      Where the code and the user disagree, the user wins: editing a text
+      box's initial text keeps what was typed, as in Flutter.
     - **A handler in the framework** (`[assembly: MetadataUpdateHandler]`,
       internal), since the framework knows every view, the theme and the
-      renderers. It does nothing unless .NET calls it (only when the app is
-      running with hot reload). On the UI thread, after an update:
+      renderers; XForms adds what it owns (templates, `UserControl`). It
+      does nothing unless .NET calls it (only when the app is running with
+      hot reload). On the UI thread, after an update:
       - **The theme is rebuilt** (`CreateTheme` again, which runs the
         theme package's `Apply` and the app's own adjustments), and given
-        to every view even when it compares equal, so a template's code
-        that changed runs again: each templated control's template is
-        removed and applied again (`Unapply`, `Apply`).
-      - **Everything is measured and drawn again:** the root frame, other
-        windows and open popups.
-      - **Pages rebuild themselves** (see the decision below), the current
-        page first; pages in the back stack rebuild when they're shown
-        again.
+        to every view even when it compares equal, so that templates build
+        their parts again.
+      - **Pages and `UserControl`s build again,** carrying user state
+        over: the current page and what's on screen (other windows, open
+        popups) at once; pages in the back stack when they're shown again.
+      - **Everything is measured and drawn again.**
       - **`Application.HotReloaded`** (an event) tells the app, for
-        anything else it built once (a cache, a list's item views).
+        anything else it built once (a cache).
+    - **No declarative model.** Flutter and React keep state for free
+      because their views are descriptions that the framework compares
+      and patches. XForms keeps WinUI's retained views, which code holds
+      references to and which XAML (phase 27) and WinUI compatibility
+      (phase 28) are built on. Patching old views in place instead of
+      replacing them was rejected for the same reason: fields assigned in
+      `Build()` would refer to discarded views, and handlers and bindings
+      would have to be moved across one by one. Replacing the views and
+      carrying the user's state over is the sound way in a retained model.
     - **How each platform gets updates** (step 1 checks each, since this
       depends on the tools, not XForms):
       - Win32: Visual Studio's Hot Reload (F5), and `dotnet watch`.
@@ -2838,13 +2884,9 @@ Win32, Android and the browser, as before.
         builds; it builds on Windows here but can't be checked.
     - **What it can't do:** an edit .NET can't apply while running (a
       "rude edit", such as changing a class's base type) still needs a
-      restart, as in any .NET app. A rebuilt page keeps what it holds in
-      fields (a view model, the item it shows) but not what only its views
-      held (text typed into a box, a list's scroll position), unless the
-      rebuild carries it over.
-    - **XAML (phase 27)** will come with the same handler: markup compiled
-      to C# reloads as C# does; markup loaded at run time would reload
-      when its file changes.
+      restart, as in any .NET app. A change to a page's constructor (its
+      fields and state) shows only for pages created after it, as a
+      change to Flutter's `initState` does.
 
     **Steps,** each built for every platform and verified on Win32,
     Android and the browser:
@@ -2852,43 +2894,51 @@ Win32, Android and the browser, as before.
        under Visual Studio and `dotnet watch` on Win32, Android and in the
        browser; what each needs (Debug settings, the web development
        server, launch profiles) written down.
-    2. **Theme, templates and drawing:** the framework's handler rebuilds
-       the theme, applies templates again, measures and draws everything
-       again, and raises `HotReloaded`.
-    3. **Pages:** the way pages rebuild (decided below), in the framework;
-       the test app's pages and SoonerOrLater's pages use it.
-    4. **Docs:** a "Hot reload" section in `architecture.md` (what updates
-       by itself, what a page does, each platform's tools); this document.
+    2. **`Build()`:** pages and `UserControl` build in `Build()`, called
+       by XForms, and `Content` is no longer the app's to set; templates
+       build their parts in their build method. Every page and control in
+       the test app, the Simple theme and SoonerOrLater moves to it. No
+       hot reload yet: the apps look and work exactly as before.
+    3. **Rebuilding:** the framework's handler rebuilds the theme, builds
+       templates, pages and `UserControl`s again, measures and draws
+       everything again, and raises `HotReloaded`.
+    4. **User state:** the way controls declare it, the controls that
+       have it (text box, scroll viewer, list, toggles, pickers, focus),
+       keys, and carrying it over by place, type and key.
+    5. **Docs:** a "Hot reload" section in `architecture.md` (`Build()`,
+       user state and keys, each platform's tools, what needs a restart),
+       how to write a page and a control, and this document.
 
-    **Verifying,** on Win32, Android and in the browser, with the app
-    running under hot reload and on a page deep in the back stack: a
-    changed color in `SimpleTheme`, a changed template's drawing and parts
-    (a button's corner and a combo box's arrow), a view added to a page's
-    layout, and a changed click handler each show without a restart, on
-    the same page, with the back stack and the page's view model kept; the
-    other pages show their edits when navigated back to; a Release build
-    never calls the handler, and the web download doesn't grow.
+    **Verifying:**
+    - Step 2: every Win32 test page, light and dark, pixel for pixel
+      against the captures before it; a SoonerOrLater walk on Win32; the
+      test app and SoonerOrLater on Android and in the browser.
+    - Steps 3 and 4, on Win32, Android and in the browser, with the app
+      running under hot reload on a page deep in the back stack, with text
+      typed into a box, a list scrolled and an item selected, and focus in
+      a field: a changed color in `SimpleTheme`, a changed template's
+      drawing and parts (a button's corner and a combo box's arrow), a
+      view added to a page's layout, a changed `UserControl` (one of
+      SoonerOrLater's rows), and a changed click handler each show without
+      a restart, on the same page, with the back stack, the page's view
+      model, the typed text, the scroll position, the selection and the
+      focus kept; views reordered with keys keep theirs; the other pages
+      show their edits when navigated back to.
+    - A Release build never calls the handler, and the web download
+      doesn't grow.
 
-    **To decide:**
-    - **How a page rebuilds.** Pages are created by the app, often with
-      arguments (`new BenchmarkPage(drawAsOneView: false)`), and
-      SoonerOrLater reuses page objects, so XForms can't make a new one by
-      itself. The options:
-      - **(Recommended) A method a page overrides,** `OnHotReload()`,
-        which does nothing by default; a page that builds its views in its
-        constructor moves that into a method that both call. Least change,
-        and the page decides what to keep.
-      - **A build method XForms calls:** a page builds its views in an
-        override (`BuildContent()`), which XForms calls when the page is
-        first shown and again on every reload, replacing its content.
-        Every page works the same way, but every page changes how it's
-        written.
-      - **New pages:** a page with a constructor that takes nothing is
-        replaced by a new one. Nothing to write, but what the page held is
-        lost, and pages with arguments don't update.
-    - **Which views get it:** pages only, or `UserControl` too (an app's
-      own composite controls, such as SoonerOrLater's rows, built in their
-      constructors).
+    **Decided** (2026-10-22), with no constraint from the current design,
+    since nothing has been released:
+    - `Build()` is the one way pages, `UserControl`s and templates build
+      their views; XForms calls it, and an app registers nothing.
+    - Controls declare their user state, carried over a rebuild by place
+      and type, or by a key; the user's state wins over the code's.
+    - XForms keeps retained views: no declarative model, and no patching
+      of old views in place.
+    - Navigating by page type and parameter (as WinUI's
+      `Frame.Navigate(typeof(Page), parameter)`), which would let an app
+      restore its back stack after a restart, isn't needed for hot reload
+      and is left for a decision of its own.
 
 27. **Later: `XForms.Xaml`.** The proof of concept in `spikes/XForms.Xaml`
     becomes a layer over the framework and controls, including templates
