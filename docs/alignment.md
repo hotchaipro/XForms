@@ -2274,8 +2274,8 @@ Win32, Android and the browser, as before.
 
       | Platform | XForms creates the host | The app's own host |
       |---|---|---|
-      | Win32 | `Win32Application.Run("Title", new App())`: its window and message loop | — (embedding in a caller's window is phase 29) |
-      | Browser | `await WebApplication.RunAsync("Title", new App())`: the page | — (embedding in an element is phase 29) |
+      | Win32 | `Win32Application.Run("Title", new App())`: its window and message loop | — (embedding in a caller's window is phase 30) |
+      | Browser | `await WebApplication.RunAsync("Title", new App())`: the page | — (embedding in an element is phase 30) |
       | iOS | `IosApplication.Run(args, new App())` from `Main`: XForms' internal app and scene delegates | `IosApplication.Run(windowScene, new App())` from the app's own scene delegate, with any base class |
       | Android | — | `AndroidApplication.Run(this, new App())` from the app's own activity's `OnCreate`, with any base class |
 
@@ -2502,7 +2502,7 @@ Win32, Android and the browser, as before.
     WPF and Avalonia call these `ControlTemplate` and (in Avalonia)
     `TemplatedControl`, and a markup layer will want to write templates, so
     the names follow them. Unlike theirs, a template here is code first:
-    small enough (draw, add parts, react to state) that phase 27 can
+    small enough (draw, add parts, react to state) that phase 28 can
     express one in markup.
 
     - **Templates in the theme.** The templates are a theme extension of
@@ -2595,7 +2595,7 @@ Win32, Android and the browser, as before.
     framework, and tracks its public API like the other libraries.
 
     **Later, not in this phase:** more themes (Fluent, Material); templates
-    in markup (phase 27).
+    in markup (phase 28).
 
 25. **One package for apps, and a standalone toolkit.** An app
     references two things: the `XForms` package and a theme package. It
@@ -2793,7 +2793,142 @@ Win32, Android and the browser, as before.
     - The framework and the toolkit are packages of their own (each with
       its platforms' packages), which `XForms` depends on.
 
-26. **Hot reload.** An app running under the debugger (or `dotnet watch`)
+26. **Navigation by path.** Every page an app navigates to has a path,
+    such as `/item/42`, registered with a function that makes the page
+    from it. The app navigates by path, and the back stack is a list of
+    paths, so XForms can save it and restore it, the browser's address
+    bar and Back and Forward buttons follow it, and a link can open any
+    page. Nothing is found by reflection or made from a `Type`, so it's
+    safe for trimming and AOT.
+
+    **How the others do it.** Flutter's go_router, Jetpack Compose
+    Navigation and SwiftUI register each route with a function (or
+    closure) that makes the page, in ordinary code the compiler and
+    trimmer see; SwiftUI's stack is saved through code the compiler
+    generates. MAUI Shell (`Routing.RegisterRoute("item",
+    typeof(ItemPage))` and `[QueryProperty]`), Blazor (`[Route]`
+    attributes found by scanning assemblies) and WinUI
+    (`Frame.Navigate(typeof(Page))`) make pages from types, which is where
+    trimming and AOT break. XForms takes the first way.
+
+    **The plan:**
+    - **Routes, in the app's code.** An app lists its pages by path, each
+      with a function that makes the page:
+
+      ```csharp
+      protected override void OnConfigureRoutes(Routes routes)
+      {
+          routes.Add("/", _ => new MainPage());
+          routes.Add("/about", _ => new AboutPage());
+          routes.Add("/item/{id}", route => new TaskItemPage(route["id"]));
+          routes.Add("/item/new?category={category}", route => new TaskItemPage(category: route["category"]));
+      }
+      ```
+
+      A path has fixed segments, `{name}` segments and query values;
+      `route["id"]` is the text, and helpers parse it without reflection
+      (`route.GetInt32("id")`). A page keeps an ordinary constructor with
+      arguments; the route's function passes them.
+    - **Navigating:** `await NavigateAsync("/item/42")`, `GoBackAsync()`,
+      and modal pages by path (`ShowModalAsync("/pick-color")`). A page is
+      made each time it's navigated to, by its route; apps no longer make
+      or reuse page objects for navigation. `NavigateAsync(Page)` goes, so
+      there's one way.
+    - **Results:** `Color color = await NavigateAsync<Color>("/pick-color")`
+      (and the same for a modal page): generic only over the result, which
+      types the `Task` and makes nothing. The page sets its result before
+      it goes back (`this.SetResult(color)`); going back without one gives
+      the type's default.
+    - **The back stack is paths,** with the page objects held while
+      they're in it, as now. Saved as text, it says everything needed to
+      make the pages again.
+    - **The start:** the app's first page is a path, `/` unless the
+      platform gives another: the browser's address, a link that opened
+      the app, or a restored stack. The test app's start page (now
+      `XFORMS_TEST_PAGE`, `?page=`, and an Android extra) becomes a path,
+      such as `/lists`.
+    - **The browser:** the address follows the current page
+      (`https://host/#/item/42`), each navigation is an entry in the
+      browser's history, Back and Forward move through the stack, a
+      reload comes back on the same page, and an address typed or
+      bookmarked opens its page.
+    - **Restoring:** the stack is saved when the app suspends, and made
+      again when the platform starts the app to restore it: on Android
+      when the activity is created again after its process was ended (its
+      saved state), and on iOS through scene state restoration. Each page
+      in the stack is made from its path; only the top one is shown.
+    - **Links:** a path the platform gives when it starts or resumes the
+      app opens that page: the browser's address, an Android intent's
+      data, an iOS URL. Registering a scheme or a domain with the platform
+      stays the app's own (manifest, entitlements).
+    - **A path that doesn't match** throws from `NavigateAsync`, since
+      it's the app's own mistake. From outside (an address, a link, a
+      restored stack from an older version), the app starts at `/`
+      instead, and `Application.OnRouteNotFound` lets it choose
+      otherwise.
+    - **Checked for trimming and AOT:** navigation uses no reflection; the
+      trimming and AOT analyzers, already on for every library, stay
+      clean, and the published web app (trimmed) navigates every route.
+    - **Not routes:** what a page shows inside itself, such as
+      SoonerOrLater's tabs in a `Frame` inside its main page, and popups
+      and flyouts. See the decisions.
+
+    **Steps,** each built for every platform and verified on Win32,
+    Android and the browser:
+    1. **Routes:** `Routes`, matching paths (with tests of the matching,
+       in a new unit test project), `NavigateAsync(path)` and its result
+       form, modal pages by path, the stack of paths; `NavigateAsync(Page)`
+       goes.
+    2. **The apps:** the test app's pages and SoonerOrLater's get routes
+       (SoonerOrLater's item page takes the task's ID and looks it up,
+       instead of being reused with a view model set on it); the test
+       app's start page becomes a path on every platform.
+    3. **The browser:** the address, history, Back and Forward, reload,
+       and opening an address.
+    4. **Restoring and links:** saving the stack, and making it again on
+       Android and iOS; a path from an Android intent and an iOS URL.
+    5. **Docs:** a "Navigation" section in `architecture.md` (routes,
+       paths and their syntax, results, restoring, links, the browser),
+       and this document.
+
+    **Verifying:**
+    - Every Win32 test page, light and dark, pixel for pixel against the
+      captures before it (navigation looks the same); a SoonerOrLater walk
+      on Win32, Android and in the browser, adding and editing tasks
+      through the item page.
+    - A result: a test page that returns a value, by `SetResult` and by
+      going back without one, normal and modal.
+    - The browser: the address after each navigation, Back and Forward
+      through three pages, a reload on `/item/{id}` coming back on that
+      task, a typed address opening its page, and an unknown address
+      starting at `/`.
+    - Android: the app two pages deep, its process ended in the
+      background, and opened again, on the same page with the same back
+      stack; an intent with a path opening its page. (How to end the
+      process without touching the system's UI is worked out in step 4.)
+    - The trimming and AOT analyzers report nothing new, and the
+      published web app navigates every route.
+
+    **To decide:**
+    - **Where routes are registered:** (recommended) an override on
+      `Application`, `OnConfigureRoutes(Routes routes)`, so they're with
+      the app's other startup code; or a `Routes` object passed to
+      `XFormsApp.Run`.
+    - **Frames inside a page** (SoonerOrLater's tabs): (recommended) they
+      stay what they are, a view that shows one page of the page's own
+      choosing, outside the back stack and not restored; or nested routes
+      (`/main/soon`), as go_router's shell routes, so a tab is in the
+      address and restored too, at the cost of more to learn and build.
+      Nested routes can come later without changing apps' other routes.
+    - **The browser's address:** (recommended) after a `#`
+      (`https://host/#/item/42`), which any static host serves, as
+      Flutter's default; or the path itself (`https://host/item/42`),
+      which looks cleaner but needs the host to send every path to
+      `index.html`.
+    - **Restoring on Win32:** (recommended) never, as desktop apps start
+      fresh; or the last stack when the app starts again, as an option.
+
+27. **Hot reload.** An app running under the debugger (or `dotnet watch`)
     shows an edit to its C# without restarting: a page's layout, a
     handler, a theme's colors, a template's drawing. It keeps its place
     (the page it's on, the back stack, what the page holds) and what the
@@ -2836,7 +2971,7 @@ Win32, Android and the browser, as before.
       - A template builds its parts in its own build method, apart from
         what `Apply` and `Unapply` subscribe to; its drawing (`Render`)
         and layout already run again by themselves.
-      - Compiled XAML (phase 27) will produce a `Build()`, so markup and
+      - Compiled XAML (phase 28) will produce a `Build()`, so markup and
         C# reload the same way.
     - **Controls declare their user state:** what changed through input
       since the control was created. A text box declares its text and
@@ -2882,8 +3017,8 @@ Win32, Android and the browser, as before.
     - **No declarative model.** Flutter and React keep state for free
       because their views are descriptions that the framework compares
       and patches. XForms keeps WinUI's retained views, which code holds
-      references to and which XAML (phase 27) and WinUI compatibility
-      (phase 28) are built on. Patching old views in place instead of
+      references to and which XAML (phase 28) and WinUI compatibility
+      (phase 29) are built on. Patching old views in place instead of
       replacing them was rejected for the same reason: fields assigned in
       `Build()` would refer to discarded views, and handlers and bindings
       would have to be moved across one by one. Replacing the views and
@@ -2954,23 +3089,22 @@ Win32, Android and the browser, as before.
     - Everything a view can be given is writable in a C# initializer,
       with event handlers in one fixed form after the tree, so that a
       designer writing C# stays possible.
-    - Navigating by page type and parameter (as WinUI's
-      `Frame.Navigate(typeof(Page), parameter)`), which would let an app
-      restore its back stack after a restart, isn't needed for hot reload
-      and is left for a decision of its own.
+    - Navigation by path comes first (phase 26), so pages move once, and
+      after an edit that needs a restart the app can come back on the same
+      page by its stack of paths.
 
-27. **Later: `XForms.Xaml`.** The proof of concept in `spikes/XForms.Xaml`
+28. **Later: `XForms.Xaml`.** The proof of concept in `spikes/XForms.Xaml`
     becomes a layer over the framework and controls, including templates
     written in markup. To be planned in detail when it's next.
 
-28. **Later: `XForms.Compat.WinUI`.** Adapters giving WinUI's names and a
+29. **Later: `XForms.Compat.WinUI`.** Adapters giving WinUI's names and a
     `DependencyProperty`-style API over XForms' controls, with XAML
     namespace mappings so existing markup loads. It stays separate from any
     Fluent theme, so neither requires the other, and keeps its types in
     `XForms.Compat.WinUI` rather than Microsoft's namespaces. To be planned
     in detail when it's next.
 
-29. **Later: embedding.** XForms inside part of an existing app's UI,
+30. **Later: embedding.** XForms inside part of an existing app's UI,
     beside native content, with `Attach` beside each platform's `Run`
     (phase 23): `Run` shows the app in a whole host; `Attach` puts it in
     a container the caller owns and keeps running its own UI.
