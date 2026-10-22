@@ -641,7 +641,8 @@ namespace XForms
         /// <summary>
         /// Creates an animator that the view keeps privately, in its own field,
         /// to animate its own content (such as a spinning ring). Call it from
-        /// the view's constructor: it throws once the view has been attached.
+        /// the view's constructor or <see cref="Element.OnAttaching"/>: it
+        /// throws once the view's native object exists.
         /// Each call creates another animator, so a subclass can add its own.
         /// The public <see cref="Animator"/> always belongs to the app.
         /// </summary>
@@ -1361,7 +1362,7 @@ namespace XForms
         {
             if (this.HasRenderer)
             {
-                throw new InvalidOperationException("CreateOwnAnimator must be called before the view is attached, from its constructor.");
+                throw new InvalidOperationException("CreateOwnAnimator must be called before the view's native object exists: from its constructor or OnAttaching.");
             }
 
             var animator = new Animator();

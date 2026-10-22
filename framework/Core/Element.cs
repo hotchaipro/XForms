@@ -159,6 +159,9 @@ namespace XForms
 
         private void CreateRendererNow()
         {
+            // The element knows its theme, and has no native object yet
+            this.OnAttaching(this.ActualTheme);
+
             var renderer = this.CreateRenderer();
             this._renderer = renderer;
 
@@ -273,6 +276,18 @@ namespace XForms
         private protected abstract IElementRenderer CreateRenderer();
 
         internal abstract IEnumerable<Element> GetChildElements();
+
+        /// <summary>
+        /// Called once, with the element's effective theme, as it's first
+        /// attached (or shown): every constructor has run, and its native object
+        /// doesn't exist yet. The last chance to set up what must come before
+        /// it, such as a view's own animators (<c>CreateOwnAnimator</c>) that
+        /// depend on its theme.
+        /// </summary>
+        protected virtual void OnAttaching(
+            Theme theme)
+        {
+        }
 
         /// <summary>
         /// Called with the element's effective theme once it's attached (every
