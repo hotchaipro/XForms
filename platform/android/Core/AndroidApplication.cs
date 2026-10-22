@@ -24,7 +24,7 @@ namespace XForms.Android
     ///     protected override void OnCreate(Bundle savedInstanceState)
     ///     {
     ///         base.OnCreate(savedInstanceState);
-    ///         AndroidApplication.Run(this, new App());
+    ///         AndroidApplication.Run(this, savedInstanceState, new App());
     ///     }
     /// }
     /// </code>
@@ -82,19 +82,29 @@ namespace XForms.Android
 
         /// <summary>
         /// Runs the app in the activity: call it from the activity's
-        /// <c>OnCreate</c>, after the base class's. The app fills the
-        /// activity's content.
+        /// <c>OnCreate</c>, after the base class's, with the state
+        /// <c>OnCreate</c> was given. The app fills the activity's content.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// When Android re-creates the activity (for a configuration change it
         /// doesn't declare), the new activity calls this again: the running app
         /// moves to it, keeping its state, and the new app object is left
         /// unused. Declaring the changes XForms handles in place (dark mode,
         /// text size, orientation and screen size) makes that rare. When the
         /// activity finishes, the app stops, and the next launch runs a new one.
+        /// </para>
+        /// <para>
+        /// The app's back stack is saved with the activity's state, so when
+        /// Android ends the app in the background and the user returns to it,
+        /// it starts on the same pages. A link the activity is started with
+        /// (its intent's data, such as <c>https://example.com/item/42</c>)
+        /// opens the page for the link's path (<c>/item/42</c>).
+        /// </para>
         /// </remarks>
         public static AndroidApplication Run(
             Activity activity,
+            Bundle savedInstanceState,
             XForms.Application application)
         {
             ArgumentNullException.ThrowIfNull(activity);
@@ -104,14 +114,64 @@ namespace XForms.Android
             if (null != current)
             {
                 current.AttachTo(activity);
+
+                // A new activity for a link, while the app runs
+                string link = (null == savedInstanceState) ? GetLinkPath(activity.Intent) : null;
+                if (null != link)
+                {
+                    _ = ApplicationHost.For(current._application).OpenPathAsync(link);
+                }
+
                 return current;
             }
 
             var host = new AndroidApplication(activity, application);
             Current = host;
             host.AttachTo(activity);
-            ApplicationHost.For(application).Start(new AndroidPlatform(host));
+
+            // The stack saved when Android ended the app, or a link's page
+            var saved = savedInstanceState?.GetStringArray(NavigationStackKey);
+            var link2 = GetLinkPath(activity.Intent);
+            var startStack = ((null != saved) && (0 < saved.Length)) ? saved : ((null != link2) ? new[] { link2 } : null);
+            ApplicationHost.For(application).Start(new AndroidPlatform(host), startStack);
             return host;
+        }
+
+        // Where the back stack is kept in the activity's saved state
+        private const string NavigationStackKey = "xforms.navigation";
+
+        // A link's path and query (/item/42?x=1), from the intent's data, or null
+        private static string GetLinkPath(
+            Intent intent)
+        {
+            var uri = intent?.Data;
+            if (null == uri)
+            {
+                return null;
+            }
+
+            string path = uri.EncodedPath;
+            if (string.IsNullOrEmpty(path))
+            {
+                path = "/";
+            }
+
+            string query = uri.EncodedQuery;
+            return string.IsNullOrEmpty(query) ? path : path + "?" + query;
+        }
+
+        private void OnActivitySaveInstanceState(
+            Activity activity,
+            Bundle outState)
+        {
+            if (activity != this._activity)
+            {
+                return;
+            }
+
+            var stack = new List<string>(ApplicationHost.For(this._application).NavigationStack);
+            stack.RemoveAll((path) => null == path);
+            outState.PutStringArray(NavigationStackKey, stack.ToArray());
         }
 
         // Shows the app in the activity (a new one, when Android re-creates it)
@@ -601,9 +661,7 @@ namespace XForms.Android
             {
             }
 
-            public void OnActivitySaveInstanceState(Activity activity, Bundle outState)
-            {
-            }
+            public void OnActivitySaveInstanceState(Activity activity, Bundle outState) => this._owner.OnActivitySaveInstanceState(activity, outState);
 
             public void OnActivityStarted(Activity activity)
             {

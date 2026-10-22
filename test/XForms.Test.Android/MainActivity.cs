@@ -37,7 +37,7 @@ namespace XForms.Test
             }
 
             TestApp.RecreateHost = () => AndroidApplication.Current?.Activity?.Recreate();
-            XFormsApp.Run(this, new TestApp(), new SimpleTheme());
+            XFormsApp.Run(this, bundle, new TestApp(), new SimpleTheme());
         }
     }
 }

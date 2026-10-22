@@ -1,2 +1,2 @@
-static XForms.XFormsApp.Run(UIKit.UIWindowScene windowScene, XForms.Application application, XForms.Controls.AppTheme theme) -> void
+static XForms.XFormsApp.Run(UIKit.UIWindowScene windowScene, UIKit.UISceneConnectionOptions connectionOptions, XForms.Application application, XForms.Controls.AppTheme theme) -> void
 static XForms.XFormsApp.Run(string[] args, XForms.Application application, XForms.Controls.AppTheme theme) -> void

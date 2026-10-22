@@ -3,5 +3,4 @@ XForms.iOS.IosApplication.RootViewController.get -> UIKit.UIViewController
 XForms.iOS.IosApplication.Window.get -> UIKit.UIWindow
 XForms.iOS.IosApplication.WindowScene.get -> UIKit.UIWindowScene
 static XForms.iOS.IosApplication.Current.get -> XForms.iOS.IosApplication
-static XForms.iOS.IosApplication.Run(UIKit.UIWindowScene windowScene, XForms.Application application) -> XForms.iOS.IosApplication
 static XForms.iOS.IosApplication.Run(string[] args, XForms.Application application) -> void

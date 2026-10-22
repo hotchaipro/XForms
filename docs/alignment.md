@@ -2801,7 +2801,7 @@ Win32, Android and the browser, as before.
     page. Nothing is found by reflection or made from a `Type`, so it's
     safe for trimming and AOT.
 
-    **Status: steps 1 to 3 done** (step 2 came with step 1, since taking
+    **Status: steps 1 to 4 done** (step 2 came with step 1, since taking
     `NavigateAsync(Page)` away needed the apps' routes):
     - **Routes:** `Routes` and `Route` in the framework,
       `Application.OnConfigureRoutes`, `NavigateAsync(path)` and
@@ -2835,6 +2835,18 @@ Win32, Android and the browser, as before.
       own going back moves back through the entries, so Forward returns; a
       reload restores the whole stack, and a typed address shows its page
       over the current one. The address wins over the test app's `?page=`.
+    - **Restoring and links (step 4):** on Android, `Run` takes the
+      activity's `savedInstanceState` (`XFormsApp.Run(this,
+      savedInstanceState, new App(), theme)`; a library can't read it
+      later), the stack is saved with the activity's state, and a link the
+      activity is started with (its intent's data) opens the page for its
+      path and query; a new activity for a link while the app runs opens it
+      over the current page. On iOS, `Run` takes the scene's connection
+      options; XForms' scene delegate saves the stack as the session's
+      state-restoration activity and opens URLs while the app runs, and an
+      app's own scene delegate calls `IosApplication.Current`'s
+      `CreateStateRestorationActivity` and `OpenUrl`. Win32 never restores.
+      A modal page comes back as an ordinary page.
     - **Verified:** every Win32 test page, light and dark, pixel for pixel
       (apart from the app page's two new buttons); the SoonerOrLater walk
       on Win32, pixel for pixel; forward, the stack, Back, and results
@@ -2847,7 +2859,12 @@ Win32, Android and the browser, as before.
       and Forward through three pages, the app's Back and then Forward, a
       reload restoring four pages, a typed address, an unknown one, a fresh
       load at `#/app/7` and at `#/nope`, and a popup closed by Back; Win32
-      pages and the SoonerOrLater walk unchanged by the new start.
+      pages and the SoonerOrLater walk unchanged by the new start. Step 4,
+      on Android: the test app three pages deep, sent to the background by
+      starting SoonerOrLater, its process ended (`am kill`), and resumed
+      with its task's intent, back on Page 3 with the same stack and Back
+      going to Page 2; started with a link (`-d xformstest:///app/5`), on
+      that page. iOS builds, but restoring and URLs there haven't run.
     - **Found, not changed:** in the browser, Escape goes back only while
       a view has keyboard focus (as it did before this phase).
 

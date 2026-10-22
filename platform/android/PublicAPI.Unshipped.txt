@@ -1,0 +1,1 @@
+static XForms.Android.AndroidApplication.Run(Android.App.Activity activity, Android.OS.Bundle savedInstanceState, XForms.Application application) -> XForms.Android.AndroidApplication
