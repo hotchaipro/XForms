@@ -1,0 +1,2 @@
+static XForms.Themes.Simple.SimpleTheme.Apply(XForms.Theme theme) -> XForms.Theme
+XForms.Themes.Simple.SimpleTheme

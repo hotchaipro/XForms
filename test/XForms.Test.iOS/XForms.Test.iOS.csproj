@@ -24,6 +24,7 @@
     <ProjectReference Include="..\..\platform\ios\XForms.Framework.iOS.csproj" />
     <ProjectReference Include="..\..\toolkit\platform\ios\XForms.Toolkit.iOS.csproj" />
     <ProjectReference Include="..\..\controls\XForms.Controls.csproj" />
+    <ProjectReference Include="..\..\themes\simple\XForms.Themes.Simple.csproj" />
     <ProjectReference Include="..\..\spikes\XForms.Xaml\XForms.Xaml.csproj" />
   </ItemGroup>
 

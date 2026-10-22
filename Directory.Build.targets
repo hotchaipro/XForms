@@ -15,6 +15,7 @@
     <XFormsAllowedReferences Condition="'$(MSBuildProjectName)' == 'XForms.Toolkit'">XForms.Framework</XFormsAllowedReferences>
     <XFormsAllowedReferences Condition="$(MSBuildProjectName.StartsWith('XForms.Toolkit.'))">XForms.Toolkit;XForms.Framework;XForms.Framework.$(MSBuildProjectName.Substring(15))</XFormsAllowedReferences>
     <XFormsAllowedReferences Condition="'$(MSBuildProjectName)' == 'XForms.Controls'">XForms.Framework;XForms.Toolkit</XFormsAllowedReferences>
+    <XFormsAllowedReferences Condition="$(MSBuildProjectName.StartsWith('XForms.Themes.'))">XForms.Controls;XForms.Toolkit;XForms.Framework</XFormsAllowedReferences>
   </PropertyGroup>
 
   <Target Name="XFormsCheckLayerReferences" BeforeTargets="ResolveProjectReferences;CoreCompile" Condition="'$(XFormsAllowedReferences)' != ''">

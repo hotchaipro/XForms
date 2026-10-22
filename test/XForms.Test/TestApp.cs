@@ -1,5 +1,6 @@
 ﻿using System;
 using XForms;
+using XForms.Themes.Simple;
 
 namespace XForms.Test
 {
@@ -52,6 +53,14 @@ namespace XForms.Test
         {
             base.OnResume();
             Console.WriteLine("XForms.Test: resumed");
+        }
+
+        // The Simple theme
+        protected override Theme CreateTheme(
+            ThemeMode mode,
+            Color accentColor)
+        {
+            return SimpleTheme.Apply(base.CreateTheme(mode, accentColor));
         }
 
         protected override void OnStart()

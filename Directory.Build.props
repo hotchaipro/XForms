@@ -11,12 +11,13 @@
   </ItemGroup>
 
   <!--
-    The framework, its platforms, the toolkit and its platforms track their
+    The framework, its platforms, the toolkit, its platforms and the themes
+    track their
     public API in PublicAPI.Shipped.txt and PublicAPI.Unshipped.txt: public
     API that isn't listed (RS0016), or listed API that's gone (RS0017), fails
     the build, so every change to it shows in review.
   -->
-  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'XForms.Framework' or $(MSBuildProjectName.StartsWith('XForms.Framework.')) or '$(MSBuildProjectName)' == 'XForms.Toolkit' or $(MSBuildProjectName.StartsWith('XForms.Toolkit.'))">
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'XForms.Framework' or $(MSBuildProjectName.StartsWith('XForms.Framework.')) or '$(MSBuildProjectName)' == 'XForms.Toolkit' or $(MSBuildProjectName.StartsWith('XForms.Toolkit.')) or $(MSBuildProjectName.StartsWith('XForms.Themes.'))">
     <XFormsTracksPublicApi>true</XFormsTracksPublicApi>
   </PropertyGroup>
   <PropertyGroup Condition="'$(XFormsTracksPublicApi)' == 'true'">
