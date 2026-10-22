@@ -2164,45 +2164,47 @@ Win32, Android and the browser, as before.
 
 23. **Platform layers.** Each layer's platform code lives in its own
     platform assemblies, apps host XForms without deriving from XForms
-    types, and the layers are enforced, so they stay clean.
-
-    **Status: done.** As planned below, in four commits:
-    - **Hosting:** `Application()`, and `Run` on every platform, with no
-      native base classes; Android moves the running app to a re-created
-      activity.
-    - **The toolkit's platforms:** `XForms.Toolkit.Win32`, `.Android`,
-      `.iOS` and `.Web` (in `toolkit/platform/`), registered with
-      `Win32ToolkitServices.Register()` and the like; the framework's
-      platforms no longer reference the toolkit.
-    - **Internal:** the contract, and every platform type but its hosting
-      class.
-    - **Enforcement:** XF0002 for references, and the public API analyzer
-      with today's API as the shipped baseline. Each platform's public API
-      is its hosting class; each toolkit platform's, its registration.
-    - **Verified:**
-      - Win32: the test pages pixel for pixel against before (apart from
-        the spinning progress ring); preferences, secure storage, the
-        network and haptics; SoonerOrLater pixel for pixel.
-      - Android: re-creating the activity (`Activity.Recreate`, from a test
-        app button) twice, keeping the page and Back; Back by the key;
-        suspend and resume reaching the app, including across re-creation;
-        preferences, secure storage, the network and haptics; the document
-        picker starting through the toolkit's `ResultActivity`;
-        SoonerOrLater pixel for pixel.
-      - The browser: navigation and a modal page; preferences, secure
-        storage, the network and haptics through `xforms-toolkit.js`;
-        SoonerOrLater.
-      - The build: a framework platform referencing the toolkit fails with
-        XF0002; a new public type in a platform fails with RS0016.
-    - **Not done:**
-      - iOS builds only: its new hosting (`Run(args, ...)` with XForms'
-        delegates, or `Run(windowScene, ...)`) hasn't run.
-      - Not exercised: Back before Android 13 (the emulator runs Android
-        16), dark mode and text size changing in place on Android (that
-        needs the emulator's system settings), and a document picked on
-        Android coming back (that needs the system picker's UI). The file
-        dialogs and Copy and Share weren't run on Win32.
-
+    types, and the layers are enforced, so they stay clean.
+
+    **Status: done.** As planned below, in four commits:
+    - **Hosting:** `Application()`, and `Run` on every platform, with no
+      native base classes; Android moves the running app to a re-created
+      activity.
+    - **The toolkit's platforms:** `XForms.Toolkit.Win32`, `.Android`,
+      `.iOS` and `.Web` (in `toolkit/platform/`), registered with
+      `Win32ToolkitServices.Register()` and the like; the framework's
+      platforms no longer reference the toolkit.
+    - **Internal:** the contract, and every platform type but its hosting
+      class.
+    - **Enforcement:** XF0002 for references, and the public API analyzer
+      with today's API as the shipped baseline. Each platform's public API
+      is its hosting class; each toolkit platform's, its registration.
+    - **Verified:**
+      - Win32: the test pages pixel for pixel against before (apart from
+        the spinning progress ring); preferences, secure storage, the
+        network and haptics; SoonerOrLater pixel for pixel.
+      - Android: re-creating the activity (`Activity.Recreate`, from a test
+        app button) twice, keeping the page and Back; Back by the key;
+        suspend and resume reaching the app, including across re-creation;
+        preferences, secure storage, the network and haptics; the document
+        picker starting through the toolkit's `ResultActivity`. (The
+        SoonerOrLater captures compared here turned out to show its splash
+        screen; phase 24 compared its main page properly, against phases 20
+        and 22: pixel for pixel.)
+      - The browser: navigation and a modal page; preferences, secure
+        storage, the network and haptics through `xforms-toolkit.js`;
+        SoonerOrLater.
+      - The build: a framework platform referencing the toolkit fails with
+        XF0002; a new public type in a platform fails with RS0016.
+    - **Not done:**
+      - iOS builds only: its new hosting (`Run(args, ...)` with XForms'
+        delegates, or `Run(windowScene, ...)`) hasn't run.
+      - Not exercised: Back before Android 13 (the emulator runs Android
+        16), dark mode and text size changing in place on Android (that
+        needs the emulator's system settings), and a document picked on
+        Android coming back (that needs the system picker's UI). The file
+        dialogs and Copy and Share weren't run on Win32.
+
     **Where things stood.**
     - **The framework's platforms implement the toolkit.** The services
       (clipboard, launcher, preferences, secure storage, sharing, haptics,
@@ -2411,6 +2413,67 @@ Win32, Android and the browser, as before.
 24. **Themes.** A control says what it does and what state it's in; a
     theme says how it looks. The controls' current look becomes the first
     theme, `XForms.Themes.Simple`, and an app chooses its theme explicitly.
+
+    **Status: done,** as planned below, with these differences:
+    - **The mechanism** (step 1): `ControlTemplate<TControl>` (for any
+      view, not only `TemplatedControl`), `TemplateContext`, the
+      `ControlTemplates` theme extension (`theme.GetTemplate`,
+      `theme.WithTemplate`), and `TemplatedControl`. The framework gained
+      one hook, `Element.OnAttaching(theme)`: called as an element is first
+      attached, before its native object exists, so a template can create
+      the control's own animators. Templates can also give a background
+      (`Background`), skip drawing (`Render` is optional), and restyle
+      their parts when the mode or accent color changes
+      (`OnThemeChanged`).
+    - **Two more hosts for templates:** `TemplatedContentControl`, for
+      content controls (`MenuBar`, `TabStrip`, `CommandListViewItem`,
+      `HyperlinkButton`, `MessageBoxView`), and `ListViewItem`, which is an
+      `ItemContainer`; both use the same `TemplateHost`.
+    - **The package** (step 2): `themes/simple/XForms.Themes.Simple`, with
+      `SimpleTheme.Apply(base.CreateTheme(mode, accent))` rather than
+      `Create(mode, accent)`, so the framework's theme (with the system's
+      high-contrast colors) stays the base. It's in the layer check and
+      tracks its public API.
+    - **The looks** (step 3), each group verified before its commit:
+      - buttons: `Button`, `ToggleButton`, `RadioButton`,
+        `ImageToggleButton`, `MenuButton`, `TabStripItem`,
+        `FloatingButton`, `CommandBarButton`, `DayOfWeekToggleButton`;
+      - list rows: `ListViewItem`, `ListViewSwipeItem` (and its dimming
+        during a swipe);
+      - fields and pickers: `PickerField` (so `ComboBox` and
+        `CalendarDatePicker`), `CalendarView`, the popups' frames (the new
+        `PopupFrame`) and `ComboBoxItemsView`;
+      - `ProgressRing` and `Flyout`'s frame;
+      - the composites: `MenuBar` and `TabStrip`'s backgrounds,
+        `CommandListViewItem`'s, `HyperlinkButton`'s feedback, and
+        `MessageBox`'s layout (a `MessageBoxView` whose template adds the
+        message and buttons as parts).
+    - **Geometry stays with input.** Controls whose input depends on their
+      geometry (the calendar's cells and arrows, a picker's text and glyph
+      areas, a combo box's rows) keep it and expose it read-only, with
+      their state; their templates draw everything else. A theme can
+      restyle them but not move their cells.
+    - **`Border` isn't templated:** it draws only what its own properties
+      say, as WPF's and WinUI's `Border` (not a templated control there).
+    - **Public now, for themes to template:** `RadioButton`, `MenuButton`,
+      `CommandBarButton`, `DayOfWeekToggleButton`, `ListViewSwipeItem`
+      (and `ListViewSwipeDirection`), `ComboBoxItemsView`, `PopupFrame`,
+      `MessageBoxView` and `CalendarViewPart`. `ButtonStyle` moved to
+      XForms.Themes.Simple, and `Button.Style` is gone.
+    - **Verified, for each group:** every Win32 test page in light and
+      dark pixel for pixel against the baseline (apart from the spinning
+      progress ring), and the group's own states against the previous
+      commit (built from a stash): a SoonerOrLater walk (a tab mid-press,
+      a task's command bar, a task mid-swipe, the new task page and its
+      schedule), a selected row, a pressed picker field, the combo box's
+      list (and the keyboard in it), the date picker's calendar, the
+      Schedule flyout, and the message box, in light and dark. Android
+      and the browser: each group's pages, popups and SoonerOrLater
+      render, and SoonerOrLater's main page on Android is pixel for pixel
+      as in phases 20 and 22.
+    - **Not done:** `ComboBoxItem` rows, popups and the calendar are drawn
+      by templates, but nothing yet changes them per view other than a
+      whole template. Only `Button` has a style. iOS builds only.
 
     **Where things stand.** Eighteen controls draw themselves in `Render`
     (`Button`, `ToggleButton`, `RadioButton`, `ImageToggleButton`,

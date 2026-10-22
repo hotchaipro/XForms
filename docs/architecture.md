@@ -12,10 +12,13 @@ built only on the framework's public API. **Apps** use all three.
 ┌──────────────────────────────────────────────────────────────┐
 │ App (for example SoonerOrLater)                              │
 ├──────────────────────────────────────────────────────────────┤
+│ Theme: XForms.Themes.Simple (chosen by the app)              │
+│   How the controls look: a template for each, and tokens     │
+├──────────────────────────────────────────────────────────────┤
 │ Controls: XForms.Controls                                    │
 │   Buttons, tabs, menus, pickers, calendar, lists, panels,    │
-│   gestures, their base classes, and their theme tokens       │
-│   Built only on the public framework API                     │
+│   gestures and their base classes: what they do, and their   │
+│   state; built only on the public framework API              │
 ├──────────────────────────────────────────────────────────────┤
 │ Toolkit: XForms.Toolkit                                      │
 │   Platform services and data binding, for any set of         │
@@ -43,10 +46,10 @@ The goal is that any control library built on the framework runs on every
 supported platform with the same look and the same layout. All of the
 per-platform complexity stays inside the framework and the platforms.
 
-Planned layers ([alignment.md](alignment.md#layering), phases 24-27): themes
-(`XForms.Themes.Simple` first) for how the controls look, `XForms.Xaml` for
-markup, `XForms.Compat.WinUI` for WinUI's API, and embedding XForms in
-part of an existing app's UI.
+Planned layers ([alignment.md](alignment.md#layering), phases 25-27):
+`XForms.Xaml` for markup, `XForms.Compat.WinUI` for WinUI's API, and
+embedding XForms in part of an existing app's UI; and more themes beside
+`XForms.Themes.Simple`.
 
 ## The rule for what goes where
 
@@ -73,9 +76,9 @@ The framework holds two kinds of things:
   - compositor animations.
 
 A control belongs in XForms.Controls when it can be written once on top of
-those pieces. Its Button, for example, draws itself in `Render` and reacts to
-a `TapGestureRecognizer`. It contains no platform code and looks identical
-everywhere. Panels, `Control`, `ContentControl` and `UserControl`, and the
+those pieces. Its Button, for example, reacts to a `TapGestureRecognizer`
+and says when it's pressed; its theme's template draws it in `Render`. It
+contains no platform code and looks identical everywhere. Panels, `Control`, `ContentControl` and `UserControl`, and the
 gesture recognizers (tap, double tap and hold included), are built the same
 way.
 
@@ -417,7 +420,8 @@ outline and disabled), and **extensions** that control libraries add
 framework knows only the mode and colors, which the platforms also fill
 from the system's high-contrast colors. XForms.Controls adds its
 `Typography`, `Shapes` and `Motion` (read as `theme.Typography` and so on)
-and default control styles such as `ButtonStyle`.
+and its controls' templates (below); a theme package adds its own styles,
+such as XForms.Themes.Simple's `ButtonStyle`.
 
 The application builds its theme with `CreateTheme(mode, accent)` from the
 mode (the system's, unless the app sets `RequestedThemeMode`) and the accent
@@ -430,8 +434,47 @@ attached and whenever the theme changes. The framework's primitives use the
 theme's colors by default, as properties an app or control library can
 set (`TextBox.BackgroundColor`, `ForegroundColor`, `PlaceholderColor` and
 `AccentColor`; `ItemsView.BackgroundColor` and `AccentColor`); the renderers
-take those colors and never read the theme. The controls draw from its
-tokens.
+take those colors and never read the theme.
+
+**Templates.** A control says what it does and what state it's in; its
+theme says how it looks. Each XForms.Controls control with a look is a
+`TemplatedControl` (owner-drawn) or `TemplatedContentControl` (a content
+control); `ListViewItem`, an `ItemContainer`, uses the same machinery. As
+the control is first attached (`Element.OnAttaching`: its theme is known,
+and its native object doesn't exist yet), it finds its template in its
+theme (`theme.GetTemplate(type)`, falling back to its base types) and
+applies it. The template (`ControlTemplate<TControl>`, as WPF's and
+Avalonia's, but in code):
+- `Apply`: adds parts (child views beneath the content) and creates
+  animators, through a `TemplateContext`;
+- `Render`, and optionally `Measure` and `Arrange`, or just a `Background`;
+- `OnStateChanged`: feedback when the control is pressed, pointed at,
+  focused or enabled, or its own state (checked, selected, active) changes;
+- `OnThemeChanged`: restyles parts when the mode or accent color changes.
+
+One template serves every control of its type, so per-control state (an
+animator, a part) lives in `TemplateContext.State`. Controls whose input
+depends on their geometry (the calendar's cells, a picker's text and glyph
+areas, a combo box's rows) keep that geometry and expose it, with their
+state, read-only; the template draws everything else.
+
+**Choosing a theme.** An app chooses its theme in `CreateTheme`, and there's
+no fallback: a templated control whose theme has no template for it throws
+when it's attached, saying so.
+
+```csharp
+protected override Theme CreateTheme(ThemeMode mode, Color accentColor)
+{
+    return SimpleTheme.Apply(base.CreateTheme(mode, accentColor));
+}
+```
+
+A view's theme can override a template or a style for it and its
+descendants: `view.Theme = theme.WithExtension(new ButtonStyle { ... })`, or
+`theme.WithTemplate(new MyButtonTemplate())`. The mode and accent color
+change at runtime; switching to another theme package doesn't (yet).
+`Border` isn't templated: as WPF's and WinUI's, it draws only what its own
+properties say.
 
 ## Popups and light dismiss
 
@@ -512,10 +555,10 @@ contract. Still to do:
 
 - **iOS testing.** iOS builds, but it hasn't been run since the restructure
   (it needs a Mac). Its popups, in particular, are new and untested.
-- **Themes.** The controls still draw themselves; phase 24 of
-  [alignment.md](alignment.md#layering) moves their drawing into themes
-  (`XForms.Themes.Simple` first), then adds markup and WinUI compatibility.
-  Controls other than `Button` have no styles of their own.
+- **Themes.** XForms.Themes.Simple is the only theme so far, and only
+  `Button` has a style (`ButtonStyle`); the other looks change through
+  their templates. Markup and WinUI compatibility come next
+  ([alignment.md](alignment.md#layering)).
 - **Web.** The browser backend (`platform/web`) has been tested in one
   browser (Chromium) without a screen reader or a touch screen.
 - **Known Win32 issue.** RichEdit's built-in spell checker can crash the
