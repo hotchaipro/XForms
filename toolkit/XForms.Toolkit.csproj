@@ -1,23 +1,21 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <!--
-    XForms.Toolkit: what apps use besides controls, for any control set: the
-    platform services (clipboard, preferences, sharing, files, ...), which
-    each platform implements, and data binding.
+    XForms.Toolkit: cross-platform services (the clipboard, the launcher,
+    preferences, secure storage, sharing, haptics, connectivity, file
+    pickers) for any .NET app, with nothing about a UI in it. Each
+    platform's implementation is a project in platform/, which an app
+    registers (an XForms app's start does it).
   -->
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
-    <RootNamespace>XForms</RootNamespace>
+    <RootNamespace>XForms.Toolkit</RootNamespace>
     <AssemblyName>XForms.Toolkit</AssemblyName>
     <IsTrimmable>true</IsTrimmable>
     <IsAotCompatible>true</IsAotCompatible>
     <!-- Each platform's services are projects of their own, in platform/ -->
     <DefaultItemExcludes>$(DefaultItemExcludes);platform/**</DefaultItemExcludes>
   </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\framework\XForms.Framework.csproj" />
-  </ItemGroup>
 
 </Project>

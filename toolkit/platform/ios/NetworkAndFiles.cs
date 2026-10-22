@@ -9,7 +9,7 @@ using Network;
 using UIKit;
 using UniformTypeIdentifiers;
 
-namespace XForms.iOS
+namespace XForms.Toolkit
 {
     /// <summary>
     /// Whether the device is online, from the Network framework's path
@@ -105,7 +105,7 @@ namespace XForms.iOS
             picker.DidPickDocumentAtUrls += (sender, e) => completion.TrySetResult(e.Urls);
             picker.WasCancelled += (sender, e) => completion.TrySetResult(Array.Empty<NSUrl>());
 
-            var presenter = IosApplication.Current?.RootViewController;
+            var presenter = IosToolkitServices.Presenter;
             if (null == presenter)
             {
                 return Task.FromResult(Array.Empty<NSUrl>());

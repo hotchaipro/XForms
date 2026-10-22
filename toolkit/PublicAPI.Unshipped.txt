@@ -1,0 +1,216 @@
+XForms.Toolkit.Clipboard
+XForms.Toolkit.Connectivity
+XForms.Toolkit.FilePicker
+XForms.Toolkit.FilePickerOptions
+XForms.Toolkit.FilePickerOptions.AllowMultiple.get -> bool
+XForms.Toolkit.FilePickerOptions.AllowMultiple.init -> void
+XForms.Toolkit.FilePickerOptions.FilePickerOptions() -> void
+XForms.Toolkit.FilePickerOptions.FileTypes.get -> System.Collections.Generic.IReadOnlyList<string>
+XForms.Toolkit.FilePickerOptions.FileTypes.init -> void
+XForms.Toolkit.FilePickerOptions.Title.get -> string
+XForms.Toolkit.FilePickerOptions.Title.init -> void
+XForms.Toolkit.HapticFeedback
+XForms.Toolkit.HapticFeedbackType
+XForms.Toolkit.HapticFeedbackType.Click = 0 -> XForms.Toolkit.HapticFeedbackType
+XForms.Toolkit.HapticFeedbackType.LongPress = 1 -> XForms.Toolkit.HapticFeedbackType
+XForms.Toolkit.IClipboard
+XForms.Toolkit.IClipboard.GetTextAsync() -> System.Threading.Tasks.Task<string>
+XForms.Toolkit.IClipboard.HasText.get -> bool
+XForms.Toolkit.IClipboard.SetTextAsync(string text) -> System.Threading.Tasks.Task
+XForms.Toolkit.IConnectivity
+XForms.Toolkit.IConnectivity.ConnectivityChanged -> System.EventHandler
+XForms.Toolkit.IConnectivity.NetworkAccess.get -> XForms.Toolkit.NetworkAccess
+XForms.Toolkit.IFilePicker
+XForms.Toolkit.IFilePicker.PickAsync(XForms.Toolkit.FilePickerOptions options = null) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<XForms.Toolkit.PickedFile>>
+XForms.Toolkit.IFilePicker.SaveAsync(string suggestedName, System.Func<System.IO.Stream, System.Threading.Tasks.Task> write, XForms.Toolkit.FilePickerOptions options = null) -> System.Threading.Tasks.Task<bool>
+XForms.Toolkit.IHapticFeedback
+XForms.Toolkit.IHapticFeedback.IsSupported.get -> bool
+XForms.Toolkit.IHapticFeedback.Perform(XForms.Toolkit.HapticFeedbackType type) -> void
+XForms.Toolkit.ILauncher
+XForms.Toolkit.ILauncher.OpenAsync(System.Uri uri) -> System.Threading.Tasks.Task<bool>
+XForms.Toolkit.IPreferences
+XForms.Toolkit.IPreferences.Clear() -> void
+XForms.Toolkit.IPreferences.ContainsKey(string key) -> bool
+XForms.Toolkit.IPreferences.Get(string key, string defaultValue = null) -> string
+XForms.Toolkit.IPreferences.Remove(string key) -> void
+XForms.Toolkit.IPreferences.Set(string key, string value) -> void
+XForms.Toolkit.ISecureStorage
+XForms.Toolkit.ISecureStorage.GetAsync(string key) -> System.Threading.Tasks.Task<string>
+XForms.Toolkit.ISecureStorage.Remove(string key) -> bool
+XForms.Toolkit.ISecureStorage.RemoveAll() -> void
+XForms.Toolkit.ISecureStorage.SetAsync(string key, string value) -> System.Threading.Tasks.Task
+XForms.Toolkit.IShare
+XForms.Toolkit.IShare.RequestAsync(XForms.Toolkit.ShareRequest request) -> System.Threading.Tasks.Task
+XForms.Toolkit.Launcher
+XForms.Toolkit.NetworkAccess
+XForms.Toolkit.NetworkAccess.Internet = 3 -> XForms.Toolkit.NetworkAccess
+XForms.Toolkit.NetworkAccess.Local = 2 -> XForms.Toolkit.NetworkAccess
+XForms.Toolkit.NetworkAccess.None = 1 -> XForms.Toolkit.NetworkAccess
+XForms.Toolkit.NetworkAccess.Unknown = 0 -> XForms.Toolkit.NetworkAccess
+XForms.Toolkit.PickedFile
+XForms.Toolkit.PickedFile.Name.get -> string
+XForms.Toolkit.PickedFile.OpenReadAsync() -> System.Threading.Tasks.Task<System.IO.Stream>
+XForms.Toolkit.PickedFile.PickedFile(string name, System.Func<System.Threading.Tasks.Task<System.IO.Stream>> open) -> void
+XForms.Toolkit.Preferences
+XForms.Toolkit.PreferencesExtensions
+XForms.Toolkit.SecureStorage
+XForms.Toolkit.Share
+XForms.Toolkit.ShareRequest
+XForms.Toolkit.ShareRequest.ShareRequest() -> void
+XForms.Toolkit.ShareRequest.Text.get -> string
+XForms.Toolkit.ShareRequest.Text.init -> void
+XForms.Toolkit.ShareRequest.Title.get -> string
+XForms.Toolkit.ShareRequest.Title.init -> void
+XForms.Toolkit.ShareRequest.Uri.get -> System.Uri
+XForms.Toolkit.ShareRequest.Uri.init -> void
+static XForms.Toolkit.Clipboard.Default.get -> XForms.Toolkit.IClipboard
+static XForms.Toolkit.Clipboard.Default.set -> void
+static XForms.Toolkit.Connectivity.Default.get -> XForms.Toolkit.IConnectivity
+static XForms.Toolkit.Connectivity.Default.set -> void
+static XForms.Toolkit.FilePicker.Default.get -> XForms.Toolkit.IFilePicker
+static XForms.Toolkit.FilePicker.Default.set -> void
+static XForms.Toolkit.HapticFeedback.Default.get -> XForms.Toolkit.IHapticFeedback
+static XForms.Toolkit.HapticFeedback.Default.set -> void
+static XForms.Toolkit.Launcher.Default.get -> XForms.Toolkit.ILauncher
+static XForms.Toolkit.Launcher.Default.set -> void
+static XForms.Toolkit.Preferences.Default.get -> XForms.Toolkit.IPreferences
+static XForms.Toolkit.Preferences.Default.set -> void
+static XForms.Toolkit.PreferencesExtensions.Get<T>(this XForms.Toolkit.IPreferences preferences, string key, T defaultValue) -> T
+static XForms.Toolkit.PreferencesExtensions.Set<T>(this XForms.Toolkit.IPreferences preferences, string key, T value) -> void
+static XForms.Toolkit.SecureStorage.Default.get -> XForms.Toolkit.ISecureStorage
+static XForms.Toolkit.SecureStorage.Default.set -> void
+static XForms.Toolkit.Share.Default.get -> XForms.Toolkit.IShare
+static XForms.Toolkit.Share.Default.set -> void
+*REMOVED*XForms.ApplicationServicesExtensions
+*REMOVED*XForms.ApplicationServicesExtensions.extension(XForms.Application)
+*REMOVED*XForms.ApplicationServicesExtensions.extension(XForms.Application).Services.get -> XForms.PlatformServices
+*REMOVED*XForms.Binding
+*REMOVED*XForms.FilePickerOptions
+*REMOVED*XForms.FilePickerOptions.AllowMultiple.get -> bool
+*REMOVED*XForms.FilePickerOptions.AllowMultiple.init -> void
+*REMOVED*XForms.FilePickerOptions.FilePickerOptions() -> void
+*REMOVED*XForms.FilePickerOptions.FileTypes.get -> System.Collections.Generic.IReadOnlyList<string>
+*REMOVED*XForms.FilePickerOptions.FileTypes.init -> void
+*REMOVED*XForms.FilePickerOptions.Title.get -> string
+*REMOVED*XForms.FilePickerOptions.Title.init -> void
+*REMOVED*XForms.HapticFeedbackType
+*REMOVED*XForms.HapticFeedbackType.Click = 0 -> XForms.HapticFeedbackType
+*REMOVED*XForms.HapticFeedbackType.LongPress = 1 -> XForms.HapticFeedbackType
+*REMOVED*XForms.IClipboard
+*REMOVED*XForms.IClipboard.GetTextAsync() -> System.Threading.Tasks.Task<string>
+*REMOVED*XForms.IClipboard.HasText.get -> bool
+*REMOVED*XForms.IClipboard.SetTextAsync(string text) -> System.Threading.Tasks.Task
+*REMOVED*XForms.IConnectivity
+*REMOVED*XForms.IConnectivity.ConnectivityChanged -> System.EventHandler
+*REMOVED*XForms.IConnectivity.NetworkAccess.get -> XForms.NetworkAccess
+*REMOVED*XForms.IFilePicker
+*REMOVED*XForms.IFilePicker.PickAsync(XForms.FilePickerOptions options = null) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<XForms.PickedFile>>
+*REMOVED*XForms.IFilePicker.SaveAsync(string suggestedName, System.Func<System.IO.Stream, System.Threading.Tasks.Task> write, XForms.FilePickerOptions options = null) -> System.Threading.Tasks.Task<bool>
+*REMOVED*XForms.IHapticFeedback
+*REMOVED*XForms.IHapticFeedback.IsSupported.get -> bool
+*REMOVED*XForms.IHapticFeedback.Perform(XForms.HapticFeedbackType type) -> void
+*REMOVED*XForms.ILauncher
+*REMOVED*XForms.ILauncher.OpenAsync(System.Uri uri) -> System.Threading.Tasks.Task<bool>
+*REMOVED*XForms.IPreferences
+*REMOVED*XForms.IPreferences.Clear() -> void
+*REMOVED*XForms.IPreferences.ContainsKey(string key) -> bool
+*REMOVED*XForms.IPreferences.Get(string key, string defaultValue = null) -> string
+*REMOVED*XForms.IPreferences.Remove(string key) -> void
+*REMOVED*XForms.IPreferences.Set(string key, string value) -> void
+*REMOVED*XForms.ISecureStorage
+*REMOVED*XForms.ISecureStorage.GetAsync(string key) -> System.Threading.Tasks.Task<string>
+*REMOVED*XForms.ISecureStorage.Remove(string key) -> bool
+*REMOVED*XForms.ISecureStorage.RemoveAll() -> void
+*REMOVED*XForms.ISecureStorage.SetAsync(string key, string value) -> System.Threading.Tasks.Task
+*REMOVED*XForms.IShare
+*REMOVED*XForms.IShare.RequestAsync(XForms.ShareRequest request) -> System.Threading.Tasks.Task
+*REMOVED*XForms.ImageProperties
+*REMOVED*XForms.ImageProperties.extension(XForms.Primitives.Image)
+*REMOVED*XForms.NetworkAccess
+*REMOVED*XForms.NetworkAccess.Internet = 3 -> XForms.NetworkAccess
+*REMOVED*XForms.NetworkAccess.Local = 2 -> XForms.NetworkAccess
+*REMOVED*XForms.NetworkAccess.None = 1 -> XForms.NetworkAccess
+*REMOVED*XForms.NetworkAccess.Unknown = 0 -> XForms.NetworkAccess
+*REMOVED*XForms.PickedFile
+*REMOVED*XForms.PickedFile.Name.get -> string
+*REMOVED*XForms.PickedFile.OpenReadAsync() -> System.Threading.Tasks.Task<System.IO.Stream>
+*REMOVED*XForms.PickedFile.PickedFile(string name, System.Func<System.Threading.Tasks.Task<System.IO.Stream>> open) -> void
+*REMOVED*XForms.PlatformServices
+*REMOVED*XForms.PlatformServices.Clipboard.get -> XForms.IClipboard
+*REMOVED*XForms.PlatformServices.Clipboard.set -> void
+*REMOVED*XForms.PlatformServices.Connectivity.get -> XForms.IConnectivity
+*REMOVED*XForms.PlatformServices.Connectivity.set -> void
+*REMOVED*XForms.PlatformServices.FilePicker.get -> XForms.IFilePicker
+*REMOVED*XForms.PlatformServices.FilePicker.set -> void
+*REMOVED*XForms.PlatformServices.HapticFeedback.get -> XForms.IHapticFeedback
+*REMOVED*XForms.PlatformServices.HapticFeedback.set -> void
+*REMOVED*XForms.PlatformServices.Launcher.get -> XForms.ILauncher
+*REMOVED*XForms.PlatformServices.Launcher.set -> void
+*REMOVED*XForms.PlatformServices.PlatformServices() -> void
+*REMOVED*XForms.PlatformServices.Preferences.get -> XForms.IPreferences
+*REMOVED*XForms.PlatformServices.Preferences.set -> void
+*REMOVED*XForms.PlatformServices.SecureStorage.get -> XForms.ISecureStorage
+*REMOVED*XForms.PlatformServices.SecureStorage.set -> void
+*REMOVED*XForms.PlatformServices.Share.get -> XForms.IShare
+*REMOVED*XForms.PlatformServices.Share.set -> void
+*REMOVED*XForms.PreferencesExtensions
+*REMOVED*XForms.ShareRequest
+*REMOVED*XForms.ShareRequest.ShareRequest() -> void
+*REMOVED*XForms.ShareRequest.Text.get -> string
+*REMOVED*XForms.ShareRequest.Text.init -> void
+*REMOVED*XForms.ShareRequest.Title.get -> string
+*REMOVED*XForms.ShareRequest.Title.init -> void
+*REMOVED*XForms.ShareRequest.Uri.get -> System.Uri
+*REMOVED*XForms.ShareRequest.Uri.init -> void
+*REMOVED*XForms.TextBlockProperties
+*REMOVED*XForms.TextBlockProperties.extension(XForms.Primitives.TextBlock)
+*REMOVED*XForms.TextBoxProperties
+*REMOVED*XForms.TextBoxProperties.extension(XForms.Primitives.TextBox)
+*REMOVED*XForms.ViewBindingExtensions
+*REMOVED*XForms.ViewProperties
+*REMOVED*XForms.ViewProperties.extension(XForms.View)
+*REMOVED*XForms.ViewProperty<TView, TValue>
+*REMOVED*XForms.ViewProperty<TView, TValue>.GetValue(TView view) -> TValue
+*REMOVED*XForms.ViewProperty<TView, TValue>.Name.get -> string
+*REMOVED*XForms.ViewProperty<TView, TValue>.SetValue(TView view, TValue value) -> void
+*REMOVED*XForms.ViewProperty<TView, TValue>.ViewProperty(string name, System.Func<TView, TValue> getValue, System.Action<TView, TValue> setValue) -> void
+*REMOVED*abstract XForms.Binding.Dispose() -> void
+*REMOVED*abstract XForms.Binding.Refresh() -> void
+*REMOVED*override XForms.ViewProperty<TView, TValue>.ToString() -> string
+*REMOVED*static XForms.ApplicationServicesExtensions.get_Services(XForms.Application application) -> XForms.PlatformServices
+*REMOVED*static XForms.ImageProperties.extension(XForms.Primitives.Image).SourceProperty.get -> XForms.ViewProperty<XForms.Primitives.Image, XForms.ImageSource>
+*REMOVED*static XForms.ImageProperties.extension(XForms.Primitives.Image).TintProperty.get -> XForms.ViewProperty<XForms.Primitives.Image, XForms.Color>
+*REMOVED*static XForms.ImageProperties.get_SourceProperty() -> XForms.ViewProperty<XForms.Primitives.Image, XForms.ImageSource>
+*REMOVED*static XForms.ImageProperties.get_TintProperty() -> XForms.ViewProperty<XForms.Primitives.Image, XForms.Color>
+*REMOVED*static XForms.PlatformServices.Current.get -> XForms.PlatformServices
+*REMOVED*static XForms.PlatformServices.Current.set -> void
+*REMOVED*static XForms.PreferencesExtensions.Get<T>(this XForms.IPreferences preferences, string key, T defaultValue) -> T
+*REMOVED*static XForms.PreferencesExtensions.Set<T>(this XForms.IPreferences preferences, string key, T value) -> void
+*REMOVED*static XForms.TextBlockProperties.extension(XForms.Primitives.TextBlock).FontSizeProperty.get -> XForms.ViewProperty<XForms.Primitives.TextBlock, float>
+*REMOVED*static XForms.TextBlockProperties.extension(XForms.Primitives.TextBlock).FontWeightProperty.get -> XForms.ViewProperty<XForms.Primitives.TextBlock, XForms.FontWeight>
+*REMOVED*static XForms.TextBlockProperties.extension(XForms.Primitives.TextBlock).ForegroundProperty.get -> XForms.ViewProperty<XForms.Primitives.TextBlock, XForms.Color>
+*REMOVED*static XForms.TextBlockProperties.extension(XForms.Primitives.TextBlock).StrikethroughProperty.get -> XForms.ViewProperty<XForms.Primitives.TextBlock, bool>
+*REMOVED*static XForms.TextBlockProperties.extension(XForms.Primitives.TextBlock).TextProperty.get -> XForms.ViewProperty<XForms.Primitives.TextBlock, string>
+*REMOVED*static XForms.TextBlockProperties.get_FontSizeProperty() -> XForms.ViewProperty<XForms.Primitives.TextBlock, float>
+*REMOVED*static XForms.TextBlockProperties.get_FontWeightProperty() -> XForms.ViewProperty<XForms.Primitives.TextBlock, XForms.FontWeight>
+*REMOVED*static XForms.TextBlockProperties.get_ForegroundProperty() -> XForms.ViewProperty<XForms.Primitives.TextBlock, XForms.Color>
+*REMOVED*static XForms.TextBlockProperties.get_StrikethroughProperty() -> XForms.ViewProperty<XForms.Primitives.TextBlock, bool>
+*REMOVED*static XForms.TextBlockProperties.get_TextProperty() -> XForms.ViewProperty<XForms.Primitives.TextBlock, string>
+*REMOVED*static XForms.TextBoxProperties.extension(XForms.Primitives.TextBox).PlaceholderTextProperty.get -> XForms.ViewProperty<XForms.Primitives.TextBox, string>
+*REMOVED*static XForms.TextBoxProperties.extension(XForms.Primitives.TextBox).TextProperty.get -> XForms.ViewProperty<XForms.Primitives.TextBox, string>
+*REMOVED*static XForms.TextBoxProperties.get_PlaceholderTextProperty() -> XForms.ViewProperty<XForms.Primitives.TextBox, string>
+*REMOVED*static XForms.TextBoxProperties.get_TextProperty() -> XForms.ViewProperty<XForms.Primitives.TextBox, string>
+*REMOVED*static XForms.ViewBindingExtensions.Bind<TView, TValue, TSource>(this TView view, XForms.ViewProperty<TView, TValue> property, TSource source, System.Func<TSource, TValue> getValue) -> XForms.Binding
+*REMOVED*static XForms.ViewBindingExtensions.Bind<TView, TValue, TSource>(this TView view, XForms.ViewProperty<TView, TValue> property, TSource source, System.Func<TSource, TValue> getValue, System.Action<TSource, TValue> setValue) -> XForms.Binding
+*REMOVED*static XForms.ViewProperties.extension(XForms.View).AccessibilityLabelProperty.get -> XForms.ViewProperty<XForms.View, string>
+*REMOVED*static XForms.ViewProperties.extension(XForms.View).HeightProperty.get -> XForms.ViewProperty<XForms.View, float>
+*REMOVED*static XForms.ViewProperties.extension(XForms.View).IsHitTestVisibleProperty.get -> XForms.ViewProperty<XForms.View, bool>
+*REMOVED*static XForms.ViewProperties.extension(XForms.View).IsVisibleProperty.get -> XForms.ViewProperty<XForms.View, bool>
+*REMOVED*static XForms.ViewProperties.extension(XForms.View).MarginProperty.get -> XForms.ViewProperty<XForms.View, XForms.Thickness>
+*REMOVED*static XForms.ViewProperties.extension(XForms.View).WidthProperty.get -> XForms.ViewProperty<XForms.View, float>
+*REMOVED*static XForms.ViewProperties.get_AccessibilityLabelProperty() -> XForms.ViewProperty<XForms.View, string>
+*REMOVED*static XForms.ViewProperties.get_HeightProperty() -> XForms.ViewProperty<XForms.View, float>
+*REMOVED*static XForms.ViewProperties.get_IsHitTestVisibleProperty() -> XForms.ViewProperty<XForms.View, bool>
+*REMOVED*static XForms.ViewProperties.get_IsVisibleProperty() -> XForms.ViewProperty<XForms.View, bool>
+*REMOVED*static XForms.ViewProperties.get_MarginProperty() -> XForms.ViewProperty<XForms.View, XForms.Thickness>
+*REMOVED*static XForms.ViewProperties.get_WidthProperty() -> XForms.ViewProperty<XForms.View, float>

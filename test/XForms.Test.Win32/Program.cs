@@ -1,5 +1,6 @@
 using System;
 using XForms.Win32;
+using XForms.Toolkit;
 
 namespace XForms.Test.Win32
 {
@@ -26,7 +27,7 @@ namespace XForms.Test.Win32
                 AppContext.SetSwitch("XForms.DisableLightweightViews", true);
             }
 
-            Win32ToolkitServices.Register();
+            Win32ToolkitServices.Register(() => Win32Application.Current?.MainWindowHandle ?? 0);
             Win32Application.Run("XForms Test (Win32)", new TestApp());
         }
     }

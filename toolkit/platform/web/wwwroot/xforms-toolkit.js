@@ -6,7 +6,7 @@ let exports = null;
 
 export async function init() {
     const runtime = await globalThis.getDotnetRuntime(0);
-    exports = (await runtime.getAssemblyExports('XForms.Toolkit.Web')).XForms.Web.ToolkitJs;
+    exports = (await runtime.getAssemblyExports('XForms.Toolkit.Web')).XForms.Toolkit.ToolkitJs;
 }
 
 export function openUrl(url) {

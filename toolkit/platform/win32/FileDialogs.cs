@@ -12,7 +12,7 @@ using Windows.Win32.System.Com;
 using Windows.Win32.UI.Shell;
 using Windows.Win32.UI.Shell.Common;
 
-namespace XForms.Win32
+namespace XForms.Toolkit
 {
     /// <summary>
     /// The common file dialogs (IFileOpenDialog and IFileSaveDialog), shown
@@ -21,7 +21,7 @@ namespace XForms.Win32
     internal sealed class CommonFileDialogs : IFilePicker
     {
         // The dialogs belong to the app's window
-        private static unsafe HWND OwnerWindow => new HWND((void*)(Win32Application.Current?.MainWindowHandle ?? 0));
+        private static unsafe HWND OwnerWindow => new HWND((void*)Win32ToolkitServices.OwnerWindow);
 
         private const int Canceled = unchecked((int)0x800704C7); // ERROR_CANCELLED
 

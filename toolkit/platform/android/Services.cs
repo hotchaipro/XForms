@@ -7,36 +7,40 @@ using Java.Security;
 using Javax.Crypto;
 using Javax.Crypto.Spec;
 
-namespace XForms.Android
+namespace XForms.Toolkit
 {
     /// <summary>
     /// Android's services for the application.
     /// </summary>
     public static class AndroidToolkitServices
     {
-        /// <summary>
-        /// Makes Android's services the app's (<see cref="PlatformServices.Current"/>):
-        /// call it before <see cref="AndroidApplication.Run"/>.
-        /// </summary>
-        public static void Register()
-        {
-            PlatformServices.Current ??= Create();
-        }
+        private static bool _isRegistered;
 
-        private static PlatformServices Create()
+        /// <summary>
+        /// Makes Android's services the app's (<see cref="Clipboard.Default"/>
+        /// and the others), with the activity to start other activities from
+        /// and give haptic feedback on, read each time; without one, they
+        /// start in a new task.
+        /// </summary>
+        public static void Register(
+            Func<global::Android.App.Activity> activity = null)
         {
-            var context = AndroidHost.Context;
-            return new PlatformServices()
+            AndroidHost.ActivityProvider = activity;
+            if (_isRegistered)
             {
-                Clipboard = new AndroidClipboard(context),
-                Launcher = new IntentLauncher(),
-                Preferences = new SharedPreferencesStore(context, ".preferences"),
-                SecureStorage = new KeystoreStorage(context),
-                Share = new IntentShare(),
-                HapticFeedback = new ViewHapticFeedback(),
-                Connectivity = new AndroidConnectivity(),
-                FilePicker = new DocumentPicker(),
-            };
+                return;
+            }
+
+            _isRegistered = true;
+            var context = AndroidHost.Context;
+            Clipboard.Default = new AndroidClipboard(context);
+            Launcher.Default = new IntentLauncher();
+            Preferences.Default = new SharedPreferencesStore(context, ".preferences");
+            SecureStorage.Default = new KeystoreStorage(context);
+            Share.Default = new IntentShare();
+            HapticFeedback.Default = new ViewHapticFeedback();
+            Connectivity.Default = new AndroidConnectivity();
+            FilePicker.Default = new DocumentPicker();
         }
     }
 

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
 
-namespace XForms.Web
+namespace XForms.Toolkit
 {
     /// <summary>
     /// The page's services. A page has no secret store, so secure storage is
@@ -14,30 +14,30 @@ namespace XForms.Web
     [SupportedOSPlatform("browser")]
     public static class WebToolkitServices
     {
+        private static bool _isRegistered;
+
         /// <summary>
         /// Loads the services' script into the page and makes the page's
-        /// services the app's (<see cref="PlatformServices.Current"/>): call it
-        /// before <see cref="WebApplication.RunAsync"/>.
+        /// services the app's (<see cref="Clipboard.Default"/> and the
+        /// others).
         /// </summary>
         public static async Task InitializeAsync()
         {
             await ToolkitJs.InitializeAsync();
-            PlatformServices.Current ??= Create();
-        }
-
-        private static PlatformServices Create()
-        {
-            return new PlatformServices()
+            if (_isRegistered)
             {
-                Clipboard = new WebClipboard(),
-                Launcher = new WebLauncher(),
-                Preferences = new LocalStoragePreferences("xforms.preferences."),
-                SecureStorage = new LocalStorageSecrets("xforms.secure."),
-                Share = new WebShare(),
-                HapticFeedback = new VibrationHapticFeedback(),
-                Connectivity = new WebConnectivity(),
-                FilePicker = new WebFilePicker(),
-            };
+                return;
+            }
+
+            _isRegistered = true;
+            Clipboard.Default = new WebClipboard();
+            Launcher.Default = new WebLauncher();
+            Preferences.Default = new LocalStoragePreferences("xforms.preferences.");
+            SecureStorage.Default = new LocalStorageSecrets("xforms.secure.");
+            Share.Default = new WebShare();
+            HapticFeedback.Default = new VibrationHapticFeedback();
+            Connectivity.Default = new WebConnectivity();
+            FilePicker.Default = new WebFilePicker();
         }
     }
 

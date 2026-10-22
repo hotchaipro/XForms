@@ -8,36 +8,48 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace XForms.Win32
+namespace XForms.Toolkit
 {
     /// <summary>
     /// Windows' services for the application.
     /// </summary>
     public static class Win32ToolkitServices
     {
+        private static Func<nint> _ownerWindow;
+        private static bool _isRegistered;
+
         /// <summary>
-        /// Makes Windows' services the app's (<see cref="PlatformServices.Current"/>):
-        /// call it before <see cref="Win32Application.Run"/>.
+        /// Makes Windows' services the app's (<see cref="Clipboard.Default"/>
+        /// and the others), with the window (an <c>HWND</c>) that owns their
+        /// dialogs, read each time one shows; or null, for none.
         /// </summary>
-        public static void Register()
+        public static void Register(
+            Func<nint> ownerWindow = null)
         {
-            PlatformServices.Current ??= Create();
+            _ownerWindow = ownerWindow;
+            if (_isRegistered)
+            {
+                return;
+            }
+
+            _isRegistered = true;
+            Clipboard.Default = new Win32Clipboard();
+            Launcher.Default = new ShellLauncher();
+            Preferences.Default = new FilePreferences(Path.Combine(AppDataFolder, "preferences.json"));
+            SecureStorage.Default = new ProtectedStorage(Path.Combine(AppDataFolder, "secure.json"));
+            Share.Default = new ClipboardShare();
+            HapticFeedback.Default = new NoHapticFeedback();
+            Connectivity.Default = new NetworkConnectivity();
+            FilePicker.Default = new CommonFileDialogs();
         }
 
-        private static PlatformServices Create()
+        // The window that owns the dialogs, or 0
+        internal static nint OwnerWindow
         {
-            var preferences = new FilePreferences(Path.Combine(AppDataFolder, "preferences.json"));
-            return new PlatformServices()
+            get
             {
-                Clipboard = new Win32Clipboard(),
-                Launcher = new ShellLauncher(),
-                Preferences = preferences,
-                SecureStorage = new ProtectedStorage(Path.Combine(AppDataFolder, "secure.json")),
-                Share = new ClipboardShare(),
-                HapticFeedback = new NoHapticFeedback(),
-                Connectivity = new NetworkConnectivity(),
-                FilePicker = new CommonFileDialogs(),
-            };
+                return _ownerWindow?.Invoke() ?? 0;
+            }
         }
 
         // The app's folder in the user's local application data

@@ -6,12 +6,12 @@ using Android.Content;
 using Android.OS;
 using Android.Runtime;
 
-namespace XForms.Android
+namespace XForms.Toolkit
 {
     /// <summary>
-    /// What the services need of the running app: its context and activity
-    /// (through <see cref="AndroidApplication.Current"/>), the UI thread, and
-    /// activities started for a result.
+    /// What the services need of the running app: its context, its activity
+    /// (from the provider it registered with), the UI thread, and activities
+    /// started for a result.
     /// </summary>
     internal static class AndroidHost
     {
@@ -27,11 +27,17 @@ namespace XForms.Android
             }
         }
 
+        public static Func<Activity> ActivityProvider
+        {
+            get;
+            set;
+        }
+
         public static Activity Activity
         {
             get
             {
-                return AndroidApplication.Current?.Activity;
+                return ActivityProvider?.Invoke();
             }
         }
 

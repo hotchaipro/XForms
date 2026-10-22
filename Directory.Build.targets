@@ -12,9 +12,10 @@
   <PropertyGroup>
     <XFormsAllowedReferences Condition="'$(MSBuildProjectName)' == 'XForms.Framework'">XForms.Analyzers</XFormsAllowedReferences>
     <XFormsAllowedReferences Condition="$(MSBuildProjectName.StartsWith('XForms.Framework.'))">XForms.Framework;XForms.Analyzers</XFormsAllowedReferences>
-    <XFormsAllowedReferences Condition="'$(MSBuildProjectName)' == 'XForms.Toolkit'">XForms.Framework</XFormsAllowedReferences>
-    <XFormsAllowedReferences Condition="$(MSBuildProjectName.StartsWith('XForms.Toolkit.'))">XForms.Toolkit;XForms.Framework;XForms.Framework.$(MSBuildProjectName.Substring(15))</XFormsAllowedReferences>
-    <XFormsAllowedReferences Condition="'$(MSBuildProjectName)' == 'XForms.Controls'">XForms.Framework;XForms.Toolkit</XFormsAllowedReferences>
+    <!-- The toolkit stands alone: nothing of XForms -->
+    <XFormsAllowedReferences Condition="'$(MSBuildProjectName)' == 'XForms.Toolkit'">(none)</XFormsAllowedReferences>
+    <XFormsAllowedReferences Condition="$(MSBuildProjectName.StartsWith('XForms.Toolkit.'))">XForms.Toolkit</XFormsAllowedReferences>
+    <XFormsAllowedReferences Condition="'$(MSBuildProjectName)' == 'XForms.Controls'">XForms.Framework</XFormsAllowedReferences>
     <XFormsAllowedReferences Condition="$(MSBuildProjectName.StartsWith('XForms.Themes.'))">XForms.Controls;XForms.Toolkit;XForms.Framework</XFormsAllowedReferences>
   </PropertyGroup>
 

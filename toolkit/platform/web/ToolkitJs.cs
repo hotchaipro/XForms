@@ -3,7 +3,7 @@ using System.Runtime.InteropServices.JavaScript;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
 
-namespace XForms.Web
+namespace XForms.Toolkit
 {
     /// <summary>
     /// The JavaScript side of the toolkit's services

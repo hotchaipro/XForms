@@ -1,0 +1,4 @@
+XForms.Toolkit.Win32ToolkitServices
+static XForms.Toolkit.Win32ToolkitServices.Register(System.Func<nint> ownerWindow = null) -> void
+*REMOVED*XForms.Win32.Win32ToolkitServices
+*REMOVED*static XForms.Win32.Win32ToolkitServices.Register() -> void

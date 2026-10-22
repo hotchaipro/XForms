@@ -4,35 +4,48 @@ using Foundation;
 using Security;
 using UIKit;
 
-namespace XForms.iOS
+namespace XForms.Toolkit
 {
     /// <summary>
     /// iOS's services for the application.
     /// </summary>
     public static class IosToolkitServices
     {
+        private static Func<UIViewController> _presenter;
+        private static bool _isRegistered;
+
         /// <summary>
-        /// Makes iOS's services the app's (<see cref="PlatformServices.Current"/>):
-        /// call it before <see cref="IosApplication"/>'s <c>Run</c>.
+        /// Makes iOS's services the app's (<see cref="Clipboard.Default"/> and
+        /// the others), with the view controller to present the share sheet
+        /// and document picker on, read each time one shows.
         /// </summary>
-        public static void Register()
+        public static void Register(
+            Func<UIViewController> presenter = null)
         {
-            PlatformServices.Current ??= Create();
+            _presenter = presenter;
+            if (_isRegistered)
+            {
+                return;
+            }
+
+            _isRegistered = true;
+            Clipboard.Default = new Pasteboard();
+            Launcher.Default = new UrlLauncher();
+            Preferences.Default = new UserDefaultsPreferences();
+            SecureStorage.Default = new KeychainStorage();
+            Share.Default = new ActivityShare();
+            HapticFeedback.Default = new GeneratorHapticFeedback();
+            Connectivity.Default = new PathConnectivity();
+            FilePicker.Default = new DocumentPicker();
         }
 
-        private static PlatformServices Create()
+        // The view controller to present on, or null
+        internal static UIViewController Presenter
         {
-            return new PlatformServices()
+            get
             {
-                Clipboard = new Pasteboard(),
-                Launcher = new UrlLauncher(),
-                Preferences = new UserDefaultsPreferences(),
-                SecureStorage = new KeychainStorage(),
-                Share = new ActivityShare(),
-                HapticFeedback = new GeneratorHapticFeedback(),
-                Connectivity = new PathConnectivity(),
-                FilePicker = new DocumentPicker(),
-            };
+                return _presenter?.Invoke();
+            }
         }
     }
 
@@ -181,7 +194,7 @@ namespace XForms.iOS
             }
 
             var controller = new UIActivityViewController(items.ToArray(), null);
-            var presenter = IosApplication.Current?.RootViewController;
+            var presenter = IosToolkitServices.Presenter;
             if (null != presenter)
             {
                 // On iPad the sheet is a popover, anchored to the window

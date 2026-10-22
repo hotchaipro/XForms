@@ -2,6 +2,7 @@ using System;
 using XForms.Controls;
 using XForms.Layouts;
 using XForms.Primitives;
+using XForms.Toolkit;
 
 namespace XForms.Test
 {
@@ -47,30 +48,30 @@ namespace XForms.Test
             var services = new WrapPanel() { ItemSpacing = 8, LineSpacing = 8 };
             services.Children.Add(this.CreateButton("Copy", async () =>
             {
-                await this.Application.Services.Clipboard.SetTextAsync($"XForms page {depth}");
-                this.Show($"Clipboard: \"{await this.Application.Services.Clipboard.GetTextAsync()}\"");
+                await Clipboard.Default.SetTextAsync($"XForms page {depth}");
+                this.Show($"Clipboard: \"{await Clipboard.Default.GetTextAsync()}\"");
             }));
             services.Children.Add(this.CreateButton("Count runs", () =>
             {
-                var preferences = this.Application.Services.Preferences;
+                var preferences = Preferences.Default;
                 int count = preferences.Get("count", 0) + 1;
                 preferences.Set("count", count);
                 this.Show($"Preference count: {count}");
             }));
             services.Children.Add(this.CreateButton("Secret", async () =>
             {
-                var storage = this.Application.Services.SecureStorage;
+                var storage = SecureStorage.Default;
                 await storage.SetAsync("secret", $"s3cret at {DateTime.Now:T}");
                 this.Show($"Secure storage: \"{await storage.GetAsync("secret")}\"");
             }));
             services.Children.Add(this.CreateButton("Share", async () =>
             {
-                await this.Application.Services.Share.RequestAsync(new ShareRequest() { Title = "XForms", Text = "Shared from XForms", Uri = new Uri("https://example.com") });
+                await Share.Default.RequestAsync(new ShareRequest() { Title = "XForms", Text = "Shared from XForms", Uri = new Uri("https://example.com") });
                 this.Show("Shared");
             }));
             services.Children.Add(this.CreateButton("Buzz", () =>
             {
-                var haptics = this.Application.Services.HapticFeedback;
+                var haptics = HapticFeedback.Default;
                 haptics.Perform(HapticFeedbackType.Click);
                 this.Show($"Haptics supported: {haptics.IsSupported}");
             }));
@@ -106,14 +107,14 @@ namespace XForms.Test
             var system = new WrapPanel() { ItemSpacing = 8, LineSpacing = 8 };
             system.Children.Add(this.CreateButton("Network", () =>
             {
-                var connectivity = this.Application.Services.Connectivity;
+                var connectivity = Connectivity.Default;
                 connectivity.ConnectivityChanged -= this.Connectivity_Changed;
                 connectivity.ConnectivityChanged += this.Connectivity_Changed;
                 this.Show($"Network: {connectivity.NetworkAccess}");
             }));
             system.Children.Add(this.CreateButton("Open file", async () =>
             {
-                var files = await this.Application.Services.FilePicker.PickAsync(new FilePickerOptions() { Title = "Open a text file", FileTypes = new[] { ".txt" } });
+                var files = await FilePicker.Default.PickAsync(new FilePickerOptions() { Title = "Open a text file", FileTypes = new[] { ".txt" } });
                 if (0 == files.Count)
                 {
                     this.Show("Open: canceled");
@@ -129,7 +130,7 @@ namespace XForms.Test
             }));
             system.Children.Add(this.CreateButton("Save file", async () =>
             {
-                bool saved = await this.Application.Services.FilePicker.SaveAsync("hello.txt", async (stream) =>
+                bool saved = await FilePicker.Default.SaveAsync("hello.txt", async (stream) =>
                 {
                     using (var writer = new System.IO.StreamWriter(stream))
                     {
@@ -176,7 +177,7 @@ namespace XForms.Test
             object sender,
             EventArgs e)
         {
-            this.Show($"Network changed: {this.Application.Services.Connectivity.NetworkAccess}");
+            this.Show($"Network changed: {Connectivity.Default.NetworkAccess}");
         }
 
         private void Show(

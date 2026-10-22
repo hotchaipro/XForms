@@ -4,7 +4,7 @@ using System.IO;
 using System.Globalization;
 using System.Threading.Tasks;
 
-namespace XForms
+namespace XForms.Toolkit
 {
     /// <summary>
     /// The system clipboard's text.
@@ -199,42 +199,6 @@ namespace XForms
     }
 
     /// <summary>
-    /// The platform's services, from <see cref="Current"/> (or <c>Application.Services</c>). Each
-    /// is an interface, so an app can substitute its own (in tests, say).
-    /// </summary>
-    /// <remarks>
-    /// The API shapes follow .NET MAUI's Essentials, as instances rather than
-    /// static classes.
-    /// </remarks>
-    public sealed class PlatformServices
-    {
-        /// <summary>
-        /// The running platform's services, which the platform sets as it
-        /// starts (an app or test can replace them).
-        /// </summary>
-        public static PlatformServices Current
-        {
-            get;
-            set;
-        }
-        public IClipboard Clipboard { get; set; }
-
-        public ILauncher Launcher { get; set; }
-
-        public IPreferences Preferences { get; set; }
-
-        public ISecureStorage SecureStorage { get; set; }
-
-        public IShare Share { get; set; }
-
-        public IHapticFeedback HapticFeedback { get; set; }
-
-        public IConnectivity Connectivity { get; set; }
-
-        public IFilePicker FilePicker { get; set; }
-    }
-
-    /// <summary>
     /// Typed values in preferences, stored as invariant strings.
     /// </summary>
     public static class PreferencesExtensions
@@ -272,15 +236,213 @@ namespace XForms
     }
 
     /// <summary>
-    /// The platform's services, from the application: the same as
-    /// <see cref="PlatformServices.Current"/>.
+    /// The clipboard's text: <see cref="Default"/>.
     /// </summary>
-    public static class ApplicationServicesExtensions
+    public static class Clipboard
     {
-        extension(Application application)
+        private static IClipboard _default;
+
+        /// <summary>
+        /// The platform's implementation, set when its services are
+        /// registered (an app or test can set its own).
+        /// </summary>
+        public static IClipboard Default
         {
-            public PlatformServices Services => PlatformServices.Current
-                ?? throw new InvalidOperationException("The app has no platform services: call the platform's ToolkitServices (such as Win32ToolkitServices.Register()) before running the app.");
+            get
+            {
+                return _default ?? throw Services.NotRegistered(nameof(Clipboard));
+            }
+
+            set
+            {
+                _default = value;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Opening URIs in other apps (such as the browser): <see cref="Default"/>.
+    /// </summary>
+    public static class Launcher
+    {
+        private static ILauncher _default;
+
+        /// <summary>
+        /// The platform's implementation, set when its services are
+        /// registered (an app or test can set its own).
+        /// </summary>
+        public static ILauncher Default
+        {
+            get
+            {
+                return _default ?? throw Services.NotRegistered(nameof(Launcher));
+            }
+
+            set
+            {
+                _default = value;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Simple settings that last between runs: <see cref="Default"/>.
+    /// </summary>
+    public static class Preferences
+    {
+        private static IPreferences _default;
+
+        /// <summary>
+        /// The platform's implementation, set when its services are
+        /// registered (an app or test can set its own).
+        /// </summary>
+        public static IPreferences Default
+        {
+            get
+            {
+                return _default ?? throw Services.NotRegistered(nameof(Preferences));
+            }
+
+            set
+            {
+                _default = value;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Secrets, kept encrypted by the platform: <see cref="Default"/>.
+    /// </summary>
+    public static class SecureStorage
+    {
+        private static ISecureStorage _default;
+
+        /// <summary>
+        /// The platform's implementation, set when its services are
+        /// registered (an app or test can set its own).
+        /// </summary>
+        public static ISecureStorage Default
+        {
+            get
+            {
+                return _default ?? throw Services.NotRegistered(nameof(SecureStorage));
+            }
+
+            set
+            {
+                _default = value;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Sharing text and links with other apps: <see cref="Default"/>.
+    /// </summary>
+    public static class Share
+    {
+        private static IShare _default;
+
+        /// <summary>
+        /// The platform's implementation, set when its services are
+        /// registered (an app or test can set its own).
+        /// </summary>
+        public static IShare Default
+        {
+            get
+            {
+                return _default ?? throw Services.NotRegistered(nameof(Share));
+            }
+
+            set
+            {
+                _default = value;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Haptic feedback, where the device has it: <see cref="Default"/>.
+    /// </summary>
+    public static class HapticFeedback
+    {
+        private static IHapticFeedback _default;
+
+        /// <summary>
+        /// The platform's implementation, set when its services are
+        /// registered (an app or test can set its own).
+        /// </summary>
+        public static IHapticFeedback Default
+        {
+            get
+            {
+                return _default ?? throw Services.NotRegistered(nameof(HapticFeedback));
+            }
+
+            set
+            {
+                _default = value;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Whether the device is online: <see cref="Default"/>.
+    /// </summary>
+    public static class Connectivity
+    {
+        private static IConnectivity _default;
+
+        /// <summary>
+        /// The platform's implementation, set when its services are
+        /// registered (an app or test can set its own).
+        /// </summary>
+        public static IConnectivity Default
+        {
+            get
+            {
+                return _default ?? throw Services.NotRegistered(nameof(Connectivity));
+            }
+
+            set
+            {
+                _default = value;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Opening and saving files the user picks: <see cref="Default"/>.
+    /// </summary>
+    public static class FilePicker
+    {
+        private static IFilePicker _default;
+
+        /// <summary>
+        /// The platform's implementation, set when its services are
+        /// registered (an app or test can set its own).
+        /// </summary>
+        public static IFilePicker Default
+        {
+            get
+            {
+                return _default ?? throw Services.NotRegistered(nameof(FilePicker));
+            }
+
+            set
+            {
+                _default = value;
+            }
+        }
+    }
+
+    // The error when a platform's services aren't registered
+    internal static class Services
+    {
+        public static InvalidOperationException NotRegistered(
+            string service)
+        {
+            return new InvalidOperationException(
+                $"{service} has no implementation: register the platform's services first (an XForms app's XFormsApp.Run does; otherwise, for example, Win32ToolkitServices.Register).");
         }
     }
 }

@@ -1,0 +1,4 @@
+XForms.Toolkit.AndroidToolkitServices
+static XForms.Toolkit.AndroidToolkitServices.Register(System.Func<Android.App.Activity> activity = null) -> void
+*REMOVED*XForms.Android.AndroidToolkitServices
+*REMOVED*static XForms.Android.AndroidToolkitServices.Register() -> void
