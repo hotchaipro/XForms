@@ -2274,8 +2274,8 @@ Win32, Android and the browser, as before.
 
       | Platform | XForms creates the host | The app's own host |
       |---|---|---|
-      | Win32 | `Win32Application.Run("Title", new App())`: its window and message loop | — (embedding in a caller's window is phase 28) |
-      | Browser | `await WebApplication.RunAsync("Title", new App())`: the page | — (embedding in an element is phase 28) |
+      | Win32 | `Win32Application.Run("Title", new App())`: its window and message loop | — (embedding in a caller's window is phase 29) |
+      | Browser | `await WebApplication.RunAsync("Title", new App())`: the page | — (embedding in an element is phase 29) |
       | iOS | `IosApplication.Run(args, new App())` from `Main`: XForms' internal app and scene delegates | `IosApplication.Run(windowScene, new App())` from the app's own scene delegate, with any base class |
       | Android | — | `AndroidApplication.Run(this, new App())` from the app's own activity's `OnCreate`, with any base class |
 
@@ -2502,7 +2502,7 @@ Win32, Android and the browser, as before.
     WPF and Avalonia call these `ControlTemplate` and (in Avalonia)
     `TemplatedControl`, and a markup layer will want to write templates, so
     the names follow them. Unlike theirs, a template here is code first:
-    small enough (draw, add parts, react to state) that phase 26 can
+    small enough (draw, add parts, react to state) that phase 27 can
     express one in markup.
 
     - **Templates in the theme.** The templates are a theme extension of
@@ -2595,7 +2595,7 @@ Win32, Android and the browser, as before.
     framework, and tracks its public API like the other libraries.
 
     **Later, not in this phase:** more themes (Fluent, Material); templates
-    in markup (phase 26).
+    in markup (phase 27).
 
 25. **One package for apps, and a standalone toolkit.** An app
     references two things: the `XForms` package and a theme package. It
@@ -2793,18 +2793,115 @@ Win32, Android and the browser, as before.
     - The framework and the toolkit are packages of their own (each with
       its platforms' packages), which `XForms` depends on.
 
-26. **Later: `XForms.Xaml`.** The proof of concept in `spikes/XForms.Xaml`
+26. **Hot reload.** An app running under the debugger (or `dotnet watch`)
+    shows an edit to its C# without restarting: a page's layout, a
+    handler, a theme's colors, a template's drawing. It keeps its place
+    (the page it's on, the back stack, what the page holds). Release
+    builds are unchanged.
+
+    **What .NET gives, and what it doesn't.** .NET's hot reload patches
+    the running app's methods and then calls every assembly's
+    `[MetadataUpdateHandler]` with the types it changed. Code that runs
+    again picks up the edit by itself: a click handler, a template's
+    `Render` the next time it draws. Code that already ran doesn't: a
+    page's constructor that built its views, a theme's `Apply` that built
+    the theme, a template's `Apply` that added its parts. So what's on
+    screen stays as it was until XForms runs that code again, and that's
+    this phase's work.
+
+    **The plan:**
+    - **A handler in the framework** (`[assembly: MetadataUpdateHandler]`,
+      internal), since the framework knows every view, the theme and the
+      renderers. It does nothing unless .NET calls it (only when the app is
+      running with hot reload). On the UI thread, after an update:
+      - **The theme is rebuilt** (`CreateTheme` again, which runs the
+        theme package's `Apply` and the app's own adjustments), and given
+        to every view even when it compares equal, so a template's code
+        that changed runs again: each templated control's template is
+        removed and applied again (`Unapply`, `Apply`).
+      - **Everything is measured and drawn again:** the root frame, other
+        windows and open popups.
+      - **Pages rebuild themselves** (see the decision below), the current
+        page first; pages in the back stack rebuild when they're shown
+        again.
+      - **`Application.HotReloaded`** (an event) tells the app, for
+        anything else it built once (a cache, a list's item views).
+    - **How each platform gets updates** (step 1 checks each, since this
+      depends on the tools, not XForms):
+      - Win32: Visual Studio's Hot Reload (F5), and `dotnet watch`.
+      - Android: Visual Studio's Hot Reload on the emulator or a device;
+        `dotnet watch` if the SDK supports it for Android apps.
+      - The browser: `dotnet watch` on a Debug build, served by its own
+        development server (which delivers the updates), rather than a
+        published build on a static server, which can't take them.
+      - iOS: Visual Studio Code with a Mac, using the interpreter in Debug
+        builds; it builds on Windows here but can't be checked.
+    - **What it can't do:** an edit .NET can't apply while running (a
+      "rude edit", such as changing a class's base type) still needs a
+      restart, as in any .NET app. A rebuilt page keeps what it holds in
+      fields (a view model, the item it shows) but not what only its views
+      held (text typed into a box, a list's scroll position), unless the
+      rebuild carries it over.
+    - **XAML (phase 27)** will come with the same handler: markup compiled
+      to C# reloads as C# does; markup loaded at run time would reload
+      when its file changes.
+
+    **Steps,** each built for every platform and verified on Win32,
+    Android and the browser:
+    1. **How updates arrive:** a handler that only logs, in the test app,
+       under Visual Studio and `dotnet watch` on Win32, Android and in the
+       browser; what each needs (Debug settings, the web development
+       server, launch profiles) written down.
+    2. **Theme, templates and drawing:** the framework's handler rebuilds
+       the theme, applies templates again, measures and draws everything
+       again, and raises `HotReloaded`.
+    3. **Pages:** the way pages rebuild (decided below), in the framework;
+       the test app's pages and SoonerOrLater's pages use it.
+    4. **Docs:** a "Hot reload" section in `architecture.md` (what updates
+       by itself, what a page does, each platform's tools); this document.
+
+    **Verifying,** on Win32, Android and in the browser, with the app
+    running under hot reload and on a page deep in the back stack: a
+    changed color in `SimpleTheme`, a changed template's drawing and parts
+    (a button's corner and a combo box's arrow), a view added to a page's
+    layout, and a changed click handler each show without a restart, on
+    the same page, with the back stack and the page's view model kept; the
+    other pages show their edits when navigated back to; a Release build
+    never calls the handler, and the web download doesn't grow.
+
+    **To decide:**
+    - **How a page rebuilds.** Pages are created by the app, often with
+      arguments (`new BenchmarkPage(drawAsOneView: false)`), and
+      SoonerOrLater reuses page objects, so XForms can't make a new one by
+      itself. The options:
+      - **(Recommended) A method a page overrides,** `OnHotReload()`,
+        which does nothing by default; a page that builds its views in its
+        constructor moves that into a method that both call. Least change,
+        and the page decides what to keep.
+      - **A build method XForms calls:** a page builds its views in an
+        override (`BuildContent()`), which XForms calls when the page is
+        first shown and again on every reload, replacing its content.
+        Every page works the same way, but every page changes how it's
+        written.
+      - **New pages:** a page with a constructor that takes nothing is
+        replaced by a new one. Nothing to write, but what the page held is
+        lost, and pages with arguments don't update.
+    - **Which views get it:** pages only, or `UserControl` too (an app's
+      own composite controls, such as SoonerOrLater's rows, built in their
+      constructors).
+
+27. **Later: `XForms.Xaml`.** The proof of concept in `spikes/XForms.Xaml`
     becomes a layer over the framework and controls, including templates
     written in markup. To be planned in detail when it's next.
 
-27. **Later: `XForms.Compat.WinUI`.** Adapters giving WinUI's names and a
+28. **Later: `XForms.Compat.WinUI`.** Adapters giving WinUI's names and a
     `DependencyProperty`-style API over XForms' controls, with XAML
     namespace mappings so existing markup loads. It stays separate from any
     Fluent theme, so neither requires the other, and keeps its types in
     `XForms.Compat.WinUI` rather than Microsoft's namespaces. To be planned
     in detail when it's next.
 
-28. **Later: embedding.** XForms inside part of an existing app's UI,
+29. **Later: embedding.** XForms inside part of an existing app's UI,
     beside native content, with `Attach` beside each platform's `Run`
     (phase 23): `Run` shows the app in a whole host; `Attach` puts it in
     a container the caller owns and keeps running its own UI.
