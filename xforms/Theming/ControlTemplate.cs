@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace XForms.Controls
 {
@@ -167,6 +168,14 @@ namespace XForms.Controls
     {
         private readonly ITemplatedView _control;
 
+        // The animators made for the control, given back when a template is
+        // applied again (after a hot reload edit), since a control's own
+        // animators can only be made before its native object exists
+        private readonly List<DrawnAnimator> _drawnAnimators = new List<DrawnAnimator>();
+        private readonly List<Animator> _ownAnimators = new List<Animator>();
+        private int _drawnAnimatorsUsed;
+        private int _ownAnimatorsUsed;
+
         internal TemplateContext(
             ITemplatedView control)
         {
@@ -208,7 +217,13 @@ namespace XForms.Controls
         /// </summary>
         public DrawnAnimator CreateDrawnAnimator()
         {
-            return this._control.CreateTemplateDrawnAnimator();
+            if (this._drawnAnimatorsUsed == this._drawnAnimators.Count)
+            {
+                this._drawnAnimators.Add(this._control.CreateTemplateDrawnAnimator());
+            }
+
+            this._drawnAnimatorsUsed += 1;
+            return this._drawnAnimators[this._drawnAnimatorsUsed - 1];
         }
 
         /// <summary>
@@ -218,7 +233,20 @@ namespace XForms.Controls
         /// </summary>
         public Animator CreateOwnAnimator()
         {
-            return this._control.CreateTemplateOwnAnimator();
+            if (this._ownAnimatorsUsed == this._ownAnimators.Count)
+            {
+                this._ownAnimators.Add(this._control.CreateTemplateOwnAnimator());
+            }
+
+            this._ownAnimatorsUsed += 1;
+            return this._ownAnimators[this._ownAnimatorsUsed - 1];
+        }
+
+        // As a template is applied: it gets the animators made before, in order
+        internal void OnApplying()
+        {
+            this._drawnAnimatorsUsed = 0;
+            this._ownAnimatorsUsed = 0;
         }
 
         /// <summary>

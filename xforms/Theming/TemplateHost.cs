@@ -73,10 +73,28 @@ namespace XForms.Controls
             }
 
             this._template = template;
+            this.Context.OnApplying();
             template.ApplyCore(this._view, this.Context);
             template.OnStateChangedCore(this._view, this.Context);
             this._view.InvalidateMeasure();
             this._view.InvalidateVisual();
+        }
+
+        /// <summary>
+        /// Applies the template again, after a hot reload edit: removed, and
+        /// applied, so the code that ran once (adding its parts) runs again.
+        /// </summary>
+        public void Reapply(
+            Theme theme)
+        {
+            if (null != this._template)
+            {
+                this._template.UnapplyCore(this._view, this.Context);
+                this.Context.State = null;
+                this._template = null;
+            }
+
+            this.Apply(theme);
         }
 
         /// <summary>

@@ -164,6 +164,17 @@ namespace XForms
             return true;
         }
 
+        // Hot reload: the pages in the back stack are built again when they're
+        // shown again (the current one is, as the frame's child)
+        protected override void OnHotReload()
+        {
+            base.OnHotReload();
+            foreach (var page in this._backStack)
+            {
+                page.IsHotReloadPending = true;
+            }
+        }
+
         // Shows the arriving page with the transition, then hides (or removes)
         // the leaving one
         private async Task ShowAsync(
@@ -177,6 +188,10 @@ namespace XForms
             bool isBack = (mode == NavigationMode.Back) && !slideFromStart;
 
             this.Attach(arriving);
+            if (arriving.IsHotReloadPending)
+            {
+                arriving.ApplyHotReload();
+            }
             if (!isBack)
             {
                 // An arriving page goes on top; going back uncovers it instead

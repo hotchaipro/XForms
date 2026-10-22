@@ -194,6 +194,27 @@ namespace XForms
         }
 
         /// <summary>
+        /// Whether the view is in a window or an open popup: its ancestors
+        /// reach a root (a frame or a popup, which have no parent). A view
+        /// removed with its parent (a page's old content, after it's built
+        /// again) isn't, though it still has the parent it was removed with.
+        /// </summary>
+        [PlatformContract]
+        internal bool IsInVisualTree
+        {
+            get
+            {
+                Element top = this;
+                while (top is View view && (null != view.Parent))
+                {
+                    top = view.Parent;
+                }
+
+                return (top is Frame) || (top is Primitives.Popup);
+            }
+        }
+
+        /// <summary>
         /// Raised when the view is added to a parent (or shown), once its native
         /// object exists.
         /// </summary>
@@ -259,6 +280,43 @@ namespace XForms
 
         protected virtual void OnAttached()
         {
+        }
+
+        /// <summary>
+        /// Called after an edit while the app runs with hot reload, on every
+        /// view being shown, parents first. A view that built something once
+        /// from code (a template's parts, a control's views) runs that code
+        /// again here; a page's <see cref="Page.Build"/>, and a list's item
+        /// views, run again by themselves.
+        /// </summary>
+        protected virtual void OnHotReload()
+        {
+        }
+
+        // Hot reload: the view runs OnHotReload, then so do the children it
+        // kept (new ones are built already), and it's measured and drawn again
+        internal void ApplyHotReload()
+        {
+            if (!this.HasRenderer)
+            {
+                // Built when it's attached
+                return;
+            }
+
+            var before = new List<Element>(this.GetChildElements());
+            this.OnHotReload();
+
+            var after = new HashSet<Element>(this.GetChildElements());
+            foreach (var child in before)
+            {
+                if ((child is View view) && after.Contains(child))
+                {
+                    view.ApplyHotReload();
+                }
+            }
+
+            this.InvalidateMeasure();
+            this.InvalidateVisual();
         }
 
         protected virtual void OnDetached()

@@ -1,3 +1,7 @@
 XForms.Controls.UserControl.IsBuilt.get -> bool
+override XForms.Controls.ListViewItem.OnHotReload() -> void
+override XForms.Controls.TemplatedContentControl.OnHotReload() -> void
+override XForms.Controls.TemplatedControl.OnHotReload() -> void
 override XForms.Controls.UserControl.OnAttaching(XForms.Theme theme) -> void
+override XForms.Controls.UserControl.OnHotReload() -> void
 virtual XForms.Controls.UserControl.Build() -> XForms.View

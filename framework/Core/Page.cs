@@ -139,6 +139,28 @@ namespace XForms
             }
         }
 
+        // Built again after a hot reload edit; for a page in the back stack,
+        // when it's shown again
+        internal bool IsHotReloadPending
+        {
+            get;
+            set;
+        }
+
+        protected override void OnHotReload()
+        {
+            base.OnHotReload();
+            this.IsHotReloadPending = false;
+            if (this._isBuilt)
+            {
+                var content = this.Build();
+                if (null != content)
+                {
+                    this.Content = content;
+                }
+            }
+        }
+
         internal override void OnBuilding()
         {
             if (this._isBuilt)

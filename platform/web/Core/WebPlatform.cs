@@ -227,6 +227,8 @@ namespace XForms.Web
             ArgumentNullException.ThrowIfNull(application);
             await InitializeAsync();
 
+            WebHotReload.Install();
+
             var host = new WebHost();
             SynchronizationContext.SetSynchronizationContext(new WebHost.WebSynchronizationContext(host));
             Js.SetTitle(title ?? string.Empty);

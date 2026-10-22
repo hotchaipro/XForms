@@ -688,6 +688,16 @@ export function listenHistory() {
     });
 }
 
+// Hot reload: dotnet watch's browser script applies edits through Blazor's
+// hooks, which XForms provides (only when the app runs with hot reload)
+
+export function installHotReload(capabilities) {
+    const blazor = (globalThis.Blazor ??= {});
+    const internal = (blazor._internal ??= {});
+    internal.getApplyUpdateCapabilities ??= () => capabilities;
+    internal.applyHotReloadDeltas ??= (deltas, loggingLevel) => JSON.parse(exports.ApplyHotReloadDeltas(JSON.stringify(deltas)));
+}
+
 // Accessible elements for lightweight views: a click (as a screen reader
 // sends) activates the view
 

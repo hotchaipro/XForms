@@ -2998,7 +2998,35 @@ Win32, Android and the browser, as before.
     focused). Release builds are unchanged. The aim is the experience
     Flutter sets: edit, save, see it, nothing lost.
 
-    **Status: steps 1 and 2 done.**
+    **Status: steps 1 to 3 done.**
+
+    Step 3, rebuilding: the framework's `MetadataUpdateHandler` posts to the
+    UI thread, where the app builds its theme again, and the views showing
+    run `View.OnHotReload()` (protected, for control libraries), parents
+    first, then the children they kept: a page builds again, a
+    `UserControl` builds again, a templated control's template is removed
+    and applied again (its context hands back the animators it made, which
+    can't be made again once the native object exists), a list makes its
+    item views again; pages in a back stack build again when shown; then
+    `Application.HotReloaded`. In the browser, XForms provides Blazor's
+    two hooks (`WebHotReload`), applying each delta with
+    `MetadataUpdater.ApplyUpdate` and calling the handlers; only when
+    `MetadataUpdater.IsSupported`, so a published app trims it away.
+    Verified on Win32 under `dotnet watch`, three pages deep: a view added
+    to a page's `Build()` (shown on the same page, the stack kept, and on
+    the page below when going back), a template's code (the button's
+    background) and a theme token (`SimpleTheme`'s corner radius), and
+    their reversal; in the browser under `dotnet watch`, the added view,
+    without the page reloading; on Android, the rebuild through the test
+    app's "Simulate hot reload" (every handler called, as the agent does),
+    with the page rebuilt and working, and the page below rebuilt when
+    going back. Win32 pages and the SoonerOrLater walk are unchanged.
+    Fixed on the way: Win32's focus ring drew against a focused view that
+    had been removed (a rebuilt page's old button), and crashed; a view
+    now knows whether it's still in a window (`IsInVisualTree`). The web
+    libraries' endpoint manifests are kept out of apps too (the
+    development server read a library's, and served no `.pdb` or `.dat`,
+    so a Debug app didn't start).
 
     Step 2, `Build()`: `Page.Build()` and `UserControl.Build()` (with
     `IsBuilt`), called once before the native object exists; `Page.Content`

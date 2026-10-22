@@ -77,6 +77,20 @@ namespace XForms.Controls
             }
         }
 
+        // After a hot reload edit: the control builds again
+        protected override void OnHotReload()
+        {
+            base.OnHotReload();
+            if (this._isBuilt)
+            {
+                var content = this.Build();
+                if (null != content)
+                {
+                    this.Content = content;
+                }
+            }
+        }
+
         /// <summary>
         /// The control's content: what <see cref="Build"/> returns, or what
         /// the control is given.

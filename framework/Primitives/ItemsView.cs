@@ -413,6 +413,19 @@ namespace XForms.Primitives
             return this.Application.Platform.CreateItemsViewRenderer(this);
         }
 
+        // Hot reload: each item showing gets a new view from the source (its
+        // code may have changed), and containers set aside drop theirs, so
+        // the source doesn't reuse a view built by the old code
+        protected override void OnHotReload()
+        {
+            base.OnHotReload();
+            var source = this._source;
+            foreach (var container in this._realizedContainers)
+            {
+                container.Content = ((null != source) && (null != container.Item)) ? source.GetItemView(null, container.Item) : null;
+            }
+        }
+
         internal void AddRealizedContainer(
             ItemContainer container)
         {

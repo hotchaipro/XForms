@@ -188,6 +188,9 @@ namespace XForms.Web
         [JSImport("listenHistory", Module)]
         public static partial void ListenHistory();
 
+        [JSImport("installHotReload", Module)]
+        public static partial void InstallHotReload(string capabilities);
+
         [JSImport("listenClick", Module)]
         public static partial void ListenClick(int id);
 
@@ -302,6 +305,13 @@ namespace XForms.Web
         internal static bool OnKey(int id, string key, int modifiers, bool isDown, bool isBackTab)
         {
             return WebHost.Current?.OnKey(id, key, modifiers, isDown) ?? false;
+        }
+
+        [JSExport]
+        internal static string ApplyHotReloadDeltas(
+            string deltasJson)
+        {
+            return WebHotReload.ApplyDeltas(deltasJson);
         }
 
         [JSExport]

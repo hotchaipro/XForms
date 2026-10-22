@@ -109,6 +109,13 @@ namespace XForms.Controls
             this._templateHost.Apply(theme);
         }
 
+        // After a hot reload edit: the template is applied again
+        protected override void OnHotReload()
+        {
+            base.OnHotReload();
+            this._templateHost.Reapply(this.ActualTheme);
+        }
+
         protected override void OnThemeChanged(
             Theme theme)
         {

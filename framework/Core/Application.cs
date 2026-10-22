@@ -529,6 +529,38 @@ namespace XForms
         }
 
         /// <summary>
+        /// Raised after an edit while the app runs with hot reload, once the
+        /// theme, the pages and the controls showing have been built again,
+        /// for anything else the app built once (a cache).
+        /// </summary>
+        public event EventHandler<HotReloadEventArgs> HotReloaded;
+
+        // After an edit while the app runs with hot reload (from the
+        // framework's MetadataUpdateHandler, on the UI thread): the theme is
+        // built again (CreateTheme), the views showing run their hot reload
+        // (pages build again, templates apply again, lists make their item
+        // views again), the back stack's pages do when they're shown, and
+        // everything is measured and drawn again
+        internal void OnHotReload(
+            IReadOnlyList<Type> updatedTypes)
+        {
+            this.UpdateTheme();
+
+            this._rootFrame.ApplyHotReload();
+            foreach (var window in this._windows)
+            {
+                window.Frame.ApplyHotReload();
+            }
+
+            foreach (var popup in this._openPopups.ToArray())
+            {
+                popup.Content?.ApplyHotReload();
+            }
+
+            this.HotReloaded?.Invoke(this, new HotReloadEventArgs(updatedTypes));
+        }
+
+        /// <summary>
         /// Whether a popup is open (one more step for Back).
         /// </summary>
         internal bool HasOpenPopups

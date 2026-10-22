@@ -58,6 +58,7 @@ namespace XForms.Test
                 string color = await this.Application.NavigateAsync<string>("/pick-color");
                 this.Show($"Page result: {color ?? "(went back)"}");
             }));
+            navigation.Children.Add(this.CreateButton("Simulate hot reload", () => HotReloadLog.Simulate(typeof(AppLayerPage))));
             navigation.Children.Add(this.CreateButton("Message box", async () => this.Show($"Message box: {await MessageBox.ShowAsync("Delete everything?", "Confirm")}")));
             if (null != TestApp.RecreateHost)
             {

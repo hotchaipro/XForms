@@ -23,15 +23,17 @@
 
   <!--
     The web libraries (Razor class libraries, for their scripts) keep their
-    development manifest (*.staticwebassets.runtime.json) out of the apps that
-    reference them: the SDK copies it along, and an app's development server
-    (dotnet run, dotnet watch) reads the first one it finds, which can be a
-    library's, and then serves nothing. The app's own covers the libraries'
-    files.
+    development manifests (*.staticwebassets.runtime.json and
+    *.staticwebassets.endpoints.json) out of the apps that reference them: the
+    SDK copies them along, and an app's development server (dotnet run,
+    dotnet watch) reads the first it finds, which can be a library's, and
+    then serves nothing, or not the app's symbols and data. The app's own
+    cover the libraries' files.
   -->
-  <Target Name="XFormsKeepLibraryManifestOut" AfterTargets="AddStaticWebAssetsManifest" Condition="'$(UsingMicrosoftNETSdkRazor)' == 'true' and '$(OutputType)' == 'Library'">
+  <Target Name="XFormsKeepLibraryManifestsOut" AfterTargets="AddStaticWebAssetsManifest;AddStaticWebAssetEndpointsBuildManifest" BeforeTargets="GetCopyToOutputDirectoryItems" Condition="'$(UsingMicrosoftNETSdkRazor)' == 'true' and '$(OutputType)' == 'Library'">
     <ItemGroup>
-      <ContentWithTargetPath Remove="$(StaticWebAssetDevelopmentManifestPath)" />
+      <_XFormsLibraryManifest Include="@(ContentWithTargetPath)" Condition="$([System.String]::Copy('%(ContentWithTargetPath.TargetPath)').EndsWith('.staticwebassets.runtime.json')) or $([System.String]::Copy('%(ContentWithTargetPath.TargetPath)').EndsWith('.staticwebassets.endpoints.json'))" />
+      <ContentWithTargetPath Remove="@(_XFormsLibraryManifest)" />
     </ItemGroup>
   </Target>
 
