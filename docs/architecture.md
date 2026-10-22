@@ -46,7 +46,9 @@ The goal is that any control library built on the framework runs on every
 supported platform with the same look and the same layout. All of the
 per-platform complexity stays inside the framework and the platforms.
 
-Planned layers ([alignment.md](alignment.md#layering), phases 25-27):
+Planned ([alignment.md](alignment.md#layering), phases 25-28): a standalone
+XForms.Toolkit (services only, for any .NET app; binding moves to
+XForms.Controls),
 `XForms.Xaml` for markup, `XForms.Compat.WinUI` for WinUI's API, and
 embedding XForms in part of an existing app's UI; and more themes beside
 `XForms.Themes.Simple`.
