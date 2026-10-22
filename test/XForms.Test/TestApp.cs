@@ -58,6 +58,10 @@ namespace XForms.Test
         {
             base.OnStart();
 
+            // The first page, unless the platform gives one (the browser's
+            // address, say)
+            this.StartPath = string.IsNullOrEmpty(StartPage) ? "/" : "/" + StartPage.ToLowerInvariant();
+
             StartAsync();
         }
 
@@ -83,8 +87,6 @@ namespace XForms.Test
                 this.SwitchThemeModesAsync();
             }
             await ThemeResources.Default.LoadResourcesAsync();
-
-            _ = this.NavigateAsync(string.IsNullOrEmpty(StartPage) ? "/" : "/" + StartPage.ToLowerInvariant());
         }
 
         protected override void OnConfigureRoutes(

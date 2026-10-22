@@ -4,6 +4,8 @@ XForms.Application.NavigationStack.get -> System.Collections.Generic.IReadOnlyLi
 XForms.Application.OpenWindowAsync(string path, string title = null, XForms.Size? size = null) -> System.Threading.Tasks.Task<XForms.Window>
 XForms.Application.ShowModalAsync(string path) -> System.Threading.Tasks.Task
 XForms.Application.ShowModalAsync<TResult>(string path) -> System.Threading.Tasks.Task<TResult>
+XForms.Application.StartPath.get -> string
+XForms.Application.StartPath.set -> void
 XForms.Application.ThemeExtender.get -> System.Func<XForms.Theme, XForms.Theme>
 XForms.Application.ThemeExtender.set -> void
 XForms.Page.NavigationPath.get -> string
@@ -18,4 +20,5 @@ XForms.Route.this[string name].get -> string
 XForms.Routes
 XForms.Routes.Add(string pattern, System.Func<XForms.Route, XForms.Page> createPage) -> void
 virtual XForms.Application.OnConfigureRoutes(XForms.Routes routes) -> void
+virtual XForms.Application.OnRouteNotFound(string path) -> string
 virtual XForms.Element.OnAttaching(XForms.Theme theme) -> void

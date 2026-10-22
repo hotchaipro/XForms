@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace XForms.Platform
 {
@@ -62,12 +64,62 @@ namespace XForms.Platform
 
         /// <summary>
         /// Starts the app on the platform: creates its renderer, dispatcher and
-        /// main window, shows its root frame, and calls its <c>OnStart</c>.
+        /// main window, shows its root frame, calls its <c>OnStart</c>, and
+        /// shows its first pages: the stack of paths given (a stack restored
+        /// after the system ended the app, the browser's address, a link), or
+        /// the app's <c>StartPath</c>.
         /// </summary>
         public void Start(
-            IPlatform platform)
+            IPlatform platform,
+            IReadOnlyList<string> startStack = null)
         {
-            this._application.Start(platform);
+            this._application.Start(platform, startStack);
+        }
+
+        // ── Navigation ─────────────────────────────────────────────────────
+
+        /// <summary>
+        /// The paths of the pages in the back stack and the page showing,
+        /// oldest first, for the platform to save or show (the browser's
+        /// address).
+        /// </summary>
+        public IReadOnlyList<string> NavigationStack
+        {
+            get
+            {
+                return this._application.NavigationStack;
+            }
+        }
+
+        /// <summary>
+        /// Whether a popup is open: one more step for Back.
+        /// </summary>
+        public bool HasOpenPopups
+        {
+            get
+            {
+                return this._application.HasOpenPopups;
+            }
+        }
+
+        /// <summary>
+        /// Brings the back stack to the given paths (the browser's Back and
+        /// Forward): back to the pages both share, then forward to the rest.
+        /// </summary>
+        public Task NavigateToStackAsync(
+            IReadOnlyList<string> paths)
+        {
+            return this._application.NavigateToStackAsync(paths);
+        }
+
+        /// <summary>
+        /// Opens a path from outside the app while it runs (a link), over the
+        /// current page.
+        /// </summary>
+        public Task OpenPathAsync(
+            string path)
+        {
+            return this._application.OpenPathAsync(path);
         }
 
         /// <summary>

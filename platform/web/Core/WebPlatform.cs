@@ -240,7 +240,7 @@ namespace XForms.Web
 
                 // Saved once the app has suspended (and saved its state)
                 host.Suspending += WebFiles.Save;
-                ApplicationHost.For(application).Start(new WebPlatform(host));
+                ApplicationHost.For(application).Start(new WebPlatform(host), WebHost.GetStartStack());
             }
             catch (Exception ex)
             {

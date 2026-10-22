@@ -173,10 +173,17 @@ namespace XForms.Web
         public static partial void ListenKeyboard();
 
         [JSImport("pushHistory", Module)]
-        public static partial void PushHistory();
+        public static partial void PushHistory([JSMarshalAs<JSType.Array<JSType.String>>] string[] stack, bool popup);
 
-        [JSImport("popHistory", Module)]
-        public static partial void PopHistory();
+        [JSImport("replaceHistory", Module)]
+        public static partial void ReplaceHistory([JSMarshalAs<JSType.Array<JSType.String>>] string[] stack, bool popup);
+
+        [JSImport("goHistory", Module)]
+        public static partial void GoHistory(int delta);
+
+        [JSImport("getStartStack", Module)]
+        [return: JSMarshalAs<JSType.Array<JSType.String>>]
+        public static partial string[] GetStartStack();
 
         [JSImport("listenHistory", Module)]
         public static partial void ListenHistory();
@@ -298,9 +305,13 @@ namespace XForms.Web
         }
 
         [JSExport]
-        internal static void OnHistoryBack()
+        internal static void OnHistoryPopped(
+            bool isExpected,
+            [JSMarshalAs<JSType.Array<JSType.String>>] string[] stack,
+            bool popup,
+            string addressPath)
         {
-            WebHost.Current?.OnHistoryBack();
+            WebHost.Current?.OnHistoryPopped(isExpected, stack, popup, addressPath);
         }
 
         [JSExport]

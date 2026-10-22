@@ -2801,7 +2801,7 @@ Win32, Android and the browser, as before.
     page. Nothing is found by reflection or made from a `Type`, so it's
     safe for trimming and AOT.
 
-    **Status: steps 1 and 2 done** (step 2 came with step 1, since taking
+    **Status: steps 1 to 3 done** (step 2 came with step 1, since taking
     `NavigateAsync(Page)` away needed the apps' routes):
     - **Routes:** `Routes` and `Route` in the framework,
       `Application.OnConfigureRoutes`, `NavigateAsync(path)` and
@@ -2823,6 +2823,18 @@ Win32, Android and the browser, as before.
       SoonerOrLater's task page is made by its route, `/item/{id}` or
       `/item/new?category={category}`, instead of being kept and reused
       with a view model set on it.
+    - **The start and the browser (step 3):** XForms shows the first
+      pages after `OnStart` (and `OnLoadResources`): the stack the platform
+      gives, or the app's `StartPath` (`/` unless set); apps no longer
+      navigate to their first page. `OnRouteNotFound` chooses what a path
+      from outside that matches nothing shows (`/` unless overridden). In
+      the browser each page in the stack is a history entry whose state is
+      the stack's paths and whose address is the top page's path after a
+      `#` (an open popup is one more entry); Back and Forward bring the app
+      to an entry's stack, making pages again by their routes; the app's
+      own going back moves back through the entries, so Forward returns; a
+      reload restores the whole stack, and a typed address shows its page
+      over the current one. The address wins over the test app's `?page=`.
     - **Verified:** every Win32 test page, light and dark, pixel for pixel
       (apart from the app page's two new buttons); the SoonerOrLater walk
       on Win32, pixel for pixel; forward, the stack, Back, and results
@@ -2830,7 +2842,12 @@ Win32, Android and the browser, as before.
       Win32, Android and in the browser (headless Edge, since a hidden
       pane doesn't run animation frames); a window opened by path on
       Win32; SoonerOrLater's new and edited tasks on Win32, Android and in
-      the browser; the trimming analyzers report nothing new.
+      the browser; the trimming analyzers report nothing new. Step 3, in
+      headless Edge: the address and entries after each navigation, Back
+      and Forward through three pages, the app's Back and then Forward, a
+      reload restoring four pages, a typed address, an unknown one, a fresh
+      load at `#/app/7` and at `#/nope`, and a popup closed by Back; Win32
+      pages and the SoonerOrLater walk unchanged by the new start.
     - **Found, not changed:** in the browser, Escape goes back only while
       a view has keyboard focus (as it did before this phase).
 

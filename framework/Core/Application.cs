@@ -106,9 +106,12 @@ namespace XForms
             get;
         }
 
-        // Called by the platform (through ApplicationHost.Start) as it runs the app
+        // Called by the platform (through ApplicationHost.Start) as it runs the
+        // app, with the stack of paths it starts on (a restored stack, the
+        // browser's address, a link), or null for StartPath
         internal void Start(
-            IPlatform platform)
+            IPlatform platform,
+            IReadOnlyList<string> startStack)
         {
             this.AttachPlatform(platform);
             this._theme = null;
@@ -126,6 +129,8 @@ namespace XForms
             this.OnStart();
 
             this.OnLoadResources();
+
+            _ = this.NavigateToStartAsync(startStack);
         }
 
         /// <summary>
@@ -359,6 +364,179 @@ namespace XForms
             ArgumentNullException.ThrowIfNull(path);
             return this.Routes.CreatePage(path)
                 ?? throw new ArgumentException($"No route matches {path}: add one in OnConfigureRoutes.", nameof(path));
+        }
+
+        /// <summary>
+        /// The path the app starts on when the platform gives none (a link, a
+        /// stack restored after the system ended the app, the browser's
+        /// address): <c>/</c> unless set. XForms navigates to it after
+        /// <see cref="OnStart"/>; the app doesn't navigate to its first page
+        /// itself.
+        /// </summary>
+        public string StartPath
+        {
+            get;
+            set;
+        } = "/";
+
+        /// <summary>
+        /// Chooses what to show for a path from outside the app that no route
+        /// matches (an address, a link, a stack saved by an older version):
+        /// the path to show instead, <c>/</c> unless overridden, or null to
+        /// stay where the app is. Not called for the app's own navigation,
+        /// which throws instead.
+        /// </summary>
+        protected virtual string OnRouteNotFound(
+            string path)
+        {
+            return "/";
+        }
+
+        // The page for a path from outside the app, or for the path
+        // OnRouteNotFound chooses instead; null to show nothing new
+        private Page CreatePageFromOutside(
+            string path)
+        {
+            var page = this.Routes.CreatePage(path);
+            if (null != page)
+            {
+                return page;
+            }
+
+            string instead = this.OnRouteNotFound(path);
+            return (null != instead) ? this.CreatePage(instead) : null;
+        }
+
+        // The first pages: the platform's stack (as far as its paths match),
+        // or StartPath; shown at once, without transitions
+        private async Task NavigateToStartAsync(
+            IReadOnlyList<string> startStack)
+        {
+            var pages = new List<Page>();
+            if ((null != startStack) && (0 < startStack.Count))
+            {
+                foreach (var path in startStack)
+                {
+                    var page = this.Routes.CreatePage(path);
+                    if (null == page)
+                    {
+                        break;
+                    }
+
+                    pages.Add(page);
+                }
+
+                if (0 == pages.Count)
+                {
+                    var page = this.CreatePageFromOutside(startStack[0]);
+                    if (null != page)
+                    {
+                        pages.Add(page);
+                    }
+                }
+            }
+
+            if (0 == pages.Count)
+            {
+                pages.Add(this.CreatePage(this.StartPath ?? "/"));
+            }
+
+            foreach (var page in pages)
+            {
+                await this._rootFrame.NavigateAsync(page, PageTransition.None);
+            }
+
+            this.OnNavigationComplete();
+        }
+
+        /// <summary>
+        /// Brings the back stack to the given paths, oldest first, as the
+        /// browser's Back and Forward do: goes back to the pages both stacks
+        /// share, then makes and shows the rest (as far as their paths match).
+        /// Only the last step animates.
+        /// </summary>
+        internal async Task NavigateToStackAsync(
+            IReadOnlyList<string> paths)
+        {
+            ArgumentNullException.ThrowIfNull(paths);
+            while (this.TryClosePopup())
+            {
+            }
+
+            var current = this.NavigationStack;
+            int shared = 0;
+            while ((shared < current.Count) && (shared < paths.Count) && (current[shared] == paths[shared]) && (null != paths[shared]))
+            {
+                shared += 1;
+            }
+
+            var arriving = new List<Page>();
+            for (int i = shared; i < paths.Count; i += 1)
+            {
+                var page = this.Routes.CreatePage(paths[i]);
+                if (null == page)
+                {
+                    break;
+                }
+
+                arriving.Add(page);
+            }
+
+            // A different first page replaces it (when it's made); otherwise
+            // the first page stays
+            bool replacesFirst = (0 == shared) && (0 < arriving.Count) && (0 < current.Count);
+            int leaving = current.Count - Math.Max(shared, 1);
+            for (int i = 0; i < leaving; i += 1)
+            {
+                var top = this._rootFrame.CurrentPage;
+                this._modals.Remove(top);
+                bool isLast = (i == leaving - 1) && (0 == arriving.Count);
+                await this._rootFrame.GoBackAsync(isLast ? null : PageTransition.None);
+            }
+
+            for (int i = 0; i < arriving.Count; i += 1)
+            {
+                bool isLast = (i == arriving.Count - 1);
+                var transition = isLast ? null : PageTransition.None;
+                if (replacesFirst && (0 == i))
+                {
+                    this._modals.Remove(this._rootFrame.CurrentPage);
+                    await this._rootFrame.ReplaceAsync(arriving[i], NavigationMode.Back, transition);
+                }
+                else
+                {
+                    await this._rootFrame.NavigateAsync(arriving[i], transition);
+                }
+            }
+
+            this.OnNavigationComplete();
+        }
+
+        /// <summary>
+        /// Opens a path from outside the app while it runs (a link): shows its
+        /// page over the current one, or what <see cref="OnRouteNotFound"/>
+        /// chooses.
+        /// </summary>
+        internal async Task OpenPathAsync(
+            string path)
+        {
+            ArgumentNullException.ThrowIfNull(path);
+            var page = this.CreatePageFromOutside(path);
+            if (null != page)
+            {
+                await this.ShowPageAsync(page, null);
+            }
+        }
+
+        /// <summary>
+        /// Whether a popup is open (one more step for Back).
+        /// </summary>
+        internal bool HasOpenPopups
+        {
+            get
+            {
+                return 0 < this._openPopups.Count;
+            }
         }
 
         /// <summary>

@@ -632,29 +632,59 @@ export function listenKeyboard() {
     });
 }
 
-// History: one entry stands for the app's back stack, so the browser's Back
-// goes back in the app
+// History: an entry for each page in the app's back stack (and one for an
+// open popup), its state the stack's paths and its address the top page's
+// path after a #, so the browser's Back and Forward move through the stack,
+// and a reload or a typed address opens its page
 
-export function pushHistory() {
-    history.pushState({ xforms: true }, '');
+function historyUrl(stack) {
+    return '#' + (stack.length ? stack[stack.length - 1] : '/');
 }
 
-// Taking the entry away (when the app has gone back on its own) isn't a
-// Back for the app
-let isPoppingHistory = false;
+export function pushHistory(stack, popup) {
+    history.pushState({ xforms: true, stack: stack, popup: popup }, '', historyUrl(stack));
+}
 
-export function popHistory() {
-    isPoppingHistory = true;
-    history.back();
+export function replaceHistory(stack, popup) {
+    history.replaceState({ xforms: true, stack: stack, popup: popup }, '', historyUrl(stack));
+}
+
+// Going back in the history when the app has gone back on its own isn't a
+// Back for the app: the popstate it causes is reported as expected
+let expectedPops = 0;
+
+export function goHistory(delta) {
+    expectedPops += 1;
+    history.go(delta);
+}
+
+// The stack the page was opened with: a reloaded entry's, or the address's
+// path, or null
+export function getStartStack() {
+    const state = history.state;
+    if (state && state.xforms && Array.isArray(state.stack) && state.stack.length) {
+        return state.stack;
+    }
+
+    const hash = location.hash;
+    return (hash.length > 1 && hash[1] === '/') ? [hash.substring(1)] : null;
 }
 
 export function listenHistory() {
-    window.addEventListener('popstate', () => {
-        if (isPoppingHistory) {
-            isPoppingHistory = false;
-            return;
+    window.addEventListener('popstate', (e) => {
+        const expected = expectedPops > 0;
+        if (expected) {
+            expectedPops -= 1;
         }
-        exports.OnHistoryBack();
+
+        const state = e.state;
+        const ours = state && state.xforms && Array.isArray(state.stack);
+        const hash = location.hash;
+        exports.OnHistoryPopped(
+            expected,
+            ours ? state.stack : null,
+            ours ? !!state.popup : false,
+            (hash.length > 1 && hash[1] === '/') ? hash.substring(1) : '/');
     });
 }
 

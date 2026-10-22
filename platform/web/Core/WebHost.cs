@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Versioning;
 using System.Threading;
+using System.Threading.Tasks;
 using XForms.Web.Renderers;
 using XForms.Platform;
 
@@ -302,6 +303,20 @@ namespace XForms.Web
             }
         }
 
+        // As Run, for work that awaits
+        private static async void RunAsync(
+            Func<Task> action)
+        {
+            try
+            {
+                await action();
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"XForms: {ex}");
+            }
+        }
+
         internal sealed class WebSynchronizationContext : SynchronizationContext
         {
             private readonly WebHost _host;
@@ -535,40 +550,142 @@ namespace XForms.Web
             return ((name?.Length >= 2) && (name[0] == 'F') && Enum.TryParse(name, out Key function)) ? function : Key.None;
         }
 
-        // History: one entry stands for the app's back stack
-        private bool _hasHistoryEntry;
+        // History: the stack (and whether a popup was open) that the browser's
+        // current entry stands for; null when it stands for none yet, so the
+        // next navigation replaces it
+        private string[] _historyStack;
+        private bool _historyPopup;
 
         /// <summary>
-        /// Adds a history entry once the app can go back, so the browser's Back
-        /// goes back in the app, and takes it away once the app can't.
+        /// The stack the page was opened with: a reloaded history entry's, or
+        /// the address's path (after the #), or null.
+        /// </summary>
+        public static IReadOnlyList<string> GetStartStack()
+        {
+            return Js.GetStartStack();
+        }
+
+        /// <summary>
+        /// Brings the browser's history to the app's back stack after it
+        /// navigates: an entry for each page shown (and one for an open popup),
+        /// back through the entries when the app goes back on its own (so
+        /// Forward comes back), or the current entry replaced.
         /// </summary>
         public void SyncHistory()
         {
             var application = Application.Current;
-            bool canGoBack = (null != application) && application.CanGoBack;
-            if (canGoBack && !this._hasHistoryEntry)
+            if (null == application)
             {
-                this._hasHistoryEntry = true;
-                Js.PushHistory();
+                return;
             }
-            else if (!canGoBack && this._hasHistoryEntry)
+
+            var host = ApplicationHost.For(application);
+            var stack = new List<string>(host.NavigationStack).ToArray();
+            bool popup = host.HasOpenPopups;
+            if (0 == stack.Length)
             {
-                this._hasHistoryEntry = false;
-                Js.PopHistory();
+                return;
             }
+
+            var current = this._historyStack;
+            if (null == current)
+            {
+                Js.ReplaceHistory(stack, popup);
+            }
+            else if ((popup == this._historyPopup) && IsPrefix(current, stack) && (current.Length == stack.Length))
+            {
+                return;
+            }
+            else if (!this._historyPopup && IsPrefix(current, stack))
+            {
+                for (int count = current.Length + 1; count <= stack.Length; count += 1)
+                {
+                    Js.PushHistory(stack[..count], false);
+                }
+
+                if (popup)
+                {
+                    Js.PushHistory(stack, true);
+                }
+            }
+            else if (!popup && IsPrefix(stack, current))
+            {
+                int delta = current.Length - stack.Length + (this._historyPopup ? 1 : 0);
+                Js.GoHistory(-delta);
+            }
+            else
+            {
+                Js.ReplaceHistory(stack, popup);
+            }
+
+            this._historyStack = stack;
+            this._historyPopup = popup;
         }
 
-        public void OnHistoryBack()
+        /// <summary>
+        /// The browser moved to another history entry: Back or Forward, or a
+        /// typed address (an entry of no state), or the app's own going back.
+        /// </summary>
+        public void OnHistoryPopped(
+            bool isExpected,
+            string[] stack,
+            bool popup,
+            string addressPath)
         {
-            this._hasHistoryEntry = false;
-            Run(() =>
+            RunAsync(async () =>
             {
                 var application = Application.Current;
-                if ((null != application) && application.CanGoBack)
+                if (null == application)
                 {
-                    ApplicationHost.For(application).Back();
+                    return;
                 }
+
+                if (isExpected)
+                {
+                    // The app went back on its own: the entry stands for its
+                    // stack, unless the history was made otherwise
+                    if ((null != this._historyStack) && ((null == stack) || (popup != this._historyPopup) || !IsPrefix(stack, this._historyStack) || (stack.Length != this._historyStack.Length)))
+                    {
+                        Js.ReplaceHistory(this._historyStack, this._historyPopup);
+                    }
+
+                    return;
+                }
+
+                // The entry gets the stack the app ends up with
+                this._historyStack = null;
+                var host = ApplicationHost.For(application);
+                if (null != stack)
+                {
+                    await host.NavigateToStackAsync(stack);
+                }
+                else
+                {
+                    await host.OpenPathAsync(addressPath);
+                }
+
+                this.SyncHistory();
             });
+        }
+
+        private static bool IsPrefix(
+            string[] prefix,
+            string[] stack)
+        {
+            if (prefix.Length > stack.Length)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < prefix.Length; i += 1)
+            {
+                if (prefix[i] != stack[i])
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         // Accessible elements standing for lightweight views, by element id
