@@ -156,9 +156,6 @@ namespace XForms.Web
         [JSImport("openUrl", Module)]
         public static partial void OpenUrl(string url);
 
-        [JSImport("getQueryParameter", Module)]
-        public static partial string GetQueryParameter(string name);
-
         [JSImport("listenVisibility", Module)]
         public static partial void ListenVisibility();
 

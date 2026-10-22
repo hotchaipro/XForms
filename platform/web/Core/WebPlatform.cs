@@ -210,11 +210,9 @@ namespace XForms.Web
         private static Task _initialization;
 
         /// <summary>
-        /// Loads the platform's script into the page (once). Call it before
-        /// reading the URL with <see cref="GetQueryParameter"/>; RunAsync calls
-        /// it too.
+        /// Loads the platform's script into the page (once).
         /// </summary>
-        public static Task InitializeAsync()
+        internal static Task InitializeAsync()
         {
             return _initialization ??= Js.InitializeAsync();
         }
@@ -249,16 +247,6 @@ namespace XForms.Web
                 Console.Error.WriteLine($"XForms: the app didn't start: {ex}");
                 throw;
             }
-        }
-
-        /// <summary>
-        /// The value of a parameter in the page's URL query (such as page in
-        /// ?page=lists), or null.
-        /// </summary>
-        public static string GetQueryParameter(
-            string name)
-        {
-            return Js.GetQueryParameter(name);
         }
     }
 }

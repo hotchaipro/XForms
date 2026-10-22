@@ -561,10 +561,6 @@ export function openUrl(url) {
     window.open(url, '_blank', 'noopener');
 }
 
-export function getQueryParameter(name) {
-    return new URLSearchParams(window.location.search).get(name);
-}
-
 export function listenVisibility() {
     document.addEventListener('visibilitychange', () => exports.OnVisibilityChanged(document.visibilityState === 'hidden'));
     window.addEventListener('pagehide', () => exports.OnVisibilityChanged(true));

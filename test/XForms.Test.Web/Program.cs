@@ -1,6 +1,7 @@
 using System;
+using System.Runtime.InteropServices.JavaScript;
 using System.Threading.Tasks;
-using XForms.Web;
+using System.Web;
 using XForms.Themes.Simple;
 
 namespace XForms.Test.Web
@@ -10,11 +11,11 @@ namespace XForms.Test.Web
     {
         public static async Task Main()
         {
-            await WebApplication.InitializeAsync();
-
             // ?page=lists picks another page, as XFORMS_TEST_PAGE does on Win32
-            TestApp.StartPage = WebApplication.GetQueryParameter("page");
-            TestApp.ThemeModeSwitches = WebApplication.GetQueryParameter("themes");
+            using var location = JSHost.GlobalThis.GetPropertyAsJSObject("location");
+            var query = HttpUtility.ParseQueryString(location.GetPropertyAsString("search") ?? string.Empty);
+            TestApp.StartPage = query["page"];
+            TestApp.ThemeModeSwitches = query["themes"];
 
             await XFormsApp.RunAsync("XForms Test (Web)", new TestApp(), new SimpleTheme());
         }
