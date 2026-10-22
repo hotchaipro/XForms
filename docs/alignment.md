@@ -2675,8 +2675,7 @@ Win32, Android and the browser, as before.
       its theme. Android's re-created activity and iOS's scenes work as in
       phase 23.
     - **Themes are objects.** A theme package's entry is a class (Simple's
-      `SimpleTheme`) deriving from an XForms base class (proposed:
-      `ControlTheme`), which adds its tokens, styles and templates to the
+      `SimpleTheme`) deriving from XForms' `AppTheme`, which adds its tokens, styles and templates to the
       theme the framework builds for the mode and accent color (the
       system's high-contrast colors included). `SimpleTheme.Apply` becomes
       its method. An app overrides `Application.CreateTheme` only to adjust
@@ -2719,7 +2718,7 @@ Win32, Android and the browser, as before.
        with host providers; no XForms references. The apps register with
        their hosting classes' objects for now.
     2. **The `XForms` package:** XForms.Controls becomes `XForms`
-       (project and assembly), multi-targeted, with `XFormsApp.Run` per
+       (project and assembly, in `xforms/`), multi-targeted, with `XFormsApp.Run` per
        platform; the theme base class and the framework's theme hook;
        `SimpleTheme` derives from it.
     3. **The apps:** the test apps and SoonerOrLater reference only
@@ -2742,22 +2741,15 @@ Win32, Android and the browser, as before.
     re-created; the packed app from step 4; and a deliberate XForms
     reference from the toolkit failing the build.
 
-    **Decided** (2026-10-22): the toolkit's namespace is `XForms.Toolkit`;
-    services are reached through static entry points; binding goes into
-    `XForms`; apps reference one `XForms` package (multi-targeted) and a
-    theme package, and pass the theme to `XFormsApp.Run`.
-
-    **Decisions to make before starting:**
-    1. **Names:** the entry point `XFormsApp.Run` (recommended: one name on
-       every platform, and no clash with the framework's `Application`), or
-       another; the theme base class `ControlTheme` (recommended), or
-       `ThemePackage`.
-    2. **The folder:** keep `controls/` for the `XForms` project
-       (recommended: less churn), or rename it `xforms/`.
-    3. **Framework and toolkit packages:** published as their own packages
-       that `XForms` depends on (recommended: the toolkit must be, to stand
-       alone; the framework too, for another control library), or bundled
-       into the `XForms` package.
+    **Decided** (2026-10-22):
+    - The toolkit's namespace is `XForms.Toolkit`; services are reached
+      through static entry points; binding goes into `XForms`.
+    - Apps reference one `XForms` package (multi-targeted) and a theme
+      package, and pass the theme to `XFormsApp.Run`.
+    - The theme base class is `AppTheme`.
+    - The `XForms` project moves to `xforms/` (from `controls/`).
+    - The framework and the toolkit are packages of their own (each with
+      its platforms' packages), which `XForms` depends on.
 
 26. **Later: `XForms.Xaml`.** The proof of concept in `spikes/XForms.Xaml`
     becomes a layer over the framework and controls, including templates
