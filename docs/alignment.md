@@ -3120,3 +3120,42 @@ Win32, Android and the browser, as before.
     The hard part is shared: keyboard focus and Tab moving across the
     boundary between the host's UI and XForms, and the host and XForms
     each knowing which has focus. To be planned in detail when it's next.
+
+**Candidates from SwiftUI** (recorded 2026-10-22, not yet in order or
+planned). SwiftUI's views are values described again whenever the state
+they read changes; XForms keeps retained views (phase 27), so that model,
+chained modifiers (a second way to set what an initializer sets, phase
+27's rule) and property wrappers that hide who owns state aren't adopted.
+What developers praise in SwiftUI is mostly apart from that, and these
+carry over. Observation and environment values would come first:
+
+31. **Candidate: observation.** A view model marked with an attribute
+    notifies of its changes without hand-written `INotifyPropertyChanged`,
+    as SwiftUI's `@Observable`, so binding updates whatever reads it. A
+    source generator writes the notifications at compile time, so it's
+    safe for trimming and AOT. The largest day-to-day gain.
+
+32. **Candidate: environment values.** Typed values that flow down the
+    tree and that any subtree can override, as SwiftUI's `@Environment`:
+    one mechanism for what XForms passes down case by case today (the
+    theme, flow direction), and for more, such as navigation reachable
+    from any view, a subtree disabled, or a subtree styled differently.
+    Keys are typed objects, not strings or reflection.
+
+33. **Candidate: roles.** Say what a control means, not only how it
+    looks, as SwiftUI's `ButtonRole` and text styles: a button that is
+    primary, destructive or cancel, which themes and platforms present
+    (a destructive button in red, Escape for cancel, Enter for the
+    default), beside the theme's text styles, which already follow the
+    system's text scale.
+
+34. **Candidate: previews.** A preview is a few lines of code beside a
+    page or control that show it with sample data, as SwiftUI's
+    `#Preview`, run by the future designer (phase 27's rule) and shown
+    live through hot reload. Cheap once `Build()` and hot reload exist.
+
+35. **Candidate: implicit animation.** "Animate whatever this change
+    causes", as SwiftUI's `withAnimation { ... }`: property and layout
+    changes made inside it animate with the theme's motion, without an
+    animation written for each. XForms' animator and layout transitions
+    stay for animations written out.
