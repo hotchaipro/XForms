@@ -50,8 +50,7 @@ The goal is that any control library built on the framework runs on every
 supported platform with the same look and the same layout. All of the
 per-platform complexity stays inside the framework and the platforms.
 
-Planned ([alignment.md](alignment.md#layering), phases 28-31): the
-common controls XForms lacks,
+Planned ([alignment.md](alignment.md#layering), phases 29-31):
 `XForms.Xaml` for markup, `XForms.Compat.WinUI` for WinUI's API, and
 embedding XForms in part of an existing app's UI; and more themes beside
 `XForms.Themes.Simple`.
@@ -545,6 +544,16 @@ Keyboard input goes to the focused view through public `View` API:
   `Application.PreviewKeyDown` sees each key first.
 - `OnActivate`, for Enter, Space or a screen reader's "invoke". By default it
   sends the view a tap.
+- `ContextRequested` (and `OnContextRequested`), when the user asks for a
+  view's context menu: a right-click, a touch or pen held still for half a
+  second (answered, the press ends as canceled, so it isn't also a tap),
+  or the Menu key or Shift+F10 on the focused view. It goes to the view,
+  then its ancestors, until one answers. A right-click never presses like
+  a left one.
+
+A single-line text box handles its own keys, but offers the ones it has no
+use for (Up, Down, Page Up, Page Down, Escape) to its ancestors first, so a
+number box can step and a suggestion list can move.
 
 The platform handles Tab and Shift+Tab (focus order), Escape (closes the top
 popup, then goes back) and Alt+Left (back) on Win32. Android and iOS route
@@ -559,23 +568,35 @@ it).
 ## Accessibility
 
 Views describe themselves with `AccessibilityRole` and `AccessibilityLabel`,
-and controls with state override `AccessibilityIsChecked` (toggles),
-`AccessibilityIsSelected` (list items, tabs, radio buttons) and
-`AccessibilityValue` (a picker's choice). Assistive technology acts on a view
-through `PerformAccessibilityAction` (invoke, toggle or select; by default
-each does what a tap would). A control calls `NotifyAccessibilityStateChanged`
+and controls with state override `AccessibilityIsChecked` (toggles, with
+`AccessibilityIsMixed` for a check box's third state),
+`AccessibilityIsSelected` (list items, tabs, radio buttons, tree items),
+`AccessibilityIsExpanded` (pickers, expanders, tree items),
+`AccessibilityValue` (a picker's choice) and `AccessibilityRange` (a
+slider's, a progress bar's or a number box's value within its range).
+Assistive technology acts on a view through `PerformAccessibilityAction`
+(invoke, toggle, select, expand, collapse, increment or decrement; by default
+each does what a tap would) and `SetAccessibilityRangeValue`. A control calls `NotifyAccessibilityStateChanged`
 when its state or value changes. Controls provide defaults: a Button is a
 button named by its text; a list item is named by the text inside it. Each
 platform maps these to its own accessibility API:
-- Win32: UI Automation providers, with the Invoke, Toggle, SelectionItem and
-  Value patterns and their property-changed events.
+- Win32: UI Automation providers, with the Invoke, Toggle, SelectionItem,
+  ExpandCollapse, Value and RangeValue patterns and their property-changed
+  events, a live region for an alert, and `ShowContextMenu` (Narrator's
+  context menu command).
 - Android: TalkBack, through `AccessibilityNodeInfo`. Every native view gets
   an accessibility delegate; a layer exposes the lightweight views inside it
   as virtual nodes (as `ExploreByTouchHelper` does), with touch exploration,
   in reading order with its native children.
 - iOS: VoiceOver, through `UIAccessibility`: a layer is one element when its
   view is accessible, and otherwise holds a `UIAccessibilityElement` for each
-  accessible lightweight view, then its subviews.
+  accessible lightweight view, then its subviews. A range is adjustable
+  (VoiceOver's swipe up and down).
+- The browser: ARIA roles and states (`aria-checked`, `-selected`,
+  `-expanded`, `-valuenow`), on the element of a native view and on an
+  invisible element for each accessible lightweight view. While a
+  lightweight view has keyboard focus, its layer (which has the browser's
+  focus) points at that element (`aria-activedescendant`).
 
 Native text entries expose themselves natively.
 
@@ -655,9 +676,14 @@ properties say.
   centered in the window, or set beside a view with `PlacementTarget`: below
   it, or above it when there's more room there. The content is measured with
   the space available there, so a long list fits the screen and scrolls.
-  Clicking outside the popup, pressing Escape or going back closes it, and
-  navigating closes every open popup. When focus moved into a popup, closing
-  it returns focus to where it was.
+  The side is chosen by the content's natural height. Clicking outside the
+  popup, pressing Escape or going back closes it, and navigating closes
+  every open popup. When focus moved into a popup, closing it returns focus
+  to where it was.
+- **`IsLightDismissEnabled`** (true by default) can be turned off for a
+  popup that only shows something beside its target, such as a suggestion
+  list or a tooltip: it leaves keyboard focus where it was (the keyboard
+  stays with a text box), and presses outside it go on to the app.
 - **Popups draw nothing themselves.** XForms' `Flyout` and pickers draw
   their own frames, so popups look the same everywhere. The platforms differ
   in how they show popups:
@@ -673,6 +699,44 @@ properties say.
   that holds for input too: a child drawn outside its parent (moved there by
   an animator, like a flyout's buttons) takes clicks there. Scrolling views
   always clip.
+
+## Controls
+
+XForms' controls, beside its panels (`StackPanel`, `Grid`, `DockPanel`,
+`WrapPanel`, `UniformGrid`, `Canvas`) and `Border`, with WinUI's names:
+- **Buttons and toggles:** `Button`, `HyperlinkButton`, `FloatingButton`,
+  `ToggleButton`, `ImageToggleButton`, `CheckBox` (with a third,
+  indeterminate state), `ToggleSwitch`, `RadioButtons`, and
+  `DaysOfWeekPicker`.
+- **Values:** `Slider` and `ProgressBar` (over `RangeBase`),
+  `ProgressRing`, `NumberBox`.
+- **Text and pickers:** `PasswordBox` (with a reveal button),
+  `AutoSuggestBox`, `ComboBox`, `CalendarDatePicker` and `CalendarView`,
+  and `TimePicker`, all drawn, so they look the same everywhere.
+- **Feedback and disclosure:** `ToolTip`, `MenuFlyout` (of `MenuItem`s),
+  `Flyout`, `MessageBox`, `InfoBar` and `Expander`.
+- **Commands and structure:** `CommandBar`, `MenuBar`, `TabStrip`,
+  `NavigationView` (a side pane, or a drawer on a narrow window), `FlipView`
+  with `PipsPager`, `TreeView`, `ListView` and `CommandListView`, and
+  `RefreshContainer` (pull to refresh, around a list).
+
+Any view can be given a tooltip and a context menu, as extension
+properties an initializer can set (`ViewAttachments`):
+
+```csharp
+var file = new Button()
+{
+    Text = "Report.docx",
+    ToolTip = "Right-click or long-press for more",
+    ContextFlyout = new MenuFlyout() { Items = { copy, delete } },
+};
+```
+
+Each control's look is its template in the theme; the control has its
+behavior, its keyboard (as WinUI's), its accessibility, and its user state
+for hot reload. A control's parts (an expander's header, an info bar's
+close button, a navigation view's items, a tree's items) are views of their
+own, so assistive technology reads each, and the keyboard reaches each.
 
 ## Lists
 
@@ -734,6 +798,8 @@ contract. Still to do:
   ([alignment.md](alignment.md#layering)).
 - **Web.** The browser backend (`platform/web`) has been tested in one
   browser (Chromium) without a screen reader or a touch screen.
+- **Right to left.** A `TextBlock`'s text keeps to the left right to left
+  (its alignment doesn't follow the flow direction yet).
 - **Win32 text entry.** RichEdit's Direct2D window class
   (`RichEditD2DPT`) crashed the process now and then (an access violation
   inside RichEdit, with or without its spell checker), so text boxes use

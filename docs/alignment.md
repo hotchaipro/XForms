@@ -3331,7 +3331,9 @@ Win32, Android and the browser, as before.
     - The time picker is drawn, as XForms' date picker is, so it looks the
       same everywhere.
 
-    **Status: steps 1 to 3 done.**
+    **Status: done,** with the controls in `architecture.md` (step 4: a
+    Controls section, and the input, accessibility and popup sections
+    brought up to date).
 
     Step 1, forms: `CheckBox` (`IsChecked` a `bool?`, `IsThreeState`),
     `ToggleSwitch` (`Header`, `IsOn`, `OnContent` and `OffContent`), a
