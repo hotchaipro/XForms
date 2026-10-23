@@ -3498,6 +3498,31 @@ Win32, Android and the browser, as before.
     (its alignment doesn't follow the direction); a drawer opened with the
     mouse doesn't close on Escape (focus is still outside it).
 
+    **iOS** (2026-10-23), on the simulator (an iPhone, through a Mac),
+    driven with Facebook's idb (taps, drags, typing, and the accessibility
+    tree): the forms page. Check boxes (three states, read as "Mixed"),
+    the disabled one ignoring taps, the switch, the slider tapped and
+    dragged (read as adjustable, with its percentage), the time picker
+    accepted, the number box's spin buttons and a typed value clamped to
+    its range, the password box, and the suggestion list typed into and
+    chosen from. Fixed on the way:
+    - Drawn text was offset and cut short: `NSLayoutManager` lays out
+      lazily, so the used rectangle was read before layout.
+    - The pickers page crashed: an image view's image was set off the UI
+      thread.
+    - Lightweight views' accessibility frames were about 70 points off:
+      the frame is now converted from the view's place when asked.
+    - The keyboard covered the page: pages now lay out in the space above
+      it, the focused text entry is scrolled into view, and popups are
+      placed above it.
+    - Text boxes never reported keyboard focus, so the suggestion list
+      never opened.
+
+    Not checked on iOS yet: the feedback and structure pages, dark mode,
+    a hardware keyboard and VoiceOver itself (only its tree). Found, not
+    fixed: a popup's items (the suggestion list's) aren't in the
+    accessibility tree.
+
 29. **Later: `XForms.Xaml`.** The proof of concept in `spikes/XForms.Xaml`
     becomes a layer over the framework and controls, including templates
     written in markup. To be planned in detail when it's next.

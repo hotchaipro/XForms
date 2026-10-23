@@ -790,8 +790,10 @@ progress ring, panels and gestures, builds against public API only, no
 platform has picker-specific code, and the platforms keep to the platform
 contract. Still to do:
 
-- **iOS testing.** iOS builds, but it hasn't been run since the restructure
-  (it needs a Mac). Its popups, in particular, are new and untested.
+- **iOS testing.** iOS has been run on the simulator (through a Mac) for
+  the forms page, including the keyboard and popups; the other test pages,
+  dark mode, a hardware keyboard and VoiceOver itself are untested
+  ([alignment.md](alignment.md), phase 28).
 - **Themes.** XForms.Themes.Basic is the only theme so far, and only
   `Button` has a style (`ButtonStyle`); the other looks change through
   their templates. Markup and WinUI compatibility come next
