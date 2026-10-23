@@ -197,11 +197,15 @@ namespace XForms.iOS
             };
             this._layoutManager.AddTextContainer(this._container);
 
+            // NOTE: The layout manager lays text out lazily: without this, the
+            // used rectangle can be empty or cover only part of the text
+            this._layoutManager.EnsureLayoutForTextContainer(this._container);
             var used = this._layoutManager.GetUsedRect(this._container);
             if (float.IsInfinity(textLayout.MaxWidth))
             {
                 // Size the container to the text, so alignment works within it
                 this._container.Size = new CGSize(Math.Ceiling(used.Width), this._container.Size.Height);
+                this._layoutManager.EnsureLayoutForTextContainer(this._container);
             }
 
             int lines = 0;
