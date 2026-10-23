@@ -176,11 +176,32 @@ namespace XForms.iOS
                 : base(container)
             {
                 this._view = new WeakReference<View>(view);
-
-                var offset = LayerHost.For(view).OffsetInLayer;
-                var size = view.Bounds;
-                this.AccessibilityFrameInContainerSpace = new CGRect(offset.X, offset.Y, size.Width, size.Height);
+                this._container = new WeakReference<NativeLayoutView>(container);
                 this.IsAccessibilityElement = true;
+            }
+
+            private readonly WeakReference<NativeLayoutView> _container;
+
+            // Where the view is now, on the screen: from its place in its
+            // layer's view, converted through that view (so a scroll view's
+            // offset and insets count, and later layout too)
+            public override CGRect AccessibilityFrame
+            {
+                get
+                {
+                    if (!this._view.TryGetTarget(out var view) || !this._container.TryGetTarget(out var container))
+                    {
+                        return CGRect.Empty;
+                    }
+
+                    var offset = LayerHost.For(view).OffsetInLayer;
+                    var size = view.Bounds;
+                    return UIAccessibility.ConvertFrameToScreenCoordinates(new CGRect(offset.X, offset.Y, size.Width, size.Height), container);
+                }
+
+                set
+                {
+                }
             }
 
             public override string AccessibilityLabel
