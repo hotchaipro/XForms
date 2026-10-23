@@ -3561,12 +3561,42 @@ Win32, Android and the browser, as before.
 
     Not checked on iOS: VoiceOver's speech itself (only its tree, through
     idb), Shift+Tab and Command+[ (idb sends no modifiers), and a real
-    device. Found, not fixed: Tab stops on a list once without a ring, and
-    a list has no arrow keys (on any platform: lists have no keyboard
-    navigation yet); a tree's items are each a Tab stop (WinUI's tree is
-    one); VoiceOver still reaches the content behind an open drawer; once,
-    after switching to right to left, the suggestion list's box was left
-    under the keyboard.
+    device.
+
+    Then what that pass found, on every platform:
+    - **Lists from the keyboard.** A list is one Tab stop: the item focus
+      was last on, or the first in view (`View.IsTabStop`, internal, which
+      Tab follows on every platform; Win32's own traversal too). The arrow
+      keys move between the items (all four in a grid, mirrored right to
+      left), Home and End go to the ends, Page Up and Page Down ten lines,
+      scrolling the item into view and passing over rows that aren't items
+      (a group header); Enter and Space click it, as a tap. An item's keys
+      reach its list (an item's container isn't attached to it), and so
+      does a context request. The browser's list scrolls only as far as
+      it must, as the other platforms' do, and names a reused element for
+      its new item; Android's native lists no longer take focus from their
+      items.
+    - **A tree is one Tab stop,** as WinUI's: the item focus was last on,
+      or the selected one, or the first.
+    - **`View.AccessibilityIsHidden`** (new): assistive technology skips a
+      view and everything in it, though it shows. The navigation view
+      hides its content while its drawer is open (Win32's tree, the
+      browser's `aria-hidden` on every element inside, Android's
+      `importantForAccessibility`, iOS's `accessibilityElementsHidden`).
+    - A lightweight view's focus ring stays inside its layer, which clipped
+      it (a list's or a tree's item that fills the width).
+    - iOS scrolls the focused text entry into view again once the page has
+      laid out above the keyboard, and when focus moves to another entry
+      while the keyboard shows (Tab, or the next field).
+
+    Checked: lists and the tree from the keyboard on the iPad simulator,
+    in the browser (headless Edge) and on the Android emulator; the drawer
+    hiding its content on the iPhone simulator, in the browser and on
+    Android; moving between text boxes with the keyboard up on the iPhone.
+    Not checked: Win32 from the keyboard (real input was blocked: another
+    process held the foreground), and VoiceOver's and TalkBack's speech.
+    Found, not fixed: Tab reaches a navigation view's content before its
+    pane (its children are in drawing order, which Tab follows).
 
 29. **Later: `XForms.Xaml`.** The proof of concept in `spikes/XForms.Xaml`
     becomes a layer over the framework and controls, including templates

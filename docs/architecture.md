@@ -775,7 +775,7 @@ other threads.
 | Scrolling | Native (`android.widget.ScrollView`) | Native (`UIScrollView`) | Compositor-animated, with touch flick | Native (`overflow: auto`) |
 | Popups | `PopupWindow` | View over the window | Topmost composition target | An element over a backdrop |
 | Accessibility | `AccessibilityNodeInfo`, virtual nodes for lightweight views | `UIAccessibility` elements | UI Automation | ARIA roles and states; hidden elements for lightweight views |
-| Keyboard focus | Native focus, layer-tracked for lightweight views; view-tree Tab order | The same (first responder) | Tab order, focus ring, activation | `tabindex` and the browser's focus; lightweight focus as elsewhere |
+| Keyboard focus | Native focus, layer-tracked for lightweight views; view-tree Tab order (a list or tree is one stop) | The same (first responder; the root view controller when nothing else has it) | Tab order, focus ring, activation | `tabindex` and the browser's focus; lightweight focus as elsewhere |
 | Suspend and resume | Activity pause and resume | Scene resigning and becoming active | Minimized, closed or Windows shutting down; restored | The page hidden or shown |
 | Interop | .NET for Android | .NET for iOS | Source-generated (CsWin32, `GeneratedComInterface`): trimmable and Native AOT-compatible | `[JSImport]`, `[JSExport]` |
 
