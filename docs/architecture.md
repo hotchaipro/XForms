@@ -50,8 +50,8 @@ The goal is that any control library built on the framework runs on every
 supported platform with the same look and the same layout. All of the
 per-platform complexity stays inside the framework and the platforms.
 
-Planned ([alignment.md](alignment.md#layering), phases 26-31):
-navigation by path, hot reload, the common controls XForms lacks,
+Planned ([alignment.md](alignment.md#layering), phases 28-31): the
+common controls XForms lacks,
 `XForms.Xaml` for markup, `XForms.Compat.WinUI` for WinUI's API, and
 embedding XForms in part of an existing app's UI; and more themes beside
 `XForms.Themes.Simple`.
@@ -276,6 +276,83 @@ from outside that matches nothing shows what `OnRouteNotFound` chooses
 - **Win32:** a desktop app starts fresh; nothing is restored.
 
 A modal page comes back from a restored stack as an ordinary page.
+
+## Hot reload
+
+An app running with hot reload (Visual Studio's, or `dotnet watch`) shows
+an edit to its C# without restarting, on the same page, with the back
+stack, the page's state and what the user did kept.
+
+**Writing a page or a control.** A page, and a `UserControl`, build their
+views in `Build()`, which XForms calls once, as they're first shown (before
+the native objects exist), and again after every edit:
+
+```csharp
+public sealed class ItemPage : Page
+{
+    private readonly ItemViewModel _item;   // State: kept across edits
+    private TextBox _name;                  // A view: assigned in Build
+
+    public ItemPage(string id)
+    {
+        this._item = Store.Find(id);
+        this._item.PropertyChanged += this.Item_PropertyChanged;   // Once
+    }
+
+    protected override View Build()
+    {
+        this._name = new TextBox() { Text = this._item.Name };
+        return new StackPanel() { Children = { this._name } };
+    }
+}
+```
+
+- The constructor sets up state (a view model, the item shown) and
+  subscriptions to objects outside the page, which a rebuild mustn't
+  repeat; `Build` makes the views, and assigns the fields that refer to
+  them, so after a rebuild they refer to the new views.
+- Code that needs the views before the page is shown waits for `IsBuilt`
+  (or runs at the end of `Build`).
+- Event handlers are methods, so edits to them apply as they are.
+
+**What runs again after an edit,** on the UI thread, from the framework's
+`MetadataUpdateHandler`:
+- the theme (`CreateTheme`, so a theme package's tokens and the app's
+  adjustments);
+- the views showing, parents first, each through `View.OnHotReload`: a
+  page and a `UserControl` build again, a templated control's template is
+  removed and applied again (the parts it adds; its drawing and layout run
+  again by themselves), a list makes its item views again;
+- the pages in the back stack, when they're shown again;
+- then `Application.HotReloaded`, for anything else the app built once.
+
+**What the user did carries over.** Before a page or control builds again,
+its views' user state is recorded (`View.GetUserState`: what changed in the
+view since it was first attached), and given to the new views
+(`SetUserState`): a text box's text and selection, a scroll viewer's
+offset, a list's place and selection, a toggle's state, a picker's choice,
+and which view has focus. A new view takes the state of the old view with
+the same `Name`, wherever it moved; an unnamed one, that of the old view
+in the same place with the same type (matched from the start, then from
+the end, then by type, as Flutter does, so a view added or removed doesn't
+shift the others). A control with state of its own overrides `GetUserState`
+and `SetUserState`; a control library that builds views again itself
+calls `SaveUserState` and `RestoreUserState`.
+
+**Each platform's tools:**
+- **Win32:** Visual Studio's Hot Reload, or `dotnet watch run`.
+- **The browser:** `dotnet watch run` on a Debug build, served by its
+  development server. `dotnet watch`'s script applies edits through
+  Blazor's hooks, which XForms' web platform provides when the app runs
+  with hot reload (and a published app trims away).
+- **Android:** Visual Studio's Hot Reload. `dotnet watch` (SDK 10.0.402)
+  launches the app without its agent, so edits don't arrive.
+- **iOS:** Visual Studio Code with a Mac (not checked).
+
+**What needs a restart:** an edit .NET can't apply while running (a "rude
+edit", such as changing a class's base type), and an edit to a page's
+constructor, which runs only for pages made after it (as Flutter's
+`initState`).
 
 ## Elements and renderers
 

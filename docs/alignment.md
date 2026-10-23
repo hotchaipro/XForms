@@ -2998,7 +2998,9 @@ Win32, Android and the browser, as before.
     focused). Release builds are unchanged. The aim is the experience
     Flutter sets: edit, save, see it, nothing lost.
 
-    **Status: steps 1 to 4 done.**
+    **Status: done,** with a "Hot reload" section in `architecture.md`
+    (step 5: writing a page and a control, what runs again, what carries
+    over, each platform's tools, what needs a restart).
 
     Step 4, user state: `View.Name`, and `GetUserState` and
     `SetUserState`, which a control overrides to say what has changed in
