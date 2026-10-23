@@ -44,11 +44,10 @@ namespace XForms.iOS.Renderers
             if (null != fileImageSource)
             {
                 string resourceName = Path.GetFileName(fileImageSource.Path).ToLowerInvariant();
-                await Task.Run(() =>
-                {
-                    var image = UIImage.FromBundle(resourceName);
-                    this._nativeImageView.Image = image;
-                });
+                // Loaded off the UI thread; shown on it (UIKit's views are only
+                // touched there), where the await comes back to
+                var image = await Task.Run(() => UIImage.FromBundle(resourceName));
+                this._nativeImageView.Image = image;
             }
             else
             {
