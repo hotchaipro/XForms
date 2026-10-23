@@ -288,6 +288,10 @@ namespace XForms.Controls
             this._scrim.IsVisible = this._isNarrow && this._isPaneOpen;
             this._menuButton.IsVisible = this._isNarrow;
 
+            // While the drawer is open, assistive technology stays in it (and
+            // the button that closes it), not the content it covers
+            this._contentHost.AccessibilityIsHidden = this._isNarrow && this._isPaneOpen;
+
             var animator = this._pane.Animator;
             float hidden = (this.FlowDirection == FlowDirection.RightToLeft) ? PaneWidth : -PaneWidth;
             if (isShown)

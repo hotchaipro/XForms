@@ -157,6 +157,17 @@ namespace XForms.Android.Renderers
             }
 
             list.SetClipToPadding(false);
+
+            // Keyboard focus goes to the items (XForms moves it between them),
+            // not the list
+            list.Focusable = false;
+            list.FocusableInTouchMode = false;
+            list.DescendantFocusability = global::Android.Views.DescendantFocusability.AfterDescendants;
+            if (null != this._nativeListView)
+            {
+                this._nativeListView.ItemsCanFocus = true;
+            }
+
             this._listFrame.AddView(list);
             this.Padding = this._padding;
         }

@@ -74,6 +74,19 @@ namespace XForms.iOS.Renderers
         }
 
         /// <summary>
+        /// A text entry took focus: while the keyboard shows (it didn't just
+        /// appear for it), the entry is scrolled into view above it.
+        /// </summary>
+        internal static void TextEntryFocused(
+            UIWindow window)
+        {
+            if ((0 < KeyboardOverlap) && (window?.RootViewController?.View is RootView root))
+            {
+                root.RevealFirstResponderSoon();
+            }
+        }
+
+        /// <summary>
         /// A view gave up keyboard focus: if nothing took it, the root takes it,
         /// so a hardware keyboard's keys still reach the app.
         /// </summary>
@@ -273,6 +286,18 @@ namespace XForms.iOS.Renderers
                 }
 
                 LayerHost.For(this._frame).NotifyRootSize(new Size((float)this.Bounds.Width, (float)height));
+
+                // Once the pages have laid out in the room left, the focused
+                // entry is still in view
+                if (0 < this._keyboardOverlap)
+                {
+                    this.RevealFirstResponderSoon();
+                }
+            }
+
+            internal void RevealFirstResponderSoon()
+            {
+                CoreFoundation.DispatchQueue.MainQueue.DispatchAsync(this.RevealFirstResponder);
             }
         }
 

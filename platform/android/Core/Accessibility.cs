@@ -23,6 +23,7 @@ namespace XForms.Android
             View view)
         {
             nativeView.SetAccessibilityDelegate(new ViewAccessibilityDelegate(view));
+            ApplyHidden(nativeView, view);
 
             if (!_isListening)
             {
@@ -207,10 +208,24 @@ namespace XForms.Android
                 return;
             }
 
-            if ((view.Renderer?.NativeElement is AndroidView nativeView) && IsEnabled(nativeView.Context))
+            if (view.Renderer?.NativeElement is AndroidView nativeView)
             {
-                nativeView.SendAccessibilityEvent(view.AccessibilityIsSelected ? EventTypes.ViewSelected : EventTypes.WindowContentChanged);
+                ApplyHidden(nativeView, view);
+                if (IsEnabled(nativeView.Context))
+                {
+                    nativeView.SendAccessibilityEvent(view.AccessibilityIsSelected ? EventTypes.ViewSelected : EventTypes.WindowContentChanged);
+                }
             }
+        }
+
+        // A view hidden from assistive technology is, with everything in it
+        private static void ApplyHidden(
+            AndroidView nativeView,
+            View view)
+        {
+            nativeView.ImportantForAccessibility = view.AccessibilityIsHidden
+                ? global::Android.Views.ImportantForAccessibility.NoHideDescendants
+                : global::Android.Views.ImportantForAccessibility.Auto;
         }
     }
 

@@ -768,7 +768,48 @@ namespace XForms.Web
                 {
                     renderer.ApplyAccessibility();
                 }
+
+                // Hidden from assistive technology (or shown again): so are the
+                // elements of everything in it, which needn't be inside its
+                // element
+                bool isHidden = view.AccessibilityIsHidden;
+                if (isHidden != this._hiddenViews.TryGetValue(view, out _))
+                {
+                    if (isHidden)
+                    {
+                        this._hiddenViews.AddOrUpdate(view, null);
+                    }
+                    else
+                    {
+                        this._hiddenViews.Remove(view);
+                    }
+
+                    ApplyAccessibilityWithin(view);
+                }
             });
+        }
+
+        // The views hidden from assistive technology, held weakly
+        private readonly System.Runtime.CompilerServices.ConditionalWeakTable<View, object> _hiddenViews = new System.Runtime.CompilerServices.ConditionalWeakTable<View, object>();
+
+        private static void ApplyAccessibilityWithin(
+            View view)
+        {
+            var children = LayerHost.For(view).Children;
+            for (int i = 0; i < children.Count; i += 1)
+            {
+                var child = children[i];
+                if (LayerHost.For(child).IsLightweight)
+                {
+                    (LayerHost.For(child).Layer as ViewRenderer)?.InvalidateRender();
+                }
+                else if (child.Renderer is ViewRenderer renderer)
+                {
+                    renderer.ApplyAccessibility();
+                }
+
+                ApplyAccessibilityWithin(child);
+            }
         }
 
         #endregion Input

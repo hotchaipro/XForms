@@ -58,9 +58,12 @@ XForms.Route.Pattern.get -> string
 XForms.Route.this[string name].get -> string
 XForms.Routes
 XForms.Routes.Add(string pattern, System.Func<XForms.Route, XForms.Page> createPage) -> void
+XForms.View.AccessibilityIsHidden.get -> bool
+XForms.View.AccessibilityIsHidden.set -> void
 XForms.View.ContextRequested -> System.EventHandler<XForms.ContextRequestedEventArgs>
 XForms.View.Name.get -> string
 XForms.View.Name.set -> void
+override XForms.Primitives.ItemsView.OnKeyDown(XForms.KeyEventArgs e) -> void
 override XForms.AccessibilityRange.Equals(object obj) -> bool
 override XForms.AccessibilityRange.GetHashCode() -> int
 override XForms.AccessibilityRange.ToString() -> string

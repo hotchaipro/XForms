@@ -379,7 +379,7 @@ namespace XForms.Primitives
 
             foreach (var container in this._realizedContainers)
             {
-                if (Equals(container.Item, item))
+                if (!container.IsRecycled && Equals(container.Item, item))
                 {
                     return container;
                 }
@@ -387,6 +387,226 @@ namespace XForms.Primitives
 
             return null;
         }
+
+        #region Keyboard
+
+        // The item keyboard focus is on (or was last on): the list's Tab stop
+        private object _currentItem;
+
+        /// <summary>
+        /// The container Tab stops at in the list: the current item's, while
+        /// it's in view, or else the first focusable one in view, or null.
+        /// </summary>
+        internal ItemContainer TabStopContainer
+        {
+            get
+            {
+                var current = this.ContainerFromItem(this._currentItem);
+                if ((null != current) && current.Focusable && current.HasRenderer)
+                {
+                    return current;
+                }
+
+                var source = this._source;
+                var native = this.Native;
+                if ((null == source) || (null == native))
+                {
+                    return null;
+                }
+
+                for (int index = Math.Max(0, native.FirstVisibleIndex); index < source.Count; index += 1)
+                {
+                    var container = this.ContainerFromItem(source[index]);
+                    if (null == container)
+                    {
+                        break;
+                    }
+
+                    if (container.Focusable && container.HasRenderer)
+                    {
+                        return container;
+                    }
+                }
+
+                // Or the first item made (where a platform's first item in
+                // view isn't)
+                ItemContainer first = null;
+                int firstIndex = int.MaxValue;
+                foreach (var container in this._realizedContainers)
+                {
+                    if (container.IsRecycled || !container.Focusable || !container.HasRenderer)
+                    {
+                        continue;
+                    }
+
+                    int index = source.IndexOf(container.Item);
+                    if ((index >= 0) && (index < firstIndex))
+                    {
+                        first = container;
+                        firstIndex = index;
+                    }
+                }
+
+                return first;
+            }
+        }
+
+        internal void OnContainerFocused(
+            ItemContainer container)
+        {
+            this._currentItem = container.Item;
+        }
+
+        /// <summary>
+        /// The arrow keys move between the items (in a grid, all four), Home
+        /// and End go to the ends, and Page Up and Page Down a page at a time,
+        /// scrolling the item into view. Items that aren't focusable (a group
+        /// header) are passed over.
+        /// </summary>
+        protected override void OnKeyDown(
+            KeyEventArgs e)
+        {
+            base.OnKeyDown(e);
+            var source = this._source;
+            var original = e.OriginalSource as View;
+            var container = (original as ItemContainer) ?? ItemContainer.ContainerFromContent(original);
+            if (e.Handled || (null == source) || (null == container) || (container.ItemsView != this) || (e.KeyModifiers != KeyModifiers.None))
+            {
+                return;
+            }
+
+            int index = source.IndexOf(container.Item);
+            if (index < 0)
+            {
+                return;
+            }
+
+            int count = source.Count;
+            int columns = Math.Max(1, this._layout.Columns);
+            bool isHorizontal = this._layout.Orientation == Orientation.Horizontal;
+            int forward = (this.FlowDirection == FlowDirection.RightToLeft) ? -1 : 1;
+
+            // Along the list a line at a time; across a grid's lines, an item
+            int target;
+            switch (e.Key)
+            {
+                case Key.Up:
+                    target = isHorizontal ? ((columns > 1) ? index - 1 : -1) : index - columns;
+                    break;
+
+                case Key.Down:
+                    target = isHorizontal ? ((columns > 1) ? index + 1 : -1) : index + columns;
+                    break;
+
+                case Key.Left:
+                    target = isHorizontal ? index - (forward * columns) : ((columns > 1) ? index - forward : -1);
+                    break;
+
+                case Key.Right:
+                    target = isHorizontal ? index + (forward * columns) : ((columns > 1) ? index + forward : -1);
+                    break;
+
+                case Key.Home:
+                    target = 0;
+                    break;
+
+                case Key.End:
+                    target = count - 1;
+                    break;
+
+                case Key.PageUp:
+                    target = Math.Max(0, index - (PageLines * columns));
+                    break;
+
+                case Key.PageDown:
+                    target = Math.Min(count - 1, index + (PageLines * columns));
+                    break;
+
+                default:
+                    return;
+            }
+
+            e.Handled = true;
+            if ((target < 0) || (target >= count) || (target == index))
+            {
+                return;
+            }
+
+            int direction = ((e.Key == Key.End) || (target < index)) ? -1 : 1;
+            if (e.Key == Key.Home)
+            {
+                direction = 1;
+            }
+
+            this.FocusRow(target, direction, 0);
+        }
+
+        // Focuses a container just made, again on the next frames if it didn't
+        // take (a browser ignores focus for an element not yet placed), while
+        // its item is still the one asked for
+        private void FocusContainer(
+            ItemContainer container,
+            object row,
+            int tries)
+        {
+            container.Focus();
+            if (tries < 10)
+            {
+                this.Application?.RequestAnimationFrame((time) =>
+                {
+                    if (!container.IsFocused && Equals(this._currentItem, row) && Equals(container.Item, row) && !container.IsRecycled)
+                    {
+                        this.FocusContainer(container, row, tries + 1);
+                    }
+                });
+            }
+        }
+
+        // How far Page Up and Page Down go
+        private const int PageLines = 10;
+
+        // Focuses the item at the index (or, past an item that can't take
+        // focus, the next one in the direction), scrolling it into view and
+        // waiting for its container to be made
+        private void FocusRow(
+            int index,
+            int direction,
+            int frames)
+        {
+            var source = this._source;
+            if ((null == source) || (index < 0) || (index >= source.Count))
+            {
+                return;
+            }
+
+            object row = source[index];
+            if (0 == frames)
+            {
+                this.ScrollToItem(row);
+            }
+
+            var container = this.ContainerFromItem(row);
+            if ((null != container) && container.HasRenderer)
+            {
+                if (!container.Focusable)
+                {
+                    this.FocusRow(index + direction, direction, 0);
+                    return;
+                }
+
+                this._currentItem = row;
+                this.FocusContainer(container, row, 0);
+                return;
+            }
+
+            // A smooth scroll across a long list takes a while
+            if (frames < 180)
+            {
+                this.Application?.RequestAnimationFrame((time) => this.FocusRow(index, direction, frames + 1));
+            }
+        }
+
+        #endregion Keyboard
 
         /// <summary>
         /// The containers the platform has made (for items in view, or set

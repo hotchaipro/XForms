@@ -87,7 +87,8 @@ namespace XForms.Controls
     /// item (and on its chevron, expands or collapses it); with keyboard
     /// focus, Up and Down move between the items shown, Right expands an item
     /// (or goes to its first child), Left collapses it (or goes to its
-    /// parent), Home and End go to the ends, and Enter or Space selects. Its
+    /// parent), Home and End go to the ends, and Enter or Space selects. Tab
+    /// stops once, at the item focus was last on (or the selected one). Its
     /// theme's template draws its items.
     /// </summary>
     public class TreeView : TemplatedControl
@@ -130,11 +131,13 @@ namespace XForms.Controls
                 }
 
                 this._selectedNode = value;
+                this._currentNode = value ?? this._currentNode;
                 foreach (var item in this._items)
                 {
                     item.OnSelectionChanged();
                 }
 
+                this.UpdateTabStop();
                 this.OnPropertyChanged();
             }
         }
@@ -179,12 +182,38 @@ namespace XForms.Controls
                 this.AddItems(node, null, 0);
             }
 
+            this.UpdateTabStop();
+
             // Focus stays on its node, once the new items are in place
             var refocus = this._items.Find((item) => item.Node == focused);
             if (null != refocus)
             {
                 Application.Current?.RequestAnimationFrame((time) => refocus.Focus());
             }
+        }
+
+        // The node keyboard focus is on (or was last on, or the selected one)
+        private TreeViewNode _currentNode;
+
+        // The tree is one Tab stop, as WinUI's: its current item (or, hidden
+        // in a collapsed node, the selected or first item); the arrow keys
+        // reach the rest
+        private void UpdateTabStop()
+        {
+            var stop = this._items.Find((item) => item.Node == this._currentNode)
+                ?? this._items.Find((item) => item.Node == this._selectedNode)
+                ?? ((this._items.Count > 0) ? this._items[0] : null);
+            foreach (var item in this._items)
+            {
+                item.Focusable = item == stop;
+            }
+        }
+
+        internal void OnItemFocused(
+            TreeViewItem item)
+        {
+            this._currentNode = item.Node;
+            this.UpdateTabStop();
         }
 
         private void AddItems(
@@ -457,6 +486,12 @@ namespace XForms.Controls
         protected override void OnActivate()
         {
             this._tree.Choose(this.Node);
+        }
+
+        protected override void OnGotFocus()
+        {
+            base.OnGotFocus();
+            this._tree.OnItemFocused(this);
         }
 
         protected override void OnKeyDown(

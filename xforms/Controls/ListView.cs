@@ -145,6 +145,10 @@ namespace XForms.Controls
             if (container is ListViewItem listViewItem)
             {
                 listViewItem.IsSelected = this.IsSelected(container.Item);
+
+                // The keyboard passes over rows that aren't items (a group
+                // header)
+                listViewItem.Focusable = this.IsItemRow(container.Item);
             }
         }
 

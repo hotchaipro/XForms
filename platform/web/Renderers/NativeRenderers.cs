@@ -472,6 +472,13 @@ namespace XForms.Web.Renderers
                 this._recycled.Add(reuse);
             }
 
+            // A reused element is named for its new item (ARIA's attributes
+            // are set, not asked for)
+            if (container == reuse)
+            {
+                ((ViewRenderer)container.Renderer).ApplyAccessibility();
+            }
+
             int position = 0;
             foreach (var realized in this._realized.Keys)
             {
@@ -539,15 +546,34 @@ namespace XForms.Web.Renderers
                 return;
             }
 
-            // The item scrolls to just after the leading padding
+            // The item scrolls into view, no further than it must, as on the
+            // other platforms: to just after the leading padding, or to end
+            // clear of the trailing padding
             float estimate = this.EstimatedExtent;
+            int itemLine = index / this._layout.Columns;
             float position = 0;
-            for (int line = 0; line < index / this._layout.Columns; line += 1)
+            for (int line = 0; line < itemLine; line += 1)
             {
                 position += this.LineExtent(line, estimate);
             }
 
-            Js.ScrollTo(this.Id, this.IsHorizontal ? position : 0, this.IsHorizontal ? 0 : position, true);
+            float end = this.LeadingPadding + position + this.LineExtent(itemLine, estimate);
+            float viewportExtent = this.IsHorizontal ? this._viewport.Width : this._viewport.Height;
+            float target;
+            if (position < this._scrollOffset)
+            {
+                target = position;
+            }
+            else if (end > this._scrollOffset + viewportExtent - this.TrailingPadding)
+            {
+                target = end - viewportExtent + this.TrailingPadding;
+            }
+            else
+            {
+                return;
+            }
+
+            Js.ScrollTo(this.Id, this.IsHorizontal ? target : 0, this.IsHorizontal ? 0 : target, true);
         }
 
         public override Size MeasureNative(

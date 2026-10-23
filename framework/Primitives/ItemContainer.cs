@@ -116,6 +116,7 @@ namespace XForms.Primitives
             this.ItemsView = itemsView ?? throw new ArgumentNullException(nameof(itemsView));
             itemsView.AddRealizedContainer(this);
             this.Item = item;
+            this.IsRecycled = false;
             itemsView.OnContainerBound(this);
             this.OnBind();
         }
@@ -126,6 +127,26 @@ namespace XForms.Primitives
             get
             {
                 return this.ItemsView;
+            }
+        }
+
+        // A list is one Tab stop: the container of its current item
+        internal override bool IsTabStop
+        {
+            get
+            {
+                return base.IsTabStop && (this.ItemsView?.TabStopContainer == this);
+            }
+        }
+
+        // Focus (from a tap, Tab or the arrow keys) makes the item current
+        internal override void OnFocusChangedCore(
+            bool isFocused)
+        {
+            base.OnFocusChangedCore(isFocused);
+            if (isFocused)
+            {
+                this.ItemsView?.OnContainerFocused(this);
             }
         }
 
@@ -142,7 +163,18 @@ namespace XForms.Primitives
         /// </summary>
         public void Recycle()
         {
+            this.IsRecycled = true;
             this.OnRecycle();
+        }
+
+        /// <summary>
+        /// Whether the container is set aside (out of view) until it's bound
+        /// to an item again.
+        /// </summary>
+        internal bool IsRecycled
+        {
+            get;
+            private set;
         }
 
         /// <summary>

@@ -67,6 +67,13 @@ namespace XForms.Win32
             return (renderer.Element is View view) && view.Focusable && renderer.IsHitTestVisible;
         }
 
+        // Where Tab stops: a list is one stop, its current item
+        private static bool IsTabStop(
+            ViewRenderer renderer)
+        {
+            return IsFocusable(renderer) && ((renderer is TextBoxRenderer) || ((View)renderer.Element).IsTabStop);
+        }
+
         private void CollectFocusable(
             ViewRenderer renderer,
             List<ViewRenderer> focusable)
@@ -76,7 +83,7 @@ namespace XForms.Win32
                 return;
             }
 
-            if (IsFocusable(renderer))
+            if (IsTabStop(renderer))
             {
                 focusable.Add(renderer);
             }

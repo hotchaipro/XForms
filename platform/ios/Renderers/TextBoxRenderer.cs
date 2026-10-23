@@ -273,7 +273,11 @@ namespace XForms.iOS.Renderers
                 LayerHost.For(view).NativeFocusChanged(hasFocus, isBackward: false);
             }
 
-            if (!hasFocus)
+            if (hasFocus)
+            {
+                FrameRenderer.TextEntryFocused(this.Editor?.Window);
+            }
+            else
             {
                 FrameRenderer.KeyboardFocusLost(this.Editor?.Window);
             }

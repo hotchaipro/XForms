@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -1450,6 +1450,17 @@ namespace XForms
         }
 
         /// <summary>
+        /// Where keys and focus go after this view: its parent, or for an
+        /// item's container (which isn't attached), its items view.
+        /// </summary>
+        internal View KeyboardParent
+        {
+            get
+            {
+                return (this.Parent as View) ?? (this as Primitives.ItemContainer)?.ItemsView;
+            }
+        }
+        /// <summary>
         /// Moves keyboard focus from this view to the next (or previous)
         /// focusable view in the tree it is in, wrapping around: lightweight
         /// and native views alike, in view order, as on Win32. (Android and
@@ -1460,7 +1471,7 @@ namespace XForms
             bool isForward)
         {
             var root = this;
-            while (root.Parent is View parent)
+            while (root.KeyboardParent is View parent)
             {
                 root = parent;
             }
@@ -1498,12 +1509,37 @@ namespace XForms
                     continue;
                 }
 
-                if (child.Focusable || (child is Primitives.TextBox))
+                // A list is one stop: its current item
+                if (child is Primitives.ItemsView itemsView)
+                {
+                    var stop = itemsView.TabStopContainer;
+                    if (null != stop)
+                    {
+                        result.Add(stop);
+                    }
+
+                    continue;
+                }
+
+                if (child.IsTabStop || (child is Primitives.TextBox))
                 {
                     result.Add(child);
                 }
 
                 CollectFocusable(child, result);
+            }
+        }
+
+        /// <summary>
+        /// Whether Tab stops at the view: it's focusable, and (for an item in a
+        /// list) it's the list's current item. Arrow keys reach the rest.
+        /// </summary>
+        [PlatformContract]
+        internal virtual bool IsTabStop
+        {
+            get
+            {
+                return this.Focusable;
             }
         }
 
@@ -1544,10 +1580,18 @@ namespace XForms
             }
 
             const float outset = 2.0f;
+            const float inset = 1.0f;
             var offset = focused.OffsetInLayer;
             var size = focused.Bounds;
+
+            // Around the view, but inside the layer, which clips it (a view
+            // that fills a list's or a scroll viewer's width)
+            float left = Math.Max(offset.X - outset, inset);
+            float top = Math.Max(offset.Y - outset, inset);
+            float right = Math.Min(offset.X + size.Width + outset, this.Bounds.Width - inset);
+            float bottom = Math.Min(offset.Y + size.Height + outset, this.Bounds.Height - inset);
             context.DrawRoundedRectangle(
-                new Rect(offset.X - outset, offset.Y - outset, size.Width + (outset * 2), size.Height + (outset * 2)),
+                new Rect(left, top, Math.Max(0, right - left), Math.Max(0, bottom - top)),
                 4.0f,
                 this.ActualTheme.Colors.Foreground,
                 2.0f);
@@ -1800,10 +1844,34 @@ namespace XForms
             }
         }
 
+        private bool _accessibilityIsHidden;
+
+        /// <summary>
+        /// Whether assistive technology skips the view and everything in it,
+        /// though it shows: content an open drawer or dialog covers, say.
+        /// </summary>
+        public bool AccessibilityIsHidden
+        {
+            get
+            {
+                return this._accessibilityIsHidden;
+            }
+
+            set
+            {
+                if (value != this._accessibilityIsHidden)
+                {
+                    this._accessibilityIsHidden = value;
+                    this.NotifyAccessibilityStateChanged();
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
         /// <summary>
         /// Whether assistive technology should skip the view and its
-        /// descendants: it or an ancestor is hidden, or scaled or faded to
-        /// nothing by an animator.
+        /// descendants: it or an ancestor is hidden (or hidden from assistive
+        /// technology), or scaled or faded to nothing by an animator.
         /// </summary>
         internal bool IsHiddenFromAccessibility
         {
@@ -1811,7 +1879,7 @@ namespace XForms
             {
                 for (var view = this; null != view; view = view.Parent as View)
                 {
-                    if (!view._isVisible || IsAnimatedAway(view._animator))
+                    if (!view._isVisible || view._accessibilityIsHidden || IsAnimatedAway(view._animator))
                     {
                         return true;
                     }
@@ -3146,6 +3214,7 @@ namespace XForms
                 if (value != this._isFocused)
                 {
                     this._isFocused = value;
+                    this.OnFocusChangedCore(value);
 
                     if (value)
                     {
@@ -3179,6 +3248,15 @@ namespace XForms
             }
 
             return this.Native?.Focus() ?? false;
+        }
+
+        /// <summary>
+        /// Called when the view gains or loses keyboard focus, before
+        /// <see cref="OnGotFocus"/> or <see cref="OnLostFocus"/>.
+        /// </summary>
+        internal virtual void OnFocusChangedCore(
+            bool isFocused)
+        {
         }
 
         protected virtual void OnGotFocus()
@@ -3257,7 +3335,7 @@ namespace XForms
         internal bool RouteKeyDown(
             KeyEventArgs e)
         {
-            for (var view = this; null != view; view = view.Parent as View)
+            for (var view = this; null != view; view = view.KeyboardParent)
             {
                 if (view.DispatchKeyDown(e))
                 {
@@ -3304,7 +3382,7 @@ namespace XForms
             ContextRequestedEventArgs e)
         {
             e.OriginalSource ??= this;
-            for (var view = this; null != view; view = view.Parent as View)
+            for (var view = this; null != view; view = view.KeyboardParent)
             {
                 view.OnContextRequested(e);
                 view.ContextRequested?.Invoke(view, e);
@@ -3348,7 +3426,7 @@ namespace XForms
         internal bool RouteKeyUp(
             KeyEventArgs e)
         {
-            for (var view = this; null != view; view = view.Parent as View)
+            for (var view = this; null != view; view = view.KeyboardParent)
             {
                 if (view.DispatchKeyUp(e))
                 {

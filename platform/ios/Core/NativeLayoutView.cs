@@ -235,6 +235,20 @@ namespace XForms.iOS
             }
         }
 
+        // Hidden from assistive technology (content a drawer covers, say), with
+        // everything in it
+        public override bool AccessibilityElementsHidden
+        {
+            get
+            {
+                return this._owner.AccessibilityIsHidden;
+            }
+
+            set
+            {
+            }
+        }
+
         public override string AccessibilityLabel
         {
             get
