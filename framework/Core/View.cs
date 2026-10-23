@@ -926,6 +926,7 @@ namespace XForms
             DrawingContext context,
             Rect bounds)
         {
+            this._drawnFlowDirection = this.FlowDirection;
             var animators = this._drawnAnimators;
             if (null == animators)
             {
@@ -2228,9 +2229,29 @@ namespace XForms
             set
             {
                 this._flowDirection = value;
-                this.InvalidateMeasure();
+                this.OnFlowDirectionChanged();
 
                 this.OnPropertyChanged();
+            }
+        }
+
+        // The view, and the descendants that take its direction, lay out and
+        // draw again (each mirrors its children, and may draw by direction)
+        private void OnFlowDirectionChanged()
+        {
+            this.InvalidateMeasure();
+            this.InvalidateArrange();
+            if (this._drawsContent)
+            {
+                this.InvalidateVisual();
+            }
+
+            foreach (var child in this.VisualChildren)
+            {
+                if (!child._flowDirection.HasValue)
+                {
+                    child.OnFlowDirectionChanged();
+                }
             }
         }
 
@@ -2358,9 +2379,32 @@ namespace XForms
         /// according to its margin, alignment and size. Called by the parent view
         /// after <see cref="Measure"/>.
         /// </summary>
+        /// <summary>
+        /// Whether the view mirrors its children's places when right to left:
+        /// all views but those whose platforms place their content themselves
+        /// (a scroll viewer's, which fills its width).
+        /// </summary>
+        internal virtual bool MirrorsChildren
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        // The direction the view was last drawn in: a view moved (or
+        // re-attached) under another direction draws again
+        private FlowDirection? _drawnFlowDirection;
+
         public void Arrange(
             Rect finalRect)
         {
+            if (this._drawnFlowDirection.HasValue && (this._drawnFlowDirection != this.FlowDirection))
+            {
+                this._drawnFlowDirection = null;
+                this.InvalidateVisual();
+            }
+
             var margin = this._margin;
 
             float slotX = finalRect.X + margin.Left;
@@ -2397,7 +2441,7 @@ namespace XForms
                 x += padding.Left;
                 y += padding.Top;
 
-                if (parent.FlowDirection == FlowDirection.RightToLeft)
+                if ((parent.FlowDirection == FlowDirection.RightToLeft) && parent.MirrorsChildren)
                 {
                     x = parent._contentArrangeSize.Width - x - width;
                 }

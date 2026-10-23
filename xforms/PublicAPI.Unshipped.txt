@@ -54,6 +54,20 @@ XForms.Controls.Expander.IsExpanded.set -> void
 XForms.Controls.ExpanderHeader
 XForms.Controls.ExpanderHeader.CreateTextFormat() -> XForms.TextFormat
 XForms.Controls.ExpanderHeader.Expander.get -> XForms.Controls.Expander
+XForms.Controls.FlipView
+XForms.Controls.FlipView.FlipView() -> void
+XForms.Controls.FlipView.Items.get -> XForms.Controls.FlipViewItemCollection
+XForms.Controls.FlipView.Select(int index, bool animated) -> void
+XForms.Controls.FlipView.SelectedIndex.get -> int
+XForms.Controls.FlipView.SelectedIndex.set -> void
+XForms.Controls.FlipView.SelectionChanged -> System.EventHandler
+XForms.Controls.FlipViewButton
+XForms.Controls.FlipViewButton.Direction.get -> int
+XForms.Controls.FlipViewItemCollection
+XForms.Controls.FlipViewItemCollection.Add(XForms.View item) -> void
+XForms.Controls.FlipViewItemCollection.Count.get -> int
+XForms.Controls.FlipViewItemCollection.GetEnumerator() -> System.Collections.Generic.IEnumerator<XForms.View>
+XForms.Controls.FlipViewItemCollection.this[int index].get -> XForms.View
 XForms.Controls.InfoBar
 XForms.Controls.InfoBar.ActionButton.get -> XForms.View
 XForms.Controls.InfoBar.ActionButton.set -> void
@@ -91,6 +105,46 @@ XForms.Controls.MenuFlyoutView.IsItemEnabled(int index) -> bool
 XForms.Controls.MenuFlyoutView.Items.get -> System.Collections.Generic.IReadOnlyList<XForms.Controls.MenuItem>
 XForms.Controls.MenuFlyoutView.PressedIndex.get -> int
 XForms.Controls.MenuItem.Click -> System.EventHandler
+XForms.Controls.NavigationView
+XForms.Controls.NavigationView.BarBounds.get -> XForms.Rect
+XForms.Controls.NavigationView.Content.get -> XForms.View
+XForms.Controls.NavigationView.Content.set -> void
+XForms.Controls.NavigationView.IsPaneDrawer.get -> bool
+XForms.Controls.NavigationView.IsPaneOpen.get -> bool
+XForms.Controls.NavigationView.IsPaneOpen.set -> void
+XForms.Controls.NavigationView.MenuItems.get -> XForms.Controls.NavigationViewItemCollection
+XForms.Controls.NavigationView.NavigationView() -> void
+XForms.Controls.NavigationView.PaneTitle.get -> string
+XForms.Controls.NavigationView.PaneTitle.set -> void
+XForms.Controls.NavigationView.SelectedItem.get -> XForms.Controls.NavigationViewItem
+XForms.Controls.NavigationView.SelectedItem.set -> void
+XForms.Controls.NavigationView.SelectionChanged -> System.EventHandler<XForms.Controls.NavigationViewSelectionChangedEventArgs>
+XForms.Controls.NavigationViewItem
+XForms.Controls.NavigationViewItem.CreateTextFormat() -> XForms.TextFormat
+XForms.Controls.NavigationViewItem.Icon.get -> XForms.Bitmap
+XForms.Controls.NavigationViewItem.Icon.set -> void
+XForms.Controls.NavigationViewItem.IsSelected.get -> bool
+XForms.Controls.NavigationViewItem.NavigationView.get -> XForms.Controls.NavigationView
+XForms.Controls.NavigationViewItem.NavigationViewItem() -> void
+XForms.Controls.NavigationViewItem.Tag.get -> object
+XForms.Controls.NavigationViewItem.Tag.set -> void
+XForms.Controls.NavigationViewItem.Text.get -> string
+XForms.Controls.NavigationViewItem.Text.set -> void
+XForms.Controls.NavigationViewItemCollection
+XForms.Controls.NavigationViewItemCollection.Add(XForms.Controls.NavigationViewItem item) -> void
+XForms.Controls.NavigationViewItemCollection.Count.get -> int
+XForms.Controls.NavigationViewItemCollection.GetEnumerator() -> System.Collections.Generic.IEnumerator<XForms.Controls.NavigationViewItem>
+XForms.Controls.NavigationViewItemCollection.IndexOf(XForms.Controls.NavigationViewItem item) -> int
+XForms.Controls.NavigationViewItemCollection.this[int index].get -> XForms.Controls.NavigationViewItem
+XForms.Controls.NavigationViewMenuButton
+XForms.Controls.NavigationViewMenuButton.NavigationView.get -> XForms.Controls.NavigationView
+XForms.Controls.NavigationViewPane
+XForms.Controls.NavigationViewPane.NavigationView.get -> XForms.Controls.NavigationView
+XForms.Controls.NavigationViewPane.TitleBounds.get -> XForms.Rect
+XForms.Controls.NavigationViewScrim
+XForms.Controls.NavigationViewSelectionChangedEventArgs
+XForms.Controls.NavigationViewSelectionChangedEventArgs.NavigationViewSelectionChangedEventArgs(XForms.Controls.NavigationViewItem selectedItem) -> void
+XForms.Controls.NavigationViewSelectionChangedEventArgs.SelectedItem.get -> XForms.Controls.NavigationViewItem
 XForms.Controls.NumberBox
 XForms.Controls.NumberBox.DownButtonBounds.get -> XForms.Rect
 XForms.Controls.NumberBox.LargeChange.get -> double
@@ -134,6 +188,14 @@ XForms.Controls.PasswordRevealMode
 XForms.Controls.PasswordRevealMode.Hidden = 1 -> XForms.Controls.PasswordRevealMode
 XForms.Controls.PasswordRevealMode.Peek = 0 -> XForms.Controls.PasswordRevealMode
 XForms.Controls.PasswordRevealMode.Visible = 2 -> XForms.Controls.PasswordRevealMode
+XForms.Controls.PipsPager
+XForms.Controls.PipsPager.GetDotCenter(int index) -> XForms.Point
+XForms.Controls.PipsPager.NumberOfPages.get -> int
+XForms.Controls.PipsPager.NumberOfPages.set -> void
+XForms.Controls.PipsPager.PipsPager() -> void
+XForms.Controls.PipsPager.SelectedIndexChanged -> System.EventHandler
+XForms.Controls.PipsPager.SelectedPageIndex.get -> int
+XForms.Controls.PipsPager.SelectedPageIndex.set -> void
 XForms.Controls.ProgressBar
 XForms.Controls.ProgressBar.IsIndeterminate.get -> bool
 XForms.Controls.ProgressBar.IsIndeterminate.set -> void
@@ -156,6 +218,15 @@ XForms.Controls.RangeValueChangedEventArgs
 XForms.Controls.RangeValueChangedEventArgs.NewValue.get -> double
 XForms.Controls.RangeValueChangedEventArgs.OldValue.get -> double
 XForms.Controls.RangeValueChangedEventArgs.RangeValueChangedEventArgs(double oldValue, double newValue) -> void
+XForms.Controls.RefreshContainer
+XForms.Controls.RefreshContainer.Content.get -> XForms.View
+XForms.Controls.RefreshContainer.Content.set -> void
+XForms.Controls.RefreshContainer.IsRefreshing.get -> bool
+XForms.Controls.RefreshContainer.RefreshContainer() -> void
+XForms.Controls.RefreshContainer.RefreshRequested -> System.EventHandler<XForms.Controls.RefreshRequestedEventArgs>
+XForms.Controls.RefreshContainer.RequestRefresh() -> void
+XForms.Controls.RefreshRequestedEventArgs
+XForms.Controls.RefreshRequestedEventArgs.GetDeferral() -> System.Action
 XForms.Controls.Slider
 XForms.Controls.Slider.Header.get -> string
 XForms.Controls.Slider.Header.set -> void
@@ -224,6 +295,34 @@ XForms.Controls.ToolTip.CreateTextFormat() -> XForms.TextFormat
 XForms.Controls.ToolTip.Text.get -> string
 XForms.Controls.ToolTip.Text.set -> void
 XForms.Controls.ToolTip.ToolTip() -> void
+XForms.Controls.TreeView
+XForms.Controls.TreeView.ItemInvoked -> System.EventHandler<XForms.Controls.TreeViewItemInvokedEventArgs>
+XForms.Controls.TreeView.Refresh() -> void
+XForms.Controls.TreeView.RootNodes.get -> System.Collections.Generic.List<XForms.Controls.TreeViewNode>
+XForms.Controls.TreeView.SelectedNode.get -> XForms.Controls.TreeViewNode
+XForms.Controls.TreeView.SelectedNode.set -> void
+XForms.Controls.TreeView.TreeView() -> void
+XForms.Controls.TreeViewItem
+XForms.Controls.TreeViewItem.ChevronBounds.get -> XForms.Rect
+XForms.Controls.TreeViewItem.CreateTextFormat() -> XForms.TextFormat
+XForms.Controls.TreeViewItem.IsSelected.get -> bool
+XForms.Controls.TreeViewItem.Level.get -> int
+XForms.Controls.TreeViewItem.Node.get -> XForms.Controls.TreeViewNode
+XForms.Controls.TreeViewItem.TextBounds.get -> XForms.Rect
+XForms.Controls.TreeViewItem.TreeView.get -> XForms.Controls.TreeView
+XForms.Controls.TreeViewItemInvokedEventArgs
+XForms.Controls.TreeViewItemInvokedEventArgs.Node.get -> XForms.Controls.TreeViewNode
+XForms.Controls.TreeViewItemInvokedEventArgs.TreeViewItemInvokedEventArgs(XForms.Controls.TreeViewNode node) -> void
+XForms.Controls.TreeViewNode
+XForms.Controls.TreeViewNode.Children.get -> System.Collections.Generic.List<XForms.Controls.TreeViewNode>
+XForms.Controls.TreeViewNode.Content.get -> string
+XForms.Controls.TreeViewNode.Content.set -> void
+XForms.Controls.TreeViewNode.HasChildren.get -> bool
+XForms.Controls.TreeViewNode.IsExpanded.get -> bool
+XForms.Controls.TreeViewNode.IsExpanded.set -> void
+XForms.Controls.TreeViewNode.Tag.get -> object
+XForms.Controls.TreeViewNode.Tag.set -> void
+XForms.Controls.TreeViewNode.TreeViewNode() -> void
 XForms.Controls.UserControl.IsBuilt.get -> bool
 XForms.Controls.ViewAttachments
 XForms.Controls.ViewAttachments.extension(XForms.View)
@@ -240,8 +339,14 @@ const XForms.Controls.InfoBar.IconSize = 20 -> float
 const XForms.Controls.InfoBar.Spacing = 12 -> float
 const XForms.Controls.MenuFlyoutView.RowHeight = 36 -> float
 const XForms.Controls.MenuFlyoutView.TextInset = 40 -> float
+const XForms.Controls.NavigationView.BarHeight = 48 -> float
+const XForms.Controls.NavigationView.CompactThreshold = 640 -> float
+const XForms.Controls.NavigationView.PaneWidth = 260 -> float
+const XForms.Controls.NavigationViewItem.ItemHeight = 40 -> float
+const XForms.Controls.NavigationViewPane.TitleHeight = 56 -> float
 const XForms.Controls.NumberBox.SpinButtonWidth = 32 -> float
 const XForms.Controls.PasswordBox.RevealButtonWidth = 36 -> float
+const XForms.Controls.PipsPager.DotSpacing = 20 -> float
 const XForms.Controls.ProgressBar.DefaultHeight = 4 -> float
 const XForms.Controls.Slider.ThumbSize = 20 -> float
 const XForms.Controls.Slider.TouchHeight = 32 -> float
@@ -254,6 +359,9 @@ const XForms.Controls.ToggleSwitch.TouchHeight = 32 -> float
 const XForms.Controls.ToggleSwitch.TrackHeight = 20 -> float
 const XForms.Controls.ToggleSwitch.TrackWidth = 40 -> float
 const XForms.Controls.ToolTip.MaximumWidth = 320 -> float
+const XForms.Controls.TreeViewItem.ChevronWidth = 28 -> float
+const XForms.Controls.TreeViewItem.Indent = 20 -> float
+const XForms.Controls.TreeViewItem.ItemHeight = 36 -> float
 override XForms.Controls.AutoSuggestBox.AccessibilityIsExpanded.get -> bool?
 override XForms.Controls.AutoSuggestBox.Build() -> XForms.View
 override XForms.Controls.AutoSuggestBox.DefaultAccessibilityLabel.get -> string
@@ -276,12 +384,21 @@ override XForms.Controls.CheckBox.SetUserState(object state) -> void
 override XForms.Controls.ComboBox.GetUserState() -> object
 override XForms.Controls.ComboBox.OnAttaching(XForms.Theme theme) -> void
 override XForms.Controls.ComboBox.SetUserState(object state) -> void
-override XForms.Controls.Expander.Build() -> XForms.View
 override XForms.Controls.Expander.GetUserState() -> object
 override XForms.Controls.Expander.OnAttaching(XForms.Theme theme) -> void
 override XForms.Controls.Expander.SetUserState(object state) -> void
 override XForms.Controls.ExpanderHeader.AccessibilityIsExpanded.get -> bool?
 override XForms.Controls.ExpanderHeader.PerformAccessibilityAction(XForms.AccessibilityAction action) -> bool
+override XForms.Controls.FlipView.AccessibilityValue.get -> string
+override XForms.Controls.FlipView.ArrangeOverride(XForms.Size finalSize) -> void
+override XForms.Controls.FlipView.DefaultAccessibilityRole.get -> XForms.AccessibilityRole
+override XForms.Controls.FlipView.GetUserState() -> object
+override XForms.Controls.FlipView.MeasureOverride(XForms.Size availableSize) -> XForms.Size
+override XForms.Controls.FlipView.OnAttaching(XForms.Theme theme) -> void
+override XForms.Controls.FlipView.OnKeyDown(XForms.KeyEventArgs keyInputEvent) -> void
+override XForms.Controls.FlipView.SetUserState(object state) -> void
+override XForms.Controls.FlipViewButton.IsAccessibilityActionSupported(XForms.AccessibilityAction action) -> bool
+override XForms.Controls.FlipViewButton.PerformAccessibilityAction(XForms.AccessibilityAction action) -> bool
 override XForms.Controls.ImageToggleButton.GetUserState() -> object
 override XForms.Controls.ImageToggleButton.OnAttaching(XForms.Theme theme) -> void
 override XForms.Controls.ImageToggleButton.SetUserState(object state) -> void
@@ -294,6 +411,20 @@ override XForms.Controls.ListView.OnAttaching(XForms.Theme theme) -> void
 override XForms.Controls.ListView.SetUserState(object state) -> void
 override XForms.Controls.ListViewItem.OnHotReload() -> void
 override XForms.Controls.MenuFlyoutView.AccessibilityValue.get -> string
+override XForms.Controls.NavigationView.ArrangeOverride(XForms.Size finalSize) -> void
+override XForms.Controls.NavigationView.GetUserState() -> object
+override XForms.Controls.NavigationView.MeasureOverride(XForms.Size availableSize) -> XForms.Size
+override XForms.Controls.NavigationView.OnAttaching(XForms.Theme theme) -> void
+override XForms.Controls.NavigationView.OnKeyDown(XForms.KeyEventArgs keyInputEvent) -> void
+override XForms.Controls.NavigationView.SetUserState(object state) -> void
+override XForms.Controls.NavigationViewItem.AccessibilityIsSelected.get -> bool
+override XForms.Controls.NavigationViewItem.DefaultAccessibilityLabel.get -> string
+override XForms.Controls.NavigationViewItem.DefaultAccessibilityRole.get -> XForms.AccessibilityRole
+override XForms.Controls.NavigationViewItem.OnActivate() -> void
+override XForms.Controls.NavigationViewItem.OnKeyDown(XForms.KeyEventArgs keyInputEvent) -> void
+override XForms.Controls.NavigationViewItem.PerformAccessibilityAction(XForms.AccessibilityAction action) -> bool
+override XForms.Controls.NavigationViewMenuButton.AccessibilityIsExpanded.get -> bool?
+override XForms.Controls.NavigationViewMenuButton.PerformAccessibilityAction(XForms.AccessibilityAction action) -> bool
 override XForms.Controls.NumberBox.AccessibilityRange.get -> XForms.AccessibilityRange?
 override XForms.Controls.NumberBox.Build() -> XForms.View
 override XForms.Controls.NumberBox.DefaultAccessibilityLabel.get -> string
@@ -312,6 +443,17 @@ override XForms.Controls.PasswordBox.Build() -> XForms.View
 override XForms.Controls.PasswordBox.OnPointerCanceled(XForms.PointerEventArgs e) -> void
 override XForms.Controls.PasswordBox.OnPointerPressed(XForms.PointerEventArgs e) -> void
 override XForms.Controls.PasswordBox.OnPointerReleased(XForms.PointerEventArgs e) -> void
+override XForms.Controls.PipsPager.AccessibilityRange.get -> XForms.AccessibilityRange?
+override XForms.Controls.PipsPager.AccessibilityValue.get -> string
+override XForms.Controls.PipsPager.DefaultAccessibilityLabel.get -> string
+override XForms.Controls.PipsPager.DefaultAccessibilityRole.get -> XForms.AccessibilityRole
+override XForms.Controls.PipsPager.IsAccessibilityActionSupported(XForms.AccessibilityAction action) -> bool
+override XForms.Controls.PipsPager.MeasureOverride(XForms.Size availableSize) -> XForms.Size
+override XForms.Controls.PipsPager.OnKeyDown(XForms.KeyEventArgs keyInputEvent) -> void
+override XForms.Controls.PipsPager.OnPointerPressed(XForms.PointerEventArgs e) -> void
+override XForms.Controls.PipsPager.OnPointerReleased(XForms.PointerEventArgs e) -> void
+override XForms.Controls.PipsPager.PerformAccessibilityAction(XForms.AccessibilityAction action) -> bool
+override XForms.Controls.PipsPager.SetAccessibilityRangeValue(double value) -> bool
 override XForms.Controls.ProgressBar.AccessibilityRange.get -> XForms.AccessibilityRange?
 override XForms.Controls.ProgressBar.DefaultAccessibilityRole.get -> XForms.AccessibilityRole
 override XForms.Controls.ProgressBar.MeasureOverride(XForms.Size availableSize) -> XForms.Size
@@ -359,6 +501,12 @@ override XForms.Controls.ToggleSwitch.MeasureOverride(XForms.Size availableSize)
 override XForms.Controls.ToggleSwitch.OnActivate() -> void
 override XForms.Controls.ToggleSwitch.OnAttaching(XForms.Theme theme) -> void
 override XForms.Controls.ToggleSwitch.SetUserState(object state) -> void
+override XForms.Controls.TreeView.DefaultAccessibilityRole.get -> XForms.AccessibilityRole
+override XForms.Controls.TreeView.OnAttaching(XForms.Theme theme) -> void
+override XForms.Controls.TreeViewItem.AccessibilityIsExpanded.get -> bool?
+override XForms.Controls.TreeViewItem.AccessibilityIsSelected.get -> bool
+override XForms.Controls.TreeViewItem.IsAccessibilityActionSupported(XForms.AccessibilityAction action) -> bool
+override XForms.Controls.TreeViewItem.PerformAccessibilityAction(XForms.AccessibilityAction action) -> bool
 override XForms.Controls.UserControl.OnAttaching(XForms.Theme theme) -> void
 override XForms.Controls.UserControl.OnHotReload() -> void
 static XForms.Controls.ViewAttachments.get_ContextFlyout(XForms.View view) -> XForms.Primitives.Popup
@@ -368,9 +516,11 @@ static XForms.Controls.ViewAttachments.set_ToolTip(XForms.View view, string valu
 static readonly XForms.Controls.AutoSuggestBox.TextProperty -> XForms.ViewProperty<XForms.Controls.AutoSuggestBox, string>
 static readonly XForms.Controls.CheckBox.IsCheckedProperty -> XForms.ViewProperty<XForms.Controls.CheckBox, bool?>
 static readonly XForms.Controls.Expander.IsExpandedProperty -> XForms.ViewProperty<XForms.Controls.Expander, bool>
+static readonly XForms.Controls.FlipView.SelectedIndexProperty -> XForms.ViewProperty<XForms.Controls.FlipView, int>
 static readonly XForms.Controls.InfoBar.IsOpenProperty -> XForms.ViewProperty<XForms.Controls.InfoBar, bool>
 static readonly XForms.Controls.NumberBox.ValueProperty -> XForms.ViewProperty<XForms.Controls.NumberBox, double>
 static readonly XForms.Controls.PasswordBox.PasswordProperty -> XForms.ViewProperty<XForms.Controls.PasswordBox, string>
+static readonly XForms.Controls.PipsPager.SelectedPageIndexProperty -> XForms.ViewProperty<XForms.Controls.PipsPager, int>
 static readonly XForms.Controls.ProgressBar.ValueProperty -> XForms.ViewProperty<XForms.Controls.ProgressBar, double>
 static readonly XForms.Controls.Slider.ValueProperty -> XForms.ViewProperty<XForms.Controls.Slider, double>
 static readonly XForms.Controls.TimePicker.SelectedTimeProperty -> XForms.ViewProperty<XForms.Controls.TimePicker, System.TimeSpan?>

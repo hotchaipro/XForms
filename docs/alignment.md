@@ -3331,7 +3331,7 @@ Win32, Android and the browser, as before.
     - The time picker is drawn, as XForms' date picker is, so it looks the
       same everywhere.
 
-    **Status: steps 1 and 2 done.**
+    **Status: steps 1 to 3 done.**
 
     Step 1, forms: `CheckBox` (`IsChecked` a `bool?`, `IsThreeState`),
     `ToggleSwitch` (`Header`, `IsOn`, `OnContent` and `OffContent`), a
@@ -3445,6 +3445,56 @@ Win32, Android and the browser, as before.
     element's type, name and patterns; an info bar closed, an expander
     expanded and collapsed). Not checked: the menu and the tooltip with
     Win32's mouse and keyboard (another process held the foreground).
+
+    Step 3, structure: `NavigationView` (`MenuItems` of
+    `NavigationViewItem`s, each with `Text`, `Icon` and `Tag`;
+    `PaneTitle`, `Content`, `SelectedItem`, `SelectionChanged`; a side
+    pane on a wide window and, below 640 wide, a drawer a menu button
+    opens over a shade, which a tap on the shade or Escape closes; focus
+    moves into the drawer from the keyboard and back to its button),
+    `FlipView` (`Items`, `SelectedIndex`; a horizontal swipe follows the
+    finger and settles, a fifth of the width moving on; arrow buttons;
+    Left, Right, Page Up, Page Down, Home and End) with `PipsPager`
+    (`NumberOfPages`, `SelectedPageIndex`, read as a range: "2 of 4"),
+    `TreeView` (`RootNodes` of `TreeViewNode`s, `SelectedNode`,
+    `ItemInvoked`; WinUI's keys: Up and Down, Right to expand or go to the
+    first child, Left to collapse or go to the parent, Home and End, Enter
+    and Space) and `RefreshContainer` (`RefreshRequested` with a deferral,
+    `RequestRefresh`), on a new structure page (`/structure`). Each item
+    of a navigation view and a tree is a view of its own, so assistive
+    technology reads each (a list item, a tree item with its expanded and
+    selected states). `RefreshContainer` drives the pull to refresh the
+    platforms already give a list (`ItemsView.IsRefreshEnabled`: Android's
+    SwipeRefreshLayout, iOS's UIRefreshControl, and Win32's and the
+    browser's own indicators); around other content it refreshes only when
+    asked (`RequestRefresh`), since a scroll viewer's pull is the
+    platform's (the browser and Android scroll it natively).
+
+    Fixed on the way:
+    - Setting `FlowDirection` laid out and drew again only the view
+      itself, not the descendants that take its direction; and a view
+      drawn under one direction and attached again under another kept its
+      drawing.
+    - A scroll viewer's content was placed off screen right to left (it
+      was mirrored against a width the scroll viewer never had; the
+      platforms place it, filling the viewport).
+    - Parts that must be above a native sibling (the flip view's buttons
+      over its strip, the drawer's shade over the content) have layers of
+      their own: a lightweight view is drawn into its layer, beneath its
+      native siblings.
+
+    Checked in the browser with the mouse, the keyboard and touch (each
+    item's ARIA; swipes, a short swipe staying, the pips, the flip view's
+    keys; the tree's keys and expanded states; pull to refresh; the
+    drawer from the keyboard and closed by its shade; right to left), on
+    Android with taps and swipes (swipes, the drawer, its items, pull to
+    refresh, each one's widget class and label), and on Win32 through UI
+    Automation (each element's type, name and patterns; the navigation
+    items selected, the flip buttons and pips, the tree expanded and
+    selected, a refresh, the drawer on a narrow window, right to left).
+    Found, not fixed: a text block's text keeps to the left right to left
+    (its alignment doesn't follow the direction); a drawer opened with the
+    mouse doesn't close on Escape (focus is still outside it).
 
 29. **Later: `XForms.Xaml`.** The proof of concept in `spikes/XForms.Xaml`
     becomes a layer over the framework and controls, including templates

@@ -132,6 +132,15 @@ namespace XForms.Primitives
         }
 
         // The platforms render it natively
+        // The platforms place the content (filling the viewport's width)
+        internal override bool MirrorsChildren
+        {
+            get
+            {
+                return false;
+            }
+        }
+
         internal override bool IsLightweightType
         {
             get

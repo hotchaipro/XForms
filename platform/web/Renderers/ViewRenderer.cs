@@ -579,7 +579,7 @@ namespace XForms.Web.Renderers
             Js.SetAttribute(id, "aria-valuemax", range.HasValue ? Number(range.Value.Maximum) : null);
             Js.SetAttribute(id, "aria-valuenow", range.HasValue ? Number(range.Value.Value) : null);
             Js.SetAttribute(id, "aria-valuetext", range.HasValue ? view.AccessibilityValue : null);
-            Js.SetAttribute(id, "aria-selected", ((role == AccessibilityRole.TabItem) || (role == AccessibilityRole.ListItem)) ? (view.AccessibilityIsSelected ? "true" : "false") : null);
+            Js.SetAttribute(id, "aria-selected", ((role == AccessibilityRole.TabItem) || (role == AccessibilityRole.ListItem) || (role == AccessibilityRole.TreeItem)) ? (view.AccessibilityIsSelected ? "true" : "false") : null);
             Js.SetAttribute(id, "aria-expanded", view.AccessibilityIsExpanded.HasValue ? (view.AccessibilityIsExpanded.Value ? "true" : "false") : null);
             Js.SetAttribute(id, "aria-disabled", view.IsHitTestVisible ? null : "true");
         }

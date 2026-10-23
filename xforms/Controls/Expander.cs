@@ -34,6 +34,12 @@ namespace XForms.Controls
                 Padding = new Thickness(16, 8, 16, 16),
                 IsVisible = false,
             };
+
+            this._header.Height = HeaderHeight;
+            base.Content = new StackPanel()
+            {
+                Children = { this._header, this._contentHost },
+            };
         }
 
         /// <summary>
@@ -152,15 +158,6 @@ namespace XForms.Controls
             }
         }
 
-        protected override View Build()
-        {
-            this._contentHost.IsVisible = this._isExpanded;
-            this._header.Height = HeaderHeight;
-            return new StackPanel()
-            {
-                Children = { this._header, this._contentHost },
-            };
-        }
     }
 
     /// <summary>

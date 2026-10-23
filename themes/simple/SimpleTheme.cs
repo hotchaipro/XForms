@@ -69,7 +69,18 @@ namespace XForms.Themes.Simple
             .With(new InfoBarTemplate())
             .With(new InfoBarCloseButtonTemplate())
             .With(new ExpanderTemplate())
-            .With(new ExpanderHeaderTemplate());
+            .With(new ExpanderHeaderTemplate())
+            .With(new NavigationViewTemplate())
+            .With(new NavigationViewPaneTemplate())
+            .With(new NavigationViewItemTemplate())
+            .With(new NavigationViewMenuButtonTemplate())
+            .With(new NavigationViewScrimTemplate())
+            .With(new FlipViewTemplate())
+            .With(new FlipViewButtonTemplate())
+            .With(new PipsPagerTemplate())
+            .With(new RefreshContainerTemplate())
+            .With(new TreeViewTemplate())
+            .With(new TreeViewItemTemplate());
 
         private static Theme WithDefault<TExtension>(
             Theme theme,
