@@ -604,8 +604,10 @@ export function listenKeyboard() {
     document.addEventListener('keydown', (e) => {
         const tag = document.activeElement?.tagName;
         const isTextEntry = tag === 'INPUT' || tag === 'TEXTAREA';
-        // Text entries handle their own keys, except Tab and Escape
-        if (isTextEntry && e.key !== 'Tab' && e.key !== 'Escape') {
+        // Text entries handle their own keys, except Tab and Escape; a
+        // single-line one offers the keys it has no use for to the app first
+        const offered = tag === 'INPUT' && (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'PageUp' || e.key === 'PageDown');
+        if (isTextEntry && !offered && e.key !== 'Tab' && e.key !== 'Escape') {
             return;
         }
         if (exports.OnKey(focusedId(), e.key, modifiers(e), true, e.shiftKey && e.key === 'Tab')) {

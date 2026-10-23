@@ -25,6 +25,12 @@ namespace XForms.Win32
         /// Closes the popup because the user clicked outside it or pressed Escape.
         /// </summary>
         void Dismiss();
+
+        /// <summary>
+        /// Whether clicking outside the popup closes it, and keyboard focus
+        /// stays inside it; otherwise clicks outside it go on beneath.
+        /// </summary>
+        bool IsLightDismissEnabled { get; }
     }
 
     /// <summary>
@@ -47,11 +53,34 @@ namespace XForms.Win32
             this._visual = visual;
         }
 
+        /// <summary>
+        /// The top light-dismissed popup, which input outside dismisses and
+        /// which holds keyboard focus.
+        /// </summary>
         public IOverlay Top
         {
             get
             {
-                return (this._overlays.Count > 0) ? this._overlays[this._overlays.Count - 1] : null;
+                for (int i = this._overlays.Count - 1; i >= 0; i -= 1)
+                {
+                    if (this._overlays[i].IsLightDismissEnabled)
+                    {
+                        return this._overlays[i];
+                    }
+                }
+
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Whether any popup is open.
+        /// </summary>
+        public bool IsAnyOpen
+        {
+            get
+            {
+                return this._overlays.Count > 0;
             }
         }
 
@@ -127,14 +156,25 @@ namespace XForms.Win32
         {
             hit = null;
 
-            var top = this.Top;
-            if (null == top)
+            // Down through the popups that aren't light-dismissed, to the top
+            // light-dismissed one (outside which a click dismisses it) or the
+            // window (null)
+            for (int i = this._overlays.Count - 1; i >= 0; i -= 1)
             {
-                return true;
+                var overlay = this._overlays[i];
+                hit = overlay.Renderer.HitTest(point);
+                if (null != hit)
+                {
+                    return true;
+                }
+
+                if (overlay.IsLightDismissEnabled)
+                {
+                    return false;
+                }
             }
 
-            hit = top.Renderer.HitTest(point);
-            return null != hit;
+            return true;
         }
     }
 }

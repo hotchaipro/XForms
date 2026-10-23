@@ -115,6 +115,7 @@ namespace XForms.Test
 
             routes.Add("/", _ => new TextAndListPage());
             routes.Add("/pickers", _ => new PickersPage());
+            routes.Add("/forms", _ => new FormsPage());
             routes.Add("/drawing", _ => new DrawingPage());
             routes.Add("/input", _ => new InputPage());
             routes.Add("/binding", _ => new BindingPage());

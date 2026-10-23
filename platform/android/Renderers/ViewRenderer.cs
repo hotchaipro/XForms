@@ -285,6 +285,7 @@ namespace XForms.Android.Renderers
                 oldElement.GenericMotion -= Element_GenericMotion;
                 oldElement.FocusChange -= Element_FocusChange;
                 oldElement.KeyPress -= Element_KeyPress;
+                oldElement.KeyPress -= TextBox_KeyPress;
                 oldElement.Hover -= Element_Hover;
             }
 
@@ -300,7 +301,8 @@ namespace XForms.Android.Renderers
                 newElement.GenericMotion += Element_GenericMotion;
                 newElement.FocusChange += Element_FocusChange;
 
-                // Text boxes handle their own keys
+                // Text boxes handle their own keys, but offer the ones they have
+                // no use for to their ancestors first
                 if (!(this.Element is XForms.Primitives.TextBox))
                 {
                     newElement.KeyPress += Element_KeyPress;
@@ -310,6 +312,10 @@ namespace XForms.Android.Renderers
                     {
                         newElement.Focusable = true;
                     }
+                }
+                else
+                {
+                    newElement.KeyPress += TextBox_KeyPress;
                 }
             }
         }
@@ -559,6 +565,34 @@ namespace XForms.Android.Renderers
             else if (e.Event.Action == KeyEventActions.Up)
             {
                 e.Handled = LayerHost.For(view).RouteKeyUp(keyEvent);
+            }
+        }
+
+        // A single-line text box's Up, Down, Page Up, Page Down and Escape go
+        // to its ancestors first (a suggestion list, a number box)
+        private void TextBox_KeyPress(
+            object sender,
+            AndroidView.KeyEventArgs e)
+        {
+            e.Handled = false;
+
+            var key = ToKey(e.KeyCode);
+            if (!(this.Element is XForms.Primitives.TextBox textBox) || textBox.AcceptsReturn || !View.IsTextBoxNavigationKey(key))
+            {
+                return;
+            }
+
+            if (e.Event.Action == KeyEventActions.Down)
+            {
+                var keyEvent = new KeyEventArgs(key, ToKeyModifiers(e.Event.MetaState));
+                for (var view = textBox.Parent as View; null != view; view = view.Parent as View)
+                {
+                    if (LayerHost.For(view).DispatchKeyDown(keyEvent))
+                    {
+                        e.Handled = true;
+                        return;
+                    }
+                }
             }
         }
 

@@ -34,11 +34,13 @@ namespace XForms.Win32.Renderers
             }
         }
 
+        // It draws itself, or a background (a page's, under only native
+        // children, has no lightweight children to draw it with)
         protected override bool HasContent
         {
             get
             {
-                return this._drawsContent;
+                return this._drawsContent || base.HasContent;
             }
         }
 

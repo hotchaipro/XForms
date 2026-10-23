@@ -33,7 +33,28 @@ namespace XForms.iOS
         {
             // A picker may be labeled by its value
             string value = view.AccessibilityValue;
+            if ((null == value) && (view.AccessibilityRange is AccessibilityRange range))
+            {
+                // A range without its own text is read as a percentage
+                double span = range.Maximum - range.Minimum;
+                value = (span > 0) ? ((range.Value - range.Minimum) / span).ToString("P0", System.Globalization.CultureInfo.CurrentCulture) : null;
+            }
+            else if (view.AccessibilityIsMixed)
+            {
+                value = "Mixed";
+            }
+
             return (value == view.AccessibilityLabel) ? null : value;
+        }
+
+        /// <summary>
+        /// VoiceOver's swipe up and down on an adjustable view.
+        /// </summary>
+        public static void Adjust(
+            View view,
+            bool up)
+        {
+            view.PerformAccessibilityAction(up ? AccessibilityAction.Increment : AccessibilityAction.Decrement);
         }
 
         public static UIAccessibilityTrait TraitsFor(
@@ -59,8 +80,27 @@ namespace XForms.iOS
                 case AccessibilityRole.RadioButton:
                 case AccessibilityRole.TabItem:
                 case AccessibilityRole.ComboBox:
+                case AccessibilityRole.CheckBox:
+                case AccessibilityRole.Switch:
+                case AccessibilityRole.MenuItem:
+                case AccessibilityRole.TreeItem:
                     traits |= UIAccessibilityTrait.Button;
                     break;
+
+                case AccessibilityRole.ToolTip:
+                case AccessibilityRole.Alert:
+                    traits |= UIAccessibilityTrait.StaticText;
+                    break;
+
+                case AccessibilityRole.ProgressBar:
+                    traits |= UIAccessibilityTrait.UpdatesFrequently;
+                    break;
+            }
+
+            // A range the user can step is adjusted with swipes up and down
+            if (view.AccessibilityRange.HasValue && view.IsAccessibilityActionSupported(AccessibilityAction.Increment))
+            {
+                traits |= UIAccessibilityTrait.Adjustable;
             }
 
             // VoiceOver reads a checked toggle as selected
@@ -183,6 +223,24 @@ namespace XForms.iOS
             public bool Activate()
             {
                 return this._view.TryGetTarget(out var view) && LayerHost.For(view).IsAccessibilityActionable && LayerHost.For(view).PerformDefaultAccessibilityAction();
+            }
+
+            [Export("accessibilityIncrement")]
+            public void Increment()
+            {
+                if (this._view.TryGetTarget(out var view))
+                {
+                    Adjust(view, up: true);
+                }
+            }
+
+            [Export("accessibilityDecrement")]
+            public void Decrement()
+            {
+                if (this._view.TryGetTarget(out var view))
+                {
+                    Adjust(view, up: false);
+                }
             }
         }
     }

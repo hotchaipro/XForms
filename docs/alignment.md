@@ -3325,13 +3325,88 @@ Win32, Android and the browser, as before.
     TalkBack, and the browser's accessibility tree); right to left; and a
     SoonerOrLater walk unchanged (it uses none of them yet).
 
-    **To decide:**
-    - **Scope:** (recommended) the three groups above; or only forms and
-      feedback now, with structure (navigation view, pull to refresh, flip
-      view, tree view) as a later phase.
-    - **The time picker:** (recommended) drawn, as XForms' date picker
-      is, so it looks the same everywhere; or the platform's own picker on
-      Android and iOS, as MAUI does.
+    **Decided** (2026-10-22, taking the recommendations when asked to
+    carry on through this phase):
+    - All three groups, in this phase.
+    - The time picker is drawn, as XForms' date picker is, so it looks the
+      same everywhere.
+
+    **Status: step 1 done.**
+
+    Step 1, forms: `CheckBox` (`IsChecked` a `bool?`, `IsThreeState`),
+    `ToggleSwitch` (`Header`, `IsOn`, `OnContent` and `OffContent`), a
+    `RangeBase` under `Slider` (`Header`, `StepFrequency`, `SmallChange`,
+    `LargeChange`; a mouse press drags at once, a touch once it moves
+    sideways, so a vertical drag still scrolls) and `ProgressBar`
+    (`IsIndeterminate`, `ShowError`, `ShowPaused`; Simple slides the
+    indeterminate segment on a layer of its own), `TimePicker` (a
+    `PickerField` whose popup has hour, minute and AM or PM columns and
+    Accept and Dismiss, `ClockIdentifier`, `MinuteIncrement`),
+    `NumberBox` (typed and committed on Enter or leaving it, a range,
+    `SpinButtonPlacementMode`), `PasswordBox` (`PasswordRevealMode`, Peek
+    by default) and `AutoSuggestBox` (`ItemsSource` set by the app as the
+    text changes, `TextChanged` with its reason, `SuggestionChosen`,
+    `QuerySubmitted`), each with a Simple template and its user state, on
+    a new forms page in the test app (`/forms`). What they needed:
+    - Accessibility: roles for a check box, a switch, a slider, a progress
+      bar, a spin button (and, for steps 2 and 3, a tooltip, an alert, a
+      menu and its items, and a tree and its items); a mixed checked state;
+      a range value (`View.AccessibilityRange`, and
+      `SetAccessibilityRangeValue`) and the increment and decrement
+      actions. Mapped to UI Automation (the control types, the toggle
+      state's indeterminate, the RangeValue pattern), TalkBack (the
+      widget classes, range info, scroll forward and back, set progress),
+      VoiceOver (the adjustable trait, increment and decrement) and ARIA
+      (the roles, `aria-checked="mixed"`, `aria-valuenow`, `-min`,
+      `-max`).
+    - A single-line text box offers the keys it has no use for (Up, Down,
+      Page Up, Page Down, Escape) to its ancestors first, on Win32, in the
+      browser and on Android, for the number box's steps and the
+      suggestion list.
+    - `Popup.IsLightDismissEnabled` (WinUI's name): false for a popup that
+      leaves focus where it was and lets presses outside it through (the
+      suggestion list, which mustn't take the keyboard from its box), on
+      every platform.
+
+    Checked on Win32 through UI Automation (each control's type, name,
+    patterns and states; toggling, a range value set, the number box typed
+    and stepped, the pickers expanded; real input was blocked, as another
+    process held the foreground), in the browser with the mouse and the
+    keyboard (each control's ARIA, Tab order, Space, Enter, the slider's
+    keys, the time picker opened, moved and accepted from the keyboard, the
+    number box's keys and buttons, the password peek, the suggestions'
+    Down, Up, Enter, Escape and click), and on Android with taps and drags
+    and TalkBack's tree (each control's widget class, label, checked and
+    enabled state). Light, dark, high contrast and right to left on the
+    page. Not checked: typing on Android (the keyboard's stylus
+    introduction covers the app), and so the password peek and the
+    suggestions there.
+
+    Fixed on the way:
+    - A disabled templated control took keyboard focus and read as enabled
+      (`IsEnabled` now makes it not hit-test visible, as the platforms
+      read it).
+    - `NotifyAccessibilityStateChanged` created a view's native object
+      when called before it was attached (from a property set in an
+      initializer), so properties set after it were missed (a progress
+      bar's label in the browser).
+    - In the browser, a focused lightweight view gave assistive technology
+      nothing (its layer has the focus): the layer now points at the
+      view's element (`aria-activedescendant`).
+    - A popup with more room above its target still opened below it,
+      squeezed, when its content fits itself to the space it's given (a
+      list, a calendar): the side is chosen by its natural height (Win32,
+      Android, iOS).
+    - On Win32, a page whose only child is native (a scroll viewer) drew
+      no background.
+    - On Android, a lightweight view that clips (`ClipToBounds`) couldn't
+      clip a native child: a view that clips has a native object.
+    - On Win32, RichEdit's Direct2D window class crashed the process now
+      and then (an access violation inside RichEdit: about one start in
+      nine with a few text boxes, with or without the spell checker, which
+      the known issue blamed); text boxes use the classic class, which
+      draws the same and didn't crash in 35 starts.
+
 29. **Later: `XForms.Xaml`.** The proof of concept in `spikes/XForms.Xaml`
     becomes a layer over the framework and controls, including templates
     written in markup. To be planned in detail when it's next.

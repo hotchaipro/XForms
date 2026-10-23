@@ -53,6 +53,16 @@ namespace XForms.Android
                 case AccessibilityRole.Image: return "android.widget.ImageView";
                 case AccessibilityRole.TextBox: return "android.widget.EditText";
                 case AccessibilityRole.Heading: return "android.widget.TextView";
+                case AccessibilityRole.CheckBox: return "android.widget.CheckBox";
+                case AccessibilityRole.Switch: return "android.widget.Switch";
+                case AccessibilityRole.Slider: return "android.widget.SeekBar";
+                case AccessibilityRole.ProgressBar: return "android.widget.ProgressBar";
+                case AccessibilityRole.SpinButton: return "android.widget.NumberPicker";
+                case AccessibilityRole.ToolTip: return "android.widget.TextView";
+                case AccessibilityRole.Alert: return "android.widget.TextView";
+                case AccessibilityRole.Menu: return "android.widget.ListView";
+                case AccessibilityRole.MenuItem: return "android.widget.Button";
+                case AccessibilityRole.Tree: return "android.widget.ListView";
                 default: return "android.view.ViewGroup";
             }
         }
@@ -88,8 +98,35 @@ namespace XForms.Android
             {
                 info.Checkable = true;
 #pragma warning disable CA1422 // Replaced by a tri-state in Android 16
-                info.Checked = isChecked;
+                info.Checked = isChecked && !view.AccessibilityIsMixed;
 #pragma warning restore CA1422
+                if (view.AccessibilityIsMixed && OperatingSystem.IsAndroidVersionAtLeast(30))
+                {
+                    info.StateDescription = "Partially checked";
+                }
+            }
+
+            // A range: TalkBack's adjust gestures scroll it forward and back
+            if (view.AccessibilityRange is AccessibilityRange range)
+            {
+#pragma warning disable CA1422 // Obtain is replaced by a constructor in Android 16
+                info.SetRangeInfo(AccessibilityNodeInfo.RangeInfo.Obtain(RangeType.Float, (float)range.Minimum, (float)range.Maximum, (float)range.Value));
+#pragma warning restore CA1422
+                if (view.IsAccessibilityActionSupported(AccessibilityAction.Increment))
+                {
+                    info.AddAction(AccessibilityNodeInfo.AccessibilityAction.ActionScrollForward);
+                    info.AddAction(AccessibilityNodeInfo.AccessibilityAction.ActionScrollBackward);
+                    if (OperatingSystem.IsAndroidVersionAtLeast(24))
+                    {
+                        info.AddAction(AccessibilityNodeInfo.AccessibilityAction.ActionSetProgress);
+                    }
+                }
+            }
+
+            // An alert is read as it appears or changes
+            if (view.AccessibilityRole == AccessibilityRole.Alert)
+            {
+                info.LiveRegion = global::Android.Views.AccessibilityLiveRegion.Polite;
             }
 
             if (view.IsAccessibilityActionSupported(AccessibilityAction.Select))
@@ -117,6 +154,47 @@ namespace XForms.Android
         }
 
 
+
+        /// <summary>
+        /// Steps or sets a range's value: TalkBack's scroll forward and back,
+        /// and set progress. Returns whether the action is a range's.
+        /// </summary>
+        public static bool PerformRangeAction(
+            View view,
+            NodeAction action,
+            Bundle arguments,
+            out bool handled)
+        {
+            handled = false;
+            if (!view.AccessibilityRange.HasValue)
+            {
+                return false;
+            }
+
+            if ((int)action == global::Android.Resource.Id.AccessibilityActionSetProgress)
+            {
+                if (arguments?.ContainsKey(AccessibilityNodeInfo.ActionArgumentProgressValue) ?? false)
+                {
+                    handled = view.SetAccessibilityRangeValue(arguments.GetFloat(AccessibilityNodeInfo.ActionArgumentProgressValue));
+                }
+
+                return true;
+            }
+
+            switch (action)
+            {
+                case NodeAction.ScrollForward:
+                    handled = view.PerformAccessibilityAction(AccessibilityAction.Increment);
+                    return true;
+
+                case NodeAction.ScrollBackward:
+                    handled = view.PerformAccessibilityAction(AccessibilityAction.Decrement);
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
 
         // A view's checked or selected state, or its value, changed
         private static void OnStateChanged(
@@ -187,6 +265,11 @@ namespace XForms.Android
             if (((action == NodeAction.Expand) || (action == NodeAction.Collapse)) && this._view.TryGetTarget(out var expandable))
             {
                 return expandable.PerformAccessibilityAction((action == NodeAction.Expand) ? AccessibilityAction.Expand : AccessibilityAction.Collapse);
+            }
+
+            if (this._view.TryGetTarget(out var ranged) && AndroidAccessibility.PerformRangeAction(ranged, action, args, out bool rangeHandled))
+            {
+                return rangeHandled;
             }
 
             return base.PerformAccessibilityAction(host, action, args);
@@ -429,7 +512,7 @@ namespace XForms.Android
 
                 if (view.AccessibilityIsChecked is bool isChecked)
                 {
-                    e.Checked = isChecked;
+                    e.Checked = isChecked && !view.AccessibilityIsMixed;
                 }
 
                 e.Enabled = view.IsHitTestVisible;
@@ -501,7 +584,7 @@ namespace XForms.Android
                     return view.PerformAccessibilityAction(AccessibilityAction.Collapse);
 
                 default:
-                    return false;
+                    return AndroidAccessibility.PerformRangeAction(view, action, arguments, out bool handled) && handled;
             }
         }
 

@@ -58,6 +58,29 @@ namespace XForms.Primitives
         /// The view the popup opens next to, such as the field of a picker. The
         /// popup's content is measured with the space available there.
         /// </summary>
+        private bool _isLightDismissEnabled = true;
+
+        /// <summary>
+        /// Whether the popup is light-dismissed (the default): a click or tap
+        /// outside it, Escape or Back closes it, and keyboard focus stays
+        /// inside it. Otherwise it only shows content beside its target (a
+        /// suggestion list): focus stays where it was, and input outside it
+        /// goes to the app, which closes it.
+        /// </summary>
+        public bool IsLightDismissEnabled
+        {
+            get
+            {
+                return this._isLightDismissEnabled;
+            }
+
+            set
+            {
+                this._isLightDismissEnabled = value;
+                this.Native?.IsLightDismissEnabled = value;
+            }
+        }
+
         public View PlacementTarget
         {
             get
@@ -143,6 +166,7 @@ namespace XForms.Primitives
 
             var native = this.Native;
             native.PlacementTarget = this._placementTarget;
+            native.IsLightDismissEnabled = this._isLightDismissEnabled;
 
             var content = this._content;
             if (null != content)

@@ -706,7 +706,7 @@ other threads.
 |---|---|---|---|---|
 | Host | The app's activity, with a root `ViewGroup`; edge-to-edge with insets | Scene-based `UIWindow`; safe area | Win32 window with a DirectComposition tree | A page: an element per layer, positioned absolutely |
 | Drawing | `Canvas` | Core Graphics | Direct2D, DirectWrite | A `<canvas>` per layer, from a recorded command list |
-| Text entry | `EditText` | `UITextField` / `UITextView` | RichEdit (`RichEditD2DPT`) | `<input>` / `<textarea>` |
+| Text entry | `EditText` | `UITextField` / `UITextView` | RichEdit (`RICHEDIT50W`) | `<input>` / `<textarea>` |
 | List | `ListView`; `RecyclerView` for rows and grids | `UITableView`; `UICollectionView` for rows and grids | Virtualized compositor list | A scrolling element, virtualized by lines |
 | Scrolling | Native (`android.widget.ScrollView`) | Native (`UIScrollView`) | Compositor-animated, with touch flick | Native (`overflow: auto`) |
 | Popups | `PopupWindow` | View over the window | Topmost composition target | An element over a backdrop |
@@ -734,6 +734,7 @@ contract. Still to do:
   ([alignment.md](alignment.md#layering)).
 - **Web.** The browser backend (`platform/web`) has been tested in one
   browser (Chromium) without a screen reader or a touch screen.
-- **Known Win32 issue.** RichEdit's built-in spell checker can crash the
-  process when a text entry window is shown, hidden or resized while it is
-  checking. A fix is in progress.
+- **Win32 text entry.** RichEdit's Direct2D window class
+  (`RichEditD2DPT`) crashed the process now and then (an access violation
+  inside RichEdit, with or without its spell checker), so text boxes use
+  the classic class (`RICHEDIT50W`), which draws the same.

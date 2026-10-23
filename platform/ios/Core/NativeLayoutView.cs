@@ -256,6 +256,16 @@ namespace XForms.iOS
             return LayerHost.For(this._owner).IsAccessibilityActionable && LayerHost.For(this._owner).PerformDefaultAccessibilityAction();
         }
 
+        public override void AccessibilityIncrement()
+        {
+            NativeAccessibility.Adjust(this._owner, up: true);
+        }
+
+        public override void AccessibilityDecrement()
+        {
+            NativeAccessibility.Adjust(this._owner, up: false);
+        }
+
         // NOTE: Null (nil) means the subviews
         [Export("accessibilityElements")]
         public NSObject[] GetAccessibilityElements()

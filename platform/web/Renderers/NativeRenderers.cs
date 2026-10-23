@@ -1008,6 +1008,12 @@ namespace XForms.Web.Renderers
             set;
         }
 
+        public bool IsLightDismissEnabled
+        {
+            get;
+            set;
+        } = true;
+
         public void Show()
         {
             if (this._isOpen)
@@ -1017,7 +1023,19 @@ namespace XForms.Web.Renderers
 
             this._isOpen = true;
             var host = WebHost.Current;
-            host.RegisterBackdrop(this._backdropId, this.Close);
+
+            // Without light dismiss, presses outside the content go through
+            // the backdrop to the page
+            Js.SetStyle(this._backdropId, "pointer-events", this.IsLightDismissEnabled ? null : "none");
+            if ((this._content?.Renderer is ViewRenderer content) && !this.IsLightDismissEnabled)
+            {
+                Js.SetStyle(content.Id, "pointer-events", "auto");
+            }
+
+            if (this.IsLightDismissEnabled)
+            {
+                host.RegisterBackdrop(this._backdropId, this.Close);
+            }
             host.ViewportChanged += this.Layout;
             Js.AddOverlay(this._backdropId);
             Js.SetStyle(this._backdropId, "display", null);

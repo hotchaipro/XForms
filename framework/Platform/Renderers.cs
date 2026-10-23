@@ -308,6 +308,12 @@ namespace XForms.Platform
 
         View PlacementTarget { get; set; }
 
+        /// <summary>
+        /// Whether a press outside the popup closes it, and it holds keyboard
+        /// focus; otherwise input outside it goes on to the app.
+        /// </summary>
+        bool IsLightDismissEnabled { get; set; }
+
         void Show();
 
         void Close();

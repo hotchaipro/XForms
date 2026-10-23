@@ -700,9 +700,17 @@ namespace XForms.Win32
             Point point,
             out ViewRenderer hit)
         {
-            if (null != this._overlays.Top)
+            if (this._overlays.IsAnyOpen)
             {
-                return this._overlays.HitTest(point, out hit);
+                if (!this._overlays.HitTest(point, out hit))
+                {
+                    return false;
+                }
+
+                if (null != hit)
+                {
+                    return true;
+                }
             }
 
             hit = this._root?.HitTest(point);

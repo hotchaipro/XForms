@@ -126,6 +126,32 @@ namespace XForms.Win32.Automation
         int get_IsReadOnly(out int isReadOnly);
     }
 
+    [GeneratedComInterface]
+    [Guid("36dc7aef-33e6-4691-afe1-2be7274b3d33")]
+    internal partial interface IRangeValueProvider
+    {
+        [PreserveSig]
+        int SetValue(double value);
+
+        [PreserveSig]
+        int get_Value(out double value);
+
+        [PreserveSig]
+        int get_IsReadOnly(out int isReadOnly);
+
+        [PreserveSig]
+        int get_Maximum(out double maximum);
+
+        [PreserveSig]
+        int get_Minimum(out double minimum);
+
+        [PreserveSig]
+        int get_LargeChange(out double largeChange);
+
+        [PreserveSig]
+        int get_SmallChange(out double smallChange);
+    }
+
     [StructLayout(LayoutKind.Sequential)]
     internal struct UiaRect
     {
@@ -143,6 +169,7 @@ namespace XForms.Win32.Automation
     {
         public const ushort VT_EMPTY = 0;
         public const ushort VT_I4 = 3;
+        public const ushort VT_R8 = 5;
         public const ushort VT_BSTR = 8;
         public const ushort VT_BOOL = 11;
 
@@ -157,6 +184,14 @@ namespace XForms.Win32.Automation
 
         [FieldOffset(8)]
         public nint PointerValue;
+
+        [FieldOffset(8)]
+        public double DoubleValue;
+
+        public static Variant FromDouble(double value)
+        {
+            return new Variant() { VariantType = VT_R8, DoubleValue = value };
+        }
 
         public static Variant FromInt(int value)
         {
@@ -204,6 +239,16 @@ namespace XForms.Win32.Automation
         public const int ToggleToggleStatePropertyId = 30086;
         public const int ExpandCollapseExpandCollapseStatePropertyId = 30070;
         public const int HeadingLevelPropertyId = 30173;
+        public const int RangeValueValuePropertyId = 30047;
+        public const int RangeValueIsReadOnlyPropertyId = 30048;
+        public const int RangeValueMinimumPropertyId = 30049;
+        public const int RangeValueMaximumPropertyId = 30050;
+        public const int RangeValueLargeChangePropertyId = 30051;
+        public const int RangeValueSmallChangePropertyId = 30052;
+        public const int LiveSettingPropertyId = 30135;
+
+        // LiveSetting
+        public const int Polite = 1;
 
         // HeadingLevel
         public const int HeadingLevel1 = 80051;
@@ -211,6 +256,7 @@ namespace XForms.Win32.Automation
         // Patterns
         public const int InvokePatternId = 10000;
         public const int ValuePatternId = 10002;
+        public const int RangeValuePatternId = 10003;
         public const int ExpandCollapsePatternId = 10005;
 
         // ExpandCollapseState
@@ -222,10 +268,12 @@ namespace XForms.Win32.Automation
         // ToggleState
         public const int ToggleStateOff = 0;
         public const int ToggleStateOn = 1;
+        public const int ToggleStateIndeterminate = 2;
 
         // Events
         public const int AutomationFocusChangedEventId = 20005;
         public const int SelectionItemElementSelectedEventId = 20012;
+        public const int LiveRegionChangedEventId = 20024;
 
         // Control types
         public const int ButtonControlTypeId = 50000;
@@ -235,9 +283,17 @@ namespace XForms.Win32.Automation
         public const int ImageControlTypeId = 50006;
         public const int ListItemControlTypeId = 50007;
         public const int ListControlTypeId = 50008;
+        public const int MenuControlTypeId = 50009;
+        public const int MenuItemControlTypeId = 50011;
+        public const int ProgressBarControlTypeId = 50012;
+        public const int SliderControlTypeId = 50015;
+        public const int SpinnerControlTypeId = 50016;
         public const int RadioButtonControlTypeId = 50013;
         public const int TabItemControlTypeId = 50019;
         public const int TextControlTypeId = 50020;
+        public const int ToolTipControlTypeId = 50022;
+        public const int TreeControlTypeId = 50023;
+        public const int TreeItemControlTypeId = 50024;
         public const int GroupControlTypeId = 50026;
         public const int PaneControlTypeId = 50033;
 

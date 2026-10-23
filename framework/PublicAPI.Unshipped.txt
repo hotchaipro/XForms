@@ -1,3 +1,27 @@
+XForms.AccessibilityAction.Decrement = 6 -> XForms.AccessibilityAction
+XForms.AccessibilityAction.Increment = 5 -> XForms.AccessibilityAction
+XForms.AccessibilityRange
+XForms.AccessibilityRange.AccessibilityRange() -> void
+XForms.AccessibilityRange.AccessibilityRange(double Minimum, double Maximum, double Value) -> void
+XForms.AccessibilityRange.Deconstruct(out double Minimum, out double Maximum, out double Value) -> void
+XForms.AccessibilityRange.Equals(XForms.AccessibilityRange other) -> bool
+XForms.AccessibilityRange.Maximum.get -> double
+XForms.AccessibilityRange.Maximum.init -> void
+XForms.AccessibilityRange.Minimum.get -> double
+XForms.AccessibilityRange.Minimum.init -> void
+XForms.AccessibilityRange.Value.get -> double
+XForms.AccessibilityRange.Value.init -> void
+XForms.AccessibilityRole.Alert = 19 -> XForms.AccessibilityRole
+XForms.AccessibilityRole.CheckBox = 13 -> XForms.AccessibilityRole
+XForms.AccessibilityRole.Menu = 20 -> XForms.AccessibilityRole
+XForms.AccessibilityRole.MenuItem = 21 -> XForms.AccessibilityRole
+XForms.AccessibilityRole.ProgressBar = 16 -> XForms.AccessibilityRole
+XForms.AccessibilityRole.Slider = 15 -> XForms.AccessibilityRole
+XForms.AccessibilityRole.SpinButton = 17 -> XForms.AccessibilityRole
+XForms.AccessibilityRole.Switch = 14 -> XForms.AccessibilityRole
+XForms.AccessibilityRole.ToolTip = 18 -> XForms.AccessibilityRole
+XForms.AccessibilityRole.Tree = 22 -> XForms.AccessibilityRole
+XForms.AccessibilityRole.TreeItem = 23 -> XForms.AccessibilityRole
 XForms.Application.HotReloaded -> System.EventHandler<XForms.HotReloadEventArgs>
 XForms.Application.NavigateAsync(string path, XForms.PageTransition transition = null) -> System.Threading.Tasks.Task
 XForms.Application.NavigateAsync<TResult>(string path, XForms.PageTransition transition = null) -> System.Threading.Tasks.Task<TResult>
@@ -15,6 +39,8 @@ XForms.HotReloadEventArgs.UpdatedTypes.get -> System.Collections.Generic.IReadOn
 XForms.Page.IsBuilt.get -> bool
 XForms.Page.NavigationPath.get -> string
 XForms.Page.SetResult(object result) -> void
+XForms.Primitives.Popup.IsLightDismissEnabled.get -> bool
+XForms.Primitives.Popup.IsLightDismissEnabled.set -> void
 XForms.Route
 XForms.Route.GetGuid(string name) -> System.Guid
 XForms.Route.GetInt32(string name) -> int
@@ -26,6 +52,9 @@ XForms.Routes
 XForms.Routes.Add(string pattern, System.Func<XForms.Route, XForms.Page> createPage) -> void
 XForms.View.Name.get -> string
 XForms.View.Name.set -> void
+override XForms.AccessibilityRange.Equals(object obj) -> bool
+override XForms.AccessibilityRange.GetHashCode() -> int
+override XForms.AccessibilityRange.ToString() -> string
 override XForms.Frame.OnHotReload() -> void
 override XForms.Page.OnHotReload() -> void
 override XForms.Primitives.ItemsView.GetUserState() -> object
@@ -36,12 +65,17 @@ override XForms.Primitives.ScrollViewer.SetUserState(object state) -> void
 override XForms.Primitives.TextBox.GetUserState() -> object
 override XForms.Primitives.TextBox.OnAttaching(XForms.Theme theme) -> void
 override XForms.Primitives.TextBox.SetUserState(object state) -> void
+static XForms.AccessibilityRange.operator !=(XForms.AccessibilityRange left, XForms.AccessibilityRange right) -> bool
+static XForms.AccessibilityRange.operator ==(XForms.AccessibilityRange left, XForms.AccessibilityRange right) -> bool
 static XForms.View.RestoreUserState(object saved, XForms.View newViews) -> void
 static XForms.View.SaveUserState(XForms.View views) -> object
 virtual XForms.Application.OnConfigureRoutes(XForms.Routes routes) -> void
 virtual XForms.Application.OnRouteNotFound(string path) -> string
 virtual XForms.Element.OnAttaching(XForms.Theme theme) -> void
 virtual XForms.Page.Build() -> XForms.View
+virtual XForms.View.AccessibilityIsMixed.get -> bool
+virtual XForms.View.AccessibilityRange.get -> XForms.AccessibilityRange?
 virtual XForms.View.GetUserState() -> object
 virtual XForms.View.OnHotReload() -> void
+virtual XForms.View.SetAccessibilityRangeValue(double value) -> bool
 virtual XForms.View.SetUserState(object state) -> void

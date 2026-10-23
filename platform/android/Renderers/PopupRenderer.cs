@@ -66,6 +66,22 @@ namespace XForms.Android.Renderers
             set;
         }
 
+        public bool IsLightDismissEnabled
+        {
+            get
+            {
+                return this._nativePopup.Focusable;
+            }
+
+            set
+            {
+                // Without focus, the keyboard stays with the text box beneath
+                this._nativePopup.Focusable = value;
+                this._nativePopup.OutsideTouchable = value;
+                this._nativePopup.InputMethodMode = value ? global::Android.Widget.InputMethod.FromFocusable : global::Android.Widget.InputMethod.NotNeeded;
+            }
+        }
+
         public void Show()
         {
             var target = this.PlacementTarget;
@@ -110,10 +126,17 @@ namespace XForms.Android.Renderers
             float below = Math.Max(0, windowHeight - bottom - AnchorGap);
             float above = Math.Max(0, top - AnchorGap);
 
-            this._content.Measure(new Size(windowWidth, below));
+            // Below, if its natural height fits there (or there's more room
+            // there)
+            this._content.Measure(new Size(windowWidth, float.PositiveInfinity));
             var size = this._content.DesiredSize;
             float y = bottom + AnchorGap;
-            if ((size.Height > below) && (above > below))
+            if ((size.Height <= below) || (above <= below))
+            {
+                this._content.Measure(new Size(windowWidth, below));
+                size = this._content.DesiredSize;
+            }
+            else
             {
                 this._content.Measure(new Size(windowWidth, above));
                 size = this._content.DesiredSize;

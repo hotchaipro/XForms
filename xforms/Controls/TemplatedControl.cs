@@ -71,7 +71,9 @@ namespace XForms.Controls
         }
 
         /// <summary>
-        /// Whether the control responds to the user.
+        /// Whether the control responds to the user. A disabled control takes
+        /// no input or keyboard focus (it isn't hit-test visible), and reads
+        /// as disabled to assistive technology.
         /// </summary>
         public virtual bool IsEnabled
         {
@@ -85,7 +87,9 @@ namespace XForms.Controls
                 if (value != this._isEnabled)
                 {
                     this._isEnabled = value;
+                    this.IsHitTestVisible = value;
                     this.OnStateChanged();
+                    this.NotifyAccessibilityStateChanged();
                     this.OnPropertyChanged();
                 }
             }

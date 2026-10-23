@@ -185,6 +185,12 @@ namespace XForms.Win32.Renderers
             this.Close();
         }
 
+        public bool IsLightDismissEnabled
+        {
+            get;
+            set;
+        } = true;
+
         void IOverlay.Place(
             Size windowSize)
         {
@@ -234,12 +240,17 @@ namespace XForms.Win32.Renderers
             float above = Math.Max(0, origin.Y - AnchorGap - EdgeMargin);
             float availableWidth = Math.Max(0, windowSize.Width - (2 * EdgeMargin));
 
-            content.Measure(new Size(availableWidth, below));
+            // Below, if its natural height fits there (or there's more room
+            // there): measured within the room below, content that fits itself
+            // to the space it's given always seems to fit
+            content.Measure(new Size(availableWidth, float.PositiveInfinity));
             var size = content.DesiredSize;
 
             float y;
             if ((size.Height <= below) || (below >= above))
             {
+                content.Measure(new Size(availableWidth, below));
+                size = content.DesiredSize;
                 y = origin.Y + targetFrame.Height + AnchorGap;
             }
             else

@@ -106,12 +106,11 @@ namespace XForms.Win32.Renderers
             uint style = (uint)(WINDOW_STYLE.WS_CHILD | WINDOW_STYLE.WS_TABSTOP);
             style |= this._multiline ? (ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN) : ES_AUTOHSCROLL;
 
-            // Prefer RichEdit's Direct2D/DirectWrite rendering
-            this._hwnd = Create(Environment.GetEnvironmentVariable("XFORMS_EDIT_CLASS") ?? "RichEditD2DPT", (WINDOW_STYLE)style); // TEMP
-            if (this._hwnd.IsNull)
-            {
-                this._hwnd = Create("RICHEDIT50W", (WINDOW_STYLE)style);
-            }
+            // NOTE: Not RichEdit's Direct2D class (RichEditD2DPT), which crashed
+            // the process now and then (an access violation inside RichEdit,
+            // about one start in nine with a few text boxes), with or without
+            // spell checking; this one draws the same and didn't, in 35 starts
+            this._hwnd = Create(Environment.GetEnvironmentVariable("XFORMS_EDIT_CLASS") ?? "RICHEDIT50W", (WINDOW_STYLE)style); // TEMP
 
             PInvoke.SendMessage(this._hwnd, EM_SETEVENTMASK, 0, ENM_CHANGE | ENM_REQUESTRESIZE | ENM_SELCHANGE);
 

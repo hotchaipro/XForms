@@ -1020,6 +1020,13 @@ namespace XForms
                     return false;
                 }
 
+                // A view that clips its children clips them natively (its
+                // layer can't clip a native child, such as an animated one)
+                if (this._clipToBounds)
+                {
+                    return false;
+                }
+
                 return (this.Parent is View parent) && !parent.RequiresNativeChildren;
             }
         }
@@ -1735,6 +1742,41 @@ namespace XForms
         }
 
         /// <summary>
+        /// Whether the view's checked state is neither checked nor unchecked
+        /// (a check box's indeterminate state).
+        /// </summary>
+        public virtual bool AccessibilityIsMixed
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// The view's value within a range (a slider's, a progress bar's), or
+        /// null when it has none.
+        /// </summary>
+        public virtual AccessibilityRange? AccessibilityRange
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Sets the view's value within its range, for assistive technology.
+        /// Returns whether it was set: false for a view whose range only
+        /// shows a value (a progress bar's).
+        /// </summary>
+        public virtual bool SetAccessibilityRangeValue(
+            double value)
+        {
+            return false;
+        }
+
+        /// <summary>
         /// Whether the view (a list item, tab or radio button) is selected.
         /// </summary>
         public virtual bool AccessibilityIsSelected
@@ -1962,7 +2004,9 @@ namespace XForms
         /// </summary>
         protected void NotifyAccessibilityStateChanged()
         {
-            if (null != this.Renderer)
+            // NOTE: Not Renderer, which would create the native object, before
+            // the view is attached (and the rest of its initializer has run)
+            if (this.HasRenderer)
             {
                 AccessibilityStateChanged?.Invoke(this);
             }
@@ -3032,6 +3076,18 @@ namespace XForms
             this.OnKeyUp(e);
             this.KeyUp?.Invoke(this, e);
             return e.Handled;
+        }
+
+        /// <summary>
+        /// Whether a single-line text box offers the key to its ancestors
+        /// before handling it (it has no use for it): Up, Down, Page Up, Page
+        /// Down and Escape, for a suggestion list or a number box around it.
+        /// </summary>
+        [PlatformContract]
+        internal static bool IsTextBoxNavigationKey(
+            Key key)
+        {
+            return (key == Key.Up) || (key == Key.Down) || (key == Key.PageUp) || (key == Key.PageDown) || (key == Key.Escape);
         }
 
         /// <summary>

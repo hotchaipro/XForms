@@ -200,9 +200,19 @@ namespace XForms.Win32.Automation
 
             nint provider = GetInterface<IRawElementProviderSimple>(GetElement(renderer));
             var empty = new Variant();
-            if (view.AccessibilityIsChecked is bool isChecked)
+            if (view.AccessibilityIsChecked.HasValue)
             {
-                UiaNative.UiaRaiseAutomationPropertyChangedEvent(provider, UiaConstants.ToggleToggleStatePropertyId, empty, Variant.FromInt(isChecked ? UiaConstants.ToggleStateOn : UiaConstants.ToggleStateOff));
+                UiaNative.UiaRaiseAutomationPropertyChangedEvent(provider, UiaConstants.ToggleToggleStatePropertyId, empty, Variant.FromInt(ElementProvider.ToggleStateFor(view)));
+            }
+
+            if (view.AccessibilityRange is AccessibilityRange range)
+            {
+                UiaNative.UiaRaiseAutomationPropertyChangedEvent(provider, UiaConstants.RangeValueValuePropertyId, empty, Variant.FromDouble(range.Value));
+            }
+
+            if (view.AccessibilityRole == AccessibilityRole.Alert)
+            {
+                UiaNative.UiaRaiseAutomationEvent(provider, UiaConstants.LiveRegionChangedEventId);
             }
 
             if (view.IsAccessibilityActionSupported(AccessibilityAction.Select))
@@ -321,7 +331,7 @@ namespace XForms.Win32.Automation
     /// An automation element for one accessible view.
     /// </summary>
     [GeneratedComClass]
-    internal sealed unsafe partial class ElementProvider : IRawElementProviderSimple, IRawElementProviderFragment, IInvokeProvider, IToggleProvider, ISelectionItemProvider, IValueProvider, IExpandCollapseProvider
+    internal sealed unsafe partial class ElementProvider : IRawElementProviderSimple, IRawElementProviderFragment, IInvokeProvider, IToggleProvider, ISelectionItemProvider, IValueProvider, IExpandCollapseProvider, IRangeValueProvider
     {
         private readonly WeakReference<ViewRenderer> _renderer;
         private readonly int _runtimeId;
@@ -365,6 +375,19 @@ namespace XForms.Win32.Automation
                 case AccessibilityRole.Image: return UiaConstants.ImageControlTypeId;
                 case AccessibilityRole.TextBox: return UiaConstants.EditControlTypeId;
                 case AccessibilityRole.Group: return UiaConstants.GroupControlTypeId;
+                case AccessibilityRole.CheckBox: return UiaConstants.CheckBoxControlTypeId;
+
+                // As WinUI's toggle switch: a button with a toggle state
+                case AccessibilityRole.Switch: return UiaConstants.ButtonControlTypeId;
+                case AccessibilityRole.Slider: return UiaConstants.SliderControlTypeId;
+                case AccessibilityRole.ProgressBar: return UiaConstants.ProgressBarControlTypeId;
+                case AccessibilityRole.SpinButton: return UiaConstants.SpinnerControlTypeId;
+                case AccessibilityRole.ToolTip: return UiaConstants.ToolTipControlTypeId;
+                case AccessibilityRole.Alert: return UiaConstants.GroupControlTypeId;
+                case AccessibilityRole.Menu: return UiaConstants.MenuControlTypeId;
+                case AccessibilityRole.MenuItem: return UiaConstants.MenuItemControlTypeId;
+                case AccessibilityRole.Tree: return UiaConstants.TreeControlTypeId;
+                case AccessibilityRole.TreeItem: return UiaConstants.TreeItemControlTypeId;
                 default: return UiaConstants.TextControlTypeId;
             }
         }
@@ -472,6 +495,14 @@ namespace XForms.Win32.Automation
                         }
 
                         break;
+
+                    case UiaConstants.RangeValuePatternId:
+                        if (view.AccessibilityRange.HasValue)
+                        {
+                            result = AutomationTree.GetInterface<IRangeValueProvider>(this);
+                        }
+
+                        break;
                 }
 
                 return 0;
@@ -524,9 +555,37 @@ namespace XForms.Win32.Automation
                         break;
 
                     case UiaConstants.ToggleToggleStatePropertyId:
-                        if (view.AccessibilityIsChecked is bool isChecked)
+                        if (view.AccessibilityIsChecked.HasValue)
                         {
-                            result = Variant.FromInt(isChecked ? UiaConstants.ToggleStateOn : UiaConstants.ToggleStateOff);
+                            result = Variant.FromInt(ToggleStateFor(view));
+                        }
+
+                        break;
+
+                    case UiaConstants.RangeValueValuePropertyId:
+                    case UiaConstants.RangeValueMinimumPropertyId:
+                    case UiaConstants.RangeValueMaximumPropertyId:
+                    case UiaConstants.RangeValueSmallChangePropertyId:
+                    case UiaConstants.RangeValueLargeChangePropertyId:
+                        if (view.AccessibilityRange is AccessibilityRange range)
+                        {
+                            result = Variant.FromDouble(RangeProperty(range, propertyId));
+                        }
+
+                        break;
+
+                    case UiaConstants.RangeValueIsReadOnlyPropertyId:
+                        if (view.AccessibilityRange.HasValue)
+                        {
+                            result = Variant.FromBool(!view.IsAccessibilityActionSupported(AccessibilityAction.Increment));
+                        }
+
+                        break;
+
+                    case UiaConstants.LiveSettingPropertyId:
+                        if (view.AccessibilityRole == AccessibilityRole.Alert)
+                        {
+                            result = Variant.FromInt(UiaConstants.Polite);
                         }
 
                         break;
@@ -674,12 +733,111 @@ namespace XForms.Win32.Automation
             int result = 0;
             int hr = this.OnUIThread((renderer) =>
             {
-                result = (((View)renderer.Element).AccessibilityIsChecked == true) ? UiaConstants.ToggleStateOn : UiaConstants.ToggleStateOff;
+                result = ToggleStateFor((View)renderer.Element);
                 return 0;
             });
 
             state = result;
             return hr;
+        }
+
+        internal static int ToggleStateFor(
+            View view)
+        {
+            if (view.AccessibilityIsMixed)
+            {
+                return UiaConstants.ToggleStateIndeterminate;
+            }
+
+            return (view.AccessibilityIsChecked == true) ? UiaConstants.ToggleStateOn : UiaConstants.ToggleStateOff;
+        }
+
+        // A range's value and bounds, and its steps (a hundredth and a tenth
+        // of it)
+        internal static double RangeProperty(
+            AccessibilityRange range,
+            int propertyId)
+        {
+            switch (propertyId)
+            {
+                case UiaConstants.RangeValueMinimumPropertyId: return range.Minimum;
+                case UiaConstants.RangeValueMaximumPropertyId: return range.Maximum;
+                case UiaConstants.RangeValueSmallChangePropertyId: return (range.Maximum - range.Minimum) / 100;
+                case UiaConstants.RangeValueLargeChangePropertyId: return (range.Maximum - range.Minimum) / 10;
+                default: return range.Value;
+            }
+        }
+
+        private int GetRangeProperty(
+            int propertyId,
+            out double value)
+        {
+            double result = 0;
+            int hr = this.OnUIThread((renderer) =>
+            {
+                if (((View)renderer.Element).AccessibilityRange is AccessibilityRange range)
+                {
+                    result = RangeProperty(range, propertyId);
+                }
+
+                return 0;
+            });
+
+            value = result;
+            return hr;
+        }
+
+        int IRangeValueProvider.SetValue(double value)
+        {
+            return this.OnUIThread((renderer) =>
+            {
+                var view = (View)renderer.Element;
+                if (!view.IsAccessibilityActionSupported(AccessibilityAction.Increment))
+                {
+                    return E_ACCESSDENIED;
+                }
+
+                Win32Host.Current.Post(() => view.SetAccessibilityRangeValue(value));
+                return 0;
+            });
+        }
+
+        int IRangeValueProvider.get_Value(out double value)
+        {
+            return this.GetRangeProperty(UiaConstants.RangeValueValuePropertyId, out value);
+        }
+
+        int IRangeValueProvider.get_IsReadOnly(out int isReadOnly)
+        {
+            int result = 1;
+            int hr = this.OnUIThread((renderer) =>
+            {
+                result = ((View)renderer.Element).IsAccessibilityActionSupported(AccessibilityAction.Increment) ? 0 : 1;
+                return 0;
+            });
+
+            isReadOnly = result;
+            return hr;
+        }
+
+        int IRangeValueProvider.get_Maximum(out double maximum)
+        {
+            return this.GetRangeProperty(UiaConstants.RangeValueMaximumPropertyId, out maximum);
+        }
+
+        int IRangeValueProvider.get_Minimum(out double minimum)
+        {
+            return this.GetRangeProperty(UiaConstants.RangeValueMinimumPropertyId, out minimum);
+        }
+
+        int IRangeValueProvider.get_LargeChange(out double largeChange)
+        {
+            return this.GetRangeProperty(UiaConstants.RangeValueLargeChangePropertyId, out largeChange);
+        }
+
+        int IRangeValueProvider.get_SmallChange(out double smallChange)
+        {
+            return this.GetRangeProperty(UiaConstants.RangeValueSmallChangePropertyId, out smallChange);
         }
 
         public int Expand()

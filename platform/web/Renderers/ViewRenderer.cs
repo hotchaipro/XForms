@@ -511,6 +511,12 @@ namespace XForms.Web.Renderers
             ApplyAccessibility(this.Id, this.View, isTextElement: this is TextBlockRenderer);
         }
 
+        private static string Number(
+            double value)
+        {
+            return value.ToString("0.###", CultureInfo.InvariantCulture);
+        }
+
         // ARIA for an element standing for a view: its role, label, and
         // checked, selected or expanded state
         private static void ApplyAccessibility(
@@ -543,6 +549,17 @@ namespace XForms.Web.Renderers
                 AccessibilityRole.ComboBox => "combobox",
                 AccessibilityRole.Heading => "heading",
                 AccessibilityRole.Group => "group",
+                AccessibilityRole.CheckBox => "checkbox",
+                AccessibilityRole.Switch => "switch",
+                AccessibilityRole.Slider => "slider",
+                AccessibilityRole.ProgressBar => "progressbar",
+                AccessibilityRole.SpinButton => "spinbutton",
+                AccessibilityRole.ToolTip => "tooltip",
+                AccessibilityRole.Alert => "status",
+                AccessibilityRole.Menu => "menu",
+                AccessibilityRole.MenuItem => "menuitem",
+                AccessibilityRole.Tree => "tree",
+                AccessibilityRole.TreeItem => "treeitem",
                 _ => null,
             };
             Js.SetAttribute(id, "role", ariaRole);
@@ -551,8 +568,17 @@ namespace XForms.Web.Renderers
             Js.SetAttribute(id, "aria-label", isTextElement ? null : LayerHost.For(view).AccessibilityText);
             Js.SetAttribute(id, "aria-level", (role == AccessibilityRole.Heading) ? "1" : null);
             Js.SetAttribute(id, "aria-checked", (role == AccessibilityRole.RadioButton) ? (view.AccessibilityIsSelected ? "true" : "false")
+                : view.AccessibilityIsMixed ? "mixed"
                 : view.AccessibilityIsChecked.HasValue ? (view.AccessibilityIsChecked.Value ? "true" : "false")
                 : null);
+
+            // A range's value and bounds (none while a progress bar is
+            // indeterminate)
+            var range = view.AccessibilityRange;
+            Js.SetAttribute(id, "aria-valuemin", range.HasValue ? Number(range.Value.Minimum) : null);
+            Js.SetAttribute(id, "aria-valuemax", range.HasValue ? Number(range.Value.Maximum) : null);
+            Js.SetAttribute(id, "aria-valuenow", range.HasValue ? Number(range.Value.Value) : null);
+            Js.SetAttribute(id, "aria-valuetext", range.HasValue ? view.AccessibilityValue : null);
             Js.SetAttribute(id, "aria-selected", ((role == AccessibilityRole.TabItem) || (role == AccessibilityRole.ListItem)) ? (view.AccessibilityIsSelected ? "true" : "false") : null);
             Js.SetAttribute(id, "aria-expanded", view.AccessibilityIsExpanded.HasValue ? (view.AccessibilityIsExpanded.Value ? "true" : "false") : null);
             Js.SetAttribute(id, "aria-disabled", view.IsHitTestVisible ? null : "true");
@@ -615,6 +641,34 @@ namespace XForms.Web.Renderers
                 }
 
                 Js.PlaceAccessible(this.Id, ids);
+            }
+
+            this.UpdateActiveDescendant();
+        }
+
+        // The browser's focus is on the layer while a lightweight view inside
+        // it has keyboard focus: the layer points assistive technology at the
+        // view's element (and, having no role of its own, is a group, which
+        // can)
+        private void UpdateActiveDescendant()
+        {
+            var focused = LayerHost.For(this.View).FocusedLightweight;
+            int element = 0;
+            if ((null != focused) && (null != this._accessibleElements))
+            {
+                for (var view = focused; null != view; view = view.Parent as View)
+                {
+                    if (this._accessibleElements.TryGetValue(view, out element))
+                    {
+                        break;
+                    }
+                }
+            }
+
+            Js.SetAttribute(this.Id, "aria-activedescendant", (0 != element) ? "x" + element.ToString(CultureInfo.InvariantCulture) : null);
+            if (this.View.AccessibilityRole == AccessibilityRole.None)
+            {
+                Js.SetAttribute(this.Id, "role", (0 != element) ? "group" : null);
             }
         }
 

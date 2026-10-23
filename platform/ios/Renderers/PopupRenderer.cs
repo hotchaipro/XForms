@@ -76,6 +76,12 @@ namespace XForms.iOS.Renderers
             set;
         }
 
+        public bool IsLightDismissEnabled
+        {
+            get;
+            set;
+        } = true;
+
         private static UIWindow Window
         {
             get
@@ -95,8 +101,12 @@ namespace XForms.iOS.Renderers
 
             this._isOpen = true;
 
-            this._dismissLayer.Frame = window.Bounds;
-            window.AddSubview(this._dismissLayer);
+            if (this.IsLightDismissEnabled)
+            {
+                this._dismissLayer.Frame = window.Bounds;
+                window.AddSubview(this._dismissLayer);
+            }
+
             window.AddSubview(contentView);
 
             this.Place(window);
@@ -119,12 +129,16 @@ namespace XForms.iOS.Renderers
                 float above = Math.Max(0, top - AnchorGap - EdgeMargin);
                 float availableWidth = Math.Max(0, windowSize.Width - (2 * EdgeMargin));
 
-                content.Measure(new Size(availableWidth, below));
+                // Below, if its natural height fits there (or there's more room
+                // there)
+                content.Measure(new Size(availableWidth, float.PositiveInfinity));
                 var size = content.DesiredSize;
 
                 float y;
                 if ((size.Height <= below) || (below >= above))
                 {
+                    content.Measure(new Size(availableWidth, below));
+                    size = content.DesiredSize;
                     y = bottom + AnchorGap;
                 }
                 else

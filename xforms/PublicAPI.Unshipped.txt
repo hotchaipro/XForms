@@ -1,7 +1,211 @@
+XForms.Controls.AutoSuggestBox
+XForms.Controls.AutoSuggestBox.AutoSuggestBox() -> void
+XForms.Controls.AutoSuggestBox.IsSuggestionListOpen.get -> bool
+XForms.Controls.AutoSuggestBox.ItemsSource.get -> System.Collections.Generic.IReadOnlyList<string>
+XForms.Controls.AutoSuggestBox.ItemsSource.set -> void
+XForms.Controls.AutoSuggestBox.PlaceholderText.get -> string
+XForms.Controls.AutoSuggestBox.PlaceholderText.set -> void
+XForms.Controls.AutoSuggestBox.QuerySubmitted -> System.EventHandler<XForms.Controls.AutoSuggestBoxQuerySubmittedEventArgs>
+XForms.Controls.AutoSuggestBox.SuggestionChosen -> System.EventHandler<XForms.Controls.AutoSuggestBoxSuggestionChosenEventArgs>
+XForms.Controls.AutoSuggestBox.SuggestionCount.get -> int
+XForms.Controls.AutoSuggestBox.Text.get -> string
+XForms.Controls.AutoSuggestBox.Text.set -> void
+XForms.Controls.AutoSuggestBox.TextChanged -> System.EventHandler<XForms.Controls.AutoSuggestBoxTextChangedEventArgs>
+XForms.Controls.AutoSuggestBoxListView
+XForms.Controls.AutoSuggestBoxListView.AutoSuggestBox.get -> XForms.Controls.AutoSuggestBox
+XForms.Controls.AutoSuggestBoxListView.HighlightedIndex.get -> int
+XForms.Controls.AutoSuggestBoxListView.PressedIndex.get -> int
+XForms.Controls.AutoSuggestBoxQuerySubmittedEventArgs
+XForms.Controls.AutoSuggestBoxQuerySubmittedEventArgs.AutoSuggestBoxQuerySubmittedEventArgs(string queryText, string chosenSuggestion) -> void
+XForms.Controls.AutoSuggestBoxQuerySubmittedEventArgs.ChosenSuggestion.get -> string
+XForms.Controls.AutoSuggestBoxQuerySubmittedEventArgs.QueryText.get -> string
+XForms.Controls.AutoSuggestBoxSuggestionChosenEventArgs
+XForms.Controls.AutoSuggestBoxSuggestionChosenEventArgs.AutoSuggestBoxSuggestionChosenEventArgs(string selectedItem) -> void
+XForms.Controls.AutoSuggestBoxSuggestionChosenEventArgs.SelectedItem.get -> string
+XForms.Controls.AutoSuggestBoxTextChangedEventArgs
+XForms.Controls.AutoSuggestBoxTextChangedEventArgs.AutoSuggestBoxTextChangedEventArgs(XForms.Controls.AutoSuggestionBoxTextChangeReason reason) -> void
+XForms.Controls.AutoSuggestBoxTextChangedEventArgs.Reason.get -> XForms.Controls.AutoSuggestionBoxTextChangeReason
+XForms.Controls.AutoSuggestionBoxTextChangeReason
+XForms.Controls.AutoSuggestionBoxTextChangeReason.ProgrammaticChange = 1 -> XForms.Controls.AutoSuggestionBoxTextChangeReason
+XForms.Controls.AutoSuggestionBoxTextChangeReason.SuggestionChosen = 2 -> XForms.Controls.AutoSuggestionBoxTextChangeReason
+XForms.Controls.AutoSuggestionBoxTextChangeReason.UserInput = 0 -> XForms.Controls.AutoSuggestionBoxTextChangeReason
+XForms.Controls.CheckBox
+XForms.Controls.CheckBox.BoxBounds.get -> XForms.Rect
+XForms.Controls.CheckBox.CheckBox() -> void
+XForms.Controls.CheckBox.CreateTextFormat() -> XForms.TextFormat
+XForms.Controls.CheckBox.IsChecked.get -> bool?
+XForms.Controls.CheckBox.IsChecked.set -> void
+XForms.Controls.CheckBox.IsCheckedChanged -> System.EventHandler
+XForms.Controls.CheckBox.IsThreeState.get -> bool
+XForms.Controls.CheckBox.IsThreeState.set -> void
+XForms.Controls.CheckBox.Text.get -> string
+XForms.Controls.CheckBox.Text.set -> void
+XForms.Controls.CheckBox.TextBounds.get -> XForms.Rect
+XForms.Controls.NumberBox
+XForms.Controls.NumberBox.DownButtonBounds.get -> XForms.Rect
+XForms.Controls.NumberBox.LargeChange.get -> double
+XForms.Controls.NumberBox.LargeChange.set -> void
+XForms.Controls.NumberBox.Maximum.get -> double
+XForms.Controls.NumberBox.Maximum.set -> void
+XForms.Controls.NumberBox.Minimum.get -> double
+XForms.Controls.NumberBox.Minimum.set -> void
+XForms.Controls.NumberBox.NumberBox() -> void
+XForms.Controls.NumberBox.PlaceholderText.get -> string
+XForms.Controls.NumberBox.PlaceholderText.set -> void
+XForms.Controls.NumberBox.PressedPart.get -> XForms.Controls.NumberBoxPart
+XForms.Controls.NumberBox.SmallChange.get -> double
+XForms.Controls.NumberBox.SmallChange.set -> void
+XForms.Controls.NumberBox.SpinButtonPlacementMode.get -> XForms.Controls.NumberBoxSpinButtonPlacementMode
+XForms.Controls.NumberBox.SpinButtonPlacementMode.set -> void
+XForms.Controls.NumberBox.UpButtonBounds.get -> XForms.Rect
+XForms.Controls.NumberBox.Value.get -> double
+XForms.Controls.NumberBox.Value.set -> void
+XForms.Controls.NumberBox.ValueChanged -> System.EventHandler<XForms.Controls.RangeValueChangedEventArgs>
+XForms.Controls.NumberBoxPart
+XForms.Controls.NumberBoxPart.DownButton = 2 -> XForms.Controls.NumberBoxPart
+XForms.Controls.NumberBoxPart.None = 0 -> XForms.Controls.NumberBoxPart
+XForms.Controls.NumberBoxPart.UpButton = 1 -> XForms.Controls.NumberBoxPart
+XForms.Controls.NumberBoxSpinButtonPlacementMode
+XForms.Controls.NumberBoxSpinButtonPlacementMode.Hidden = 0 -> XForms.Controls.NumberBoxSpinButtonPlacementMode
+XForms.Controls.NumberBoxSpinButtonPlacementMode.Inline = 1 -> XForms.Controls.NumberBoxSpinButtonPlacementMode
+XForms.Controls.PasswordBox
+XForms.Controls.PasswordBox.IsPasswordRevealed.get -> bool
+XForms.Controls.PasswordBox.IsRevealButtonVisible.get -> bool
+XForms.Controls.PasswordBox.Password.get -> string
+XForms.Controls.PasswordBox.Password.set -> void
+XForms.Controls.PasswordBox.PasswordBox() -> void
+XForms.Controls.PasswordBox.PasswordChanged -> System.EventHandler
+XForms.Controls.PasswordBox.PasswordRevealMode.get -> XForms.Controls.PasswordRevealMode
+XForms.Controls.PasswordBox.PasswordRevealMode.set -> void
+XForms.Controls.PasswordBox.PlaceholderText.get -> string
+XForms.Controls.PasswordBox.PlaceholderText.set -> void
+XForms.Controls.PasswordBox.RevealButtonBounds.get -> XForms.Rect
+XForms.Controls.PasswordRevealMode
+XForms.Controls.PasswordRevealMode.Hidden = 1 -> XForms.Controls.PasswordRevealMode
+XForms.Controls.PasswordRevealMode.Peek = 0 -> XForms.Controls.PasswordRevealMode
+XForms.Controls.PasswordRevealMode.Visible = 2 -> XForms.Controls.PasswordRevealMode
+XForms.Controls.ProgressBar
+XForms.Controls.ProgressBar.IsIndeterminate.get -> bool
+XForms.Controls.ProgressBar.IsIndeterminate.set -> void
+XForms.Controls.ProgressBar.ProgressBar() -> void
+XForms.Controls.ProgressBar.ShowError.get -> bool
+XForms.Controls.ProgressBar.ShowError.set -> void
+XForms.Controls.ProgressBar.ShowPaused.get -> bool
+XForms.Controls.ProgressBar.ShowPaused.set -> void
+XForms.Controls.RangeBase
+XForms.Controls.RangeBase.Fraction.get -> double
+XForms.Controls.RangeBase.Maximum.get -> double
+XForms.Controls.RangeBase.Maximum.set -> void
+XForms.Controls.RangeBase.Minimum.get -> double
+XForms.Controls.RangeBase.Minimum.set -> void
+XForms.Controls.RangeBase.RangeBase() -> void
+XForms.Controls.RangeBase.Value.get -> double
+XForms.Controls.RangeBase.Value.set -> void
+XForms.Controls.RangeBase.ValueChanged -> System.EventHandler<XForms.Controls.RangeValueChangedEventArgs>
+XForms.Controls.RangeValueChangedEventArgs
+XForms.Controls.RangeValueChangedEventArgs.NewValue.get -> double
+XForms.Controls.RangeValueChangedEventArgs.OldValue.get -> double
+XForms.Controls.RangeValueChangedEventArgs.RangeValueChangedEventArgs(double oldValue, double newValue) -> void
+XForms.Controls.Slider
+XForms.Controls.Slider.Header.get -> string
+XForms.Controls.Slider.Header.set -> void
+XForms.Controls.Slider.HeaderBounds.get -> XForms.Rect
+XForms.Controls.Slider.IsDragging.get -> bool
+XForms.Controls.Slider.LargeChange.get -> double
+XForms.Controls.Slider.LargeChange.set -> void
+XForms.Controls.Slider.Slider() -> void
+XForms.Controls.Slider.SmallChange.get -> double
+XForms.Controls.Slider.SmallChange.set -> void
+XForms.Controls.Slider.StepFrequency.get -> double
+XForms.Controls.Slider.StepFrequency.set -> void
+XForms.Controls.Slider.ThumbCenter.get -> XForms.Point
+XForms.Controls.Slider.TrackBounds.get -> XForms.Rect
+XForms.Controls.Slider.ValuePosition.get -> float
+XForms.Controls.TimePicker
+XForms.Controls.TimePicker.ClockIdentifier.get -> string
+XForms.Controls.TimePicker.ClockIdentifier.set -> void
+XForms.Controls.TimePicker.FormatTime(System.TimeSpan time) -> string
+XForms.Controls.TimePicker.Is24HourClock.get -> bool
+XForms.Controls.TimePicker.MinuteIncrement.get -> int
+XForms.Controls.TimePicker.MinuteIncrement.set -> void
+XForms.Controls.TimePicker.PlaceholderText.get -> string
+XForms.Controls.TimePicker.PlaceholderText.set -> void
+XForms.Controls.TimePicker.SelectedTime.get -> System.TimeSpan?
+XForms.Controls.TimePicker.SelectedTime.set -> void
+XForms.Controls.TimePicker.SelectedTimeChanged -> System.EventHandler<System.TimeSpan?>
+XForms.Controls.TimePicker.TimePicker() -> void
+XForms.Controls.TimePickerView
+XForms.Controls.TimePickerView.AcceptBounds.get -> XForms.Rect
+XForms.Controls.TimePickerView.ColumnCount.get -> int
+XForms.Controls.TimePickerView.DismissBounds.get -> XForms.Rect
+XForms.Controls.TimePickerView.FocusedColumn.get -> int
+XForms.Controls.TimePickerView.GetColumnBounds(int column) -> XForms.Rect
+XForms.Controls.TimePickerView.GetRowBounds(int column, int row) -> XForms.Rect
+XForms.Controls.TimePickerView.GetText(int column, int offset) -> string
+XForms.Controls.TimePickerView.PressedColumn.get -> int
+XForms.Controls.TimePickerView.PressedPart.get -> XForms.Controls.TimePickerViewPart
+XForms.Controls.TimePickerView.PressedRow.get -> int
+XForms.Controls.TimePickerView.Time.get -> System.TimeSpan
+XForms.Controls.TimePickerView.TimePicker.get -> XForms.Controls.TimePicker
+XForms.Controls.TimePickerViewPart
+XForms.Controls.TimePickerViewPart.Accept = 2 -> XForms.Controls.TimePickerViewPart
+XForms.Controls.TimePickerViewPart.Column = 1 -> XForms.Controls.TimePickerViewPart
+XForms.Controls.TimePickerViewPart.Dismiss = 3 -> XForms.Controls.TimePickerViewPart
+XForms.Controls.TimePickerViewPart.None = 0 -> XForms.Controls.TimePickerViewPart
+XForms.Controls.ToggleSwitch
+XForms.Controls.ToggleSwitch.CreateHeaderFormat() -> XForms.TextFormat
+XForms.Controls.ToggleSwitch.CreateTextFormat() -> XForms.TextFormat
+XForms.Controls.ToggleSwitch.Header.get -> string
+XForms.Controls.ToggleSwitch.Header.set -> void
+XForms.Controls.ToggleSwitch.HeaderBounds.get -> XForms.Rect
+XForms.Controls.ToggleSwitch.IsOn.get -> bool
+XForms.Controls.ToggleSwitch.IsOn.set -> void
+XForms.Controls.ToggleSwitch.OffContent.get -> string
+XForms.Controls.ToggleSwitch.OffContent.set -> void
+XForms.Controls.ToggleSwitch.OnContent.get -> string
+XForms.Controls.ToggleSwitch.OnContent.set -> void
+XForms.Controls.ToggleSwitch.StateText.get -> string
+XForms.Controls.ToggleSwitch.TextBounds.get -> XForms.Rect
+XForms.Controls.ToggleSwitch.ToggleSwitch() -> void
+XForms.Controls.ToggleSwitch.Toggled -> System.EventHandler<XForms.Controls.ToggledEventArgs>
+XForms.Controls.ToggleSwitch.TrackBounds.get -> XForms.Rect
 XForms.Controls.UserControl.IsBuilt.get -> bool
+const XForms.Controls.AutoSuggestBox.MaximumSuggestions = 8 -> int
+const XForms.Controls.AutoSuggestBoxListView.RowHeight = 36 -> float
+const XForms.Controls.CheckBox.BoxSize = 20 -> float
+const XForms.Controls.CheckBox.TextGap = 8 -> float
+const XForms.Controls.NumberBox.SpinButtonWidth = 32 -> float
+const XForms.Controls.PasswordBox.RevealButtonWidth = 36 -> float
+const XForms.Controls.ProgressBar.DefaultHeight = 4 -> float
+const XForms.Controls.Slider.ThumbSize = 20 -> float
+const XForms.Controls.Slider.TouchHeight = 32 -> float
+const XForms.Controls.TimePicker.TwelveHourClock = "12HourClock" -> string
+const XForms.Controls.TimePicker.TwentyFourHourClock = "24HourClock" -> string
+const XForms.Controls.TimePickerView.RowHeight = 40 -> float
+const XForms.Controls.TimePickerView.VisibleRows = 5 -> int
+const XForms.Controls.ToggleSwitch.TextGap = 12 -> float
+const XForms.Controls.ToggleSwitch.TouchHeight = 32 -> float
+const XForms.Controls.ToggleSwitch.TrackHeight = 20 -> float
+const XForms.Controls.ToggleSwitch.TrackWidth = 40 -> float
+override XForms.Controls.AutoSuggestBox.AccessibilityIsExpanded.get -> bool?
+override XForms.Controls.AutoSuggestBox.Build() -> XForms.View
+override XForms.Controls.AutoSuggestBox.DefaultAccessibilityLabel.get -> string
+override XForms.Controls.AutoSuggestBox.DefaultAccessibilityRole.get -> XForms.AccessibilityRole
+override XForms.Controls.AutoSuggestBox.OnKeyDown(XForms.KeyEventArgs keyInputEvent) -> void
+override XForms.Controls.AutoSuggestBox.PerformAccessibilityAction(XForms.AccessibilityAction action) -> bool
 override XForms.Controls.CalendarDatePicker.GetUserState() -> object
 override XForms.Controls.CalendarDatePicker.OnAttaching(XForms.Theme theme) -> void
 override XForms.Controls.CalendarDatePicker.SetUserState(object state) -> void
+override XForms.Controls.CheckBox.AccessibilityIsChecked.get -> bool?
+override XForms.Controls.CheckBox.AccessibilityIsMixed.get -> bool
+override XForms.Controls.CheckBox.DefaultAccessibilityLabel.get -> string
+override XForms.Controls.CheckBox.DefaultAccessibilityRole.get -> XForms.AccessibilityRole
+override XForms.Controls.CheckBox.GetUserState() -> object
+override XForms.Controls.CheckBox.IsAccessibilityActionSupported(XForms.AccessibilityAction action) -> bool
+override XForms.Controls.CheckBox.MeasureOverride(XForms.Size availableSize) -> XForms.Size
+override XForms.Controls.CheckBox.OnActivate() -> void
+override XForms.Controls.CheckBox.OnAttaching(XForms.Theme theme) -> void
+override XForms.Controls.CheckBox.SetUserState(object state) -> void
 override XForms.Controls.ComboBox.GetUserState() -> object
 override XForms.Controls.ComboBox.OnAttaching(XForms.Theme theme) -> void
 override XForms.Controls.ComboBox.SetUserState(object state) -> void
@@ -12,14 +216,80 @@ override XForms.Controls.ListView.GetUserState() -> object
 override XForms.Controls.ListView.OnAttaching(XForms.Theme theme) -> void
 override XForms.Controls.ListView.SetUserState(object state) -> void
 override XForms.Controls.ListViewItem.OnHotReload() -> void
+override XForms.Controls.NumberBox.AccessibilityRange.get -> XForms.AccessibilityRange?
+override XForms.Controls.NumberBox.Build() -> XForms.View
+override XForms.Controls.NumberBox.DefaultAccessibilityLabel.get -> string
+override XForms.Controls.NumberBox.DefaultAccessibilityRole.get -> XForms.AccessibilityRole
+override XForms.Controls.NumberBox.GetUserState() -> object
+override XForms.Controls.NumberBox.IsAccessibilityActionSupported(XForms.AccessibilityAction action) -> bool
+override XForms.Controls.NumberBox.OnAttaching(XForms.Theme theme) -> void
+override XForms.Controls.NumberBox.OnKeyDown(XForms.KeyEventArgs keyInputEvent) -> void
+override XForms.Controls.NumberBox.OnPointerCanceled(XForms.PointerEventArgs e) -> void
+override XForms.Controls.NumberBox.OnPointerPressed(XForms.PointerEventArgs e) -> void
+override XForms.Controls.NumberBox.OnPointerReleased(XForms.PointerEventArgs e) -> void
+override XForms.Controls.NumberBox.PerformAccessibilityAction(XForms.AccessibilityAction action) -> bool
+override XForms.Controls.NumberBox.SetAccessibilityRangeValue(double value) -> bool
+override XForms.Controls.NumberBox.SetUserState(object state) -> void
+override XForms.Controls.PasswordBox.Build() -> XForms.View
+override XForms.Controls.PasswordBox.OnPointerCanceled(XForms.PointerEventArgs e) -> void
+override XForms.Controls.PasswordBox.OnPointerPressed(XForms.PointerEventArgs e) -> void
+override XForms.Controls.PasswordBox.OnPointerReleased(XForms.PointerEventArgs e) -> void
+override XForms.Controls.ProgressBar.AccessibilityRange.get -> XForms.AccessibilityRange?
+override XForms.Controls.ProgressBar.DefaultAccessibilityRole.get -> XForms.AccessibilityRole
+override XForms.Controls.ProgressBar.MeasureOverride(XForms.Size availableSize) -> XForms.Size
 override XForms.Controls.RadioButtons.GetUserState() -> object
 override XForms.Controls.RadioButtons.OnAttaching(XForms.Theme theme) -> void
 override XForms.Controls.RadioButtons.SetUserState(object state) -> void
+override XForms.Controls.RangeBase.AccessibilityRange.get -> XForms.AccessibilityRange?
+override XForms.Controls.Slider.CoerceValue(double value) -> double
+override XForms.Controls.Slider.DefaultAccessibilityLabel.get -> string
+override XForms.Controls.Slider.DefaultAccessibilityRole.get -> XForms.AccessibilityRole
+override XForms.Controls.Slider.GetUserState() -> object
+override XForms.Controls.Slider.IsAccessibilityActionSupported(XForms.AccessibilityAction action) -> bool
+override XForms.Controls.Slider.MeasureOverride(XForms.Size availableSize) -> XForms.Size
+override XForms.Controls.Slider.OnAttaching(XForms.Theme theme) -> void
+override XForms.Controls.Slider.OnKeyDown(XForms.KeyEventArgs keyInputEvent) -> void
+override XForms.Controls.Slider.OnPointerCanceled(XForms.PointerEventArgs e) -> void
+override XForms.Controls.Slider.OnPointerMoved(XForms.PointerEventArgs e) -> void
+override XForms.Controls.Slider.OnPointerPressed(XForms.PointerEventArgs e) -> void
+override XForms.Controls.Slider.OnPointerReleased(XForms.PointerEventArgs e) -> void
+override XForms.Controls.Slider.PerformAccessibilityAction(XForms.AccessibilityAction action) -> bool
+override XForms.Controls.Slider.SetAccessibilityRangeValue(double value) -> bool
+override XForms.Controls.Slider.SetUserState(object state) -> void
 override XForms.Controls.TabStripItem.GetUserState() -> object
 override XForms.Controls.TabStripItem.OnAttaching(XForms.Theme theme) -> void
 override XForms.Controls.TabStripItem.SetUserState(object state) -> void
 override XForms.Controls.TemplatedContentControl.OnHotReload() -> void
 override XForms.Controls.TemplatedControl.OnHotReload() -> void
+override XForms.Controls.TimePicker.ClosePicker() -> void
+override XForms.Controls.TimePicker.DefaultAccessibilityLabel.get -> string
+override XForms.Controls.TimePicker.DisplayText.get -> string
+override XForms.Controls.TimePicker.GetUserState() -> object
+override XForms.Controls.TimePicker.IsPickerOpen.get -> bool
+override XForms.Controls.TimePicker.IsPlaceholder.get -> bool
+override XForms.Controls.TimePicker.MaximumTextWidth.get -> float
+override XForms.Controls.TimePicker.OnAttaching(XForms.Theme theme) -> void
+override XForms.Controls.TimePicker.OpenPicker() -> void
+override XForms.Controls.TimePicker.SetUserState(object state) -> void
+override XForms.Controls.TimePickerView.AccessibilityValue.get -> string
+override XForms.Controls.ToggleSwitch.AccessibilityIsChecked.get -> bool?
+override XForms.Controls.ToggleSwitch.DefaultAccessibilityLabel.get -> string
+override XForms.Controls.ToggleSwitch.DefaultAccessibilityRole.get -> XForms.AccessibilityRole
+override XForms.Controls.ToggleSwitch.GetUserState() -> object
+override XForms.Controls.ToggleSwitch.IsAccessibilityActionSupported(XForms.AccessibilityAction action) -> bool
+override XForms.Controls.ToggleSwitch.MeasureOverride(XForms.Size availableSize) -> XForms.Size
+override XForms.Controls.ToggleSwitch.OnActivate() -> void
+override XForms.Controls.ToggleSwitch.OnAttaching(XForms.Theme theme) -> void
+override XForms.Controls.ToggleSwitch.SetUserState(object state) -> void
 override XForms.Controls.UserControl.OnAttaching(XForms.Theme theme) -> void
 override XForms.Controls.UserControl.OnHotReload() -> void
+static readonly XForms.Controls.AutoSuggestBox.TextProperty -> XForms.ViewProperty<XForms.Controls.AutoSuggestBox, string>
+static readonly XForms.Controls.CheckBox.IsCheckedProperty -> XForms.ViewProperty<XForms.Controls.CheckBox, bool?>
+static readonly XForms.Controls.NumberBox.ValueProperty -> XForms.ViewProperty<XForms.Controls.NumberBox, double>
+static readonly XForms.Controls.PasswordBox.PasswordProperty -> XForms.ViewProperty<XForms.Controls.PasswordBox, string>
+static readonly XForms.Controls.ProgressBar.ValueProperty -> XForms.ViewProperty<XForms.Controls.ProgressBar, double>
+static readonly XForms.Controls.Slider.ValueProperty -> XForms.ViewProperty<XForms.Controls.Slider, double>
+static readonly XForms.Controls.TimePicker.SelectedTimeProperty -> XForms.ViewProperty<XForms.Controls.TimePicker, System.TimeSpan?>
+static readonly XForms.Controls.ToggleSwitch.IsOnProperty -> XForms.ViewProperty<XForms.Controls.ToggleSwitch, bool>
+virtual XForms.Controls.RangeBase.CoerceValue(double value) -> double
 virtual XForms.Controls.UserControl.Build() -> XForms.View

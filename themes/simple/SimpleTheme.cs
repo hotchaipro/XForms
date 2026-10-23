@@ -53,7 +53,17 @@ namespace XForms.Themes.Simple
             .With(new TabStripTemplate())
             .With(new CommandListViewItemTemplate())
             .With(new HyperlinkButtonTemplate())
-            .With(new MessageBoxTemplate());
+            .With(new MessageBoxTemplate())
+            .With(new CheckBoxTemplate())
+            .With(new ToggleSwitchTemplate())
+            .With(new SliderTemplate())
+            .With(new ProgressBarTemplate())
+            .With(new TimePickerTemplate())
+            .With(new TimePickerViewTemplate())
+            .With(new NumberBoxTemplate())
+            .With(new PasswordBoxTemplate())
+            .With(new AutoSuggestBoxTemplate())
+            .With(new AutoSuggestBoxListViewTemplate());
 
         private static Theme WithDefault<TExtension>(
             Theme theme,

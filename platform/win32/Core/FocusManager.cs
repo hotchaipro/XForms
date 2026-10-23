@@ -200,10 +200,14 @@ namespace XForms.Win32
                 return false;
             }
 
-            // A native text entry handles its own keys (except Tab and Escape)
+            // A native text entry handles its own keys (except Tab and Escape),
+            // but a single-line one offers the keys it has no use for (Up,
+            // Down, Page Up, Page Down and Escape) to its ancestors first, for
+            // a suggestion list or a number box
             bool isTextBox = this._focused is TextBoxRenderer;
+            bool offersKey = isTextBox && !((TextBoxRenderer)this._focused).Multiline && View.IsTextBoxNavigationKey(key);
 
-            if (!isTextBox && this.DispatchKey(new KeyEventArgs(key, modifiers), isDown: true))
+            if ((!isTextBox || offersKey) && this.DispatchKey(new KeyEventArgs(key, modifiers), isDown: true))
             {
                 return true;
             }
