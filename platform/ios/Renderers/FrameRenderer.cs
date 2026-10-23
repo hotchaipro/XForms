@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using UIKit;
 using XForms.Platform;
 using NativeView = UIKit.UIView;
@@ -28,10 +29,165 @@ namespace XForms.iOS.Renderers
                 BackgroundColor = UIColor.SystemBackground,
             };
 
-            this._viewController = new UIViewController();
+            this._viewController = new RootViewController(frame);
             this._viewController.View = view;
 
             this.SetNativeElement(view);
+        }
+
+        /// <summary>
+        /// Goes back a page, if the app can. Returns whether it did.
+        /// </summary>
+        internal static bool GoBack()
+        {
+            var application = Application.Current;
+            if ((null != application) && application.CanGoBack)
+            {
+                ApplicationHost.For(application).Back();
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// The view with keyboard focus in the window, or null: the first
+        /// responder's view (a layer's focused lightweight view, or a text box).
+        /// </summary>
+        internal static View FocusedView(
+            UIWindow window)
+        {
+            for (var view = (null == window) ? null : RootView.FindFirstResponder(window); null != view; view = view.Superview)
+            {
+                if (view is NativeLayoutView layout)
+                {
+                    return LayerHost.For(layout.Owner).FocusedLightweight ?? layout.Owner;
+                }
+
+                if (view is TextBoxRenderer.NativeTextEntryView textEntry)
+                {
+                    return textEntry.Owner;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// A view gave up keyboard focus: if nothing took it, the root takes it,
+        /// so a hardware keyboard's keys still reach the app.
+        /// </summary>
+        internal static void KeyboardFocusLost(
+            UIWindow window)
+        {
+            CoreFoundation.DispatchQueue.MainQueue.DispatchAsync(() =>
+            {
+                if ((window?.RootViewController is RootViewController controller) && (null == RootView.FindFirstResponder(window)))
+                {
+                    controller.BecomeFirstResponder();
+                }
+            });
+        }
+
+        // Has keyboard focus when no view does, and handles the keys no view
+        // used: Tab starts at the first (or last) focusable view, and Escape
+        // and Command+[ go back, as on the desktop and in the browser
+        private sealed class RootViewController : UIViewController
+        {
+            private readonly Frame _frame;
+            private readonly HashSet<Key> _handledKeys = new HashSet<Key>();
+
+            public RootViewController(
+                Frame frame)
+            {
+                this._frame = frame;
+            }
+
+            public override bool CanBecomeFirstResponder
+            {
+                get
+                {
+                    return true;
+                }
+            }
+
+            public override void ViewDidAppear(
+                bool animated)
+            {
+                base.ViewDidAppear(animated);
+                KeyboardFocusLost(this.View.Window);
+            }
+
+            public override void PressesBegan(
+                Foundation.NSSet<UIPress> presses,
+                UIPressesEvent evt)
+            {
+                bool handled = false;
+                foreach (var press in presses)
+                {
+                    var uiKey = press.Key;
+                    if (null == uiKey)
+                    {
+                        continue;
+                    }
+
+                    var key = NativeLayoutView.ToKey(uiKey.KeyCode);
+                    var modifiers = NativeLayoutView.ToKeyModifiers(uiKey.ModifierFlags);
+                    if (this.OnKeyDown(key, modifiers, uiKey.KeyCode))
+                    {
+                        this._handledKeys.Add(key);
+                        handled = true;
+                    }
+                }
+
+                if (!handled)
+                {
+                    base.PressesBegan(presses, evt);
+                }
+            }
+
+            public override void PressesEnded(
+                Foundation.NSSet<UIPress> presses,
+                UIPressesEvent evt)
+            {
+                bool handled = false;
+                foreach (var press in presses)
+                {
+                    var uiKey = press.Key;
+                    if (null != uiKey)
+                    {
+                        handled |= this._handledKeys.Remove(NativeLayoutView.ToKey(uiKey.KeyCode));
+                    }
+                }
+
+                if (!handled)
+                {
+                    base.PressesEnded(presses, evt);
+                }
+            }
+
+            public override bool AccessibilityPerformEscape()
+            {
+                return GoBack();
+            }
+
+            private bool OnKeyDown(
+                Key key,
+                KeyModifiers modifiers,
+                UIKeyboardHidUsage usage)
+            {
+                // Tab reaches the root only when nothing has focus: it starts
+                // in the open popup, if there's one, or the page
+                if ((key == Key.Tab) && ((modifiers & ~KeyModifiers.Shift) == KeyModifiers.None) && this.IsFirstResponder)
+                {
+                    var scope = PopupRenderer.TopModalContent ?? this._frame;
+                    return LayerHost.For(scope).MoveFocus(isForward: !modifiers.HasFlag(KeyModifiers.Shift));
+                }
+
+                bool isBack = ((key == Key.Escape) && (modifiers == KeyModifiers.None))
+                    || ((usage == UIKeyboardHidUsage.KeyboardOpenBracket) && (modifiers == KeyModifiers.Meta));
+                return isBack && GoBack();
+            }
         }
 
         // Reports its size: the root frame is the window's content, above the
@@ -85,7 +241,7 @@ namespace XForms.iOS.Renderers
                 }
             }
 
-            private static NativeView FindFirstResponder(
+            internal static NativeView FindFirstResponder(
                 NativeView view)
             {
                 if (view.IsFirstResponder)

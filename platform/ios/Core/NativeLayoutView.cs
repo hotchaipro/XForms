@@ -85,6 +85,14 @@ namespace XForms.iOS
             }
         }
 
+        internal View Owner
+        {
+            get
+            {
+                return this._owner;
+            }
+        }
+
         /// <summary>
         /// Draws the lightweight views inside this view, beneath its subviews.
         /// </summary>
@@ -96,6 +104,17 @@ namespace XForms.iOS
                 var drawContext = new DrawContext(UIGraphics.GetCurrentContext(), this.Bounds);
                 LayerHost.For(this._owner).PaintLightweightViews(drawContext);
                 LayerHost.For(this._owner).PaintFocusRing(drawContext);
+            }
+
+            // A focused view with a layer of its own has its ring inside it,
+            // as a lightweight view's is around it
+            if (this._owner.IsFocused)
+            {
+                var bounds = this.Bounds;
+                var ring = UIBezierPath.FromRoundedRect(new CGRect(bounds.X + 1, bounds.Y + 1, bounds.Width - 2, bounds.Height - 2), 4);
+                ring.LineWidth = 2;
+                this._owner.ActualTheme.Colors.Foreground.ToUIColor().SetStroke();
+                ring.Stroke();
             }
         }
 
@@ -207,7 +226,8 @@ namespace XForms.iOS
         {
             get
             {
-                return (this._owner.AccessibilityRole != AccessibilityRole.None) && !LayerHost.For(this._owner).IsHiddenFromAccessibility;
+                var role = this._owner.AccessibilityRole;
+                return (role != AccessibilityRole.None) && !NativeAccessibility.IsContainer(role) && !LayerHost.For(this._owner).IsHiddenFromAccessibility;
             }
 
             set
@@ -251,6 +271,23 @@ namespace XForms.iOS
             }
         }
 
+        [Export("accessibilityExpandedStatus")]
+        public nint ExpandedStatus
+        {
+            get
+            {
+                return NativeAccessibility.ExpandedStatusFor(this._owner);
+            }
+        }
+
+        // VoiceOver's escape gesture (a two-finger scrub) does what Escape
+        // does: closes a menu or a dialog, or (unhandled, at the root) goes back
+        public override bool AccessibilityPerformEscape()
+        {
+            // The view's ancestors get it here, so enclosing views don't again
+            return LayerHost.For(this._owner).RouteKeyDown(new KeyEventArgs(Key.Escape, KeyModifiers.None)) || Renderers.FrameRenderer.GoBack();
+        }
+
         public override bool AccessibilityActivate()
         {
             return LayerHost.For(this._owner).IsAccessibilityActionable && LayerHost.For(this._owner).PerformDefaultAccessibilityAction();
@@ -270,14 +307,14 @@ namespace XForms.iOS
         [Export("accessibilityElements")]
         public NSObject[] GetAccessibilityElements()
         {
-            if ((this._owner.AccessibilityRole != AccessibilityRole.None) || !LayerHost.For(this._owner).HasLightweightChildren)
+            var role = this._owner.AccessibilityRole;
+            if (((role != AccessibilityRole.None) && !NativeAccessibility.IsContainer(role)) || !LayerHost.For(this._owner).HasLightweightChildren)
             {
                 return null;
             }
 
             return NativeAccessibility.ElementsFor(this, this._owner);
         }
-
         #endregion Accessibility
 
         #region Keyboard
@@ -296,6 +333,7 @@ namespace XForms.iOS
             if (result)
             {
                 LayerHost.For(this._owner).NativeFocusChanged(true, isBackward: false);
+                this.SetNeedsDisplay();
             }
 
             return result;
@@ -307,6 +345,8 @@ namespace XForms.iOS
             if (result)
             {
                 LayerHost.For(this._owner).NativeFocusChanged(false, isBackward: false);
+                this.SetNeedsDisplay();
+                Renderers.FrameRenderer.KeyboardFocusLost(this.Window);
             }
 
             return result;
@@ -353,13 +393,20 @@ namespace XForms.iOS
                 }
 
                 var keyEvent = new KeyEventArgs(key, ToKeyModifiers(uiKey.ModifierFlags));
+                if (isDown && (key == Key.Tab) && ((keyEvent.KeyModifiers & ~KeyModifiers.Shift) == KeyModifiers.None)
+                    && Renderers.PopupRenderer.MoveFocusIntoModal(LayerHost.For(this._owner).FocusedLightweight ?? this._owner, !keyEvent.IsShiftDown))
+                {
+                    handled = true;
+                    continue;
+                }
+
                 handled |= isDown ? LayerHost.For(this._owner).RouteKeyDown(keyEvent) : LayerHost.For(this._owner).RouteKeyUp(keyEvent);
             }
 
             return handled;
         }
 
-        private static KeyModifiers ToKeyModifiers(
+        internal static KeyModifiers ToKeyModifiers(
             UIKeyModifierFlags flags)
         {
             var modifiers = KeyModifiers.None;
@@ -370,7 +417,7 @@ namespace XForms.iOS
             return modifiers;
         }
 
-        private static Key ToKey(
+        internal static Key ToKey(
             UIKeyboardHidUsage usage)
         {
             switch (usage)
@@ -391,6 +438,7 @@ namespace XForms.iOS
                 case UIKeyboardHidUsage.KeyboardDeleteOrBackspace: return Key.Back;
                 case UIKeyboardHidUsage.KeyboardDeleteForward: return Key.Delete;
                 case UIKeyboardHidUsage.KeyboardInsert: return Key.Insert;
+                case UIKeyboardHidUsage.KeyboardApplication: return Key.Menu;
                 case UIKeyboardHidUsage.KeyboardF1: return Key.F1;
                 case UIKeyboardHidUsage.KeyboardF2: return Key.F2;
                 case UIKeyboardHidUsage.KeyboardF3: return Key.F3;

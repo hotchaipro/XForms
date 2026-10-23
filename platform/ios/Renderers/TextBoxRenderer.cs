@@ -1,4 +1,6 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
+using Foundation;
 using UIKit;
 using XForms.Primitives;
 using XForms.Platform;
@@ -22,12 +24,13 @@ namespace XForms.iOS.Renderers
         private bool _isPassword;
         private int _maxLength;
         private bool _isReadOnly;
+        private readonly HashSet<Key> _offeredKeys = new HashSet<Key>();
 
         public TextBoxRenderer(
             TextBox textEntry)
             : base(textEntry)
         {
-            this._container = new NativeTextEntryView();
+            this._container = new NativeTextEntryView() { Owner = textEntry };
             this._keyboardOptions = KeyboardOptions.All;
             this._textColor = UIColor.Label;
 
@@ -89,11 +92,7 @@ namespace XForms.iOS.Renderers
             {
                 this._placeholderLabel.Text = value;
 
-                if (null != this._textField)
-                {
-                    this._textField.Placeholder = value;
-                }
-
+                this.ApplyPlaceholder();
                 this._container.RequestLayout();
             }
         }
@@ -152,9 +151,16 @@ namespace XForms.iOS.Renderers
             }
         }
 
-        public void Focus()
+        // The editor takes focus, not its container (Tab moving into the box
+        // comes here)
+        public override bool Focus()
         {
-            this.Editor.BecomeFirstResponder();
+            return this.Editor.BecomeFirstResponder();
+        }
+
+        void ITextBoxRenderer.Focus()
+        {
+            this.Focus();
         }
 
         public Color ForegroundColor
@@ -171,6 +177,7 @@ namespace XForms.iOS.Renderers
             set
             {
                 this._placeholderLabel.TextColor = value.ToUIColor();
+                this.ApplyPlaceholder();
             }
         }
 
@@ -192,13 +199,12 @@ namespace XForms.iOS.Renderers
             string text,
             string placeholderText)
         {
-            var textField = new UITextField()
+            var textField = new NativeTextField(this)
             {
                 Font = CreateFont(),
                 AdjustsFontForContentSizeCategory = true,
                 BorderStyle = UITextBorderStyle.None,
                 Text = text,
-                Placeholder = placeholderText,
                 ReturnKeyType = UIReturnKeyType.Done,
             };
 
@@ -206,6 +212,8 @@ namespace XForms.iOS.Renderers
             textField.EditingDidBegin += (sender, e) => this.OnNativeFocusChanged(true);
             textField.EditingDidEnd += (sender, e) => this.OnNativeFocusChanged(false);
 
+            // The on-screen keyboard's Done key submits and puts the keyboard
+            // away (a hardware keyboard's Return is NativeTextField's)
             textField.ShouldReturn = (field) =>
             {
                 ((ITextBoxDelegate)this.Element).OnNativeSubmitted();
@@ -217,6 +225,7 @@ namespace XForms.iOS.Renderers
             textField.DidChangeSelection += (sender, e) => ((ITextBoxDelegate)this.Element).OnNativeSelectionChanged();
 
             this._textField = textField;
+            this.ApplyPlaceholder();
 
             this.AddEditor(textField);
         }
@@ -224,7 +233,7 @@ namespace XForms.iOS.Renderers
         private void CreateTextView(
             string text)
         {
-            var textView = new UITextView()
+            var textView = new NativeTextView(this)
             {
                 Font = CreateFont(),
                 AdjustsFontForContentSizeCategory = true,
@@ -251,6 +260,7 @@ namespace XForms.iOS.Renderers
             // UITextView has no placeholder of its own
             this._container.Placeholder = this._placeholderLabel;
             this.UpdatePlaceholderVisibility();
+            this.ApplyPlaceholder();
         }
 
         // Editing starts and ends with keyboard focus: the view's IsFocused and
@@ -262,6 +272,95 @@ namespace XForms.iOS.Renderers
             {
                 LayerHost.For(view).NativeFocusChanged(hasFocus, isBackward: false);
             }
+
+            if (!hasFocus)
+            {
+                FrameRenderer.KeyboardFocusLost(this.Editor?.Window);
+            }
+        }
+
+        // Keys from a hardware keyboard, before the editor sees them: Tab moves
+        // focus, and a single-line box offers the keys it has no use for (Up,
+        // Down, Page Up, Page Down and Escape) to its ancestors first, for a
+        // suggestion list or a number box. Returns whether they were used.
+        private bool OnPresses(
+            NSSet<UIPress> presses,
+            bool isDown)
+        {
+            if (!(this.Element is TextBox textBox))
+            {
+                return false;
+            }
+
+            bool handled = false;
+            foreach (var press in presses)
+            {
+                var uiKey = press.Key;
+                if (null == uiKey)
+                {
+                    continue;
+                }
+
+                var key = NativeLayoutView.ToKey(uiKey.KeyCode);
+                var modifiers = NativeLayoutView.ToKeyModifiers(uiKey.ModifierFlags);
+                if ((key == Key.Tab) && ((modifiers & ~KeyModifiers.Shift) == KeyModifiers.None))
+                {
+                    bool isForward = !modifiers.HasFlag(KeyModifiers.Shift);
+                    if (isDown && !PopupRenderer.MoveFocusIntoModal(textBox, isForward))
+                    {
+                        LayerHost.For(textBox).MoveFocus(isForward);
+                    }
+
+                    handled = true;
+                }
+                else if (!this.Multiline && View.IsTextBoxNavigationKey(key))
+                {
+                    if (isDown)
+                    {
+                        if (this.OfferToAncestors(textBox, new KeyEventArgs(key, modifiers)))
+                        {
+                            this._offeredKeys.Add(key);
+                            handled = true;
+                        }
+                    }
+                    else
+                    {
+                        handled = this._offeredKeys.Remove(key);
+                    }
+                }
+            }
+
+            return handled;
+        }
+
+        private bool OfferToAncestors(
+            TextBox textBox,
+            KeyEventArgs keyEvent)
+        {
+            for (var view = textBox.Parent as View; null != view; view = view.Parent as View)
+            {
+                if (LayerHost.For(view).DispatchKeyDown(keyEvent))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool IsReturn(
+            NSSet<UIPress> presses)
+        {
+            foreach (var press in presses)
+            {
+                var code = press.Key?.KeyCode;
+                if ((code == UIKeyboardHidUsage.KeyboardReturnOrEnter) || (code == UIKeyboardHidUsage.KeypadEnter))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private void AddEditor(
@@ -398,6 +497,29 @@ namespace XForms.iOS.Renderers
             }
         }
 
+        // A single-line field's placeholder, in the theme's color (as the
+        // multiline one's label), not UIKit's
+        private void ApplyPlaceholder()
+        {
+            string text = this._placeholderLabel.Text;
+            if (null == this._textField)
+            {
+                // VoiceOver reads a field's placeholder as its name; a text
+                // view's label, drawn over it, is named the same way
+                this._placeholderLabel.IsAccessibilityElement = false;
+                if (null != this._textView)
+                {
+                    this._textView.AccessibilityLabel = text;
+                }
+
+                return;
+            }
+
+            this._textField.AttributedPlaceholder = string.IsNullOrEmpty(text)
+                ? null
+                : new NSAttributedString(text, foregroundColor: this._placeholderLabel.TextColor);
+        }
+
         private void ApplyColors()
         {
             if (null != this._textField)
@@ -429,6 +551,88 @@ namespace XForms.iOS.Renderers
             this._placeholderLabel.Hidden = !String.IsNullOrEmpty(this._textView?.Text);
         }
 
+        // The editors, with hardware keys going through the renderer first
+        private sealed class NativeTextField : UITextField
+        {
+            private readonly WeakReference<TextBoxRenderer> _renderer;
+
+            public NativeTextField(
+                TextBoxRenderer renderer)
+            {
+                this._renderer = new WeakReference<TextBoxRenderer>(renderer);
+            }
+
+            private bool _isReturnDown;
+
+            public override void PressesBegan(
+                NSSet<UIPress> presses,
+                UIPressesEvent evt)
+            {
+                if (!this._renderer.TryGetTarget(out var renderer) || renderer.OnPresses(presses, isDown: true))
+                {
+                    return;
+                }
+
+                // A hardware keyboard's Return submits and keeps focus, as on
+                // the desktop (unless it ends an input method's composition)
+                if (IsReturn(presses) && (null == this.MarkedTextRange))
+                {
+                    this._isReturnDown = true;
+                    ((ITextBoxDelegate)renderer.Element).OnNativeSubmitted();
+                    return;
+                }
+
+                base.PressesBegan(presses, evt);
+            }
+
+            public override void PressesEnded(
+                NSSet<UIPress> presses,
+                UIPressesEvent evt)
+            {
+                if (this._isReturnDown && IsReturn(presses))
+                {
+                    this._isReturnDown = false;
+                    return;
+                }
+
+                if (!this._renderer.TryGetTarget(out var renderer) || !renderer.OnPresses(presses, isDown: false))
+                {
+                    base.PressesEnded(presses, evt);
+                }
+            }
+        }
+
+        private sealed class NativeTextView : UITextView
+        {
+            private readonly WeakReference<TextBoxRenderer> _renderer;
+
+            public NativeTextView(
+                TextBoxRenderer renderer)
+            {
+                this._renderer = new WeakReference<TextBoxRenderer>(renderer);
+            }
+
+            public override void PressesBegan(
+                NSSet<UIPress> presses,
+                UIPressesEvent evt)
+            {
+                if (!this._renderer.TryGetTarget(out var renderer) || !renderer.OnPresses(presses, isDown: true))
+                {
+                    base.PressesBegan(presses, evt);
+                }
+            }
+
+            public override void PressesEnded(
+                NSSet<UIPress> presses,
+                UIPressesEvent evt)
+            {
+                if (!this._renderer.TryGetTarget(out var renderer) || !renderer.OnPresses(presses, isDown: false))
+                {
+                    base.PressesEnded(presses, evt);
+                }
+            }
+        }
+
         /// <summary>
         /// Hosts the native editor (and, for multiline text, a placeholder) at
         /// full width, sized to the editor's content.
@@ -437,6 +641,12 @@ namespace XForms.iOS.Renderers
         {
             private UIView _editor;
             private UIView _placeholder;
+
+            public TextBox Owner
+            {
+                get;
+                set;
+            }
 
             public UIView Editor
             {

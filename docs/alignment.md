@@ -3518,10 +3518,55 @@ Win32, Android and the browser, as before.
     - Text boxes never reported keyboard focus, so the suggestion list
       never opened.
 
-    Not checked on iOS yet: the feedback and structure pages, dark mode,
-    a hardware keyboard and VoiceOver itself (only its tree). Found, not
-    fixed: a popup's items (the suggestion list's) aren't in the
-    accessibility tree.
+    Then a hardware keyboard (an iPad's Magic Keyboard), and the rest of
+    the pass, on an iPad simulator and the iPhone, with idb's key presses:
+    - Tab and Shift+Tab move through the page from anywhere: from nothing
+      focused (the root view controller has focus then, and starts at the
+      first view, as the browser does), out of text boxes (a single-line
+      box also offers Up, Down, Page Up, Page Down and Escape to its
+      ancestors, as on the other platforms), and within an open menu,
+      picker or dialog, as on Win32.
+    - Return in a single-line box submits and keeps focus, as on the
+      desktop (the on-screen keyboard's Done key still puts the keyboard
+      away); an input method's composition keeps its Return.
+    - Escape, and Command+[, go back when nothing uses them; the Menu key
+      opens a context menu.
+    - Focus goes back to where it was when a popup closes, and a focused
+      view with a layer of its own (the navigation view's menu button)
+      draws its ring.
+    - Checked: the forms page from the keyboard (check boxes, the slider's
+      arrows, the time picker opened, changed and accepted, the number box
+      committed on Tab and Return, the suggestions' Down, Return and
+      Escape), the feedback page (the menu from a long press and the Menu
+      key, tooltips on a long press and on focus, an info bar closed, an
+      expander opened), the structure page (the side pane on the iPad, the
+      drawer on the iPhone from a tap and the keyboard, the tree's and the
+      flip view's keys, pull to refresh), the app page (Escape back, a
+      message box answered from the keyboard), the text, input, binding,
+      lists and pickers pages, every page started and shown, dark mode and
+      right to left.
+
+    Fixed on the way:
+    - A text box's focus went to its container, not its editor, so Tab
+      never reached a text box.
+    - VoiceOver: the controls inside an accessible view (an info bar's
+      buttons) are elements of their own, after it; a list, a menu, a tree
+      or a group isn't an element itself, so its items are reached (the
+      navigation pane's, a popup's, the flip view's); a switch reads as a
+      toggle (UIKit's toggle button trait, iOS 17) with its state; expanded
+      and collapsed views report it (iOS 18); a menu, picker or dialog
+      keeps VoiceOver inside it while it's open; VoiceOver's escape gesture
+      does what Escape does; a multiline box is named by its placeholder.
+    - A single-line box's placeholder had UIKit's color, not the theme's.
+
+    Not checked on iOS: VoiceOver's speech itself (only its tree, through
+    idb), Shift+Tab and Command+[ (idb sends no modifiers), and a real
+    device. Found, not fixed: Tab stops on a list once without a ring, and
+    a list has no arrow keys (on any platform: lists have no keyboard
+    navigation yet); a tree's items are each a Tab stop (WinUI's tree is
+    one); VoiceOver still reaches the content behind an open drawer; once,
+    after switching to right to left, the suggestion list's box was left
+    under the keyboard.
 
 29. **Later: `XForms.Xaml`.** The proof of concept in `spikes/XForms.Xaml`
     becomes a layer over the framework and controls, including templates

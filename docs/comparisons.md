@@ -283,7 +283,7 @@ is the primary platform.
 - A small footprint on Windows, with no XAML or Windows App SDK.
 
 **XForms' gaps today:**
-- Platforms: Windows, Android and iOS (iOS only partly tested since the
+- Platforms: Windows, Android and iOS (iOS tested on simulators since the
   restructure), with no macOS, Linux or web yet.
 - Accessibility and keyboard focus are implemented only on Windows.
 - A small control set.

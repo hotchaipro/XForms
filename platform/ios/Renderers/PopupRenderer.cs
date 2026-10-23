@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using CoreGraphics;
 using UIKit;
 using XForms.Primitives;
@@ -100,6 +101,7 @@ namespace XForms.iOS.Renderers
             }
 
             this._isOpen = true;
+            this._previousFocus = FrameRenderer.FocusedView(window);
 
             if (this.IsLightDismissEnabled)
             {
@@ -110,6 +112,15 @@ namespace XForms.iOS.Renderers
             window.AddSubview(contentView);
 
             this.Place(window);
+
+            // A popup that takes the user's attention (a menu, a picker, a
+            // dialog) keeps VoiceOver inside it while it's open
+            if (this.IsLightDismissEnabled)
+            {
+                ModalPopups.Add(this);
+                contentView.AccessibilityViewIsModal = true;
+                UIAccessibility.PostNotification(UIAccessibilityPostNotification.ScreenChanged, contentView);
+            }
         }
 
         private void Place(
@@ -185,10 +196,77 @@ namespace XForms.iOS.Renderers
             }
 
             this._isOpen = false;
-            (this._content?.Renderer.NativeElement as UIView)?.RemoveFromSuperview();
+            ModalPopups.Remove(this);
+            var window = Window;
+            var focused = FrameRenderer.FocusedView(window);
+            var contentView = this._content?.Renderer.NativeElement as UIView;
+            contentView?.RemoveFromSuperview();
             this._dismissLayer.RemoveFromSuperview();
+            if ((null != contentView) && contentView.AccessibilityViewIsModal)
+            {
+                contentView.AccessibilityViewIsModal = false;
+                UIAccessibility.PostNotification(UIAccessibilityPostNotification.ScreenChanged, null);
+            }
+
+            // Keyboard focus that was in the popup (or is nowhere) goes back to
+            // where it was before it opened, as on the desktop
+            var previous = this._previousFocus;
+            this._previousFocus = null;
+            if ((null != previous) && ((null == focused) || this.Contains(focused)))
+            {
+                previous.Focus();
+            }
 
             ((IPopupDelegate)this.Element).NotifyClosed();
+        }
+
+        private View _previousFocus;
+
+        // The open popups that take the user's attention, the top one last
+        private static readonly List<PopupRenderer> ModalPopups = new List<PopupRenderer>();
+
+        /// <summary>
+        /// The content of the top open popup that takes the user's attention
+        /// (a menu, a picker, a dialog), or null: keyboard focus stays inside
+        /// it, as on the desktop.
+        /// </summary>
+        internal static View TopModalContent
+        {
+            get
+            {
+                return (0 < ModalPopups.Count) ? ModalPopups[ModalPopups.Count - 1]._content : null;
+            }
+        }
+
+        /// <summary>
+        /// Tab from a view outside the top open popup (focus left behind on the
+        /// page) moves into the popup. Returns whether it did.
+        /// </summary>
+        internal static bool MoveFocusIntoModal(
+            View from,
+            bool isForward)
+        {
+            var top = ModalPopups.Count > 0 ? ModalPopups[ModalPopups.Count - 1] : null;
+            if ((null == top) || (null == top._content) || top.Contains(from))
+            {
+                return false;
+            }
+
+            return LayerHost.For(top._content).MoveFocus(isForward);
+        }
+
+        private bool Contains(
+            View view)
+        {
+            for (; null != view; view = view.Parent as View)
+            {
+                if (view == this._content)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private void DismissLayer_TouchDown(

@@ -247,7 +247,7 @@ namespace XForms.iOS.Renderers
             this._nativeView?.SetNeedsDisplay();
         }
 
-        public bool Focus()
+        public virtual bool Focus()
         {
             // NOTE: Only native views that can become first responder take focus
             // (owner-drawn and layout views do when their view is focusable)

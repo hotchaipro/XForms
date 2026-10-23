@@ -43,8 +43,55 @@ namespace XForms.iOS
             {
                 value = "Mixed";
             }
+            else if ((null == value) && IsToggle(view) && (view.AccessibilityIsChecked is bool isOn))
+            {
+                // A switch's state, which VoiceOver reads as on or off
+                value = isOn ? "1" : "0";
+            }
 
             return (value == view.AccessibilityLabel) ? null : value;
+        }
+
+        // UIKit's toggle button trait (iOS 17), which isn't bound: a switch
+        // reads as one, with its state as its value
+        private static readonly UIAccessibilityTrait ToggleButtonTrait = LoadToggleButtonTrait();
+
+        private static UIAccessibilityTrait LoadToggleButtonTrait()
+        {
+            if (!UIDevice.CurrentDevice.CheckSystemVersion(17, 0))
+            {
+                return UIAccessibilityTrait.None;
+            }
+
+            var uiKit = ObjCRuntime.Dlfcn.dlopen(ObjCRuntime.Constants.UIKitLibrary, 0);
+            return (UIAccessibilityTrait)ObjCRuntime.Dlfcn.GetUInt64(uiKit, "UIAccessibilityTraitToggleButton");
+        }
+
+        private static bool IsToggle(
+            View view)
+        {
+            return (view.AccessibilityRole == AccessibilityRole.Switch) && (ToggleButtonTrait != UIAccessibilityTrait.None);
+        }
+
+        /// <summary>
+        /// Whether the role is a container of other elements (a list, a menu,
+        /// a tree, a group): VoiceOver reaches what's inside, so it isn't an
+        /// element itself.
+        /// </summary>
+        public static bool IsContainer(
+            AccessibilityRole role)
+        {
+            return (role == AccessibilityRole.List) || (role == AccessibilityRole.Group) || (role == AccessibilityRole.Menu) || (role == AccessibilityRole.Tree);
+        }
+
+        /// <summary>
+        /// UIAccessibilityExpandedStatus (iOS 18): unsupported (0), expanded
+        /// (1) or collapsed (2).
+        /// </summary>
+        public static nint ExpandedStatusFor(
+            View view)
+        {
+            return (view.AccessibilityIsExpanded is bool isExpanded) ? (isExpanded ? 1 : 2) : 0;
         }
 
         /// <summary>
@@ -103,8 +150,13 @@ namespace XForms.iOS
                 traits |= UIAccessibilityTrait.Adjustable;
             }
 
-            // VoiceOver reads a checked toggle as selected
-            if (view.AccessibilityIsSelected || (view.AccessibilityIsChecked == true))
+            if (IsToggle(view))
+            {
+                traits |= ToggleButtonTrait;
+            }
+
+            // VoiceOver reads a checked check box as selected
+            if (view.AccessibilityIsSelected || ((view.AccessibilityIsChecked == true) && !IsToggle(view)))
             {
                 traits |= UIAccessibilityTrait.Selected;
             }
@@ -152,14 +204,41 @@ namespace XForms.iOS
                     continue;
                 }
 
-                if (child.AccessibilityRole != AccessibilityRole.None)
+                if ((child.AccessibilityRole != AccessibilityRole.None) && !IsContainer(child.AccessibilityRole))
                 {
                     elements.Add(new LightweightElement(container, child));
+
+                    // VoiceOver's elements don't nest: the controls inside an
+                    // accessible view (an info bar's buttons) follow it
+                    CollectActionable(container, child, elements);
                 }
                 else
                 {
                     Collect(container, child, elements);
                 }
+            }
+        }
+
+        private static void CollectActionable(
+            NativeLayoutView container,
+            View parent,
+            List<NSObject> elements)
+        {
+            var children = LayerHost.For(parent).Children;
+            for (int i = 0; i < children.Count; i += 1)
+            {
+                var child = children[i];
+                if (!LayerHost.For(child).IsLightweight || !child.IsVisible || LayerHost.For(child).IsHiddenFromAccessibility)
+                {
+                    continue;
+                }
+
+                if ((child.AccessibilityRole != AccessibilityRole.None) && LayerHost.For(child).IsAccessibilityActionable)
+                {
+                    elements.Add(new LightweightElement(container, child));
+                }
+
+                CollectActionable(container, child, elements);
             }
         }
 
@@ -237,6 +316,15 @@ namespace XForms.iOS
 
                 set
                 {
+                }
+            }
+
+            [Export("accessibilityExpandedStatus")]
+            public nint ExpandedStatus
+            {
+                get
+                {
+                    return this._view.TryGetTarget(out var view) ? ExpandedStatusFor(view) : 0;
                 }
             }
 
