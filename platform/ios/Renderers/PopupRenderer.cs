@@ -116,7 +116,14 @@ namespace XForms.iOS.Renderers
             UIWindow window)
         {
             var content = this._content;
+            // The safe area, above the keyboard while it shows
             var safeFrame = window.SafeAreaLayoutGuide.LayoutFrame;
+            var keyboardTop = window.Bounds.Height - FrameRenderer.KeyboardOverlap;
+            if (safeFrame.Bottom > keyboardTop)
+            {
+                safeFrame.Height = (nfloat)Math.Max(0, keyboardTop - safeFrame.Top);
+            }
+
             var windowSize = new Size((float)safeFrame.Width, (float)safeFrame.Height);
 
             Rect frame;

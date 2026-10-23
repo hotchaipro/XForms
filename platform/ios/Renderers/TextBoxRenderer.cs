@@ -203,6 +203,8 @@ namespace XForms.iOS.Renderers
             };
 
             textField.EditingChanged += (sender, e) => ((ITextBoxDelegate)this.Element).OnNativeTextChanged();
+            textField.EditingDidBegin += (sender, e) => this.OnNativeFocusChanged(true);
+            textField.EditingDidEnd += (sender, e) => this.OnNativeFocusChanged(false);
 
             textField.ShouldReturn = (field) =>
             {
@@ -237,6 +239,8 @@ namespace XForms.iOS.Renderers
             textView.TextContainer.LineFragmentPadding = 0;
 
             textView.Changed += this.TextView_Changed;
+            textView.Started += (sender, e) => this.OnNativeFocusChanged(true);
+            textView.Ended += (sender, e) => this.OnNativeFocusChanged(false);
             textView.ShouldChangeText = (view, range, replacement) => this.CanChange(view.Text, range, replacement);
             textView.SelectionChanged += (sender, e) => ((ITextBoxDelegate)this.Element).OnNativeSelectionChanged();
 
@@ -247,6 +251,17 @@ namespace XForms.iOS.Renderers
             // UITextView has no placeholder of its own
             this._container.Placeholder = this._placeholderLabel;
             this.UpdatePlaceholderVisibility();
+        }
+
+        // Editing starts and ends with keyboard focus: the view's IsFocused and
+        // its focus events follow it
+        private void OnNativeFocusChanged(
+            bool hasFocus)
+        {
+            if (this.Element is View view)
+            {
+                LayerHost.For(view).NativeFocusChanged(hasFocus, isBackward: false);
+            }
         }
 
         private void AddEditor(
