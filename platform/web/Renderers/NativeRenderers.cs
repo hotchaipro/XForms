@@ -1023,6 +1023,7 @@ namespace XForms.Web.Renderers
 
             this._isOpen = true;
             var host = WebHost.Current;
+            this._previousFocus = host.FocusedView;
 
             // Without light dismiss, presses outside the content go through
             // the backdrop to the page
@@ -1054,7 +1055,34 @@ namespace XForms.Web.Renderers
             host.UnregisterBackdrop(this._backdropId);
             host.ViewportChanged -= this.Layout;
             Js.SetStyle(this._backdropId, "display", "none");
+
+            // Keyboard focus that was in the popup (or is nowhere now) goes
+            // back to where it was before it opened, as on the desktop
+            var previous = this._previousFocus;
+            this._previousFocus = null;
+            var focused = host.FocusedView;
+            if ((null != previous) && ((null == focused) || this.Contains(focused)))
+            {
+                previous.Focus();
+            }
+
             ((IPopupDelegate)this.Element).NotifyClosed();
+        }
+
+        private View _previousFocus;
+
+        private bool Contains(
+            View view)
+        {
+            for (; null != view; view = view.Parent as View)
+            {
+                if (view == this._content)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         // Below the target, or above it when there's more room there

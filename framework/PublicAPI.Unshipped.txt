@@ -33,9 +33,17 @@ XForms.Application.StartPath.get -> string
 XForms.Application.StartPath.set -> void
 XForms.Application.ThemeExtender.get -> System.Func<XForms.Theme, XForms.Theme>
 XForms.Application.ThemeExtender.set -> void
+XForms.ContextRequestedEventArgs
+XForms.ContextRequestedEventArgs.ContextRequestedEventArgs(XForms.Point? position, XForms.PointerDeviceType? deviceType) -> void
+XForms.ContextRequestedEventArgs.DeviceType.get -> XForms.PointerDeviceType?
+XForms.ContextRequestedEventArgs.Handled.get -> bool
+XForms.ContextRequestedEventArgs.Handled.set -> void
+XForms.ContextRequestedEventArgs.OriginalSource.get -> XForms.View
+XForms.ContextRequestedEventArgs.Position.get -> XForms.Point?
 XForms.HotReloadEventArgs
 XForms.HotReloadEventArgs.HotReloadEventArgs(System.Collections.Generic.IReadOnlyList<System.Type> updatedTypes) -> void
 XForms.HotReloadEventArgs.UpdatedTypes.get -> System.Collections.Generic.IReadOnlyList<System.Type>
+XForms.Key.Menu = 64 -> XForms.Key
 XForms.Page.IsBuilt.get -> bool
 XForms.Page.NavigationPath.get -> string
 XForms.Page.SetResult(object result) -> void
@@ -50,6 +58,7 @@ XForms.Route.Pattern.get -> string
 XForms.Route.this[string name].get -> string
 XForms.Routes
 XForms.Routes.Add(string pattern, System.Func<XForms.Route, XForms.Page> createPage) -> void
+XForms.View.ContextRequested -> System.EventHandler<XForms.ContextRequestedEventArgs>
 XForms.View.Name.get -> string
 XForms.View.Name.set -> void
 override XForms.AccessibilityRange.Equals(object obj) -> bool
@@ -76,6 +85,7 @@ virtual XForms.Page.Build() -> XForms.View
 virtual XForms.View.AccessibilityIsMixed.get -> bool
 virtual XForms.View.AccessibilityRange.get -> XForms.AccessibilityRange?
 virtual XForms.View.GetUserState() -> object
+virtual XForms.View.OnContextRequested(XForms.ContextRequestedEventArgs e) -> void
 virtual XForms.View.OnHotReload() -> void
 virtual XForms.View.SetAccessibilityRangeValue(double value) -> bool
 virtual XForms.View.SetUserState(object state) -> void

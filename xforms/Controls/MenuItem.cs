@@ -61,6 +61,11 @@ namespace XForms.Controls
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        /// <summary>
+        /// Raised when the item is chosen (before its command runs).
+        /// </summary>
+        public event EventHandler Click;
+
         public MenuItem()
         {
             this._isVisible = true;
@@ -105,6 +110,16 @@ namespace XForms.Controls
             {
                 this._text = value;
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Text)));
+            }
+        }
+
+        // Chosen: its click, then its command
+        internal void RaiseClick()
+        {
+            this.Click?.Invoke(this, EventArgs.Empty);
+            if ((null != this._command) && this._command.CanExecute(null))
+            {
+                this._command.Execute(null);
             }
         }
 

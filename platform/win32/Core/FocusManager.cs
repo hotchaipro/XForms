@@ -117,6 +117,7 @@ namespace XForms.Win32
                 case VIRTUAL_KEY.VK_F8: return Key.F8;
                 case VIRTUAL_KEY.VK_F9: return Key.F9;
                 case VIRTUAL_KEY.VK_F10: return Key.F10;
+                case VIRTUAL_KEY.VK_APPS: return Key.Menu;
                 case VIRTUAL_KEY.VK_F11: return Key.F11;
                 case VIRTUAL_KEY.VK_F12: return Key.F12;
                 default:

@@ -3331,7 +3331,7 @@ Win32, Android and the browser, as before.
     - The time picker is drawn, as XForms' date picker is, so it looks the
       same everywhere.
 
-    **Status: step 1 done.**
+    **Status: steps 1 and 2 done.**
 
     Step 1, forms: `CheckBox` (`IsChecked` a `bool?`, `IsThreeState`),
     `ToggleSwitch` (`Header`, `IsOn`, `OnContent` and `OffContent`), a
@@ -3406,6 +3406,45 @@ Win32, Android and the browser, as before.
       nine with a few text boxes, with or without the spell checker, which
       the known issue blamed); text boxes use the classic class, which
       draws the same and didn't crash in 35 starts.
+
+    Step 2, feedback and disclosure: `ToolTip` and `ContextFlyout` on any
+    view, as extension properties (`ViewAttachments`, so an initializer
+    can set them: `new Button { ToolTip = "...", ContextFlyout = new
+    MenuFlyout { Items = { ... } } }`); the tooltip shows after the pointer
+    rests half a second, on keyboard focus, and for a few seconds after a
+    long press on a view without a context menu, beside the view in a popup
+    that doesn't take focus. `MenuFlyout` (the existing `MenuItem`s, now
+    with `Click`; an item whose command can't run is shown unavailable;
+    Up and Down wrap, Enter chooses, Escape closes). `InfoBar` (`Title`,
+    `Message`, `Severity`, `IsOpen`, `IsClosable`, `ActionButton`,
+    `Closed`; read as it opens: UI Automation's live region, ARIA's
+    status, Android's live region) and `Expander` (`Header`, `Content`,
+    `IsExpanded`, `Expanding`, `Collapsed`; the content fades and slides
+    in), on a new feedback page (`/feedback`). What they needed:
+    - Context requests in the framework: `View.ContextRequested` (and
+      `OnContextRequested`), raised for the view under a right-click, a
+      long press of a touch or pen (half a second, held still; answered,
+      the press ends as canceled, so it isn't also a tap), and the focused
+      view on the Menu key (a new `Key.Menu`) or Shift+F10, and then for
+      its ancestors until one answers. On Win32 a right-click had pressed
+      like a left one (it now asks for the context menu), and so had the
+      browser's; Narrator's context menu command reaches it through UI
+      Automation's `ShowContextMenu`.
+    - In the browser, keyboard focus goes back to where it was when a
+      popup closes, as on Win32; and the controls inside an accessible
+      container (an info bar's buttons) have elements of their own.
+
+    Checked in the browser with the mouse, the keyboard and touch (a
+    tooltip after hovering and gone when the pointer leaves; the menu by a
+    right-click, the Menu key, Shift+F10 and a touch's long press, chosen
+    from the keyboard and by a click, with focus back on its button; a
+    long press showing a tooltip; an info bar closed and its action
+    button; an expander opened), on Android with taps and long presses
+    (the menu, the tooltip, the info bars, the expander, and each one's
+    widget class and label), and on Win32 through UI Automation (each
+    element's type, name and patterns; an info bar closed, an expander
+    expanded and collapsed). Not checked: the menu and the tooltip with
+    Win32's mouse and keyboard (another process held the foreground).
 
 29. **Later: `XForms.Xaml`.** The proof of concept in `spikes/XForms.Xaml`
     becomes a layer over the framework and controls, including templates

@@ -699,10 +699,19 @@ namespace XForms.Web.Renderers
                     continue;
                 }
 
-                if (child.AccessibilityRole != AccessibilityRole.None)
+                var role = child.AccessibilityRole;
+                if (role != AccessibilityRole.None)
                 {
                     lightweight.Add(child);
                     order.Add(child);
+
+                    // A container's controls (an info bar's buttons) are
+                    // elements of their own; other views stand for what's
+                    // inside them (a button's text)
+                    if ((role == AccessibilityRole.Group) || (role == AccessibilityRole.Alert) || (role == AccessibilityRole.Tree))
+                    {
+                        CollectAccessible(child, lightweight, order);
+                    }
                 }
                 else
                 {

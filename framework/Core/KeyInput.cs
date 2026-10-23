@@ -39,6 +39,12 @@ namespace XForms
         A, B, C, D, E, F, G, H, I, J, K, L, M,
         N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
         D0, D1, D2, D3, D4, D5, D6, D7, D8, D9,
+
+        /// <summary>
+        /// The Menu (Application) key, which asks for the focused view's
+        /// context menu.
+        /// </summary>
+        Menu,
     }
 
     /// <summary>

@@ -135,6 +135,9 @@ namespace XForms.Web
         [JSImport("focus", Module)]
         public static partial void Focus(int id);
 
+        [JSImport("getFocusedId", Module)]
+        public static partial int GetFocusedId();
+
         [JSImport("getRect", Module)]
         [return: JSMarshalAs<JSType.Array<JSType.Number>>]
         public static partial double[] GetRect(int id);
@@ -231,6 +234,12 @@ namespace XForms.Web
         internal static void OnImageLoaded(int imageId, double width, double height)
         {
             WebImages.OnLoaded(imageId, width, height);
+        }
+
+        [JSExport]
+        internal static bool OnContextRequest(int id, int deviceType, double x, double y)
+        {
+            return WebHost.Current?.OnContextRequest(id, deviceType, (float)x, (float)y) ?? false;
         }
 
         [JSExport]

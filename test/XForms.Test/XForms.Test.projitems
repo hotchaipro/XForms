@@ -24,6 +24,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)XamlPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PickersPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FormsPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FeedbackPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PanelsPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BindingPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InputPage.cs" />

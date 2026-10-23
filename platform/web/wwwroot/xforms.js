@@ -48,6 +48,7 @@ export async function init() {
         }
     });
     root.addEventListener('wheel', onWheel, { passive: false });
+    root.addEventListener('contextmenu', onContextMenu);
 }
 
 // Elements
@@ -415,6 +416,10 @@ function modifiers(e) {
 }
 
 function onPointerDown(e) {
+    // Only the main button presses (the right one asks for a context menu)
+    if (e.pointerType === 'mouse' && e.button !== 0) {
+        return;
+    }
     for (const id of xids(e.target)) {
         const [x, y] = local(id, e);
         if (exports.OnPointer(id, 1, e.pointerId, deviceType(e), x, y, true, modifiers(e))) {
@@ -455,6 +460,26 @@ function onPointerEnd(e, phase) {
     try { root.releasePointerCapture(e.pointerId); } catch { }
     const [x, y] = local(owner, e);
     exports.OnPointer(owner, phase, e.pointerId, deviceType(e), x, y, true, modifiers(e));
+}
+
+// A right-click (a mouse's or pen's) asks the app for the context menu of the
+// view under it; the browser's own menu shows only in text entries. A touch's
+// long press and the keyboard's Menu key reach the app as a press and a key.
+function onContextMenu(e) {
+    const isTextEntry = e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA';
+    if (e.pointerType === 'mouse' || e.pointerType === 'pen') {
+        const ids = xids(e.target);
+        if (ids.length > 0) {
+            const [x, y] = local(ids[0], e);
+            if (exports.OnContextRequest(ids[0], deviceType(e), x, y)) {
+                e.preventDefault();
+                return;
+            }
+        }
+    }
+    if (!isTextEntry) {
+        e.preventDefault();
+    }
 }
 
 function onWheel(e) {
@@ -584,6 +609,10 @@ export function storageSet(key, value) {
 
 // Keyboard and focus: keys go to the focused element (or, with nothing
 // focused, the root); .NET routes them to the view and its ancestors
+
+export function getFocusedId() {
+    return focusedId() ?? 0;
+}
 
 function focusedId() {
     for (let element = document.activeElement; element && element !== document.body; element = element.parentElement) {

@@ -331,7 +331,7 @@ namespace XForms.Win32.Automation
     /// An automation element for one accessible view.
     /// </summary>
     [GeneratedComClass]
-    internal sealed unsafe partial class ElementProvider : IRawElementProviderSimple, IRawElementProviderFragment, IInvokeProvider, IToggleProvider, ISelectionItemProvider, IValueProvider, IExpandCollapseProvider, IRangeValueProvider
+    internal sealed unsafe partial class ElementProvider : IRawElementProviderSimple2, IRawElementProviderFragment, IInvokeProvider, IToggleProvider, ISelectionItemProvider, IValueProvider, IExpandCollapseProvider, IRangeValueProvider
     {
         private readonly WeakReference<ViewRenderer> _renderer;
         private readonly int _runtimeId;
@@ -785,6 +785,16 @@ namespace XForms.Win32.Automation
 
             value = result;
             return hr;
+        }
+
+        public int ShowContextMenu()
+        {
+            return this.OnUIThread((renderer) =>
+            {
+                var view = (View)renderer.Element;
+                Win32Host.Current.Post(() => LayerHost.For(view).RequestContext(null, null));
+                return 0;
+            });
         }
 
         int IRangeValueProvider.SetValue(double value)

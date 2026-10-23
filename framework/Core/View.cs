@@ -2844,6 +2844,11 @@ namespace XForms
         internal bool DispatchLayerPointerEvent(
             PointerEventArgs e)
         {
+            if (this.TrackLongPress(ref e))
+            {
+                return true;
+            }
+
             if (this.HasLightweightChildren || (0 < (this._pointerOwners?.Count ?? 0)))
             {
                 return this.DispatchToLightweight(e);
@@ -2877,6 +2882,116 @@ namespace XForms
 
         // The lightweight views that took pointers pressed on this layer
         private Dictionary<int, View> _pointerOwners;
+
+        /// <summary>
+        /// How long a touch or pen is held still to ask for the context menu.
+        /// </summary>
+        internal static readonly TimeSpan LongPressDuration = TimeSpan.FromMilliseconds(500);
+
+        // A touch or pen pressed and held: once held long enough, a context
+        // request for the view under it; if answered, the press ends as
+        // canceled (so it isn't also a tap)
+        private sealed class LongPress
+        {
+            public View Layer;
+            public int PointerId;
+            public long StartTicks;
+            public Point Start;
+            public View Target;
+            public Point TargetPosition;
+            public PointerDeviceType DeviceType;
+            public DispatcherTimer Timer;
+            public bool IsAnswered;
+        }
+
+        private static LongPress _longPress;
+
+        // Returns whether the event was used up (the moves and release of an
+        // answered long press); the release becomes a cancel for the views
+        private bool TrackLongPress(
+            ref PointerEventArgs e)
+        {
+            var press = _longPress;
+            bool isThisPress = (null != press) && (press.PointerId == e.PointerId);
+
+            switch (e.State)
+            {
+                case PointerInputState.Began:
+                    if (e.DeviceType == PointerDeviceType.Mouse)
+                    {
+                        return false;
+                    }
+
+                    // The same press, offered to an ancestor layer
+                    if (isThisPress && ((Environment.TickCount64 - press.StartTicks) < 100))
+                    {
+                        return false;
+                    }
+
+                    press?.Timer.Stop();
+
+                    var hit = this.HasLightweightChildren ? this.HitTestLightweight(e.Position) : null;
+                    var target = ((null != hit) && (hit != this)) ? hit : this;
+                    var started = new LongPress()
+                    {
+                        Layer = this,
+                        PointerId = e.PointerId,
+                        StartTicks = Environment.TickCount64,
+                        Start = e.Position,
+                        Target = target,
+                        TargetPosition = (target == this) ? e.Position : this.ToLocal(target, e).Position,
+                        DeviceType = e.DeviceType,
+                        Timer = new DispatcherTimer() { Interval = LongPressDuration },
+                    };
+                    started.Timer.Tick += (sender, args) =>
+                    {
+                        started.Timer.Stop();
+                        if (_longPress == started)
+                        {
+                            started.IsAnswered = started.Target.RouteContextRequested(new ContextRequestedEventArgs(started.TargetPosition, started.DeviceType));
+                        }
+                    };
+                    _longPress = started;
+                    started.Timer.Start();
+                    return false;
+
+                case PointerInputState.Moved:
+                    if (!isThisPress || (press.Layer != this))
+                    {
+                        return false;
+                    }
+
+                    if (press.IsAnswered)
+                    {
+                        return true;
+                    }
+
+                    float dx = e.Position.X - press.Start.X;
+                    float dy = e.Position.Y - press.Start.Y;
+                    if ((dx * dx) + (dy * dy) > (Application.TouchSlop * Application.TouchSlop))
+                    {
+                        press.Timer.Stop();
+                        _longPress = null;
+                    }
+
+                    return false;
+
+                default:
+                    if (!isThisPress || (press.Layer != this))
+                    {
+                        return false;
+                    }
+
+                    press.Timer.Stop();
+                    _longPress = null;
+                    if (press.IsAnswered)
+                    {
+                        e = new PointerEventArgs(e.PointerId, e.DeviceType, e.Position, PointerInputState.Canceled, false, e.KeyModifiers);
+                    }
+
+                    return false;
+            }
+        }
 
         // Routes a pointer event from the platform, which delivered it to this
         // layer, to the lightweight view under it: the deepest one, then its
@@ -3106,6 +3221,12 @@ namespace XForms
                 }
             }
 
+            // The Menu key and Shift+F10 ask for the focused view's context menu
+            if ((e.Key == Key.Menu) || ((e.Key == Key.F10) && e.IsShiftDown))
+            {
+                return this.RouteContextRequested(new ContextRequestedEventArgs(null, null));
+            }
+
             if ((e.Key == Key.Enter) || (e.Key == Key.Space))
             {
                 this.OnActivate();
@@ -3113,6 +3234,71 @@ namespace XForms
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Raised when the user asks for the view's context menu (a
+        /// right-click, a long press, the Menu key or Shift+F10), and then for
+        /// its ancestors until one handles it.
+        /// </summary>
+        public event EventHandler<ContextRequestedEventArgs> ContextRequested;
+
+        /// <summary>
+        /// Called when the user asks for the view's (or, unhandled, a
+        /// descendant's) context menu. Set <c>e.Handled</c> to answer it.
+        /// </summary>
+        protected virtual void OnContextRequested(
+            ContextRequestedEventArgs e)
+        {
+        }
+
+        /// <summary>
+        /// Delivers a context request to the view, then its ancestors, until
+        /// one handles it. Returns whether one did.
+        /// </summary>
+        internal bool RouteContextRequested(
+            ContextRequestedEventArgs e)
+        {
+            e.OriginalSource ??= this;
+            for (var view = this; null != view; view = view.Parent as View)
+            {
+                view.OnContextRequested(e);
+                view.ContextRequested?.Invoke(view, e);
+                if (e.Handled)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Asks for the context menu of the view under the point (in this
+        /// view's coordinates; a lightweight one when this is a layer), or,
+        /// without a point, of the focused view.
+        /// </summary>
+        internal bool RequestContext(
+            Point? position,
+            PointerDeviceType? deviceType)
+        {
+            var target = this;
+            Point? local = position;
+            if (position.HasValue)
+            {
+                var hit = this.HasLightweightChildren ? this.HitTestLightweight(position.Value) : null;
+                if ((null != hit) && (hit != this))
+                {
+                    target = hit;
+                    local = this.ToLocal(hit, new PointerEventArgs(position.Value, PointerInputState.Ended, false)).Position;
+                }
+            }
+            else if (null != this._focusedLightweight)
+            {
+                target = this._focusedLightweight;
+            }
+
+            return target.RouteContextRequested(new ContextRequestedEventArgs(local, deviceType));
         }
 
         internal bool RouteKeyUp(

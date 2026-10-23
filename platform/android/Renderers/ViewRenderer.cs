@@ -628,6 +628,7 @@ namespace XForms.Android.Renderers
                 case Keycode.F8: return Key.F8;
                 case Keycode.F9: return Key.F9;
                 case Keycode.F10: return Key.F10;
+                case Keycode.Menu: return Key.Menu;
                 case Keycode.F11: return Key.F11;
                 case Keycode.F12: return Key.F12;
                 default:

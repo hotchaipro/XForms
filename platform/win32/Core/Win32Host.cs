@@ -793,6 +793,23 @@ namespace XForms.Win32
                 : (pointerType == POINTER_INPUT_TYPE.PT_PEN) ? PointerDeviceType.Pen
                 : PointerDeviceType.Mouse;
 
+            // A mouse's other buttons don't press: the right one asks for the
+            // context menu of the view under it when it's released
+            const uint FirstButton = 0x0010;  // POINTER_MESSAGE_FLAG_FIRSTBUTTON
+            const uint SecondButton = 0x0020; // POINTER_MESSAGE_FLAG_SECONDBUTTON
+            if ((deviceType == PointerDeviceType.Mouse) && (msg == PInvoke.WM_POINTERDOWN) && ((flags & FirstButton) == 0))
+            {
+                this._isRightButtonPressed = (flags & SecondButton) != 0;
+                return true;
+            }
+
+            if ((deviceType == PointerDeviceType.Mouse) && (msg == PInvoke.WM_POINTERUP) && this._isRightButtonPressed)
+            {
+                this._isRightButtonPressed = false;
+                this.RequestContext(point);
+                return true;
+            }
+
             switch (msg)
             {
                 case PInvoke.WM_POINTERDOWN:
@@ -829,6 +846,26 @@ namespace XForms.Win32
             }
 
             return false;
+        }
+
+        private bool _isRightButtonPressed;
+
+        // A right-click: a context request for the view under it (outside an
+        // open popup, the popup closes, as for any click)
+        private void RequestContext(
+            Point point)
+        {
+            if (!this.HitTest(point, out var hit))
+            {
+                this._overlays.Top?.Dismiss();
+                return;
+            }
+
+            if (hit?.Element is View view)
+            {
+                var origin = hit.AbsoluteOrigin();
+                LayerHost.For(view).RequestContext(new Point(point.X - origin.X, point.Y - origin.Y), PointerDeviceType.Mouse);
+            }
         }
 
         // A mouse or pen hovers over the deepest view under it

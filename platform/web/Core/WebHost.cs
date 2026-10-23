@@ -389,6 +389,45 @@ namespace XForms.Web
             }
         }
 
+        /// <summary>
+        /// A right-click on an element (at a point in its coordinates): a
+        /// context request for the view under it. Returns whether the app
+        /// answered it.
+        /// </summary>
+        public bool OnContextRequest(
+            int id,
+            int deviceType,
+            float x,
+            float y)
+        {
+            if (!this._renderers.TryGetValue(id, out var renderer) || !(renderer.Element is View view))
+            {
+                return false;
+            }
+
+            bool result = false;
+            Run(() => result = LayerHost.For(view).RequestContext(new Point(x, y), (PointerDeviceType)deviceType));
+            return result;
+        }
+
+        /// <summary>
+        /// The view with keyboard focus (a lightweight one inside the focused
+        /// element's layer), or null.
+        /// </summary>
+        public View FocusedView
+        {
+            get
+            {
+                int id = Js.GetFocusedId();
+                if ((0 == id) || !this._renderers.TryGetValue(id, out var renderer) || !(renderer.Element is View view))
+                {
+                    return null;
+                }
+
+                return LayerHost.For(view).FocusedLightweight ?? view;
+            }
+        }
+
         public bool OnPointer(
             int id,
             int phase,
@@ -520,6 +559,7 @@ namespace XForms.Web
             switch (name)
             {
                 case "Tab": return Key.Tab;
+                case "ContextMenu": return Key.Menu;
                 case "Enter": return Key.Enter;
                 case " ": return Key.Space;
                 case "Escape": return Key.Escape;

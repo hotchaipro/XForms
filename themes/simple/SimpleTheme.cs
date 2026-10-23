@@ -63,7 +63,13 @@ namespace XForms.Themes.Simple
             .With(new NumberBoxTemplate())
             .With(new PasswordBoxTemplate())
             .With(new AutoSuggestBoxTemplate())
-            .With(new AutoSuggestBoxListViewTemplate());
+            .With(new AutoSuggestBoxListViewTemplate())
+            .With(new ToolTipTemplate())
+            .With(new MenuFlyoutViewTemplate())
+            .With(new InfoBarTemplate())
+            .With(new InfoBarCloseButtonTemplate())
+            .With(new ExpanderTemplate())
+            .With(new ExpanderHeaderTemplate());
 
         private static Theme WithDefault<TExtension>(
             Theme theme,

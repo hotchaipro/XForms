@@ -25,6 +25,15 @@ namespace XForms.Win32.Automation
         int GetHostRawElementProvider(out nint provider);
     }
 
+    // Narrator's Shift+F10 (and UI Automation's ShowContextMenu) on an element
+    [GeneratedComInterface]
+    [Guid("a0a839a9-8da1-4a82-806a-8e0d44e79f56")]
+    internal unsafe partial interface IRawElementProviderSimple2 : IRawElementProviderSimple
+    {
+        [PreserveSig]
+        int ShowContextMenu();
+    }
+
     [GeneratedComInterface]
     [Guid("f7063da8-8359-439c-9297-bbc5299a7d87")]
     internal partial interface IRawElementProviderFragment

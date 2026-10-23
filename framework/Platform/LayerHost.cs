@@ -215,6 +215,18 @@ namespace XForms.Platform
         /// whether it was handled; otherwise the platform offers it to the
         /// view's ancestors, then scrolls.
         /// </summary>
+        /// <summary>
+        /// Asks for the context menu of the view under the point (in the
+        /// view's coordinates), or, without one, of the focused view. Returns
+        /// whether it was answered.
+        /// </summary>
+        public bool RequestContext(
+            Point? position,
+            PointerDeviceType? deviceType)
+        {
+            return this._view.RequestContext(position, deviceType);
+        }
+
         public bool DispatchWheel(
             PointerEventArgs e)
         {

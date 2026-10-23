@@ -41,6 +41,56 @@ XForms.Controls.CheckBox.IsThreeState.set -> void
 XForms.Controls.CheckBox.Text.get -> string
 XForms.Controls.CheckBox.Text.set -> void
 XForms.Controls.CheckBox.TextBounds.get -> XForms.Rect
+XForms.Controls.Expander
+XForms.Controls.Expander.Collapsed -> System.EventHandler
+XForms.Controls.Expander.Content.get -> XForms.View
+XForms.Controls.Expander.Content.set -> void
+XForms.Controls.Expander.Expander() -> void
+XForms.Controls.Expander.Expanding -> System.EventHandler
+XForms.Controls.Expander.Header.get -> string
+XForms.Controls.Expander.Header.set -> void
+XForms.Controls.Expander.IsExpanded.get -> bool
+XForms.Controls.Expander.IsExpanded.set -> void
+XForms.Controls.ExpanderHeader
+XForms.Controls.ExpanderHeader.CreateTextFormat() -> XForms.TextFormat
+XForms.Controls.ExpanderHeader.Expander.get -> XForms.Controls.Expander
+XForms.Controls.InfoBar
+XForms.Controls.InfoBar.ActionButton.get -> XForms.View
+XForms.Controls.InfoBar.ActionButton.set -> void
+XForms.Controls.InfoBar.Closed -> System.EventHandler
+XForms.Controls.InfoBar.CreateMessageFormat() -> XForms.TextFormat
+XForms.Controls.InfoBar.CreateTitleFormat() -> XForms.TextFormat
+XForms.Controls.InfoBar.IconBounds.get -> XForms.Rect
+XForms.Controls.InfoBar.InfoBar() -> void
+XForms.Controls.InfoBar.IsClosable.get -> bool
+XForms.Controls.InfoBar.IsClosable.set -> void
+XForms.Controls.InfoBar.IsOpen.get -> bool
+XForms.Controls.InfoBar.IsOpen.set -> void
+XForms.Controls.InfoBar.Message.get -> string
+XForms.Controls.InfoBar.Message.set -> void
+XForms.Controls.InfoBar.MessageBounds.get -> XForms.Rect
+XForms.Controls.InfoBar.Severity.get -> XForms.Controls.InfoBarSeverity
+XForms.Controls.InfoBar.Severity.set -> void
+XForms.Controls.InfoBar.Title.get -> string
+XForms.Controls.InfoBar.Title.set -> void
+XForms.Controls.InfoBar.TitleBounds.get -> XForms.Rect
+XForms.Controls.InfoBarCloseButton
+XForms.Controls.InfoBarCloseButton.InfoBar.get -> XForms.Controls.InfoBar
+XForms.Controls.InfoBarSeverity
+XForms.Controls.InfoBarSeverity.Error = 3 -> XForms.Controls.InfoBarSeverity
+XForms.Controls.InfoBarSeverity.Informational = 0 -> XForms.Controls.InfoBarSeverity
+XForms.Controls.InfoBarSeverity.Success = 1 -> XForms.Controls.InfoBarSeverity
+XForms.Controls.InfoBarSeverity.Warning = 2 -> XForms.Controls.InfoBarSeverity
+XForms.Controls.MenuFlyout
+XForms.Controls.MenuFlyout.Items.get -> System.Collections.Generic.List<XForms.Controls.MenuItem>
+XForms.Controls.MenuFlyout.MenuFlyout() -> void
+XForms.Controls.MenuFlyoutView
+XForms.Controls.MenuFlyoutView.CreateTextFormat() -> XForms.TextFormat
+XForms.Controls.MenuFlyoutView.HighlightedIndex.get -> int
+XForms.Controls.MenuFlyoutView.IsItemEnabled(int index) -> bool
+XForms.Controls.MenuFlyoutView.Items.get -> System.Collections.Generic.IReadOnlyList<XForms.Controls.MenuItem>
+XForms.Controls.MenuFlyoutView.PressedIndex.get -> int
+XForms.Controls.MenuItem.Click -> System.EventHandler
 XForms.Controls.NumberBox
 XForms.Controls.NumberBox.DownButtonBounds.get -> XForms.Rect
 XForms.Controls.NumberBox.LargeChange.get -> double
@@ -169,11 +219,27 @@ XForms.Controls.ToggleSwitch.TextBounds.get -> XForms.Rect
 XForms.Controls.ToggleSwitch.ToggleSwitch() -> void
 XForms.Controls.ToggleSwitch.Toggled -> System.EventHandler<XForms.Controls.ToggledEventArgs>
 XForms.Controls.ToggleSwitch.TrackBounds.get -> XForms.Rect
+XForms.Controls.ToolTip
+XForms.Controls.ToolTip.CreateTextFormat() -> XForms.TextFormat
+XForms.Controls.ToolTip.Text.get -> string
+XForms.Controls.ToolTip.Text.set -> void
+XForms.Controls.ToolTip.ToolTip() -> void
 XForms.Controls.UserControl.IsBuilt.get -> bool
+XForms.Controls.ViewAttachments
+XForms.Controls.ViewAttachments.extension(XForms.View)
+XForms.Controls.ViewAttachments.extension(XForms.View).ContextFlyout.get -> XForms.Primitives.Popup
+XForms.Controls.ViewAttachments.extension(XForms.View).ContextFlyout.set -> void
+XForms.Controls.ViewAttachments.extension(XForms.View).ToolTip.get -> string
+XForms.Controls.ViewAttachments.extension(XForms.View).ToolTip.set -> void
 const XForms.Controls.AutoSuggestBox.MaximumSuggestions = 8 -> int
 const XForms.Controls.AutoSuggestBoxListView.RowHeight = 36 -> float
 const XForms.Controls.CheckBox.BoxSize = 20 -> float
 const XForms.Controls.CheckBox.TextGap = 8 -> float
+const XForms.Controls.Expander.HeaderHeight = 48 -> float
+const XForms.Controls.InfoBar.IconSize = 20 -> float
+const XForms.Controls.InfoBar.Spacing = 12 -> float
+const XForms.Controls.MenuFlyoutView.RowHeight = 36 -> float
+const XForms.Controls.MenuFlyoutView.TextInset = 40 -> float
 const XForms.Controls.NumberBox.SpinButtonWidth = 32 -> float
 const XForms.Controls.PasswordBox.RevealButtonWidth = 36 -> float
 const XForms.Controls.ProgressBar.DefaultHeight = 4 -> float
@@ -187,6 +253,7 @@ const XForms.Controls.ToggleSwitch.TextGap = 12 -> float
 const XForms.Controls.ToggleSwitch.TouchHeight = 32 -> float
 const XForms.Controls.ToggleSwitch.TrackHeight = 20 -> float
 const XForms.Controls.ToggleSwitch.TrackWidth = 40 -> float
+const XForms.Controls.ToolTip.MaximumWidth = 320 -> float
 override XForms.Controls.AutoSuggestBox.AccessibilityIsExpanded.get -> bool?
 override XForms.Controls.AutoSuggestBox.Build() -> XForms.View
 override XForms.Controls.AutoSuggestBox.DefaultAccessibilityLabel.get -> string
@@ -209,13 +276,24 @@ override XForms.Controls.CheckBox.SetUserState(object state) -> void
 override XForms.Controls.ComboBox.GetUserState() -> object
 override XForms.Controls.ComboBox.OnAttaching(XForms.Theme theme) -> void
 override XForms.Controls.ComboBox.SetUserState(object state) -> void
+override XForms.Controls.Expander.Build() -> XForms.View
+override XForms.Controls.Expander.GetUserState() -> object
+override XForms.Controls.Expander.OnAttaching(XForms.Theme theme) -> void
+override XForms.Controls.Expander.SetUserState(object state) -> void
+override XForms.Controls.ExpanderHeader.AccessibilityIsExpanded.get -> bool?
+override XForms.Controls.ExpanderHeader.PerformAccessibilityAction(XForms.AccessibilityAction action) -> bool
 override XForms.Controls.ImageToggleButton.GetUserState() -> object
 override XForms.Controls.ImageToggleButton.OnAttaching(XForms.Theme theme) -> void
 override XForms.Controls.ImageToggleButton.SetUserState(object state) -> void
+override XForms.Controls.InfoBar.ArrangeOverride(XForms.Size finalSize) -> void
+override XForms.Controls.InfoBar.DefaultAccessibilityLabel.get -> string
+override XForms.Controls.InfoBar.DefaultAccessibilityRole.get -> XForms.AccessibilityRole
+override XForms.Controls.InfoBar.MeasureOverride(XForms.Size availableSize) -> XForms.Size
 override XForms.Controls.ListView.GetUserState() -> object
 override XForms.Controls.ListView.OnAttaching(XForms.Theme theme) -> void
 override XForms.Controls.ListView.SetUserState(object state) -> void
 override XForms.Controls.ListViewItem.OnHotReload() -> void
+override XForms.Controls.MenuFlyoutView.AccessibilityValue.get -> string
 override XForms.Controls.NumberBox.AccessibilityRange.get -> XForms.AccessibilityRange?
 override XForms.Controls.NumberBox.Build() -> XForms.View
 override XForms.Controls.NumberBox.DefaultAccessibilityLabel.get -> string
@@ -283,8 +361,14 @@ override XForms.Controls.ToggleSwitch.OnAttaching(XForms.Theme theme) -> void
 override XForms.Controls.ToggleSwitch.SetUserState(object state) -> void
 override XForms.Controls.UserControl.OnAttaching(XForms.Theme theme) -> void
 override XForms.Controls.UserControl.OnHotReload() -> void
+static XForms.Controls.ViewAttachments.get_ContextFlyout(XForms.View view) -> XForms.Primitives.Popup
+static XForms.Controls.ViewAttachments.get_ToolTip(XForms.View view) -> string
+static XForms.Controls.ViewAttachments.set_ContextFlyout(XForms.View view, XForms.Primitives.Popup value) -> void
+static XForms.Controls.ViewAttachments.set_ToolTip(XForms.View view, string value) -> void
 static readonly XForms.Controls.AutoSuggestBox.TextProperty -> XForms.ViewProperty<XForms.Controls.AutoSuggestBox, string>
 static readonly XForms.Controls.CheckBox.IsCheckedProperty -> XForms.ViewProperty<XForms.Controls.CheckBox, bool?>
+static readonly XForms.Controls.Expander.IsExpandedProperty -> XForms.ViewProperty<XForms.Controls.Expander, bool>
+static readonly XForms.Controls.InfoBar.IsOpenProperty -> XForms.ViewProperty<XForms.Controls.InfoBar, bool>
 static readonly XForms.Controls.NumberBox.ValueProperty -> XForms.ViewProperty<XForms.Controls.NumberBox, double>
 static readonly XForms.Controls.PasswordBox.PasswordProperty -> XForms.ViewProperty<XForms.Controls.PasswordBox, string>
 static readonly XForms.Controls.ProgressBar.ValueProperty -> XForms.ViewProperty<XForms.Controls.ProgressBar, double>
