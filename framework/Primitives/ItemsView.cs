@@ -413,6 +413,27 @@ namespace XForms.Primitives
             return this.Application.Platform.CreateItemsViewRenderer(this);
         }
 
+        protected override object GetUserState()
+        {
+            int index = this.Native?.FirstVisibleIndex ?? 0;
+            return (index > 0) ? index : null;
+        }
+
+        protected override void SetUserState(
+            object state)
+        {
+            if (state is int index)
+            {
+                // Once the new list has laid out its items
+                this.Application.RequestAnimationFrame((time) => this.Native?.ScrollToIndex(index));
+            }
+        }
+
+        internal override IEnumerable<View> GetUserStateChildren()
+        {
+            yield break;
+        }
+
         // Hot reload: each item showing gets a new view from the source (its
         // code may have changed), and containers set aside drop theirs, so
         // the source doesn't reuse a view built by the old code

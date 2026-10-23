@@ -30,6 +30,31 @@ namespace XForms.Controls
             get;
         }
 
+        // User state: the item chosen, when that changed since it was first
+        // attached
+        private int _initialSelectedIndex;
+
+        protected override void OnAttaching(
+            Theme theme)
+        {
+            base.OnAttaching(theme);
+            this._initialSelectedIndex = this.SelectedIndex;
+        }
+
+        protected override object GetUserState()
+        {
+            return (this.SelectedIndex != this._initialSelectedIndex) ? this.SelectedIndex : null;
+        }
+
+        protected override void SetUserState(
+            object state)
+        {
+            if ((state is int index) && (index < this.Items.Count))
+            {
+                this.SelectedIndex = index;
+            }
+        }
+
         public int SelectedIndex
         {
             get

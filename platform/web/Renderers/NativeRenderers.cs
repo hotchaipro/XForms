@@ -158,6 +158,9 @@ namespace XForms.Web.Renderers
         private Rect _viewport;
         private float _scrollOffset;
 
+        // An item to scroll to once the list is laid out (ScrollToIndex)
+        private int _pendingScrollIndex = -1;
+
         private bool _isRefreshEnabled;
         private bool _isRefreshing;
         private float _pullDistance;
@@ -428,6 +431,22 @@ namespace XForms.Web.Renderers
             {
                 Js.SetBounds(this._sizerId, 0, 0, 1, position);
             }
+
+            // An item to scroll to, now that the content has its extent
+            int pendingIndex = this._pendingScrollIndex;
+            if ((pendingIndex >= 0) && (viewportExtent > 0))
+            {
+                this._pendingScrollIndex = -1;
+                float target = 0;
+                for (int line = 0; line < pendingIndex / span; line += 1)
+                {
+                    target += this.LineExtent(line, this.EstimatedExtent);
+                }
+
+                this._scrollOffset = target;
+                Js.ScrollTo(this.Id, this.IsHorizontal ? target : 0, this.IsHorizontal ? 0 : target, false);
+                this.Realize();
+            }
         }
 
         // The item's container, bound to it (reusing a recycled one), placed
@@ -475,6 +494,40 @@ namespace XForms.Web.Renderers
             this.RemoveChild((ViewRenderer)container.Renderer);
             container.Recycle();
             this._recycled.Add(container);
+        }
+
+        public int FirstVisibleIndex
+        {
+            get
+            {
+                float estimate = this.EstimatedExtent;
+                float position = 0;
+                int lines = this.LineCount;
+                int line = 0;
+                while ((line + 1 < lines) && (position + this.LineExtent(line, estimate) <= this._scrollOffset))
+                {
+                    position += this.LineExtent(line, estimate);
+                    line += 1;
+                }
+
+                return line * this._layout.Columns;
+            }
+        }
+
+        public void ScrollToIndex(
+            int index)
+        {
+            if ((index < 0) || (index >= (this._source?.Count ?? 0)))
+            {
+                return;
+            }
+
+            // Once the list is laid out (a new list isn't yet)
+            this._pendingScrollIndex = index;
+            if ((this._viewport.Width > 0) && (this._viewport.Height > 0))
+            {
+                this.Realize();
+            }
         }
 
         public void ScrollToItem(

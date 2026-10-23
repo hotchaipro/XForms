@@ -2998,7 +2998,41 @@ Win32, Android and the browser, as before.
     focused). Release builds are unchanged. The aim is the experience
     Flutter sets: edit, save, see it, nothing lost.
 
-    **Status: steps 1 to 3 done.**
+    **Status: steps 1 to 4 done.**
+
+    Step 4, user state: `View.Name`, and `GetUserState` and
+    `SetUserState`, which a control overrides to say what has changed in
+    it since it was first attached (mostly through input). A page or
+    `UserControl` building again records its old views' states and focus
+    (`SaveUserState`, before they're removed, since removing a focused
+    view takes its focus in the browser) and gives them to the new views
+    once attached (`RestoreUserState`): named views by name, wherever they
+    moved; unnamed ones as Flutter matches them, from the start while
+    their types agree, then from the end, then the rest by type, so a view
+    added or removed doesn't shift the others. Focus moves a frame later.
+    States: a text box's text and selection, a scroll viewer's offset and
+    a list's first item in view (a new `IItemsViewRenderer.
+    FirstVisibleIndex` and `ScrollToIndex` on every platform; the browser's
+    list scrolls once it's laid out), a list's selection, the toggles'
+    `IsChecked` (toggle and radio buttons, tab strip items, image toggles,
+    days of the week), the combo box's index, the date picker's date and
+    the radio buttons' choice. Nine unit tests of the matching. Checked
+    with the test app's simulated hot reload (F9, every so many seconds
+    with `XFORMS_SIMULATE_EVERY`, an Android intent extra, or a function
+    the browser's script calls): on Win32 a typed password and its focus
+    carried over a real edit under `dotnet watch` that added a view above
+    it; on Android a list's place and selection; in the browser a typed
+    box with its focus, and a list's place and selection. Not checked: a
+    list's place and selection on Win32 (input can't be sent there while
+    another window holds the foreground, and its list's items aren't in UI
+    Automation's tree, an accessibility gap of its own), and text on
+    Android (the keyboard's stylus introduction covers the app). Fixed on
+    the way: Win32 hid none of a removed view's native windows (a rebuilt
+    page's old text boxes stayed on screen); `IsShownOnScreen` now
+    requires the view to be in a window. Found, not fixed: under `dotnet
+    watch` on Win32, RichEdit text boxes crash the app now and then (an
+    access violation inside RichEdit, as the known issue in
+    `architecture.md`); running the app directly they don't.
 
     Step 3, rebuilding: the framework's `MetadataUpdateHandler` posts to the
     UI thread, where the app builds its theme again, and the views showing

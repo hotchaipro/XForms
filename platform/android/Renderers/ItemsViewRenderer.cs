@@ -192,6 +192,41 @@ namespace XForms.Android.Renderers
             }
         }
 
+        public int FirstVisibleIndex
+        {
+            get
+            {
+                if (null != this._nativeListView)
+                {
+                    return Math.Max(0, this._nativeListView.FirstVisiblePosition);
+                }
+
+                return (this._recyclerView?.GetLayoutManager() is LinearLayoutManager manager) ? Math.Max(0, manager.FindFirstVisibleItemPosition()) : 0;
+            }
+        }
+
+        public void ScrollToIndex(
+            int index)
+        {
+            if ((index < 0) || (index >= (this._source?.Count ?? 0)))
+            {
+                return;
+            }
+
+            if (null != this._nativeListView)
+            {
+                this._nativeListView.SetSelection(index);
+            }
+            else if (this._recyclerView?.GetLayoutManager() is LinearLayoutManager manager)
+            {
+                manager.ScrollToPositionWithOffset(index, 0);
+            }
+            else
+            {
+                this._recyclerView?.ScrollToPosition(index);
+            }
+        }
+
         public void ScrollToItem(
             object item)
         {

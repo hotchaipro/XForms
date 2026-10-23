@@ -62,6 +62,25 @@ namespace XForms.Test
             // address, say)
             this.StartPath = string.IsNullOrEmpty(StartPage) ? "/" : "/" + StartPage.ToLowerInvariant();
 
+            // F9 does what a hot reload edit does (without the edit), on any
+            // page, for checking what carries over a rebuild; or every so many
+            // seconds (XFORMS_SIMULATE_EVERY), where keys can't be sent
+            this.PreviewKeyDown += (sender, e) =>
+            {
+                if (e.Key == Key.F9)
+                {
+                    HotReloadLog.Simulate();
+                    e.Handled = true;
+                }
+            };
+
+            if (int.TryParse(Environment.GetEnvironmentVariable("XFORMS_SIMULATE_EVERY"), out int seconds) && (seconds > 0))
+            {
+                var timer = new DispatcherTimer() { Interval = TimeSpan.FromSeconds(seconds) };
+                timer.Tick += (sender, e) => HotReloadLog.Simulate();
+                timer.Start();
+            }
+
             StartAsync();
         }
 

@@ -418,8 +418,8 @@ namespace XForms.Win32
                 return;
             }
 
-            // Gone from the window (removed with its parent), or hidden
-            if (!focused.IsShownOnScreen || !((View)focused.Element).IsInVisualTree)
+            // Hidden, or gone from the window (removed with its parent)
+            if (!focused.IsShownOnScreen)
             {
                 this.SetFocused(null);
                 this.HideRing();

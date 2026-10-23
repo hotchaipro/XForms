@@ -22,6 +22,33 @@ namespace XForms.Controls
 
         public event EventHandler<DateTime?> SelectedDateChanged;
 
+        // User state: the date chosen, when that changed since it was first
+        // attached (null is a date too: none)
+        private DateTime? _initialSelectedDate;
+
+        protected override void OnAttaching(
+            Theme theme)
+        {
+            base.OnAttaching(theme);
+            this._initialSelectedDate = this.SelectedDate;
+        }
+
+        protected override object GetUserState()
+        {
+            return (this.SelectedDate != this._initialSelectedDate) ? new DateState(this.SelectedDate) : null;
+        }
+
+        protected override void SetUserState(
+            object state)
+        {
+            if (state is DateState dateState)
+            {
+                this.SelectedDate = dateState.Date;
+            }
+        }
+
+        private sealed record DateState(DateTime? Date);
+
         public DateTime? SelectedDate
         {
             get

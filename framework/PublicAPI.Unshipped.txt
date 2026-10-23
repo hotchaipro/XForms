@@ -24,11 +24,24 @@ XForms.Route.Pattern.get -> string
 XForms.Route.this[string name].get -> string
 XForms.Routes
 XForms.Routes.Add(string pattern, System.Func<XForms.Route, XForms.Page> createPage) -> void
+XForms.View.Name.get -> string
+XForms.View.Name.set -> void
 override XForms.Frame.OnHotReload() -> void
 override XForms.Page.OnHotReload() -> void
+override XForms.Primitives.ItemsView.GetUserState() -> object
 override XForms.Primitives.ItemsView.OnHotReload() -> void
+override XForms.Primitives.ItemsView.SetUserState(object state) -> void
+override XForms.Primitives.ScrollViewer.GetUserState() -> object
+override XForms.Primitives.ScrollViewer.SetUserState(object state) -> void
+override XForms.Primitives.TextBox.GetUserState() -> object
+override XForms.Primitives.TextBox.OnAttaching(XForms.Theme theme) -> void
+override XForms.Primitives.TextBox.SetUserState(object state) -> void
+static XForms.View.RestoreUserState(object saved, XForms.View newViews) -> void
+static XForms.View.SaveUserState(XForms.View views) -> object
 virtual XForms.Application.OnConfigureRoutes(XForms.Routes routes) -> void
 virtual XForms.Application.OnRouteNotFound(string path) -> string
 virtual XForms.Element.OnAttaching(XForms.Theme theme) -> void
 virtual XForms.Page.Build() -> XForms.View
+virtual XForms.View.GetUserState() -> object
 virtual XForms.View.OnHotReload() -> void
+virtual XForms.View.SetUserState(object state) -> void

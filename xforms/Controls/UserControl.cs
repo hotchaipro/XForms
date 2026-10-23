@@ -83,10 +83,12 @@ namespace XForms.Controls
             base.OnHotReload();
             if (this._isBuilt)
             {
+                var saved = SaveUserState(this.Content);
                 var content = this.Build();
                 if (null != content)
                 {
                     this.Content = content;
+                    RestoreUserState(saved, content);
                 }
             }
         }

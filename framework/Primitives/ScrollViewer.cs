@@ -140,6 +140,21 @@ namespace XForms.Primitives
             }
         }
 
+        protected override object GetUserState()
+        {
+            float offset = this.VerticalOffset;
+            return (offset > 0) ? offset : null;
+        }
+
+        protected override void SetUserState(
+            object state)
+        {
+            if (state is float offset)
+            {
+                this.Application.RequestAnimationFrame((time) => this.ScrollToVerticalOffset(offset, false));
+            }
+        }
+
         internal override void OnRendererCreated()
         {
             base.OnRendererCreated();

@@ -51,6 +51,31 @@ namespace XForms.Controls
             this.GestureRecognizers.Add(new TapGestureRecognizer(this));
         }
 
+        // User state: whether it's checked, when that changed since it was
+        // first attached
+        private bool _initialIsChecked;
+
+        protected override void OnAttaching(
+            Theme theme)
+        {
+            base.OnAttaching(theme);
+            this._initialIsChecked = this.IsChecked;
+        }
+
+        protected override object GetUserState()
+        {
+            return (this.IsChecked != this._initialIsChecked) ? this.IsChecked : null;
+        }
+
+        protected override void SetUserState(
+            object state)
+        {
+            if (state is bool isChecked)
+            {
+                this.IsChecked = isChecked;
+            }
+        }
+
         public bool IsChecked
         {
             get

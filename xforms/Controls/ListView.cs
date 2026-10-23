@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using XForms.Primitives;
 
 namespace XForms.Controls
@@ -177,6 +178,44 @@ namespace XForms.Controls
         /// <summary>
         /// The selected item (the first, with several), or null.
         /// </summary>
+        // User state: the place in the list (the base's), and the items
+        // selected, when they changed since it was first attached
+        private object[] _initialSelection = Array.Empty<object>();
+
+        protected override void OnAttaching(
+            Theme theme)
+        {
+            base.OnAttaching(theme);
+            this._initialSelection = this._selectedItems.ToArray();
+        }
+
+        protected override object GetUserState()
+        {
+            var place = base.GetUserState();
+            bool isSelectionChanged = !this._selectedItems.SequenceEqual(this._initialSelection);
+            if ((null == place) && !isSelectionChanged)
+            {
+                return null;
+            }
+
+            return new ListState(place, isSelectionChanged ? this._selectedItems.ToArray() : null);
+        }
+
+        protected override void SetUserState(
+            object state)
+        {
+            if (state is ListState listState)
+            {
+                base.SetUserState(listState.Place);
+                if (null != listState.Selection)
+                {
+                    this.SetSelection(listState.Selection);
+                }
+            }
+        }
+
+        private sealed record ListState(object Place, object[] Selection);
+
         public object SelectedItem
         {
             get

@@ -29,6 +29,33 @@ namespace XForms.Controls
             this.Content = this._buttonsLayout;
         }
 
+        // User state: the item chosen, when that changed since they were first
+        // attached (null is a choice too: none)
+        private object _initialSelectedItem;
+
+        protected override void OnAttaching(
+            Theme theme)
+        {
+            base.OnAttaching(theme);
+            this._initialSelectedItem = this.SelectedItem;
+        }
+
+        protected override object GetUserState()
+        {
+            return Equals(this.SelectedItem, this._initialSelectedItem) ? null : new SelectionState(this.SelectedItem);
+        }
+
+        protected override void SetUserState(
+            object state)
+        {
+            if (state is SelectionState selection)
+            {
+                this.SelectedItem = selection.Item;
+            }
+        }
+
+        private sealed record SelectionState(object Item);
+
         public object SelectedItem
         {
             get

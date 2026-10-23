@@ -171,6 +171,44 @@ namespace XForms.iOS.Renderers
             }
         }
 
+        public int FirstVisibleIndex
+        {
+            get
+            {
+                var paths = (null != this._tableView) ? this._tableView.IndexPathsForVisibleRows : this._collectionView?.IndexPathsForVisibleItems;
+                if ((null == paths) || (0 == paths.Length))
+                {
+                    return 0;
+                }
+
+                int first = int.MaxValue;
+                foreach (var path in paths)
+                {
+                    first = Math.Min(first, (int)((null != this._tableView) ? path.Row : path.Item));
+                }
+
+                return first;
+            }
+        }
+
+        public void ScrollToIndex(
+            int index)
+        {
+            if ((index < 0) || (index >= (this._source?.Count ?? 0)))
+            {
+                return;
+            }
+
+            if (null != this._tableView)
+            {
+                this._tableView.ScrollToRow(NSIndexPath.FromRowSection(index, 0), UITableViewScrollPosition.Top, false);
+            }
+            else
+            {
+                this._collectionView?.ScrollToItem(NSIndexPath.FromItemSection(index, 0), UICollectionViewScrollPosition.Top, false);
+            }
+        }
+
         public void ScrollToItem(
             object item)
         {

@@ -1,5 +1,23 @@
 XForms.Controls.UserControl.IsBuilt.get -> bool
+override XForms.Controls.CalendarDatePicker.GetUserState() -> object
+override XForms.Controls.CalendarDatePicker.OnAttaching(XForms.Theme theme) -> void
+override XForms.Controls.CalendarDatePicker.SetUserState(object state) -> void
+override XForms.Controls.ComboBox.GetUserState() -> object
+override XForms.Controls.ComboBox.OnAttaching(XForms.Theme theme) -> void
+override XForms.Controls.ComboBox.SetUserState(object state) -> void
+override XForms.Controls.ImageToggleButton.GetUserState() -> object
+override XForms.Controls.ImageToggleButton.OnAttaching(XForms.Theme theme) -> void
+override XForms.Controls.ImageToggleButton.SetUserState(object state) -> void
+override XForms.Controls.ListView.GetUserState() -> object
+override XForms.Controls.ListView.OnAttaching(XForms.Theme theme) -> void
+override XForms.Controls.ListView.SetUserState(object state) -> void
 override XForms.Controls.ListViewItem.OnHotReload() -> void
+override XForms.Controls.RadioButtons.GetUserState() -> object
+override XForms.Controls.RadioButtons.OnAttaching(XForms.Theme theme) -> void
+override XForms.Controls.RadioButtons.SetUserState(object state) -> void
+override XForms.Controls.TabStripItem.GetUserState() -> object
+override XForms.Controls.TabStripItem.OnAttaching(XForms.Theme theme) -> void
+override XForms.Controls.TabStripItem.SetUserState(object state) -> void
 override XForms.Controls.TemplatedContentControl.OnHotReload() -> void
 override XForms.Controls.TemplatedControl.OnHotReload() -> void
 override XForms.Controls.UserControl.OnAttaching(XForms.Theme theme) -> void

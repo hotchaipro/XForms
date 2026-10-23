@@ -467,6 +467,47 @@ namespace XForms.Primitives
             }
         }
 
+        // User state: the text, when it changed since the box was first
+        // attached, with the selection; or the selection alone while focused
+        private string _initialText;
+
+        protected override void OnAttaching(
+            Theme theme)
+        {
+            base.OnAttaching(theme);
+            this._initialText = this._text ?? string.Empty;
+        }
+
+        protected override object GetUserState()
+        {
+            string text = this.Text ?? string.Empty;
+            bool isTextChanged = (null != this._initialText) && (text != this._initialText);
+            if (!isTextChanged && !this.IsFocused)
+            {
+                return null;
+            }
+
+            return new TextBoxUserState(isTextChanged ? text : null, this.SelectionStart, this.SelectionLength);
+        }
+
+        protected override void SetUserState(
+            object state)
+        {
+            if (state is TextBoxUserState textState)
+            {
+                if (null != textState.Text)
+                {
+                    this.Text = textState.Text;
+                }
+
+                int length = (this.Text ?? string.Empty).Length;
+                int start = Math.Min(textState.SelectionStart, length);
+                this.Select(start, Math.Min(textState.SelectionLength, length - start));
+            }
+        }
+
+        private sealed record TextBoxUserState(string Text, int SelectionStart, int SelectionLength);
+
         internal override void OnRendererCreated()
         {
             base.OnRendererCreated();

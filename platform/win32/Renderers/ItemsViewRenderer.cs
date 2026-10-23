@@ -517,6 +517,42 @@ namespace XForms.Win32.Renderers
             }
         }
 
+        public int FirstVisibleIndex
+        {
+            get
+            {
+                int count = this._lineExtents.Count;
+                if (0 == count)
+                {
+                    return 0;
+                }
+
+                // Line starts include the leading padding; the offset doesn't
+                this.EnsureLineStarts();
+                float offset = this._scroller.TargetOffset + this.LeadingPadding;
+                int line = 0;
+                while ((line + 1 < count) && (this._lineStarts[line + 1] <= offset))
+                {
+                    line += 1;
+                }
+
+                return line * this.Span;
+            }
+        }
+
+        public void ScrollToIndex(
+            int index)
+        {
+            int line = index / this.Span;
+            if ((index < 0) || (line >= this._lineExtents.Count))
+            {
+                return;
+            }
+
+            this.EnsureLineStarts();
+            this._scroller.ScrollTo(Math.Max(0, this._lineStarts[line] - this.LeadingPadding), animated: false);
+        }
+
         public void ScrollToItem(
             object item)
         {

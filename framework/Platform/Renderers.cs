@@ -273,6 +273,18 @@ namespace XForms.Platform
         void ScrollToItem(object item);
 
         /// <summary>
+        /// The index of the first item in view, at the leading edge (0 when
+        /// there's none).
+        /// </summary>
+        int FirstVisibleIndex { get; }
+
+        /// <summary>
+        /// Scrolls, without animating, so the item at the index is at the
+        /// leading edge (as far as the list scrolls).
+        /// </summary>
+        void ScrollToIndex(int index);
+
+        /// <summary>
         /// Lays the items out in a vertical list (the default), a horizontal
         /// one, or a grid.
         /// </summary>

@@ -39,6 +39,19 @@ namespace XForms.Test
             TestApp.RecreateHost = () => AndroidApplication.Current?.Activity?.Recreate();
             XFormsApp.Run(this, bundle, new TestApp(), new SimpleTheme());
         }
+
+        // Does what a hot reload edit does (without the edit), for checking
+        // what carries over a rebuild, where dotnet watch can't deliver edits:
+        // adb shell am start -f 0x20000000 -n ... --ez simulate true
+        protected override void OnNewIntent(
+            global::Android.Content.Intent intent)
+        {
+            base.OnNewIntent(intent);
+            if (true == intent?.GetBooleanExtra("simulate", false))
+            {
+                HotReloadLog.Simulate();
+            }
+        }
     }
 }
 

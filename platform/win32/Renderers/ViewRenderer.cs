@@ -639,7 +639,10 @@ namespace XForms.Win32.Renderers
                     }
                 }
 
-                return true;
+                // A view removed with its parent (a page's old content, after
+                // it's built again) keeps its chain up to that parent, but
+                // isn't in the window
+                return !(this.Element is View view) || view.IsInVisualTree;
             }
         }
 

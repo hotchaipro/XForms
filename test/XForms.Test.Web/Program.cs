@@ -7,8 +7,18 @@ using XForms.Themes.Simple;
 namespace XForms.Test.Web
 {
     [System.Runtime.Versioning.SupportedOSPlatform("browser")]
-    public static class Program
+    public static partial class Program
     {
+        // Does what a hot reload edit does (without the edit), for checking
+        // what carries over a rebuild, from script: (await
+        // getDotnetRuntime(0).getAssemblyExports('XForms.Test.Web.dll'))
+        // .XForms.Test.Web.Program.SimulateHotReload()
+        [JSExport]
+        internal static void SimulateHotReload()
+        {
+            HotReloadLog.Simulate();
+        }
+
         public static async Task Main()
         {
             // ?page=lists picks another page, as XFORMS_TEST_PAGE does on Win32
