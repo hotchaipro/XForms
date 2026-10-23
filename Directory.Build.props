@@ -56,6 +56,6 @@
     <Description Condition="$(MSBuildProjectName.StartsWith('XForms.Framework'))">XForms' platform layer, which the XForms package uses. Apps reference XForms instead.</Description>
     <Description Condition="'$(MSBuildProjectName)' == 'XForms.Toolkit'">Cross-platform services for any .NET app: the clipboard, the launcher, preferences, secure storage, sharing, haptics, connectivity and file pickers.</Description>
     <Description Condition="$(MSBuildProjectName.StartsWith('XForms.Toolkit.'))">XForms.Toolkit's services on one platform, which an app registers (an XForms app's XFormsApp.Run does).</Description>
-    <Description Condition="'$(MSBuildProjectName)' == 'XForms.Themes.Simple'">XForms' Simple theme: the controls in a plain, flat look. Pass new SimpleTheme() to XFormsApp.Run.</Description>
+    <Description Condition="'$(MSBuildProjectName)' == 'XForms.Themes.Basic'">XForms' Basic theme: the controls in a plain, flat look. Pass new BasicTheme() to XFormsApp.Run.</Description>
   </PropertyGroup>
 </Project>

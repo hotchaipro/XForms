@@ -1,14 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <!--
-    XForms.Themes.Simple: the first theme for XForms.Controls, a plain, flat
+    XForms.Themes.Basic: the first theme for XForms.Controls, a plain, flat
     look. An app chooses it in Application.CreateTheme.
   -->
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
-    <RootNamespace>XForms.Themes.Simple</RootNamespace>
-    <AssemblyName>XForms.Themes.Simple</AssemblyName>
+    <RootNamespace>XForms.Themes.Basic</RootNamespace>
+    <AssemblyName>XForms.Themes.Basic</AssemblyName>
     <IsTrimmable>true</IsTrimmable>
     <IsAotCompatible>true</IsAotCompatible>
   </PropertyGroup>

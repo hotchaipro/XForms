@@ -5,7 +5,7 @@ namespace XForms.Controls
 {
     /// <summary>
     /// A theme's templates, by control type: the theme extension that a theme
-    /// package (such as XForms.Themes.Simple) fills, and controls read through
+    /// package (such as XForms.Themes.Basic) fills, and controls read through
     /// <see cref="ThemeTemplates"/>.
     /// </summary>
     public sealed record ControlTemplates

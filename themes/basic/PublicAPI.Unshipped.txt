@@ -1,0 +1,21 @@
+XForms.Themes.Basic.ButtonStyle
+XForms.Themes.Basic.ButtonStyle.<Clone>$() -> XForms.Themes.Basic.ButtonStyle
+XForms.Themes.Basic.ButtonStyle.Background.get -> XForms.Color?
+XForms.Themes.Basic.ButtonStyle.Background.init -> void
+XForms.Themes.Basic.ButtonStyle.ButtonStyle() -> void
+XForms.Themes.Basic.ButtonStyle.CornerRadius.get -> float?
+XForms.Themes.Basic.ButtonStyle.CornerRadius.init -> void
+XForms.Themes.Basic.ButtonStyle.Equals(XForms.Themes.Basic.ButtonStyle other) -> bool
+XForms.Themes.Basic.ButtonStyle.Foreground.get -> XForms.Color?
+XForms.Themes.Basic.ButtonStyle.Foreground.init -> void
+XForms.Themes.Basic.ButtonStyle.Over(XForms.Themes.Basic.ButtonStyle other) -> XForms.Themes.Basic.ButtonStyle
+XForms.Themes.Basic.ButtonStyle.TextStyle.get -> XForms.Controls.TextStyle
+XForms.Themes.Basic.ButtonStyle.TextStyle.init -> void
+XForms.Themes.Basic.BasicTheme
+XForms.Themes.Basic.BasicTheme.BasicTheme() -> void
+override XForms.Themes.Basic.ButtonStyle.Equals(object obj) -> bool
+override XForms.Themes.Basic.ButtonStyle.GetHashCode() -> int
+override XForms.Themes.Basic.ButtonStyle.ToString() -> string
+override XForms.Themes.Basic.BasicTheme.Apply(XForms.Theme theme) -> XForms.Theme
+static XForms.Themes.Basic.ButtonStyle.operator !=(XForms.Themes.Basic.ButtonStyle left, XForms.Themes.Basic.ButtonStyle right) -> bool
+static XForms.Themes.Basic.ButtonStyle.operator ==(XForms.Themes.Basic.ButtonStyle left, XForms.Themes.Basic.ButtonStyle right) -> bool

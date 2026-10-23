@@ -1865,7 +1865,7 @@ to go:
 | `XForms.Framework` (+ `.Win32`, `.Android`, `.iOS`, `.Web`) | The platform contract: elements, layout, drawing, raw input, and the views the platforms render | — |
 | `XForms.Toolkit` (+ `.Win32`, `.Android`, `.iOS`, `.Web`) | Cross-platform services for any .NET app, with nothing about a UI (phases 22, 23 and 25) | — |
 | `XForms` (was XForms.Controls; multi-targeted) | Functional controls (what they do, not how they look) and their base classes; panels, gestures and binding; the app's entry point (`XFormsApp.Run`, phase 25) | Framework, Toolkit |
-| `XForms.Themes.<Name>` | How the controls look: `Simple` first | Controls |
+| `XForms.Themes.<Name>` | How the controls look: `Basic` first | Controls |
 | `XForms.Xaml` | Markup | Framework, Controls |
 | `XForms.Compat.WinUI` | WinUI's API over XForms' controls | Controls, Xaml |
 
@@ -2412,7 +2412,7 @@ Win32, Android and the browser, as before.
 
 24. **Themes.** A control says what it does and what state it's in; a
     theme says how it looks. The controls' current look becomes the first
-    theme, `XForms.Themes.Simple`, and an app chooses its theme explicitly.
+    theme, `XForms.Themes.Basic`, and an app chooses its theme explicitly.
 
     **Status: done,** as planned below, with these differences:
     - **The mechanism** (step 1): `ControlTemplate<TControl>` (for any
@@ -2429,8 +2429,8 @@ Win32, Android and the browser, as before.
       content controls (`MenuBar`, `TabStrip`, `CommandListViewItem`,
       `HyperlinkButton`, `MessageBoxView`), and `ListViewItem`, which is an
       `ItemContainer`; both use the same `TemplateHost`.
-    - **The package** (step 2): `themes/simple/XForms.Themes.Simple`, with
-      `SimpleTheme.Apply(base.CreateTheme(mode, accent))` rather than
+    - **The package** (step 2): `themes/basic/XForms.Themes.Basic`, with
+      `BasicTheme.Apply(base.CreateTheme(mode, accent))` rather than
       `Create(mode, accent)`, so the framework's theme (with the system's
       high-contrast colors) stays the base. It's in the layer check and
       tracks its public API.
@@ -2459,7 +2459,7 @@ Win32, Android and the browser, as before.
       `CommandBarButton`, `DayOfWeekToggleButton`, `ListViewSwipeItem`
       (and `ListViewSwipeDirection`), `ComboBoxItemsView`, `PopupFrame`,
       `MessageBoxView` and `CalendarViewPart`. `ButtonStyle` moved to
-      XForms.Themes.Simple, and `Button.Style` is gone.
+      XForms.Themes.Basic, and `Button.Style` is gone.
     - **Verified, for each group:** every Win32 test page in light and
       dark pixel for pixel against the baseline (apart from the spinning
       progress ring), and the group's own states against the previous
@@ -2497,7 +2497,7 @@ Win32, Android and the browser, as before.
     | `Theme` | framework | The data: the mode and colors, and extensions (XForms.Controls' typography, shapes, motion, styles, and now templates). Immutable; inherited down the view tree and overridable per view, as now |
     | `TemplatedControl` | XForms.Controls | Base for controls with a look: it resolves its template from its theme, hands it its state, and draws through it |
     | `ControlTemplate<TControl>` | XForms.Controls | One control's look: its drawing, the child views (parts) it adds, its layout of them, and its response to state changes |
-    | `SimpleTheme` | XForms.Themes.Simple | Builds a `Theme` with the Simple tokens, styles and a template for every control |
+    | `BasicTheme` | XForms.Themes.Basic | Builds a `Theme` with the Basic tokens, styles and a template for every control |
 
     WPF and Avalonia call these `ControlTemplate` and (in Avalonia)
     `TemplatedControl`, and a markup layer will want to write templates, so
@@ -2531,13 +2531,13 @@ Win32, Android and the browser, as before.
       feedback (today's `OnTapBegan` scaling) moves into it, driven by
       state; the controls' tap delegates keep only behavior (click, toggle,
       select).
-    - **Styles are the theme's.** `ButtonStyle` describes the Simple look,
-      so it moves to XForms.Themes.Simple. Per-view styling stays the
+    - **Styles are the theme's.** `ButtonStyle` describes the Basic look,
+      so it moves to XForms.Themes.Basic. Per-view styling stays the
       theme's: `button.Theme = theme.WithExtension(new ButtonStyle { ... })`.
       That removes `Button.Style` (decision 3).
     - **Choosing a theme.** An app chooses it in `CreateTheme`:
       `protected override Theme CreateTheme(ThemeMode mode, Color accent)
-      => SimpleTheme.Create(mode, accent);`. `Theme.Create` stays the
+      => BasicTheme.Create(mode, accent);`. `Theme.Create` stays the
       framework's tokens-only theme, with no templates. Switching the mode
       or accent color at runtime keeps working (the template stays, its
       tokens change); switching to another theme package isn't supported
@@ -2558,11 +2558,11 @@ Win32, Android and the browser, as before.
        properties and `StateChanged`; the missing-template error. A
        framework hook if it's needed to resolve the template after the view
        has a parent but before its renderer exists. No control uses it yet.
-    2. **The package:** `themes/simple/XForms.Themes.Simple` (referencing
-       XForms.Controls), with `SimpleTheme.Create`. The test apps and
+    2. **The package:** `themes/basic/XForms.Themes.Basic` (referencing
+       XForms.Controls), with `BasicTheme.Create`. The test apps and
        SoonerOrLater choose it. Nothing looks different yet.
     3. **The looks, a group at a time,** each control's drawing, parts and
-       feedback moving into a Simple template and out of the control:
+       feedback moving into a Basic template and out of the control:
        - buttons: `Button`, `ToggleButton`, `RadioButton`,
          `ImageToggleButton`, `MenuButton`, `TabStripItem`,
          `FloatingButton`, `CommandBarButton`, the day buttons;
@@ -2590,7 +2590,7 @@ Win32, Android and the browser, as before.
     4. **Switching theme packages at runtime** isn't supported for now;
        the mode and accent color still change at runtime.
 
-    **Also:** `XForms.Themes.Simple` joins the build's layer check
+    **Also:** `XForms.Themes.Basic` joins the build's layer check
     (phase 23): it may reference XForms.Controls, XForms.Toolkit and the
     framework, and tracks its public API like the other libraries.
 
@@ -2616,16 +2616,16 @@ Win32, Android and the browser, as before.
       the browser and anything neutral, `net10.0-windows`,
       `net10.0-android`, `net10.0-ios`), with `XFormsApp.Run` per platform
       in `Platforms/`. `AppTheme` is a theme package's entry
-      (`SimpleTheme` derives from it); the framework's
+      (`BasicTheme` derives from it); the framework's
       `Application.ThemeExtender` is the general hook `XFormsApp.Run` uses
       to add it to every theme the app builds, before an app's own
       `CreateTheme` adjusts that.
     - **The apps** (the test apps and SoonerOrLater) reference `XForms` and
-      `XForms.Themes.Simple` only (and the test app the XAML spike), and
-      start with `XFormsApp.Run(..., new SimpleTheme())`.
+      `XForms.Themes.Basic` only (and the test app the XAML spike), and
+      start with `XFormsApp.Run(..., new BasicTheme())`.
     - **Packages:** the twelve libraries pack on Windows (iOS included),
       version 0.1.0-preview.1; a sample app referencing only the `XForms`
-      and `XForms.Themes.Simple` packages, from a local feed, builds and
+      and `XForms.Themes.Basic` packages, from a local feed, builds and
       runs on Win32, Android and in the browser.
     - **Enforced:** the layer check allows the toolkit nothing of XForms,
       its platforms only the toolkit, XForms the framework and toolkit
@@ -2654,7 +2654,7 @@ Win32, Android and the browser, as before.
       (`Win32Application.Run`, `AndroidApplication.Run` and the others),
       register the toolkit's services themselves
       (`Win32ToolkitServices.Register()` and the others), and choose their
-      theme by overriding `CreateTheme` (`SimpleTheme.Apply(...)`).
+      theme by overriding `CreateTheme` (`BasicTheme.Apply(...)`).
     - **XForms.Controls is platform-neutral** (`net10.0`), so it can't
       start apps or register services: only a platform's build can.
     - **The toolkit holds binding** (`Binding`, `ViewProperty`, the
@@ -2677,7 +2677,7 @@ Win32, Android and the browser, as before.
     | Package (project) | What it is | Referenced by |
     |---|---|---|
     | **`XForms`** (today's XForms.Controls, multi-targeted) | The controls and binding; on each platform, the app's entry point (`XFormsApp.Run`), which starts the framework's host with the app and its theme, and registers the toolkit's services with the host's window, activity or view controller | **apps** |
-    | **`XForms.Themes.Simple`** | The first theme | **apps** |
+    | **`XForms.Themes.Basic`** | The first theme | **apps** |
     | `XForms.Framework` (+ `.Win32`, `.Android`, `.iOS`, `.Web`) | The platform layer, as now | `XForms` |
     | `XForms.Toolkit` (+ `.Win32`, `.Android`, `.iOS`, `.Web`) | Cross-platform services, standalone, with nothing about UI | `XForms`; any other .NET app, directly |
 
@@ -2697,17 +2697,17 @@ Win32, Android and the browser, as before.
 
       ```csharp
       // Win32, from Main
-      XFormsApp.Run("Sooner or Later", new App(), new SimpleTheme());
+      XFormsApp.Run("Sooner or Later", new App(), new BasicTheme());
 
       // Android, from the app's own activity (any base class)
-      XFormsApp.Run(this, new App(), new SimpleTheme());
+      XFormsApp.Run(this, new App(), new BasicTheme());
 
       // iOS, from Main (XForms' delegates), or the app's own scene delegate
-      XFormsApp.Run(args, new App(), new SimpleTheme());
-      XFormsApp.Run(windowScene, new App(), new SimpleTheme());
+      XFormsApp.Run(args, new App(), new BasicTheme());
+      XFormsApp.Run(windowScene, new App(), new BasicTheme());
 
       // The browser, from Main
-      await XFormsApp.RunAsync("Sooner or Later", new App(), new SimpleTheme());
+      await XFormsApp.RunAsync("Sooner or Later", new App(), new BasicTheme());
       ```
 
       `XFormsApp.Run` starts the framework's host (`Win32Application.Run`
@@ -2716,10 +2716,10 @@ Win32, Android and the browser, as before.
       knows (its window, activity or view controller), and gives the app
       its theme. Android's re-created activity and iOS's scenes work as in
       phase 23.
-    - **Themes are objects.** A theme package's entry is a class (Simple's
-      `SimpleTheme`) deriving from XForms' `AppTheme`, which adds its tokens, styles and templates to the
+    - **Themes are objects.** A theme package's entry is a class (Basic's
+      `BasicTheme`) deriving from XForms' `AppTheme`, which adds its tokens, styles and templates to the
       theme the framework builds for the mode and accent color (the
-      system's high-contrast colors included). `SimpleTheme.Apply` becomes
+      system's high-contrast colors included). `BasicTheme.Apply` becomes
       its method. An app overrides `Application.CreateTheme` only to adjust
       a brand (its colors, a type scale, a style), and no longer to choose
       the theme package. The framework gets one general hook for this: a
@@ -2762,14 +2762,14 @@ Win32, Android and the browser, as before.
     2. **The `XForms` package:** XForms.Controls becomes `XForms`
        (project and assembly, in `xforms/`), multi-targeted, with `XFormsApp.Run` per
        platform; the theme base class and the framework's theme hook;
-       `SimpleTheme` derives from it.
+       `BasicTheme` derives from it.
     3. **The apps:** the test apps and SoonerOrLater reference only
-       `XForms` and `XForms.Themes.Simple` (and the test app the XAML
+       `XForms` and `XForms.Themes.Basic` (and the test app the XAML
        spike), start with `XFormsApp.Run`, and drop their registrations
        and `CreateTheme` overrides.
     4. **Packages:** `dotnet pack` for every library, on Windows; a local
        feed; a small app that references only the `XForms` and
-       `XForms.Themes.Simple` packages builds for Win32, Android and the
+       `XForms.Themes.Basic` packages builds for Win32, Android and the
        browser.
     5. **Enforcement and docs:** the layer check's rules, the public API
        files (`XForms` added), `architecture.md` (the packages and the
@@ -3051,7 +3051,7 @@ Win32, Android and the browser, as before.
     Verified on Win32 under `dotnet watch`, three pages deep: a view added
     to a page's `Build()` (shown on the same page, the stack kept, and on
     the page below when going back), a template's code (the button's
-    background) and a theme token (`SimpleTheme`'s corner radius), and
+    background) and a theme token (`BasicTheme`'s corner radius), and
     their reversal; in the browser under `dotnet watch`, the added view,
     without the page reloading; on Android, the rebuild through the test
     app's "Simulate hot reload" (every handler called, as the agent does),
@@ -3219,7 +3219,7 @@ Win32, Android and the browser, as before.
     2. **`Build()`:** pages and `UserControl` build in `Build()`, called
        by XForms, and `Content` is no longer the app's to set; templates
        build their parts in their build method. Every page and control in
-       the test app, the Simple theme and SoonerOrLater moves to it. No
+       the test app, the Basic theme and SoonerOrLater moves to it. No
        hot reload yet: the apps look and work exactly as before.
     3. **Rebuilding:** the framework's handler rebuilds the theme, builds
        templates, pages and `UserControl`s again, measures and draws
@@ -3238,7 +3238,7 @@ Win32, Android and the browser, as before.
     - Steps 3 and 4, on Win32, Android and in the browser, with the app
       running under hot reload on a page deep in the back stack, with text
       typed into a box, a list scrolled and an item selected, and focus in
-      a field: a changed color in `SimpleTheme`, a changed template's
+      a field: a changed color in `BasicTheme`, a changed template's
       drawing and parts (a button's corner and a combo box's arrow), a
       view added to a page's layout, a changed `UserControl` (one of
       SoonerOrLater's rows), and a changed click handler each show without
@@ -3293,7 +3293,7 @@ Win32, Android and the browser, as before.
 
     **For each control:**
     - A functional control in XForms, and its template in
-      `XForms.Themes.Simple`; no look in the control (phase 24).
+      `XForms.Themes.Basic`; no look in the control (phase 24).
     - Its accessibility role, name and value on every platform (UI
       Automation, TalkBack, VoiceOver, the browser's ARIA), and its
       keyboard behavior as WinUI's.
@@ -3340,7 +3340,7 @@ Win32, Android and the browser, as before.
     `RangeBase` under `Slider` (`Header`, `StepFrequency`, `SmallChange`,
     `LargeChange`; a mouse press drags at once, a touch once it moves
     sideways, so a vertical drag still scrolls) and `ProgressBar`
-    (`IsIndeterminate`, `ShowError`, `ShowPaused`; Simple slides the
+    (`IsIndeterminate`, `ShowError`, `ShowPaused`; Basic slides the
     indeterminate segment on a layer of its own), `TimePicker` (a
     `PickerField` whose popup has hour, minute and AM or PM columns and
     Accept and Dismiss, `ClockIdentifier`, `MinuteIncrement`),
@@ -3348,7 +3348,7 @@ Win32, Android and the browser, as before.
     `SpinButtonPlacementMode`), `PasswordBox` (`PasswordRevealMode`, Peek
     by default) and `AutoSuggestBox` (`ItemsSource` set by the app as the
     text changes, `TextChanged` with its reason, `SuggestionChosen`,
-    `QuerySubmitted`), each with a Simple template and its user state, on
+    `QuerySubmitted`), each with a Basic template and its user state, on
     a new forms page in the test app (`/forms`). What they needed:
     - Accessibility: roles for a check box, a switch, a slider, a progress
       bar, a spin button (and, for steps 2 and 3, a tooltip, an alert, a

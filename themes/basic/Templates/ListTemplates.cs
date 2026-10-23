@@ -1,9 +1,9 @@
 ﻿using System;
 using XForms.Controls;
 
-namespace XForms.Themes.Simple
+namespace XForms.Themes.Basic
 {
-    // The Simple look of list rows: the page's background, tinted with the
+    // The Basic look of list rows: the page's background, tinted with the
     // accent while selected
     internal sealed class ListViewItemTemplate : ControlTemplate<ListViewItem>
     {

@@ -16,7 +16,7 @@
     <Project Path="toolkit/platform/win32/XForms.Toolkit.Win32.csproj" />
   </Folder>
   <Folder Name="/themes/">
-    <Project Path="themes/simple/XForms.Themes.Simple.csproj" />
+    <Project Path="themes/basic/XForms.Themes.Basic.csproj" />
   </Folder>
   <Folder Name="/xforms/">
     <Project Path="xforms/XForms.csproj" />

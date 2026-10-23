@@ -2,9 +2,9 @@ using System;
 using System.Runtime.CompilerServices;
 using XForms.Controls;
 
-namespace XForms.Themes.Simple
+namespace XForms.Themes.Basic
 {
-    // The Simple look of the form controls: flat shapes in the accent color
+    // The Basic look of the form controls: flat shapes in the accent color
     // for what's on, chosen or done, and the subtle foreground for the rest
 
     internal static class FormColors

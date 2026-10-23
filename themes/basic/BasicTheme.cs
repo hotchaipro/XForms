@@ -1,20 +1,20 @@
 ﻿using System;
 using XForms.Controls;
 
-namespace XForms.Themes.Simple
+namespace XForms.Themes.Basic
 {
     /// <summary>
-    /// The Simple theme: XForms' controls in a plain, flat look. An app
+    /// The Basic theme: XForms' controls in a plain, flat look. An app
     /// chooses it as it starts:
     /// <code>
-    /// XFormsApp.Run("My app", new App(), new SimpleTheme());
+    /// XFormsApp.Run("My app", new App(), new BasicTheme());
     /// </code>
     /// </summary>
-    public sealed class SimpleTheme : AppTheme
+    public sealed class BasicTheme : AppTheme
     {
         /// <summary>
         /// The theme (with its mode and colors, which the framework builds,
-        /// the system's high-contrast colors included) with the Simple type
+        /// the system's high-contrast colors included) with the Basic type
         /// scale, shapes, motion and control templates. Tokens the theme
         /// already has (an app's own) are kept.
         /// </summary>
@@ -30,7 +30,7 @@ namespace XForms.Themes.Simple
             return theme;
         }
 
-        // The Simple look, for each control
+        // The Basic look, for each control
         private static readonly ControlTemplates Templates = ControlTemplates.Empty
             .With(new ButtonTemplate())
             .With(new ToggleButtonTemplate())

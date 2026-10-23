@@ -1,4 +1,4 @@
-﻿using XForms.Themes.Simple;
+﻿using XForms.Themes.Basic;
 
 namespace XForms.Test.iOS
 {
@@ -8,7 +8,7 @@ namespace XForms.Test.iOS
         static void Main(
             string[] args)
         {
-            XFormsApp.Run(args, new TestApp(), new SimpleTheme());
+            XFormsApp.Run(args, new TestApp(), new BasicTheme());
         }
     }
 }

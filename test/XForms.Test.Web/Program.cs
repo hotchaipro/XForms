@@ -2,7 +2,7 @@ using System;
 using System.Runtime.InteropServices.JavaScript;
 using System.Threading.Tasks;
 using System.Web;
-using XForms.Themes.Simple;
+using XForms.Themes.Basic;
 
 namespace XForms.Test.Web
 {
@@ -27,7 +27,7 @@ namespace XForms.Test.Web
             TestApp.StartPage = query["page"];
             TestApp.ThemeModeSwitches = query["themes"];
 
-            await XFormsApp.RunAsync("XForms Test (Web)", new TestApp(), new SimpleTheme());
+            await XFormsApp.RunAsync("XForms Test (Web)", new TestApp(), new BasicTheme());
         }
     }
 }

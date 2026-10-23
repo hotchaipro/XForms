@@ -1,7 +1,7 @@
 # XForms architecture
 
 XForms is built in layers, and an app references two packages: **`XForms`**
-and a theme (**`XForms.Themes.Simple`** first). It starts with one call,
+and a theme (**`XForms.Themes.Basic`** first). It starts with one call,
 `XFormsApp.Run`, that takes its theme.
 
 - **XForms** (`xforms/`) is the controls, with the panels, gestures and data
@@ -24,7 +24,7 @@ and a theme (**`XForms.Themes.Simple`** first). It starts with one call,
 │ App (for example SoonerOrLater)                              │
 │   references XForms and a theme; starts with XFormsApp.Run   │
 ├──────────────────────────────────────────────────────────────┤
-│ Theme: XForms.Themes.Simple (chosen by the app)              │
+│ Theme: XForms.Themes.Basic (chosen by the app)              │
 │   How the controls look: a template for each, and tokens     │
 ├──────────────────────────────────────────────────────────────┤
 │ XForms (multi-targeted)                                      │
@@ -53,7 +53,7 @@ per-platform complexity stays inside the framework and the platforms.
 Planned ([alignment.md](alignment.md#layering), phases 29-31):
 `XForms.Xaml` for markup, `XForms.Compat.WinUI` for WinUI's API, and
 embedding XForms in part of an existing app's UI; and more themes beside
-`XForms.Themes.Simple`.
+`XForms.Themes.Basic`.
 
 ## The rule for what goes where
 
@@ -102,7 +102,7 @@ spinner built from that animation goes in XForms.
 | `toolkit/` | `XForms.Toolkit` (net10.0) | Cross-platform services, standalone |
 | `toolkit/platform/<platform>/` | `XForms.Toolkit.Android`, `.iOS`, `.Win32`, `.Web` | Each platform's services, and their registration |
 | `xforms/` | `XForms` (multi-targeted) | Controls, panels, gestures, binding; each platform's entry point in `Platforms/` |
-| `themes/simple/` | `XForms.Themes.Simple` (net10.0) | The Simple theme |
+| `themes/basic/` | `XForms.Themes.Basic` (net10.0) | The Basic theme |
 | `analyzers/` | `XForms.Analyzers` | XF0001, which keeps the platforms to the platform contract |
 | `test/` | `XForms.Test.*` | Test apps (the pages are shared in `test/XForms.Test`) |
 
@@ -160,10 +160,10 @@ they need:
 
 | Platform | Start |
 |---|---|
-| Win32 | `XFormsApp.Run("Title", new App(), new SimpleTheme())` from `Main`: a window and its message loop |
-| Browser | `await XFormsApp.RunAsync("Title", new App(), new SimpleTheme())` from `Main`: the page |
-| iOS | `XFormsApp.Run(args, new App(), new SimpleTheme())` from `Main`, with XForms' own app and scene delegates; or `XFormsApp.Run(windowScene, connectionOptions, new App(), new SimpleTheme())` from the app's own scene delegate's `WillConnect` |
-| Android | `XFormsApp.Run(this, savedInstanceState, new App(), new SimpleTheme())` from the app's own activity's `OnCreate` |
+| Win32 | `XFormsApp.Run("Title", new App(), new BasicTheme())` from `Main`: a window and its message loop |
+| Browser | `await XFormsApp.RunAsync("Title", new App(), new BasicTheme())` from `Main`: the page |
+| iOS | `XFormsApp.Run(args, new App(), new BasicTheme())` from `Main`, with XForms' own app and scene delegates; or `XFormsApp.Run(windowScene, connectionOptions, new App(), new BasicTheme())` from the app's own scene delegate's `WillConnect` |
+| Android | `XFormsApp.Run(this, savedInstanceState, new App(), new BasicTheme())` from the app's own activity's `OnCreate` |
 
 `XFormsApp.Run`:
 - gives the app its theme (`Application.ThemeExtender`, see Themes);
@@ -611,7 +611,7 @@ framework knows only the mode and colors, which the platforms also fill
 from the system's high-contrast colors. XForms adds its
 `Typography`, `Shapes` and `Motion` (read as `theme.Typography` and so on)
 and its controls' templates (below); a theme package adds its own styles,
-such as XForms.Themes.Simple's `ButtonStyle`.
+such as XForms.Themes.Basic's `ButtonStyle`.
 
 The application builds its theme with `CreateTheme(mode, accent)` from the
 mode (the system's, unless the app sets `RequestedThemeMode`) and the accent
@@ -649,7 +649,7 @@ areas, a combo box's rows) keep that geometry and expose it, with their
 state, read-only; the template draws everything else.
 
 **Choosing a theme.** An app passes its theme package to `XFormsApp.Run`
-(`new SimpleTheme()`, an `AppTheme`), and there's no fallback: a templated
+(`new BasicTheme()`, an `AppTheme`), and there's no fallback: a templated
 control whose theme has no template for it throws when it's attached,
 saying so. `XFormsApp.Run` sets the framework's `Application.ThemeExtender`
 to the package's `Apply`, which the framework's `CreateTheme` calls on the
@@ -792,7 +792,7 @@ contract. Still to do:
 
 - **iOS testing.** iOS builds, but it hasn't been run since the restructure
   (it needs a Mac). Its popups, in particular, are new and untested.
-- **Themes.** XForms.Themes.Simple is the only theme so far, and only
+- **Themes.** XForms.Themes.Basic is the only theme so far, and only
   `Button` has a style (`ButtonStyle`); the other looks change through
   their templates. Markup and WinUI compatibility come next
   ([alignment.md](alignment.md#layering)).

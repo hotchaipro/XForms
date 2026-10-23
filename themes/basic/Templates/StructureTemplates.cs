@@ -1,9 +1,9 @@
 using System;
 using XForms.Controls;
 
-namespace XForms.Themes.Simple
+namespace XForms.Themes.Basic
 {
-    // The Simple look of the structural controls: the navigation pane on the
+    // The Basic look of the structural controls: the navigation pane on the
     // surface color with the selected item marked in the accent color, flip
     // view arrows and pips, the refresh indicator, and tree items
 

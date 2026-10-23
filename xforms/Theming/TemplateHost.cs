@@ -58,7 +58,7 @@ namespace XForms.Controls
         {
             var template = theme.GetTemplate(this._view.GetType())
                 ?? throw new InvalidOperationException(
-                    $"{this._view.GetType().Name} has no template in its theme. Pass a theme to XFormsApp.Run, such as new SimpleTheme() (from XForms.Themes.Simple).");
+                    $"{this._view.GetType().Name} has no template in its theme. Pass a theme to XFormsApp.Run, such as new BasicTheme() (from XForms.Themes.Basic).");
 
             if (template == this._template)
             {

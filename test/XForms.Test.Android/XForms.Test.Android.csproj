@@ -20,7 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\xforms\XForms.csproj" />
-    <ProjectReference Include="..\..\themes\simple\XForms.Themes.Simple.csproj" />
+    <ProjectReference Include="..\..\themes\basic\XForms.Themes.Basic.csproj" />
     <ProjectReference Include="..\..\spikes\XForms.Xaml\XForms.Xaml.csproj" />
   </ItemGroup>
 

@@ -1,10 +1,10 @@
 ﻿using System;
 using XForms.Controls;
 
-namespace XForms.Themes.Simple
+namespace XForms.Themes.Basic
 {
     /// <summary>
-    /// How the Simple theme draws a <see cref="Button"/>. Unset values come
+    /// How the Basic theme draws a <see cref="Button"/>. Unset values come
     /// from the theme's tokens. Set one on a theme for every button under a
     /// view.
     /// </summary>

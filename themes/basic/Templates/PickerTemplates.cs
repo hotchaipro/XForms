@@ -2,9 +2,9 @@
 using System.Globalization;
 using XForms.Controls;
 
-namespace XForms.Themes.Simple
+namespace XForms.Themes.Basic
 {
-    // The Simple look of the pickers: flat fields on the surface color, and
+    // The Basic look of the pickers: flat fields on the surface color, and
     // popups in a thin frame
 
     // A picker's field: the value (or a placeholder) and a glyph at the end,

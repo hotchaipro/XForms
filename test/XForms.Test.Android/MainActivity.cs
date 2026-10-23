@@ -2,7 +2,7 @@
 using Android.App;
 using Android.OS;
 using XForms.Android;
-using XForms.Themes.Simple;
+using XForms.Themes.Basic;
 
 namespace XForms.Test
 {
@@ -37,7 +37,7 @@ namespace XForms.Test
             }
 
             TestApp.RecreateHost = () => AndroidApplication.Current?.Activity?.Recreate();
-            XFormsApp.Run(this, bundle, new TestApp(), new SimpleTheme());
+            XFormsApp.Run(this, bundle, new TestApp(), new BasicTheme());
         }
 
         // Does what a hot reload edit does (without the edit), for checking

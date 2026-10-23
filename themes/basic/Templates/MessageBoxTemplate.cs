@@ -3,7 +3,7 @@ using XForms.Controls;
 using XForms.Layouts;
 using XForms.Primitives;
 
-namespace XForms.Themes.Simple
+namespace XForms.Themes.Basic
 {
     // The message, and Cancel and OK beneath it, side by side
     internal sealed class MessageBoxTemplate : ControlTemplate<MessageBoxView>

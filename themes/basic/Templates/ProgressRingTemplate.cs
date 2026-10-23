@@ -1,7 +1,7 @@
 ﻿using System;
 using XForms.Controls;
 
-namespace XForms.Themes.Simple
+namespace XForms.Themes.Basic
 {
     // An arc in the accent color, spinning once a second while the ring is
     // active

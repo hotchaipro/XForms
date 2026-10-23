@@ -1,9 +1,9 @@
 ﻿using System;
 using XForms.Controls;
 
-namespace XForms.Themes.Simple
+namespace XForms.Themes.Basic
 {
-    // The Simple look of the buttons: filled, flat, with a quick shrink as
+    // The Basic look of the buttons: filled, flat, with a quick shrink as
     // they're pressed
 
     internal sealed class ButtonTemplate : ControlTemplate<Button>

@@ -6,7 +6,7 @@ namespace XForms.Controls
 {
     /// <summary>
     /// An indeterminate progress indicator, shown while it's active. Its
-    /// theme's template draws it (Simple's spins an arc on the platform's
+    /// theme's template draws it (Basic's spins an arc on the platform's
     /// compositor or animation thread, so it keeps turning while the UI
     /// thread is busy).
     /// </summary>

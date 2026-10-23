@@ -1,9 +1,9 @@
 ﻿using System;
 using XForms.Controls;
 
-namespace XForms.Themes.Simple
+namespace XForms.Themes.Basic
 {
-    // The Simple look of the bars: in the accent color in light mode, and on
+    // The Basic look of the bars: in the accent color in light mode, and on
     // the surface color otherwise
     internal sealed class MenuBarTemplate : ControlTemplate<MenuBar>
     {
