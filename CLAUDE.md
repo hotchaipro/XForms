@@ -11,6 +11,14 @@ else, so apps look the same on every platform. See `README.md`. SoonerOrLater
 - Work is coordinated by the "Hot Chai Apps coordinator" session; it's the place to plan the next
   phase with the user and to track what's verified.
 
+## Open work
+
+- Phases 1-28 are done. Next is phase 29, `XForms.Xaml`, waiting on planning with the user
+  (build-time generator recommended over the spike's run-time parser).
+- Unverified: Win32 from the keyboard (scripted input is blocked when another window holds the
+  foreground), what VoiceOver and TalkBack say, a real iPhone or iPad.
+- Known bug: Tab reaches a navigation view's content before its pane.
+
 ## Layout
 
 - `framework/`: the small per-platform framework (all platform-specific code)
