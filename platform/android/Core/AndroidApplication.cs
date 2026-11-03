@@ -397,12 +397,15 @@ namespace XForms.Android
             this._keyCallback = null;
         }
 
-        // Tab when nothing in the window has focus: starts in tab order
+        // Tab when nothing in the window has focus (or only the root): starts
+        // in tab order
         private bool OnTabWithoutFocus(
             KeyEvent e)
         {
+            // Nothing has focus, or the root holds it (FrameRenderer)
             var root = Renderers.FrameRenderer.Root;
-            if ((null != this._activity?.CurrentFocus) || (null == root)
+            var focused = this._activity?.CurrentFocus;
+            if ((null == root) || ((null != focused) && (focused != Renderers.FrameRenderer.RootNativeFrame))
                 || ((e.MetaState & ~(MetaKeyStates.ShiftOn | MetaKeyStates.ShiftLeftOn | MetaKeyStates.ShiftRightOn)) != 0))
             {
                 return false;

@@ -23,6 +23,19 @@ namespace XForms.Android.Renderers
 
             this.SetNativeElement(this._nativeFrame);
             Root = frame;
+            RootNativeFrame = this._nativeFrame;
+
+            // The root holds keyboard focus when nothing else does (at start,
+            // and after a tap), as on iOS, so Tab starts in tab order: Android
+            // would otherwise give focus to its first child (the drawing
+            // order) or search by position, and use up the Tab doing it
+            this._nativeFrame.Focusable = true;
+            this._nativeFrame.FocusableInTouchMode = true;
+            this._nativeFrame.DescendantFocusability = DescendantFocusability.BeforeDescendants;
+            if (OperatingSystem.IsAndroidVersionAtLeast(26))
+            {
+                this._nativeFrame.DefaultFocusHighlightEnabled = false;
+            }
 
             // The root frame is the window's content: report its size
             this._nativeFrame.LayoutChange += (sender, e) => LayerHost.For(frame).NotifyRootSize(new Size(
@@ -34,6 +47,12 @@ namespace XForms.Android.Renderers
         /// The window's root frame (Android shows one window).
         /// </summary>
         internal static Frame Root
+        {
+            get;
+            private set;
+        }
+
+        internal static AndroidFrameLayout RootNativeFrame
         {
             get;
             private set;
