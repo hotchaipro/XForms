@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System;
+
 using System.Windows.Input;
 using XForms.Input;
 using XForms.Controls;
@@ -167,21 +168,23 @@ namespace XForms.Controls
 
         void ITapGestureDelegate.OnTapBegan()
         {
-            var command = this.ToggleCommand;
-            if ((null != command) && (command.CanExecute(this.CommandParameter)))
-            {
-                command.Execute(this.CommandParameter);
-            }
-
-            this.IsChecked = !this._isChecked;
         }
 
         void ITapGestureDelegate.OnTapEnded()
         {
         }
 
+        // A tap toggles (a drag that starts here doesn't), then runs the
+        // command, which has the last word if it sets IsChecked itself
         void ITapGestureDelegate.OnTapped()
         {
+            this.IsChecked = !this._isChecked;
+
+            var command = this.ToggleCommand;
+            if ((null != command) && (command.CanExecute(this.CommandParameter)))
+            {
+                command.Execute(this.CommandParameter);
+            }
         }
 
         void IGestureRecognizerDelegate.OnTouchBegan()

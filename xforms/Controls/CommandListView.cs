@@ -92,7 +92,9 @@ namespace XForms.Controls
 
         /// <summary>
         /// The item the view shows. The list's item source sets it as the view
-        /// is reused for item after item.
+        /// is reused for item after item. Setting the item it already shows
+        /// does nothing (<see cref="OnItemChanged"/> isn't called): to show an
+        /// item's changes, have the item notify them.
         /// </summary>
         public object Item
         {
