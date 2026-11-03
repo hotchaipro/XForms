@@ -1108,8 +1108,32 @@ namespace XForms
         internal void UpdateSafeAreaUse()
         {
             var page = this._rootFrame?.CurrentPage;
-            this.Renderer.ExtendsIntoSafeArea = !(page?.UsesSafeArea ?? true);
+            this.Renderer.DrawnSafeAreaEdges = (null == page) ? SafeAreaEdges.None : (page.UsesSafeArea ? page.ExtendedEdges : SafeAreaEdges.All);
             this.Renderer.BottomSafeAreaColor = (page?.UsesSafeArea ?? false) ? page.BottomSafeAreaColor : null;
+        }
+
+        /// <summary>
+        /// The main frame, which shows the app's pages.
+        /// </summary>
+        internal Frame RootFrame
+        {
+            get
+            {
+                return this._rootFrame;
+            }
+        }
+
+        // The pages in the main frame lay out again around the system's bars
+        internal void OnPageInsetsChanged()
+        {
+            var frame = this._rootFrame;
+            if (null != frame)
+            {
+                foreach (var page in frame.GetStack())
+                {
+                    page.InvalidateMeasure();
+                }
+            }
         }
 
         /// <summary>

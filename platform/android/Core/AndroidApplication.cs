@@ -35,7 +35,7 @@ namespace XForms.Android
         private readonly HostView _hostView;
         private readonly LifecycleCallbacks _lifecycleCallbacks;
         private Activity _activity;
-        private bool _extendsIntoSafeArea;
+        private SafeAreaEdges _drawnSafeAreaEdges;
         private bool _isStatusBarLight;
         private bool _isNavigationBarLight;
         private Action _backHandler;
@@ -244,7 +244,7 @@ namespace XForms.Android
         /// Raised when the system bars, cutout or soft keyboard cover a
         /// different part of the window, with the insets in DIPs.
         /// </summary>
-        internal event Action<Thickness> SafeAreaInsetsChanged;
+        internal event Action<Thickness, float> SafeAreaInsetsChanged;
 
         internal Context Context
         {
@@ -278,22 +278,23 @@ namespace XForms.Android
         }
 
         /// <summary>
-        /// Whether the current page draws under the system bars and cutout.
-        /// The soft keyboard still pushes it up.
+        /// The safe area's edges the current page draws in itself: the status
+        /// and navigation bars' colors don't show there.
         /// </summary>
-        internal bool ExtendsIntoSafeArea
+        internal SafeAreaEdges DrawnSafeAreaEdges
         {
             get
             {
-                return this._extendsIntoSafeArea;
+                return this._drawnSafeAreaEdges;
             }
 
             set
             {
-                if (value != this._extendsIntoSafeArea)
+                if (value != this._drawnSafeAreaEdges)
                 {
-                    this._extendsIntoSafeArea = value;
-                    this.ApplyInsets();
+                    this._drawnSafeAreaEdges = value;
+                    this._hostView.SystemBars.DrawnEdges = value;
+                    this._hostView.SystemBars.InvalidateSelf();
                 }
             }
         }
@@ -444,23 +445,21 @@ namespace XForms.Android
             this._keyboardInset = keyboardInset;
             this.ApplyInsets();
 
-            this._hostView.SystemBars.StatusBarHeight = barInsets.Top;
+            this._hostView.SystemBars.BarInsets = new global::Android.Graphics.Rect(barInsets.Left, barInsets.Top, barInsets.Right, (0 < keyboardInset) ? 0 : barInsets.Bottom);
             this._hostView.SystemBars.InvalidateSelf();
 
             float scale = this._hostView.Resources.DisplayMetrics.Density;
-            this.SafeAreaInsetsChanged?.Invoke(new Thickness(
-                barInsets.Left / scale,
-                barInsets.Top / scale,
-                barInsets.Right / scale,
-                Math.Max(barInsets.Bottom, keyboardInset) / scale));
+            this.SafeAreaInsetsChanged?.Invoke(
+                new Thickness(barInsets.Left / scale, barInsets.Top / scale, barInsets.Right / scale, barInsets.Bottom / scale),
+                keyboardInset / scale);
         }
 
-        // Pads the app clear of the bars (unless the page extends under them)
-        // and the keyboard
+        // Pads the app clear of the keyboard: the pages span the screen, and
+        // keep their content clear of the bars themselves (their insets are
+        // padding)
         private void ApplyInsets()
         {
-            var bars = this._extendsIntoSafeArea ? new global::Android.Graphics.Rect() : this._barInsets;
-            this._hostView.SetPadding(bars.Left, bars.Top, bars.Right, Math.Max(bars.Bottom, this._keyboardInset));
+            this._hostView.SetPadding(0, 0, 0, this._keyboardInset);
         }
 
         /// <summary>
@@ -599,8 +598,9 @@ namespace XForms.Android
                 this._owner = owner;
                 this.SystemBars = new SystemBarsBackground();
 
-                // The system bars are transparent, so the app paints behind them
-                this.Background = this.SystemBars;
+                // The system bars are transparent: their colors are painted over
+                // the pages, which span the screen
+                this.Foreground = this.SystemBars;
                 this.SetOnApplyWindowInsetsListener(new SystemInsetsListener(owner));
             }
 
@@ -627,7 +627,12 @@ namespace XForms.Android
 
             public global::Android.Graphics.Color NavigationBarColor { get; set; } = global::Android.Graphics.Color.Transparent;
 
-            public int StatusBarHeight { get; set; }
+            // The bars and cutout's insets (the bottom one zero while the
+            // keyboard is up)
+            public global::Android.Graphics.Rect BarInsets { get; set; } = new global::Android.Graphics.Rect();
+
+            // Where the page draws itself
+            public SafeAreaEdges DrawnEdges { get; set; }
 
             public override int Opacity
             {
@@ -641,12 +646,30 @@ namespace XForms.Android
                 global::Android.Graphics.Canvas canvas)
             {
                 var bounds = this.Bounds;
+                var insets = this.BarInsets;
+                var drawn = this.DrawnEdges;
+
+                if (!drawn.HasFlag(SafeAreaEdges.Top))
+                {
+                    this._paint.Color = this.StatusBarColor;
+                    canvas.DrawRect(bounds.Left, bounds.Top, bounds.Right, bounds.Top + insets.Top, this._paint);
+                }
 
                 this._paint.Color = this.NavigationBarColor;
-                canvas.DrawRect(bounds, this._paint);
+                if (!drawn.HasFlag(SafeAreaEdges.Bottom))
+                {
+                    canvas.DrawRect(bounds.Left, bounds.Bottom - insets.Bottom, bounds.Right, bounds.Bottom, this._paint);
+                }
 
-                this._paint.Color = this.StatusBarColor;
-                canvas.DrawRect(bounds.Left, bounds.Top, bounds.Right, bounds.Top + this.StatusBarHeight, this._paint);
+                if (!drawn.HasFlag(SafeAreaEdges.Left))
+                {
+                    canvas.DrawRect(bounds.Left, bounds.Top + insets.Top, bounds.Left + insets.Left, bounds.Bottom - insets.Bottom, this._paint);
+                }
+
+                if (!drawn.HasFlag(SafeAreaEdges.Right))
+                {
+                    canvas.DrawRect(bounds.Right - insets.Right, bounds.Top + insets.Top, bounds.Right, bounds.Bottom - insets.Bottom, this._paint);
+                }
             }
 
             public override void SetAlpha(

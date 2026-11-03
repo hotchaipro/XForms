@@ -102,3 +102,12 @@ XForms.Primitives.KeyboardDismissMode.None = 0 -> XForms.Primitives.KeyboardDism
 XForms.Primitives.KeyboardDismissMode.OnDrag = 1 -> XForms.Primitives.KeyboardDismissMode
 XForms.Primitives.ScrollViewer.KeyboardDismissMode.get -> XForms.Primitives.KeyboardDismissMode
 XForms.Primitives.ScrollViewer.KeyboardDismissMode.set -> void
+XForms.SafeAreaEdges
+XForms.SafeAreaEdges.All = XForms.SafeAreaEdges.Left | XForms.SafeAreaEdges.Top | XForms.SafeAreaEdges.Right | XForms.SafeAreaEdges.Bottom -> XForms.SafeAreaEdges
+XForms.SafeAreaEdges.Bottom = 8 -> XForms.SafeAreaEdges
+XForms.SafeAreaEdges.Left = 1 -> XForms.SafeAreaEdges
+XForms.SafeAreaEdges.None = 0 -> XForms.SafeAreaEdges
+XForms.SafeAreaEdges.Right = 4 -> XForms.SafeAreaEdges
+XForms.SafeAreaEdges.Top = 2 -> XForms.SafeAreaEdges
+XForms.View.ExtendsIntoSafeArea.get -> XForms.SafeAreaEdges
+XForms.View.ExtendsIntoSafeArea.set -> void

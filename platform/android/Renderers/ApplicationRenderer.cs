@@ -30,7 +30,7 @@ namespace XForms.Android.Renderers
             androidApplication.Suspending += Application_Suspending;
             androidApplication.Resuming += Application_Resuming;
             androidApplication.ConfigurationChanged += (sender, e) => this._applicationHost.SystemThemeChanged();
-            androidApplication.SafeAreaInsetsChanged += (insets) => this._applicationHost.SafeAreaInsetsChanged(insets);
+            androidApplication.SafeAreaInsetsChanged += (bars, keyboard) => this._applicationHost.SafeAreaInsetsChanged(bars, keyboard);
         }
 
 
@@ -159,11 +159,11 @@ namespace XForms.Android.Renderers
             throw new PlatformNotSupportedException("This platform shows one window.");
         }
 
-        public bool ExtendsIntoSafeArea
+        public SafeAreaEdges DrawnSafeAreaEdges
         {
             set
             {
-                this._androidApplication.ExtendsIntoSafeArea = value;
+                this._androidApplication.DrawnSafeAreaEdges = value;
             }
         }
 

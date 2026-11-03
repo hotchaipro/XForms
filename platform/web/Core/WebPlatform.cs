@@ -161,7 +161,8 @@ namespace XForms.Web
         {
         }
 
-        public bool ExtendsIntoSafeArea
+        // No system bands to show or hide
+        public SafeAreaEdges DrawnSafeAreaEdges
         {
             set
             {

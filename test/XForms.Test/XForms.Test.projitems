@@ -11,6 +11,7 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AccessibilityPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AppLayerPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SafeAreaPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AnimationPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BenchmarkPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ControlPage.cs" />

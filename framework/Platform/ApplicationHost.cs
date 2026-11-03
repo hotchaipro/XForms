@@ -169,13 +169,18 @@ namespace XForms.Platform
         }
 
         /// <summary>
-        /// The parts of the main window covered by system bars, a display
-        /// cutout or the soft keyboard changed (in DIPs).
+        /// The parts of the main window covered by system bars and a display
+        /// cutout, or the soft keyboard's height over its bottom, changed (in
+        /// DIPs). The pages in the main frame lay out again around them.
         /// </summary>
         public void SafeAreaInsetsChanged(
-            Thickness insets)
+            Thickness bars,
+            float keyboardHeight)
         {
-            this._application.MainWindow.OnSafeAreaInsetsChanged(insets);
+            if (this._application.MainWindow.OnSafeAreaInsetsChanged(bars, keyboardHeight))
+            {
+                this._application.OnPageInsetsChanged();
+            }
         }
 
         // ── Hover ──────────────────────────────────────────────────────────

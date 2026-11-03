@@ -53,32 +53,36 @@ namespace XForms.iOS.Renderers
         }
 
         /// <summary>
-        /// Whether the status bar's band shows: not when the page draws under
-        /// the status bar itself.
+        /// The safe area's edges the page draws in itself: the status bar's band
+        /// doesn't show at the top then, nor the home indicator's at the bottom.
         /// </summary>
-        internal bool ShowsStatusBarBand
+        internal SafeAreaEdges DrawnSafeAreaEdges
         {
             set
             {
-                ((RootView)this.NativeElement).StatusBarBand.Hidden = !value;
+                var root = (RootView)this.NativeElement;
+                root.DrawnSafeAreaEdges = value;
+                root.UpdateBands();
             }
         }
 
         /// <summary>
         /// The color of the band under the home indicator, below a page that
-        /// uses the safe area (a bar docked at its bottom reaching the screen's
-        /// edge), or null for none: the page's own background shows there.
+        /// uses the safe area, or null for none: the page's own background
+        /// shows there.
         /// </summary>
         internal Color? HomeIndicatorBandColor
         {
             set
             {
-                var band = ((RootView)this.NativeElement).HomeIndicatorBand;
-                band.Hidden = !value.HasValue;
+                var root = (RootView)this.NativeElement;
+                root.HomeIndicatorColor = value;
                 if (value.HasValue)
                 {
-                    band.BackgroundColor = value.Value.ToUIColor();
+                    root.HomeIndicatorBand.BackgroundColor = value.Value.ToUIColor();
                 }
+
+                root.UpdateBands();
             }
         }
 
@@ -351,10 +355,32 @@ namespace XForms.iOS.Renderers
                 get;
             } = new NativeView() { UserInteractionEnabled = false, Hidden = true };
 
+            internal SafeAreaEdges DrawnSafeAreaEdges;
+            internal Color? HomeIndicatorColor;
+
+            internal void UpdateBands()
+            {
+                this.StatusBarBand.Hidden = this.DrawnSafeAreaEdges.HasFlag(SafeAreaEdges.Top);
+                this.HomeIndicatorBand.Hidden = this.DrawnSafeAreaEdges.HasFlag(SafeAreaEdges.Bottom) || !this.HomeIndicatorColor.HasValue;
+            }
+
             public override void SafeAreaInsetsDidChange()
             {
                 base.SafeAreaInsetsDidChange();
                 this.SetNeedsLayout();
+            }
+
+            // The main frame reports the safe area its pages keep clear of:
+            // the bars and cutout, and the keyboard over the bottom
+            private void ReportSafeArea()
+            {
+                if ((null == this._frame.Parent) && (ApplicationHost.Current is ApplicationHost application))
+                {
+                    var insets = this.SafeAreaInsets;
+                    application.SafeAreaInsetsChanged(
+                        new Thickness((float)insets.Left, (float)insets.Top, (float)insets.Right, (float)insets.Bottom),
+                        (float)this._keyboardOverlap);
+                }
             }
 
             public override void LayoutSubviews()
@@ -372,6 +398,8 @@ namespace XForms.iOS.Renderers
                         Place(page, new Rect(0, 0, (float)this.Bounds.Width, (float)height));
                     }
                 }
+
+                this.ReportSafeArea();
 
                 this.StatusBarBand.Frame = new CoreGraphics.CGRect(0, 0, this.Bounds.Width, this.SafeAreaInsets.Top);
                 this.BringSubviewToFront(this.StatusBarBand);

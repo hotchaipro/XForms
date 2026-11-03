@@ -158,7 +158,8 @@ namespace XForms.Win32
         }
 
         // A desktop window has no system bars over it
-        public bool ExtendsIntoSafeArea
+        // No system bands to show or hide
+        public SafeAreaEdges DrawnSafeAreaEdges
         {
             set
             {

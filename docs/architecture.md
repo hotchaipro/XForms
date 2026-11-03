@@ -204,16 +204,24 @@ they need:
   screen size; SoonerOrLater's `MainActivity` is the pattern), so
   re-creation is rare. Use a theme without an action bar.
 
-**System bars.** A page uses the safe area unless it sets
-`Page.UsesSafeArea` to false. The bars around a page that uses it take the
-app's colors. At the top, `TitleBar.AccentColor` (or the theme's
-background) fills the status bar: Android colors its status bar, and iOS
-puts a band of that color over the top inset. The status bar's text is
-light or dark to match `TitleBar.ForegroundColor`. At the bottom,
-`Page.BottomSafeAreaColor` fills the system's bar (Android's navigation
-bar, a band under iOS's home indicator), so a bar docked at the page's
-bottom reaches the screen's edge while its buttons stay clear. Without it,
-the page's background shows there.
+**System bars.** Pages in the main frame span the screen. A page that
+uses the safe area (the default; see `Page.UsesSafeArea`) keeps its content
+clear of the status bar, cutout and home indicator or navigation bar.
+- **How:** it pads its content by the system's insets, in the framework's
+  layout, the same on every platform. The soft keyboard shrinks the pages
+  instead (the area above it), so a page then has no bottom inset.
+- **Reaching the edge:** a view sets `ExtendsIntoSafeArea` (edges) to reach
+  the screen's edge. Where it lies along the page's safe edge, it grows
+  through the inset and adds the inset to its padding: a bar's background
+  fills the status bar's area, its content stays clear, and it animates
+  off-screen and back as one view.
+- **The bands:** on edges no view reaches, the platform draws a band.
+  `TitleBar.AccentColor` (or the theme's background) colors the top one,
+  and `Page.BottomSafeAreaColor` colors the bottom one (Android's
+  navigation bar, a band under iOS's home indicator); without it, the
+  page's background shows.
+- **Status bar text:** it's light or dark to match
+  `TitleBar.ForegroundColor`.
 
 ## Navigation
 

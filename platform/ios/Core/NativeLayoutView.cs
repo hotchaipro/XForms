@@ -119,15 +119,6 @@ namespace XForms.iOS
         }
 
         /// <summary>
-        /// Keeps the content clear of the status bar, notch and home indicator.
-        /// </summary>
-        public bool RespectsSafeArea
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
         /// The view that receives pointer input from touches that land on this
         /// view or on any descendant that does not handle them.
         /// </summary>
@@ -164,46 +155,18 @@ namespace XForms.iOS
             this.SetNeedsLayout();
         }
 
-        public override void SafeAreaInsetsDidChange()
-        {
-            base.SafeAreaInsetsDidChange();
-
-            if (this.RespectsSafeArea)
-            {
-                this.InvalidateContentLayout();
-            }
-
-            // The window's safe area, for pages that lay out around it
-            var window = this.Window;
-            if ((null != window) && (ApplicationHost.Current is ApplicationHost application))
-            {
-                var insets = window.SafeAreaInsets;
-                application.SafeAreaInsetsChanged(new Thickness((float)insets.Left, (float)insets.Top, (float)insets.Right, (float)insets.Bottom));
-            }
-        }
-
+        // NOTE: A page keeps its content clear of the status bar, notch and
+        // home indicator itself, in its layout (its insets are padding)
         public override void LayoutSubviews()
         {
             base.LayoutSubviews();
 
-            var insets = this.RespectsSafeArea ? this.SafeAreaInsets : UIEdgeInsets.Zero;
             var bounds = this.Bounds;
-
-            var contentSize = new Size(
-                (float)Math.Max(0, bounds.Width - insets.Left - insets.Right),
-                (float)Math.Max(0, bounds.Height - insets.Top - insets.Bottom));
+            var contentSize = new Size((float)bounds.Width, (float)bounds.Height);
 
             if ((this._isLayoutValid) && (contentSize == this._laidOutSize))
             {
                 return;
-            }
-
-            // Shift the coordinate system so children laid out at (0, 0) start
-            // inside the safe area
-            var origin = new CGPoint(-insets.Left, -insets.Top);
-            if (bounds.Location != origin)
-            {
-                this.Bounds = new CGRect(origin, bounds.Size);
             }
 
             if ((!this._isMeasureValid) || (contentSize != this._measuredAvailableSize))

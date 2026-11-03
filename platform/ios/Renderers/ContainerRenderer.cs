@@ -24,10 +24,6 @@ namespace XForms.iOS.Renderers
         {
             this._drawsContent = LayerHost.For(view).DrawsContent;
             var native = this._drawsContent ? new OwnerDrawControl(view) : new NativeLayoutView(view);
-
-            // A page's background fills the screen; its content stays clear of
-            // the status bar, notch and home indicator
-            native.RespectsSafeArea = view is Page;
             this.SetNativeElement(native);
         }
 

@@ -184,14 +184,33 @@ namespace XForms
 
         public event EventHandler SafeAreaInsetsChanged;
 
-        internal void OnSafeAreaInsetsChanged(
-            Thickness insets)
+        /// <summary>
+        /// The system's bars' insets from the area the pages take (above the
+        /// soft keyboard): what a page that uses the safe area keeps clear of.
+        /// </summary>
+        internal Thickness PageInsets
         {
+            get;
+            private set;
+        }
+
+        // The bars and cutout's insets, and the keyboard's height over the
+        // window's bottom
+        internal bool OnSafeAreaInsetsChanged(
+            Thickness bars,
+            float keyboardHeight)
+        {
+            var insets = new Thickness(bars.Left, bars.Top, bars.Right, Math.Max(bars.Bottom, keyboardHeight));
+            var pageInsets = new Thickness(bars.Left, bars.Top, bars.Right, Math.Max(0, bars.Bottom - keyboardHeight));
+            bool isPageChanged = (pageInsets != this.PageInsets);
+            this.PageInsets = pageInsets;
             if (insets != this.SafeAreaInsets)
             {
                 this.SafeAreaInsets = insets;
                 this.SafeAreaInsetsChanged?.Invoke(this, EventArgs.Empty);
             }
+
+            return isPageChanged;
         }
 
         /// <summary>

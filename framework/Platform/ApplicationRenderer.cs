@@ -57,11 +57,12 @@ namespace XForms.Platform
         void ResizeWindow(Size size);
 
         /// <summary>
-        /// Whether the current page draws under the system bars and display
-        /// cutout (its <see cref="Page.UsesSafeArea"/> is false). Otherwise the
-        /// platform keeps the page clear of them.
+        /// The edges of the safe area the current page draws in itself: all of
+        /// them when it doesn't use the safe area, or those its views reach
+        /// into (<see cref="View.ExtendsIntoSafeArea"/>). The platform's bands
+        /// (the title bar's accent, the bottom color) show on the others.
         /// </summary>
-        bool ExtendsIntoSafeArea { set; }
+        SafeAreaEdges DrawnSafeAreaEdges { set; }
 
         /// <summary>
         /// The color under the system's bar at the bottom of the screen, below

@@ -2115,6 +2115,12 @@ namespace XForms
         private Size _maximumSize = new Size(Dimension.Auto, Dimension.Auto);
         private Thickness _margin = Thickness.Zero;
         private Thickness _padding = Thickness.Zero;
+        private SafeAreaEdges _extendsIntoSafeArea;
+
+        // How far the view reaches into the safe area (an extending view), or
+        // how far a page keeps its content from the system's bars: added to
+        // its padding
+        private Thickness _safeAreaExtension;
         private HorizontalAlignment _horizontalAlignment = HorizontalAlignment.Stretch;
         private VerticalAlignment _verticalAlignment = VerticalAlignment.Stretch;
         private FlowDirection? _flowDirection;
@@ -2270,6 +2276,126 @@ namespace XForms
                 this._padding = value;
                 this.InvalidateMeasure();
             }
+        }
+
+        /// <summary>
+        /// The edges on which the view reaches into the safe area: where it
+        /// lies along the edge of a page that keeps clear of the system's
+        /// bars, it grows through them to the screen's edge, and its content
+        /// is padded by as much, staying clear. So a bar docked at the top or
+        /// bottom of a page fills the status bar or home indicator area behind
+        /// it, and moves as one view when it animates. None by default.
+        /// </summary>
+        public SafeAreaEdges ExtendsIntoSafeArea
+        {
+            get
+            {
+                return this._extendsIntoSafeArea;
+            }
+
+            set
+            {
+                if (value != this._extendsIntoSafeArea)
+                {
+                    this._extendsIntoSafeArea = value;
+                    this.InvalidateMeasure();
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        /// <summary>
+        /// The view's padding, with the safe area's added (see
+        /// <see cref="ExtendsIntoSafeArea"/>, and a page's insets).
+        /// </summary>
+        private Thickness LayoutPadding
+        {
+            get
+            {
+                var safeArea = this.SafeAreaPadding;
+                var padding = this._padding;
+                return new Thickness(
+                    padding.Left + safeArea.Left,
+                    padding.Top + safeArea.Top,
+                    padding.Right + safeArea.Right,
+                    padding.Bottom + safeArea.Bottom);
+            }
+        }
+
+        /// <summary>
+        /// The space the safe area adds to the view's padding: a page's insets
+        /// from the system's bars, or how far an extending view reaches.
+        /// </summary>
+        internal virtual Thickness SafeAreaPadding
+        {
+            get
+            {
+                return this._safeAreaExtension;
+            }
+        }
+
+        // An extending view along the edge of a page's safe area grows through
+        // the page's insets there (the rectangle is in the parent's coordinates)
+        private Rect ExtendIntoSafeArea(
+            Rect rect)
+        {
+            var extension = Thickness.Zero;
+            Page page = null;
+            float x = rect.X, y = rect.Y;
+            for (var ancestor = this.Parent as View; null != ancestor; ancestor = ancestor.Parent as View)
+            {
+                if (ancestor is Page candidate)
+                {
+                    page = candidate;
+                    break;
+                }
+
+                x += ancestor._frame.X;
+                y += ancestor._frame.Y;
+            }
+
+            var insets = page?.SafeAreaPadding ?? Thickness.Zero;
+            var edges = SafeAreaEdges.None;
+            if (null != page)
+            {
+                const float Tolerance = 0.5f;
+                // (A page's frame is the platform's to place: its size is the
+                // one it last laid out at)
+                var size = page._contentArrangeSize;
+                var wanted = this._extendsIntoSafeArea;
+                if (wanted.HasFlag(SafeAreaEdges.Left) && (0 < insets.Left) && (Math.Abs(x - insets.Left) < Tolerance))
+                {
+                    extension = new Thickness(insets.Left, extension.Top, extension.Right, extension.Bottom);
+                    edges |= SafeAreaEdges.Left;
+                }
+
+                if (wanted.HasFlag(SafeAreaEdges.Top) && (0 < insets.Top) && (Math.Abs(y - insets.Top) < Tolerance))
+                {
+                    extension = new Thickness(extension.Left, insets.Top, extension.Right, extension.Bottom);
+                    edges |= SafeAreaEdges.Top;
+                }
+
+                if (wanted.HasFlag(SafeAreaEdges.Right) && (0 < insets.Right) && (Math.Abs((x + rect.Width) - (size.Width - insets.Right)) < Tolerance))
+                {
+                    extension = new Thickness(extension.Left, extension.Top, insets.Right, extension.Bottom);
+                    edges |= SafeAreaEdges.Right;
+                }
+
+                if (wanted.HasFlag(SafeAreaEdges.Bottom) && (0 < insets.Bottom) && (Math.Abs((y + rect.Height) - (size.Height - insets.Bottom)) < Tolerance))
+                {
+                    extension = new Thickness(extension.Left, extension.Top, extension.Right, insets.Bottom);
+                    edges |= SafeAreaEdges.Bottom;
+                }
+
+                page.SetExtendedEdges(this, edges);
+            }
+
+            this._safeAreaExtension = extension;
+            return new Rect(
+                rect.X - extension.Left,
+                rect.Y - extension.Top,
+                rect.Width + extension.Left + extension.Right,
+                rect.Height + extension.Top + extension.Bottom);
         }
 
         public HorizontalAlignment HorizontalAlignment
@@ -2457,7 +2583,15 @@ namespace XForms
                 this._minimumSize.Height,
                 this._maximumSize.Height);
 
-            Size measuredSize = this.Renderer.MeasureNative(new Size(availableWidth, availableHeight));
+            // An extending view lays its content out within its extension (in
+            // its padding), but takes its place without it
+            var extension = this._safeAreaExtension;
+            Size measuredSize = this.Renderer.MeasureNative(new Size(
+                availableWidth + extension.Left + extension.Right,
+                availableHeight + extension.Top + extension.Bottom));
+            measuredSize = new Size(
+                Math.Max(0, measuredSize.Width - extension.Left - extension.Right),
+                Math.Max(0, measuredSize.Height - extension.Top - extension.Bottom));
 
             float width = ConstrainLength(measuredSize.Width, this._requestedSize.Width, this._minimumSize.Width, this._maximumSize.Width);
             float height = ConstrainLength(measuredSize.Height, this._requestedSize.Height, this._minimumSize.Height, this._maximumSize.Height);
@@ -2530,7 +2664,7 @@ namespace XForms
             // parent mirrors them
             if (this.Parent is View parent)
             {
-                var padding = parent._padding;
+                var padding = parent.LayoutPadding;
                 x += padding.Left;
                 y += padding.Top;
 
@@ -2541,6 +2675,11 @@ namespace XForms
             }
 
             this._frame = new Rect(x, y, width, height);
+            if ((SafeAreaEdges.None != this._extendsIntoSafeArea) || (Thickness.Zero != this._safeAreaExtension))
+            {
+                this._frame = this.ExtendIntoSafeArea(this._frame);
+            }
+
             if (!(this.Parent is View))
             {
                 this.OnRootSizeChanged(new Size(width, height));
@@ -2569,7 +2708,7 @@ namespace XForms
         {
             this._contentMeasureSize = availableSize;
 
-            var padding = this._padding;
+            var padding = this.LayoutPadding;
             var size = this.MeasureOverride(new Size(
                 Math.Max(0, availableSize.Width - padding.Left - padding.Right),
                 Math.Max(0, availableSize.Height - padding.Top - padding.Bottom)));
@@ -2614,7 +2753,7 @@ namespace XForms
         {
             this._contentArrangeSize = size;
 
-            var padding = this._padding;
+            var padding = this.LayoutPadding;
             this.ArrangeOverride(new Size(
                 Math.Max(0, size.Width - padding.Left - padding.Right),
                 Math.Max(0, size.Height - padding.Top - padding.Bottom)));

@@ -154,21 +154,14 @@ namespace XForms.iOS.Renderers
             throw new PlatformNotSupportedException("This platform shows one window.");
         }
 
-        public bool ExtendsIntoSafeArea
+        // The bands show where the page doesn't draw itself
+        public SafeAreaEdges DrawnSafeAreaEdges
         {
             set
             {
-                // The current page's view keeps its content in the safe area,
-                // below the status bar's band
-                if (this._rootFrame?.CurrentPage?.Renderer?.NativeElement is NativeLayoutView page)
-                {
-                    page.RespectsSafeArea = !value;
-                    page.InvalidateContentLayout();
-                }
-
                 if (this._rootFrame?.Renderer is FrameRenderer frameRenderer)
                 {
-                    frameRenderer.ShowsStatusBarBand = !value;
+                    frameRenderer.DrawnSafeAreaEdges = value;
                 }
             }
         }

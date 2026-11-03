@@ -14,6 +14,10 @@ namespace XForms
         private bool _usesSafeArea = true;
         private Color? _bottomSafeAreaColor;
 
+        // The views reaching into the safe area, and on which edges
+        private Dictionary<View, SafeAreaEdges> _extendingViews;
+        private SafeAreaEdges _extendedEdges;
+
         public Page()
         {
         }
@@ -73,6 +77,8 @@ namespace XForms
                         this.Application.UpdateSafeAreaUse();
                     }
 
+                    this.InvalidateMeasure();
+
                     this.OnPropertyChanged();
                 }
             }
@@ -86,6 +92,70 @@ namespace XForms
         /// buttons clear of the system's. Null (the default): the page's
         /// background.
         /// </summary>
+        /// <summary>
+        /// A page shown in the app's main frame keeps its content clear of the
+        /// system's bars (its insets are padding), unless it doesn't use the
+        /// safe area.
+        /// </summary>
+        internal override Thickness SafeAreaPadding
+        {
+            get
+            {
+                if (this._usesSafeArea && (this.Parent is Frame frame) && (null == frame.Parent) && (null != this.Application) && (frame == this.Application.RootFrame))
+                {
+                    return this.Application.MainWindow?.PageInsets ?? Thickness.Zero;
+                }
+
+                return Thickness.Zero;
+            }
+        }
+
+        /// <summary>
+        /// The safe area's edges that views on the page reach into (see
+        /// <see cref="View.ExtendsIntoSafeArea"/>): the platform shows no band
+        /// of its own there.
+        /// </summary>
+        internal SafeAreaEdges ExtendedEdges
+        {
+            get
+            {
+                return this._extendedEdges;
+            }
+        }
+
+        internal void SetExtendedEdges(
+            View view,
+            SafeAreaEdges edges)
+        {
+            if (SafeAreaEdges.None == edges)
+            {
+                this._extendingViews?.Remove(view);
+            }
+            else
+            {
+                this._extendingViews ??= new Dictionary<View, SafeAreaEdges>();
+                this._extendingViews[view] = edges;
+            }
+
+            var union = SafeAreaEdges.None;
+            if (null != this._extendingViews)
+            {
+                foreach (var pair in this._extendingViews)
+                {
+                    union |= pair.Value;
+                }
+            }
+
+            if (union != this._extendedEdges)
+            {
+                this._extendedEdges = union;
+                if (this.HasRenderer)
+                {
+                    this.Application.UpdateSafeAreaUse();
+                }
+            }
+        }
+
         public Color? BottomSafeAreaColor
         {
             get
