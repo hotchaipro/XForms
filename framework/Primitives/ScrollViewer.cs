@@ -24,6 +24,7 @@ namespace XForms.Primitives
         private View _content;
         private bool? _isVerticalScrollingEnabled;
         private bool? _isHorizontalScrollingEnabled;
+        private KeyboardDismissMode _keyboardDismissMode;
         private float? _pendingVerticalOffset;
 
         public View Content
@@ -53,6 +54,25 @@ namespace XForms.Primitives
                 }
 
                 this.InvalidateMeasure();
+            }
+        }
+
+        /// <summary>
+        /// Whether scrolling hides the soft keyboard: none (the default), on a
+        /// drag, or interactively (the keyboard follows the drag, on iOS).
+        /// </summary>
+        public KeyboardDismissMode KeyboardDismissMode
+        {
+            get
+            {
+                return this._keyboardDismissMode;
+            }
+
+            set
+            {
+                this._keyboardDismissMode = value;
+                this.Native?.KeyboardDismissMode = value;
+                this.OnPropertyChanged();
             }
         }
 
@@ -171,6 +191,7 @@ namespace XForms.Primitives
             var native = this.Native;
             if (this._isVerticalScrollingEnabled.HasValue) native.IsVerticalScrollingEnabled = this._isVerticalScrollingEnabled.Value;
             if (this._isHorizontalScrollingEnabled.HasValue) native.IsHorizontalScrollingEnabled = this._isHorizontalScrollingEnabled.Value;
+            if (this._keyboardDismissMode != KeyboardDismissMode.None) native.KeyboardDismissMode = this._keyboardDismissMode;
 
             var content = this._content;
             if (null != content)

@@ -486,10 +486,24 @@ namespace XForms.Android
         /// </summary>
         internal void EndTextEntry()
         {
-            var focused = this._activity?.CurrentFocus;
+            var decorView = this._activity?.Window?.DecorView;
+            if (null != decorView)
+            {
+                EndTextEntry(decorView);
+            }
+        }
+
+        /// <summary>
+        /// The focused text entry in the view's window, if one has focus,
+        /// gives it up and the soft keyboard hides.
+        /// </summary>
+        internal static void EndTextEntry(
+            global::Android.Views.View viewInWindow)
+        {
+            var focused = viewInWindow.RootView?.FindFocus();
             if (focused is EditText)
             {
-                var inputMethods = (global::Android.Views.InputMethods.InputMethodManager)this._activity.GetSystemService(Context.InputMethodService);
+                var inputMethods = (global::Android.Views.InputMethods.InputMethodManager)focused.Context.GetSystemService(Context.InputMethodService);
                 inputMethods?.HideSoftInputFromWindow(focused.WindowToken, global::Android.Views.InputMethods.HideSoftInputFlags.None);
                 focused.ClearFocus();
             }

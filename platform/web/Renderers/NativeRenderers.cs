@@ -59,6 +59,12 @@ namespace XForms.Web.Renderers
             set { this._isVerticalScrollingEnabled = value; this.ApplyOverflow(); this.InvalidateMeasure(); }
         }
 
+        // Interactive (iOS's keyboard following the drag) is a drag here
+        public KeyboardDismissMode KeyboardDismissMode
+        {
+            set { Js.SetDismissesKeyboardOnDrag(this.Id, value != KeyboardDismissMode.None); }
+        }
+
         public bool IsHorizontalScrollingEnabled
         {
             get => this._isHorizontalScrollingEnabled;

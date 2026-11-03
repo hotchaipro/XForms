@@ -19,6 +19,19 @@ namespace XForms.iOS.Renderers
             this.SetNativeElement(this._nativeScrollView);
         }
 
+        public KeyboardDismissMode KeyboardDismissMode
+        {
+            set
+            {
+                this._nativeScrollView.KeyboardDismissMode = value switch
+                {
+                    KeyboardDismissMode.OnDrag => UIScrollViewKeyboardDismissMode.OnDrag,
+                    KeyboardDismissMode.Interactive => UIScrollViewKeyboardDismissMode.Interactive,
+                    _ => UIScrollViewKeyboardDismissMode.None,
+                };
+            }
+        }
+
         public float VerticalOffset
         {
             get

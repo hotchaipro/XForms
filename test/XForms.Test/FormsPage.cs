@@ -114,6 +114,7 @@ namespace XForms.Test
             return new ScrollViewer()
             {
                 IsVerticalScrollingEnabled = true,
+                KeyboardDismissMode = KeyboardDismissMode.OnDrag,
                 Content = layout,
             };
         }

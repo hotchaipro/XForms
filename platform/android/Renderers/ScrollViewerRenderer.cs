@@ -7,6 +7,15 @@ namespace XForms.Android.Renderers
 {
     internal class ScrollViewerRenderer : ViewRenderer<AndroidScrollView>, IScrollViewerRenderer
     {
+        // Interactive (iOS's keyboard following the drag) is a drag here
+        public KeyboardDismissMode KeyboardDismissMode
+        {
+            set
+            {
+                this._nativeScrollView.DismissesKeyboardOnDrag = (value != KeyboardDismissMode.None);
+            }
+        }
+
         public float VerticalOffset
         {
             get

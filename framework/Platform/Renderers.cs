@@ -247,6 +247,8 @@ namespace XForms.Platform
 
         bool IsHorizontalScrollingEnabled { get; set; }
 
+        KeyboardDismissMode KeyboardDismissMode { set; }
+
         float VerticalOffset { get; }
 
         void ScrollTo(float verticalOffset, bool animated);

@@ -23,6 +23,46 @@ namespace XForms.Android
             set;
         }
 
+        /// <summary>
+        /// Whether a drag on the content ends text entry, hiding the soft
+        /// keyboard (once per drag, past the touch slop).
+        /// </summary>
+        public bool DismissesKeyboardOnDrag
+        {
+            get;
+            set;
+        }
+
+        private float _dragStartY;
+        private bool _isDragDismissed;
+
+        public override bool DispatchTouchEvent(
+            global::Android.Views.MotionEvent e)
+        {
+            if (this.DismissesKeyboardOnDrag)
+            {
+                switch (e.ActionMasked)
+                {
+                    case global::Android.Views.MotionEventActions.Down:
+                        this._dragStartY = e.GetY();
+                        this._isDragDismissed = false;
+                        break;
+
+                    case global::Android.Views.MotionEventActions.Move:
+                        int slop = global::Android.Views.ViewConfiguration.Get(this.Context).ScaledTouchSlop;
+                        if ((!this._isDragDismissed) && (Math.Abs(e.GetY() - this._dragStartY) > slop))
+                        {
+                            this._isDragDismissed = true;
+                            AndroidApplication.EndTextEntry(this);
+                        }
+
+                        break;
+                }
+            }
+
+            return base.DispatchTouchEvent(e);
+        }
+
         protected override void OnMeasure(
             int widthMeasureSpec,
             int heightMeasureSpec)

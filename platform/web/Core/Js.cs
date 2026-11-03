@@ -138,6 +138,9 @@ namespace XForms.Web
         [JSImport("endTextEntry", Module)]
         public static partial void EndTextEntry();
 
+        [JSImport("setDismissesKeyboardOnDrag", Module)]
+        public static partial void SetDismissesKeyboardOnDrag(int id, bool value);
+
         [JSImport("getFocusedId", Module)]
         public static partial int GetFocusedId();
 

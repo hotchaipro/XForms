@@ -88,6 +88,14 @@ namespace XForms.Win32.Renderers
             set;
         }
 
+        // No soft keyboard
+        public KeyboardDismissMode KeyboardDismissMode
+        {
+            set
+            {
+            }
+        }
+
         IDCompositionVisual2* IScrollContent.ContentVisual
         {
             get

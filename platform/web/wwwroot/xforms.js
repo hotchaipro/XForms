@@ -33,7 +33,31 @@ export async function init() {
     root.style.webkitUserSelect = 'none';
     document.body.appendChild(root);
 
+    // The soft keyboard shrinks the page to what it leaves visible, as on
+    // iOS and Android: the layout viewport resizes where the browser
+    // supports it, and elsewhere (Safari) the page follows the visual one
+    let meta = document.querySelector('meta[name=viewport]');
+    if (!meta) {
+        meta = document.createElement('meta');
+        meta.name = 'viewport';
+        meta.content = 'width=device-width, initial-scale=1';
+        document.head.appendChild(meta);
+    }
+    if (!meta.content.includes('interactive-widget')) {
+        meta.content += ', interactive-widget=resizes-content';
+    }
+
     window.addEventListener('resize', () => exports.OnResize());
+    window.visualViewport?.addEventListener('resize', () => {
+        exports.OnResize();
+        // Once laid out in the room left, the focused entry is still in view
+        requestAnimationFrame(() => {
+            const element = document.activeElement;
+            if (element && (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA')) {
+                element.scrollIntoView({ block: 'nearest' });
+            }
+        });
+    });
     for (const query of ['(prefers-color-scheme: dark)', '(prefers-contrast: more)', '(forced-colors: active)']) {
         window.matchMedia(query).addEventListener('change', () => exports.OnThemeChanged());
     }
@@ -189,7 +213,17 @@ export function fontMetrics(font) {
 // The viewport and the device pixel ratio
 
 export function viewport() {
-    return [window.innerWidth, window.innerHeight, window.devicePixelRatio || 1];
+    // A keyboard over the page leaves the visual viewport shorter than the
+    // layout one (unless the page is zoomed, which also shrinks it)
+    let height = window.innerHeight;
+    const visual = window.visualViewport;
+    if (visual && (visual.scale <= 1.01) && (visual.height < height)) {
+        height = Math.round(visual.height);
+    }
+    if (root) {
+        root.style.bottom = (window.innerHeight - height) + 'px';
+    }
+    return [window.innerWidth, height, window.devicePixelRatio || 1];
 }
 
 // Scheduling
@@ -552,6 +586,23 @@ export function endTextEntry() {
     const element = document.activeElement;
     if (element && (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA')) {
         element.blur();
+    }
+}
+
+// A touch drag on a scrolling element ends text entry, once past the slop
+export function setDismissesKeyboardOnDrag(id, value) {
+    const element = elements.get(id);
+    element.dataset.dismissesKeyboard = value ? '1' : '';
+    if (value && !element.dataset.dismissListening) {
+        element.dataset.dismissListening = '1';
+        let startY = null;
+        element.addEventListener('touchstart', (e) => { startY = e.touches[0].clientY; }, { passive: true });
+        element.addEventListener('touchmove', (e) => {
+            if (element.dataset.dismissesKeyboard && (startY !== null) && (Math.abs(e.touches[0].clientY - startY) > 10)) {
+                startY = null;
+                endTextEntry();
+            }
+        }, { passive: true });
     }
 }
 

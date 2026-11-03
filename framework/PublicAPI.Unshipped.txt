@@ -96,3 +96,9 @@ XForms.View.TabIndex.get -> int
 XForms.View.TabIndex.set -> void
 XForms.Page.BottomSafeAreaColor.get -> XForms.Color?
 XForms.Page.BottomSafeAreaColor.set -> void
+XForms.Primitives.KeyboardDismissMode
+XForms.Primitives.KeyboardDismissMode.Interactive = 2 -> XForms.Primitives.KeyboardDismissMode
+XForms.Primitives.KeyboardDismissMode.None = 0 -> XForms.Primitives.KeyboardDismissMode
+XForms.Primitives.KeyboardDismissMode.OnDrag = 1 -> XForms.Primitives.KeyboardDismissMode
+XForms.Primitives.ScrollViewer.KeyboardDismissMode.get -> XForms.Primitives.KeyboardDismissMode
+XForms.Primitives.ScrollViewer.KeyboardDismissMode.set -> void
