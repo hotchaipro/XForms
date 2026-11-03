@@ -527,3 +527,5 @@ static readonly XForms.Controls.TimePicker.SelectedTimeProperty -> XForms.ViewPr
 static readonly XForms.Controls.ToggleSwitch.IsOnProperty -> XForms.ViewProperty<XForms.Controls.ToggleSwitch, bool>
 virtual XForms.Controls.RangeBase.CoerceValue(double value) -> double
 virtual XForms.Controls.UserControl.Build() -> XForms.View
+XForms.Controls.FlyoutButton.IsSubtleStyle.get -> bool
+XForms.Controls.FlyoutButton.IsSubtleStyle.set -> void

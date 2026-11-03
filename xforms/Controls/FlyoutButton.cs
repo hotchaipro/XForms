@@ -51,6 +51,32 @@ namespace XForms.Controls
             }
         }
 
+        private bool _isSubtleStyle = true;
+
+        /// <summary>
+        /// Whether the button is in the subtle style while its flyout is
+        /// closed (the default), or the accent color, as an action button.
+        /// Open, it's always subtle.
+        /// </summary>
+        public bool IsSubtleStyle
+        {
+            get
+            {
+                return this._isSubtleStyle;
+            }
+
+            set
+            {
+                this._isSubtleStyle = value;
+                if (!this._isExpanded)
+                {
+                    this._innerButton.IsSubtleStyle = value;
+                }
+
+                this.OnPropertyChanged();
+            }
+        }
+
         private bool IsExpanded
         {
             get
@@ -108,6 +134,7 @@ namespace XForms.Controls
             this._isExpandingOrCollapsing = true;
 
             this.IsLightDismissEnabled = true;
+            this._innerButton.IsSubtleStyle = true;
 
             // Rotate and scale the button to the pressed position
             var nowait = this._innerButton.FlyoutAnimator.RotateTo(Angle.FromDegrees(90), this.ActualTheme.Motion.Medium, new CubicEase(EasingMode.EaseOut));
@@ -172,6 +199,7 @@ namespace XForms.Controls
             this._isExpandingOrCollapsing = true;
 
             this.IsLightDismissEnabled = false;
+            this._innerButton.IsSubtleStyle = this._isSubtleStyle;
 
             this._isExpanded = false;
 
