@@ -45,8 +45,14 @@ namespace XForms.iOS
             float b = (float)color.B / byte.MaxValue;
             float a = (float)color.A / byte.MaxValue;
 
-            return new CGColor(r, g, b, a);
+            return new CGColor(Srgb, new nfloat[] { r, g, b, a });
         }
+
+        /// <summary>
+        /// The color space XForms colors are in (as UIColor's are): a CGColor
+        /// made from components alone is in generic RGB, and comes out lighter.
+        /// </summary>
+        internal static readonly CGColorSpace Srgb = CGColorSpace.CreateWithName(CGColorSpaceNames.Srgb);
 
         public static CGRect ToCGRect(
             this Rect rectangle)

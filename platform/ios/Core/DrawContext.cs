@@ -52,8 +52,7 @@ namespace XForms.iOS
                     locations[i] = gradient.Stops[i].Offset;
                 }
 
-                using (var colorSpace = CGColorSpace.CreateDeviceRGB())
-                using (var cgGradient = new CGGradient(colorSpace, colors, locations))
+                using (var cgGradient = new CGGradient(NativeConversions.Srgb, colors, locations))
                 {
                     gradient.GetAbsolutePoints(bounds, out var start, out var end);
                     context.DrawLinearGradient(
