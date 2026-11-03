@@ -42,7 +42,6 @@ namespace XForms.Win32
         // took it, and none of them scrolls
         private readonly Dictionary<uint, (ViewRenderer Renderer, Point Origin, PointerDeviceType DeviceType)> _others = new();
         private ViewRenderer _capture;
-        private Point _captureOrigin;
         private IScrollableRenderer _scrollable;
         private bool _isDragScrolling;
         private bool _isPulling;
@@ -151,7 +150,6 @@ namespace XForms.Win32
                     if (Deliver(renderer, local, PointerInputState.Began, pointerId, deviceType))
                     {
                         this._capture = renderer;
-                        this._captureOrigin = origin;
                         break;
                     }
                 }
@@ -194,10 +192,12 @@ namespace XForms.Win32
 
             bool isClaimed = false;
 
+            // In the view's coordinates as it is now, moved by its animators
+            // (as the other platforms give them)
             var capture = this._capture;
             if (null != capture)
             {
-                var local = new Point(point.X - this._captureOrigin.X, point.Y - this._captureOrigin.Y);
+                var local = Local(point, capture.AbsoluteOrigin());
                 isClaimed = Deliver(capture, local, PointerInputState.Moved, this._pointerId, this._deviceType);
             }
 
@@ -252,7 +252,7 @@ namespace XForms.Win32
                 var capture = this._capture;
                 if (null != capture)
                 {
-                    var local = new Point(point.X - this._captureOrigin.X, point.Y - this._captureOrigin.Y);
+                    var local = Local(point, capture.AbsoluteOrigin());
                     Deliver(capture, local, PointerInputState.Ended, this._pointerId, this._deviceType);
                 }
             }

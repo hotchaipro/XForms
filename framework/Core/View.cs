@@ -1677,6 +1677,26 @@ namespace XForms
         }
 
         /// <summary>
+        /// How far the view's animators move it now.
+        /// </summary>
+        internal Point AnimatorTranslation
+        {
+            get
+            {
+                var translation = this._animator?.Translation ?? Point.Zero;
+                if (null != this._ownAnimators)
+                {
+                    foreach (var animator in this._ownAnimators)
+                    {
+                        translation = new Point(translation.X + animator.Translation.X, translation.Y + animator.Translation.Y);
+                    }
+                }
+
+                return translation;
+            }
+        }
+
+        /// <summary>
         /// Creates one of a control's own animators (see
         /// <see cref="Controls.Control.CreateOwnAnimator"/>).
         /// </summary>
@@ -2879,6 +2899,20 @@ namespace XForms
         {
             e.OriginalSource ??= this;
 
+            // A drag an ancestor's gesture took over goes on to it
+            Drag drag = null;
+            _drags?.TryGetValue(e.PointerId, out drag);
+            if ((null != drag) && (drag.Origin == this) && (null != drag.Taker))
+            {
+                if ((e.State == PointerInputState.Ended) || (e.State == PointerInputState.Canceled))
+                {
+                    _drags.Remove(e.PointerId);
+                }
+
+                drag.Taker.DispatchToGestureRecognizers(drag.ToTaker(e));
+                return true;
+            }
+
             if (this.Application.FilterPointerInput(this, e))
             {
                 return true;
@@ -2907,17 +2941,7 @@ namespace XForms
                     break;
             }
 
-            var result = new GestureEventResult();
-            var recognizers = this._gestureRecognizers;
-            if (null != recognizers)
-            {
-                for (int i = 0; i < recognizers.Count; i += 1)
-                {
-                    var recognizerResult = new GestureEventResult();
-                    recognizers[i].HandlePointerInput(e, ref recognizerResult);
-                    result.DidHandleEvent |= recognizerResult.DidHandleEvent;
-                }
-            }
+            bool isHandled = this.DispatchToGestureRecognizers(e);
 
             bool isCaptured = this.HasPointerCapture(e.PointerId);
             if ((e.State == PointerInputState.Ended) || (e.State == PointerInputState.Canceled))
@@ -2925,9 +2949,134 @@ namespace XForms
                 this._capturedPointers?.Remove(e.PointerId);
             }
 
-            return e.Handled
-                || result.DidHandleEvent
-                || isCaptured;
+            bool isClaimed = e.Handled || isHandled || isCaptured;
+            switch (e.State)
+            {
+                case PointerInputState.Began:
+                    // The view that takes a press gets its moves: remember
+                    // where it started, for an ancestor's gesture to take over
+                    if (isClaimed)
+                    {
+                        _drags ??= new Dictionary<int, Drag>();
+                        _drags[e.PointerId] = new Drag() { Origin = this, Start = e.Position };
+                    }
+
+                    break;
+
+                case PointerInputState.Moved:
+                    if ((!isClaimed) && (null != drag) && (drag.Origin == this))
+                    {
+                        isClaimed = this.OfferDragToAncestors(drag, e);
+                    }
+
+                    break;
+
+                default:
+                    if ((null != drag) && (drag.Origin == this))
+                    {
+                        _drags.Remove(e.PointerId);
+                    }
+
+                    break;
+            }
+
+            return isClaimed;
+        }
+
+        // Returns whether a gesture recognizer claimed the event
+        private bool DispatchToGestureRecognizers(
+            PointerEventArgs e)
+        {
+            bool isHandled = false;
+            var recognizers = this._gestureRecognizers;
+            if (null != recognizers)
+            {
+                for (int i = 0; i < recognizers.Count; i += 1)
+                {
+                    var recognizerResult = new GestureEventResult();
+                    recognizers[i].HandlePointerInput(e, ref recognizerResult);
+                    isHandled |= recognizerResult.DidHandleEvent;
+                }
+            }
+
+            return isHandled;
+        }
+
+        // A pressed pointer, from the view that took the press, and the
+        // ancestor whose gesture took the drag over, if one did
+        private sealed class Drag
+        {
+            public View Origin;
+            public Point Start;
+            public View Taker;
+
+            // The event in the taker's coordinates: the views between move
+            // (the platforms give a view's positions as it is, translated by
+            // its animators), so the pressed view's own position drifts with a
+            // row's content as it follows a swipe, but the taker's doesn't
+            public PointerEventArgs ToTaker(
+                PointerEventArgs e)
+            {
+                float x = e.Position.X, y = e.Position.Y;
+                for (var view = this.Origin; (null != view) && (view != this.Taker); view = view.Parent as View)
+                {
+                    var translation = view.AnimatorTranslation;
+                    x += view._frame.X + translation.X;
+                    y += view._frame.Y + translation.Y;
+                }
+
+                return new PointerEventArgs(
+                    e.PointerId,
+                    e.DeviceType,
+                    new Point(x, y),
+                    e.State,
+                    e.IsInContact,
+                    e.KeyModifiers)
+                {
+                    OriginalSource = e.OriginalSource,
+                };
+            }
+        }
+
+        private static Dictionary<int, Drag> _drags;
+
+        // A drag past the slop that the pressed view leaves unclaimed (a tap
+        // on a button fails) is offered to its ancestors' gesture recognizers,
+        // nearest first, as if pressed where it started: the one that claims
+        // it (a row's swipe, under the button) takes it over, and the pressed
+        // view's press is canceled. As a scroll viewer takes over a drag.
+        private bool OfferDragToAncestors(
+            Drag drag,
+            PointerEventArgs e)
+        {
+            float dx = e.Position.X - drag.Start.X;
+            float dy = e.Position.Y - drag.Start.Y;
+            if ((dx * dx) + (dy * dy) <= (Application.TouchSlop * Application.TouchSlop))
+            {
+                return false;
+            }
+
+            for (var ancestor = this.Parent as View; null != ancestor; ancestor = ancestor.Parent as View)
+            {
+                if (0 == (ancestor._gestureRecognizers?.Count ?? 0))
+                {
+                    continue;
+                }
+
+                var offered = new Drag() { Origin = this, Start = drag.Start, Taker = ancestor };
+                var start = new PointerEventArgs(e.PointerId, e.DeviceType, drag.Start, PointerInputState.Began, true, e.KeyModifiers) { OriginalSource = e.OriginalSource };
+                ancestor.DispatchToGestureRecognizers(offered.ToTaker(start));
+                if (ancestor.DispatchToGestureRecognizers(offered.ToTaker(e)))
+                {
+                    this.DispatchPointerEvent(new PointerEventArgs(e.PointerId, e.DeviceType, e.Position, PointerInputState.Canceled, false, e.KeyModifiers));
+                    _drags[e.PointerId] = offered;
+                    return true;
+                }
+
+                ancestor.DispatchToGestureRecognizers(offered.ToTaker(new PointerEventArgs(e.PointerId, e.DeviceType, e.Position, PointerInputState.Canceled, false, e.KeyModifiers)));
+            }
+
+            return false;
         }
 
         /// <summary>

@@ -534,6 +534,17 @@ first. Two rules keep scrolling native:
   claimed when it's handled, or when the view called `CapturePointer`.
   Until then, a drag can still become a scroll of the enclosing list or
   scroll view.
+- **An ancestor's gesture can take over an unclaimed drag.** Once a drag
+  passes the touch slop without the pressed view claiming it, the framework
+  offers it to its ancestors' gesture recognizers, nearest first, as if
+  pressed where it started. The first to claim it gets the rest of the
+  pointer, and the pressed view's press is canceled. So a sideways drag that
+  starts on a command bar button swipes its list row, and a tap still runs
+  the button. Positions follow each view as it is, moved by its animators.
+
+A press finds its view by hit testing, which only looks inside a view's
+frame: a child pushed outside its parent (a negative margin) draws there but
+can't be pressed there.
 
 Keyboard input goes to the focused view through public `View` API:
 - `Focusable`. Views with a tap gesture are focusable by default.
