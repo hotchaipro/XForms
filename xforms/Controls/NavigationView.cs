@@ -78,6 +78,12 @@ namespace XForms.Controls
             this.AddVisualChild(this._pane);
             this.AddVisualChild(this._menuButton);
 
+            // Tab reaches them in reading order, not drawing order: the menu
+            // button, the pane, then the content
+            this._menuButton.TabIndex = 0;
+            this._pane.TabIndex = 1;
+            this._contentHost.TabIndex = 2;
+
             this.MenuItems = new NavigationViewItemCollection(this);
         }
 

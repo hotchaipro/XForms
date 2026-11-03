@@ -14,9 +14,10 @@ namespace XForms.Win32
 {
     /// <summary>
     /// Keyboard focus across owner-drawn controls (anything with a tap gesture)
-    /// and native text entries: Tab and Shift+Tab move in view order, Enter and
-    /// Space activate, Escape and Alt+Left go back. A focus ring shows only while
-    /// the keyboard is being used, as Windows does.
+    /// and native text entries: Tab and Shift+Tab move in tab order (by
+    /// TabIndex, then view order), Enter and Space activate, Escape and Alt+Left
+    /// go back. A focus ring shows only while the keyboard is being used, as
+    /// Windows does.
     /// </summary>
     internal sealed unsafe class FocusManager
     {
@@ -88,10 +89,49 @@ namespace XForms.Win32
                 focusable.Add(renderer);
             }
 
-            foreach (var child in renderer.Children)
+            foreach (var child in TabOrder(renderer.Children))
             {
                 this.CollectFocusable(child, focusable);
             }
+        }
+
+        // The children in the order Tab reaches them: by their views'
+        // TabIndex, then in drawing order (a stable sort)
+        private static List<ViewRenderer> TabOrder(
+            List<ViewRenderer> children)
+        {
+            var ordered = children;
+            for (int i = 1; i < ordered.Count; i += 1)
+            {
+                var child = ordered[i];
+                int index = TabIndex(child);
+                if (TabIndex(ordered[i - 1]) <= index)
+                {
+                    continue;
+                }
+
+                if (ordered == children)
+                {
+                    ordered = new List<ViewRenderer>(children);
+                }
+
+                int j = i - 1;
+                while ((0 <= j) && (TabIndex(ordered[j]) > index))
+                {
+                    ordered[j + 1] = ordered[j];
+                    j -= 1;
+                }
+
+                ordered[j + 1] = child;
+            }
+
+            return ordered;
+        }
+
+        private static int TabIndex(
+            ViewRenderer renderer)
+        {
+            return (renderer.Element as View)?.TabIndex ?? int.MaxValue;
         }
 
         private static Key ToKey(

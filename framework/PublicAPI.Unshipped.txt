@@ -92,3 +92,5 @@ virtual XForms.View.OnContextRequested(XForms.ContextRequestedEventArgs e) -> vo
 virtual XForms.View.OnHotReload() -> void
 virtual XForms.View.SetAccessibilityRangeValue(double value) -> bool
 virtual XForms.View.SetUserState(object state) -> void
+XForms.View.TabIndex.get -> int
+XForms.View.TabIndex.set -> void

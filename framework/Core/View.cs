@@ -1349,7 +1349,7 @@ namespace XForms
             View parent,
             List<View> result)
         {
-            var children = parent.DrawingOrderChildren;
+            var children = parent.TabOrderChildren;
             for (int i = 0; i < children.Count; i += 1)
             {
                 var child = children[i];
@@ -1463,7 +1463,8 @@ namespace XForms
         /// <summary>
         /// Moves keyboard focus from this view to the next (or previous)
         /// focusable view in the tree it is in, wrapping around: lightweight
-        /// and native views alike, in view order, as on Win32. (Android and
+        /// and native views alike, in tab order (TabIndex, then view order),
+        /// as on Win32. (Android and
         /// iOS order native views by position, which puts a layer before the
         /// views inside it.)
         /// </summary>
@@ -1500,7 +1501,7 @@ namespace XForms
             View parent,
             List<View> result)
         {
-            var children = parent.DrawingOrderChildren;
+            var children = parent.TabOrderChildren;
             for (int i = 0; i < children.Count; i += 1)
             {
                 var child = children[i];
@@ -3196,6 +3197,67 @@ namespace XForms
             {
                 this._isKeyboardFocusable = value;
                 this.OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Where Tab reaches the view among its siblings: lower first, and
+        /// siblings with the same index in view order. A view's descendants
+        /// come before its next sibling. By default <see cref="int.MaxValue"/>,
+        /// so views given an index come before the rest, as in WinUI.
+        /// </summary>
+        public int TabIndex
+        {
+            get
+            {
+                return this._tabIndex;
+            }
+
+            set
+            {
+                this._tabIndex = value;
+                this.OnPropertyChanged();
+            }
+        }
+
+        private int _tabIndex = int.MaxValue;
+
+        /// <summary>
+        /// The view's children in the order Tab reaches them: by
+        /// <see cref="TabIndex"/>, then in drawing order.
+        /// </summary>
+        internal IReadOnlyList<View> TabOrderChildren
+        {
+            get
+            {
+                var children = this.DrawingOrderChildren;
+                bool isOrdered = true;
+                for (int i = 1; isOrdered && (i < children.Count); i += 1)
+                {
+                    isOrdered = children[i - 1]._tabIndex <= children[i]._tabIndex;
+                }
+
+                if (isOrdered)
+                {
+                    return children;
+                }
+
+                // A stable sort: the same index keeps drawing order
+                var ordered = new List<View>(children);
+                for (int i = 1; i < ordered.Count; i += 1)
+                {
+                    var child = ordered[i];
+                    int j = i - 1;
+                    while ((0 <= j) && (ordered[j]._tabIndex > child._tabIndex))
+                    {
+                        ordered[j + 1] = ordered[j];
+                        j -= 1;
+                    }
+
+                    ordered[j + 1] = child;
+                }
+
+                return ordered;
             }
         }
 

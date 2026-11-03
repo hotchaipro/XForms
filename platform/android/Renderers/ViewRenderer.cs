@@ -577,7 +577,28 @@ namespace XForms.Android.Renderers
             e.Handled = false;
 
             var key = ToKey(e.KeyCode);
-            if (!(this.Element is XForms.Primitives.TextBox textBox) || textBox.AcceptsReturn || !View.IsTextBoxNavigationKey(key))
+            if (!(this.Element is XForms.Primitives.TextBox textBox))
+            {
+                return;
+            }
+
+            // Tab moves in tab order, as from any other view, not by position
+            var modifiers = ToKeyModifiers(e.Event.MetaState);
+            if ((key == Key.Tab) && ((modifiers & ~KeyModifiers.Shift) == KeyModifiers.None))
+            {
+                if (e.Event.Action == KeyEventActions.Down)
+                {
+                    e.Handled = LayerHost.For(textBox).MoveFocus(isForward: !modifiers.HasFlag(KeyModifiers.Shift));
+                }
+                else
+                {
+                    e.Handled = true;
+                }
+
+                return;
+            }
+
+            if (textBox.AcceptsReturn || !View.IsTextBoxNavigationKey(key))
             {
                 return;
             }
