@@ -33,7 +33,9 @@ namespace XForms
         /// <summary>
         /// Moves the page on top in (as a page arrives) or out (as it leaves,
         /// uncovering the one before). The frame hides the page underneath when
-        /// the task completes.
+        /// the task completes. A leaving page is left where the transition
+        /// ends: the frame hides it, then resets its animator (translation,
+        /// scale, rotation and opacity), so it doesn't show again in between.
         /// </summary>
         public abstract Task PlayAsync(
             PageTransitionContext context);
@@ -65,7 +67,6 @@ namespace XForms
                 {
                     animator.Translation = Point.Zero;
                     await animator.TranslateTo(offset, context.Duration, AccelerateEasing);
-                    animator.Translation = Point.Zero;
                 }
                 else
                 {
@@ -92,9 +93,8 @@ namespace XForms
                 else
                 {
                     await animator.FadeFrom(0, context.Duration, DecelerateEasing);
+                    animator.Opacity = 1;
                 }
-
-                animator.Opacity = 1;
             }
         }
 

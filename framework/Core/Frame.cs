@@ -222,7 +222,18 @@ namespace XForms
 
             if ((null != leaving) && (leaving != this._currentPage))
             {
+                // Hidden first, then put back (a transition leaves a leaving
+                // page where it ended: off-screen, or faded out)
                 leaving.IsVisible = false;
+                var animator = leaving.Animator;
+                if (null != animator)
+                {
+                    animator.Translation = Point.Zero;
+                    animator.Scale = 1;
+                    animator.Rotation = default;
+                    animator.Opacity = 1;
+                }
+
                 if (removeLeavingPage)
                 {
                     this.Detach(leaving);
