@@ -47,7 +47,11 @@ namespace XForms
                 if (value != this._isVisible)
                 {
                     this._isVisible = value;
-                    this.Native?.IsVisible = value && this.AreLightweightAncestorsVisible;
+
+                    // A lightweight view isn't drawn under a hidden ancestor
+                    // anyway; a native one inside lightweight ones is hidden
+                    // with them (and shown again with them)
+                    this.Native?.IsVisible = value && (this.IsLightweight || this.AreLightweightAncestorsVisible);
 
                     // A hidden view takes no space, so its parent must lay out again
                     this.InvalidateMeasure();
