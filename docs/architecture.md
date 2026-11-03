@@ -215,11 +215,11 @@ clear of the status bar, cutout and home indicator or navigation bar.
   through the inset and adds the inset to its padding: a bar's background
   fills the status bar's area, its content stays clear, and it animates
   off-screen and back as one view.
-- **The bands:** on edges no view reaches, the platform draws a band.
-  `TitleBar.AccentColor` (or the theme's background) colors the top one,
-  and `Page.BottomSafeAreaColor` colors the bottom one (Android's
-  navigation bar, a band under iOS's home indicator); without it, the
-  page's background shows.
+- **The bands:** on edges no view reaches, the page draws a band in its
+  inset. `TitleBar.AccentColor` (or the theme's background) colors the top
+  one, and `Page.BottomSafeAreaColor` the bottom one; without it, the
+  page's background shows. The bands are the page's own, so they move with
+  it as it slides in or out.
 - **Status bar text:** it's light or dark to match
   `TitleBar.ForegroundColor`.
 
@@ -565,9 +565,9 @@ A press finds its view by hit testing, which only looks inside a view's
 frame: a child pushed outside its parent (a negative margin) draws there but
 can't be pressed there.
 
-**Focus from a press.** A pressed control takes keyboard focus, and if a
-text box had it, typing ends: the soft keyboard hides. A drag that becomes a
-scroll focuses nothing, and pressing another text box moves the keyboard to
+**Focus from a tap.** A tapped control takes keyboard focus as the press
+is released (after the tap has run), and if a text box had it, typing ends:
+the soft keyboard hides. A drag that becomes a scroll focuses nothing, and pressing another text box moves the keyboard to
 it. Focus rings show only after keys move focus (Tab, the arrows), never
 after a tap or a click, as the web's `:focus-visible` does.
 

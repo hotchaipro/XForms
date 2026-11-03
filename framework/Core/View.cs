@@ -2365,9 +2365,11 @@ namespace XForms
             var extension = Thickness.Zero;
             Page page = null;
             float x = rect.X, y = rect.Y;
+            // The page that keeps clear of the system's bars: the main frame's
+            // (a page in a frame inside it, such as a tab's, passes it on)
             for (var ancestor = this.Parent as View; null != ancestor; ancestor = ancestor.Parent as View)
             {
-                if (ancestor is Page candidate)
+                if ((ancestor is Page candidate) && (candidate.SafeAreaPadding != Thickness.Zero))
                 {
                     page = candidate;
                     break;
@@ -2782,9 +2784,19 @@ namespace XForms
             this._contentArrangeSize = size;
 
             var padding = this.LayoutPadding;
-            this.ArrangeOverride(new Size(
+            var contentSize = new Size(
                 Math.Max(0, size.Width - padding.Left - padding.Right),
-                Math.Max(0, size.Height - padding.Top - padding.Bottom)));
+                Math.Max(0, size.Height - padding.Top - padding.Bottom));
+            this.ArrangeOverride(contentSize);
+            this.OnContentArranged(contentSize);
+        }
+
+        /// <summary>
+        /// Called once the children are arranged within the padding.
+        /// </summary>
+        internal virtual void OnContentArranged(
+            Size finalSize)
+        {
         }
 
         /// <summary>
@@ -3132,14 +3144,6 @@ namespace XForms
                     {
                         _drags ??= new Dictionary<int, Drag>();
                         _drags[e.PointerId] = new Drag() { Origin = this, Start = e.Position };
-
-                        // A pressed control takes focus (without a ring), and
-                        // typing in a text box ends: the soft keyboard hides
-                        if (this.Focusable && !(this is Primitives.TextBox) && !this.IsFocused)
-                        {
-                            this.Application?.Renderer.EndTextEntry();
-                            this.Focus();
-                        }
                     }
 
                     break;
@@ -3156,6 +3160,17 @@ namespace XForms
                     if ((null != drag) && (drag.Origin == this))
                     {
                         _drags.Remove(e.PointerId);
+
+                        // A control tapped takes focus (without a ring), and
+                        // typing in a text box ends: the soft keyboard hides.
+                        // On release, after the tap has run, so the layout
+                        // the keyboard leaves doesn't move the control from
+                        // under the press
+                        if ((e.State == PointerInputState.Ended) && this.Focusable && !(this is Primitives.TextBox) && !this.IsFocused)
+                        {
+                            this.Application?.Renderer.EndTextEntry();
+                            this.Focus();
+                        }
                     }
 
                     break;

@@ -57,17 +57,10 @@ namespace XForms.Platform
         void ResizeWindow(Size size);
 
         /// <summary>
-        /// The edges of the safe area the current page draws in itself: all of
-        /// them when it doesn't use the safe area, or those its views reach
-        /// into (<see cref="View.ExtendsIntoSafeArea"/>). The platform's bands
-        /// (the title bar's accent, the bottom color) show on the others.
-        /// </summary>
-        SafeAreaEdges DrawnSafeAreaEdges { set; }
-
-        /// <summary>
         /// The color under the system's bar at the bottom of the screen, below
         /// a page that uses the safe area (its <see cref="Page.BottomSafeAreaColor"/>),
-        /// or null for the page's background.
+        /// or null for the page's background: the page draws it, and the
+        /// platform makes the bar's buttons contrast with it.
         /// </summary>
         Color? BottomSafeAreaColor { set; }
 

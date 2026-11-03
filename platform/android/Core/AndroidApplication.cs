@@ -35,7 +35,6 @@ namespace XForms.Android
         private readonly HostView _hostView;
         private readonly LifecycleCallbacks _lifecycleCallbacks;
         private Activity _activity;
-        private SafeAreaEdges _drawnSafeAreaEdges;
         private bool _isStatusBarLight;
         private bool _isNavigationBarLight;
         private Action _backHandler;
@@ -277,27 +276,6 @@ namespace XForms.Android
             }
         }
 
-        /// <summary>
-        /// The safe area's edges the current page draws in itself: the status
-        /// and navigation bars' colors don't show there.
-        /// </summary>
-        internal SafeAreaEdges DrawnSafeAreaEdges
-        {
-            get
-            {
-                return this._drawnSafeAreaEdges;
-            }
-
-            set
-            {
-                if (value != this._drawnSafeAreaEdges)
-                {
-                    this._drawnSafeAreaEdges = value;
-                    this._hostView.SystemBars.DrawnEdges = value;
-                    this._hostView.SystemBars.InvalidateSelf();
-                }
-            }
-        }
 
         /// <summary>
         /// Shows the root XForms view, keeping it clear of the system bars and
@@ -445,9 +423,6 @@ namespace XForms.Android
             this._keyboardInset = keyboardInset;
             this.ApplyInsets();
 
-            this._hostView.SystemBars.BarInsets = new global::Android.Graphics.Rect(barInsets.Left, barInsets.Top, barInsets.Right, (0 < keyboardInset) ? 0 : barInsets.Bottom);
-            this._hostView.SystemBars.InvalidateSelf();
-
             float scale = this._hostView.Resources.DisplayMetrics.Density;
             this.SafeAreaInsetsChanged?.Invoke(
                 new Thickness(barInsets.Left / scale, barInsets.Top / scale, barInsets.Right / scale, barInsets.Bottom / scale),
@@ -469,8 +444,6 @@ namespace XForms.Android
             Color background,
             bool isLightBackground)
         {
-            this._hostView.SystemBars.StatusBarColor = background.ToAndroidColor();
-            this._hostView.SystemBars.InvalidateSelf();
             this._isStatusBarLight = isLightBackground;
 
             this.UpdateSystemBarAppearance();
@@ -512,8 +485,6 @@ namespace XForms.Android
             Color background,
             bool isLightBackground)
         {
-            this._hostView.SystemBars.NavigationBarColor = background.ToAndroidColor();
-            this._hostView.SystemBars.InvalidateSelf();
             this._isNavigationBarLight = isLightBackground;
 
             this.UpdateSystemBarAppearance();
@@ -596,15 +567,10 @@ namespace XForms.Android
                 : base(context)
             {
                 this._owner = owner;
-                this.SystemBars = new SystemBarsBackground();
 
-                // The system bars are transparent: their colors are painted over
-                // the pages, which span the screen
-                this.Foreground = this.SystemBars;
                 this.SetOnApplyWindowInsetsListener(new SystemInsetsListener(owner));
             }
 
-            public SystemBarsBackground SystemBars { get; }
 
             protected override void OnConfigurationChanged(
                 global::Android.Content.Res.Configuration newConfig)
@@ -612,74 +578,6 @@ namespace XForms.Android
                 base.OnConfigurationChanged(newConfig);
 
                 this._owner.ConfigurationChanged?.Invoke(this._owner, EventArgs.Empty);
-            }
-        }
-
-        /// <summary>
-        /// Paints the status bar color in the band at the top of the root view,
-        /// and the navigation bar color everywhere else the content leaves uncovered.
-        /// </summary>
-        private sealed class SystemBarsBackground : global::Android.Graphics.Drawables.Drawable
-        {
-            private readonly global::Android.Graphics.Paint _paint = new global::Android.Graphics.Paint();
-
-            public global::Android.Graphics.Color StatusBarColor { get; set; } = global::Android.Graphics.Color.Transparent;
-
-            public global::Android.Graphics.Color NavigationBarColor { get; set; } = global::Android.Graphics.Color.Transparent;
-
-            // The bars and cutout's insets (the bottom one zero while the
-            // keyboard is up)
-            public global::Android.Graphics.Rect BarInsets { get; set; } = new global::Android.Graphics.Rect();
-
-            // Where the page draws itself
-            public SafeAreaEdges DrawnEdges { get; set; }
-
-            public override int Opacity
-            {
-                get
-                {
-                    return (int)global::Android.Graphics.Format.Translucent;
-                }
-            }
-
-            public override void Draw(
-                global::Android.Graphics.Canvas canvas)
-            {
-                var bounds = this.Bounds;
-                var insets = this.BarInsets;
-                var drawn = this.DrawnEdges;
-
-                if (!drawn.HasFlag(SafeAreaEdges.Top))
-                {
-                    this._paint.Color = this.StatusBarColor;
-                    canvas.DrawRect(bounds.Left, bounds.Top, bounds.Right, bounds.Top + insets.Top, this._paint);
-                }
-
-                this._paint.Color = this.NavigationBarColor;
-                if (!drawn.HasFlag(SafeAreaEdges.Bottom))
-                {
-                    canvas.DrawRect(bounds.Left, bounds.Bottom - insets.Bottom, bounds.Right, bounds.Bottom, this._paint);
-                }
-
-                if (!drawn.HasFlag(SafeAreaEdges.Left))
-                {
-                    canvas.DrawRect(bounds.Left, bounds.Top + insets.Top, bounds.Left + insets.Left, bounds.Bottom - insets.Bottom, this._paint);
-                }
-
-                if (!drawn.HasFlag(SafeAreaEdges.Right))
-                {
-                    canvas.DrawRect(bounds.Right - insets.Right, bounds.Top + insets.Top, bounds.Right, bounds.Bottom - insets.Bottom, this._paint);
-                }
-            }
-
-            public override void SetAlpha(
-                int alpha)
-            {
-            }
-
-            public override void SetColorFilter(
-                global::Android.Graphics.ColorFilter colorFilter)
-            {
             }
         }
 

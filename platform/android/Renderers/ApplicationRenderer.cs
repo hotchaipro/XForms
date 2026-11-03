@@ -159,13 +159,6 @@ namespace XForms.Android.Renderers
             throw new PlatformNotSupportedException("This platform shows one window.");
         }
 
-        public SafeAreaEdges DrawnSafeAreaEdges
-        {
-            set
-            {
-                this._androidApplication.DrawnSafeAreaEdges = value;
-            }
-        }
 
         public void EndTextEntry()
         {

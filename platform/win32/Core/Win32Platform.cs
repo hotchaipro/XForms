@@ -158,13 +158,6 @@ namespace XForms.Win32
         }
 
         // A desktop window has no system bars over it
-        // No system bands to show or hide
-        public SafeAreaEdges DrawnSafeAreaEdges
-        {
-            set
-            {
-            }
-        }
 
         // No soft keyboard to hide: a light-dismiss popup takes focus itself
         public void EndTextEntry()

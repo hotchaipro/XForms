@@ -20,6 +20,75 @@ namespace XForms
 
         public Page()
         {
+            // Drawn first, beneath the content
+            this.AddVisualChild(this._topBand);
+            this.AddVisualChild(this._bottomBand);
+        }
+
+        // The page's own bands in the safe area: the title bar's accent behind
+        // the status bar, and the bottom color behind the home indicator or
+        // navigation bar, where no view of the page reaches. They're the
+        // page's, so they come and go with it as it slides
+        private readonly SafeAreaBand _topBand = new SafeAreaBand();
+        private readonly SafeAreaBand _bottomBand = new SafeAreaBand();
+
+        private sealed class SafeAreaBand : View
+        {
+            private Color _color;
+
+            public SafeAreaBand()
+            {
+                this.IsHitTestVisible = false;
+                this.IsVisible = false;
+            }
+
+            public Color Color
+            {
+                get
+                {
+                    return this._color;
+                }
+
+                set
+                {
+                    if (value != this._color)
+                    {
+                        this._color = value;
+                        this.InvalidateBackground();
+                    }
+                }
+            }
+
+            protected override Color GetBackgroundColor()
+            {
+                return this._color;
+            }
+        }
+
+        // The bands go in the insets, outside the content's area
+        internal override void OnContentArranged(
+            Size finalSize)
+        {
+            var insets = this.SafeAreaPadding;
+            float width = finalSize.Width + insets.Left + insets.Right;
+            this._topBand.Arrange(new Rect(-insets.Left, -insets.Top, width, insets.Top));
+            this._bottomBand.Arrange(new Rect(-insets.Left, finalSize.Height, width, insets.Bottom));
+            this.UpdateBands();
+        }
+
+        // The bands show where the page keeps clear of the system's bars and
+        // no view of its own reaches
+        private void UpdateBands()
+        {
+            var insets = this.SafeAreaPadding;
+            var application = this.Application;
+
+            this._topBand.Color = application?.TitleBar.AccentColor ?? this.ActualTheme.Colors.Background;
+            this._topBand.IsVisible = (0 < insets.Top) && !this._extendedEdges.HasFlag(SafeAreaEdges.Top);
+
+            var bottomColor = this._bottomSafeAreaColor;
+            this._bottomBand.Color = bottomColor ?? Colors.Transparent;
+            this._bottomBand.IsVisible = (0 < insets.Bottom) && bottomColor.HasValue && !this._extendedEdges.HasFlag(SafeAreaEdges.Bottom);
         }
 
         protected override Color GetBackgroundColor()
@@ -112,8 +181,8 @@ namespace XForms
 
         /// <summary>
         /// The safe area's edges that views on the page reach into (see
-        /// <see cref="View.ExtendsIntoSafeArea"/>): the platform shows no band
-        /// of its own there.
+        /// <see cref="View.ExtendsIntoSafeArea"/>): the page shows no band
+        /// there.
         /// </summary>
         internal SafeAreaEdges ExtendedEdges
         {
@@ -149,10 +218,7 @@ namespace XForms
             if (union != this._extendedEdges)
             {
                 this._extendedEdges = union;
-                if (this.HasRenderer)
-                {
-                    this.Application.UpdateSafeAreaUse();
-                }
+                this.UpdateBands();
             }
         }
 
@@ -168,6 +234,7 @@ namespace XForms
                 if (value != this._bottomSafeAreaColor)
                 {
                     this._bottomSafeAreaColor = value;
+                    this.UpdateBands();
                     if (this.HasRenderer)
                     {
                         this.Application.UpdateSafeAreaUse();

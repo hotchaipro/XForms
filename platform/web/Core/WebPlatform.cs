@@ -161,13 +161,6 @@ namespace XForms.Web
         {
         }
 
-        // No system bands to show or hide
-        public SafeAreaEdges DrawnSafeAreaEdges
-        {
-            set
-            {
-            }
-        }
 
         public void EndTextEntry()
         {

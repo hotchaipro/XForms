@@ -1108,7 +1108,6 @@ namespace XForms
         internal void UpdateSafeAreaUse()
         {
             var page = this._rootFrame?.CurrentPage;
-            this.Renderer.DrawnSafeAreaEdges = (null == page) ? SafeAreaEdges.None : (page.UsesSafeArea ? page.ExtendedEdges : SafeAreaEdges.All);
             this.Renderer.BottomSafeAreaColor = (page?.UsesSafeArea ?? false) ? page.BottomSafeAreaColor : null;
         }
 

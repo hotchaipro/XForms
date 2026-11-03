@@ -80,8 +80,7 @@ namespace XForms.iOS.Renderers
             if (this._rootFrame?.Renderer is FrameRenderer frameRenderer)
             {
                 var theme = this._theme ?? this._application.Theme;
-                frameRenderer.SetStatusBarColors(
-                    this._titleBarAccentColor ?? theme.Colors.Background,
+                frameRenderer.SetStatusBarStyle(
                     this._titleBarForegroundColor.HasValue ? IsLightColor(this._titleBarForegroundColor.Value) : (theme.Mode != ThemeMode.Light));
             }
         }
@@ -154,17 +153,6 @@ namespace XForms.iOS.Renderers
             throw new PlatformNotSupportedException("This platform shows one window.");
         }
 
-        // The bands show where the page doesn't draw itself
-        public SafeAreaEdges DrawnSafeAreaEdges
-        {
-            set
-            {
-                if (this._rootFrame?.Renderer is FrameRenderer frameRenderer)
-                {
-                    frameRenderer.DrawnSafeAreaEdges = value;
-                }
-            }
-        }
 
         // The first responder resigns if it's a text field (the root then
         // takes keyboard focus), hiding the keyboard
@@ -177,14 +165,11 @@ namespace XForms.iOS.Renderers
             }
         }
 
+        // The page draws its bottom color; the home indicator adapts itself
         public Color? BottomSafeAreaColor
         {
             set
             {
-                if (this._rootFrame?.Renderer is FrameRenderer frameRenderer)
-                {
-                    frameRenderer.HomeIndicatorBandColor = value;
-                }
             }
         }
 

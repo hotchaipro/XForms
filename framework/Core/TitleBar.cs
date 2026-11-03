@@ -27,6 +27,7 @@ namespace XForms
             set
             {
                 this._application.Renderer.TitleBarAccentColor = value;
+                this._application.OnPageInsetsChanged();
             }
         }
 
