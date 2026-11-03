@@ -176,8 +176,8 @@ namespace XForms.Controls
             this._isExpanded = false;
 
             // Unrotate and scale the button back to the collapsed state
-            var nowait = this._innerButton.FlyoutAnimator.RotateTo(Angle.FromDegrees(0), this.ActualTheme.Motion.Medium, new CubicEase(EasingMode.EaseIn));
-            nowait = this._innerButton.FlyoutAnimator.ScaleTo(1.0f, this.ActualTheme.Motion.Medium, new CubicEase(EasingMode.EaseIn));
+            var nowait = this._innerButton.FlyoutAnimator.RotateTo(Angle.FromDegrees(0), this.ActualTheme.Motion.Medium, new CubicEase(EasingMode.EaseOut));
+            nowait = this._innerButton.FlyoutAnimator.ScaleTo(1.0f, this.ActualTheme.Motion.Medium, new CubicEase(EasingMode.EaseOut));
 
             var animationTasks = new List<Task>();
 
@@ -193,8 +193,8 @@ namespace XForms.Controls
 
                 // Move and scale the buttons back to the collapsed position,
                 // then hide them (unless the flyout opened again meanwhile)
-                nowait = button.FlyoutAnimator.TranslateTo(new Point(0, 0), this.ActualTheme.Motion.Medium, new CubicEase(EasingMode.EaseIn));
-                this.HideWhenCollapsed(button, button.FlyoutAnimator.ScaleTo(0.5f, this.ActualTheme.Motion.Medium, new CubicEase(EasingMode.EaseIn)));
+                nowait = button.FlyoutAnimator.TranslateTo(new Point(0, 0), this.ActualTheme.Motion.Medium, new CubicEase(EasingMode.EaseOut));
+                this.HideWhenCollapsed(button, button.FlyoutAnimator.ScaleTo(0.5f, this.ActualTheme.Motion.Medium, new CubicEase(EasingMode.EaseOut)));
             }
             this.Collapsing?.Invoke(this, EventArgs.Empty);
 
