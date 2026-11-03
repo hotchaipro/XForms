@@ -111,3 +111,6 @@ XForms.SafeAreaEdges.Right = 4 -> XForms.SafeAreaEdges
 XForms.SafeAreaEdges.Top = 2 -> XForms.SafeAreaEdges
 XForms.View.ExtendsIntoSafeArea.get -> XForms.SafeAreaEdges
 XForms.View.ExtendsIntoSafeArea.set -> void
+static readonly XForms.Primitives.TextBox.DefaultPadding -> XForms.Thickness
+XForms.Primitives.TextBox.Padding.get -> XForms.Thickness
+XForms.Primitives.TextBox.Padding.set -> void

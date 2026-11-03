@@ -183,6 +183,14 @@ namespace XForms.Platform
         /// color.
         /// </summary>
         Color AccentColor { set; }
+
+        /// <summary>
+        /// The space between the box's edges and its text and placeholder,
+        /// which the box's background fills and a tap in focuses the box. The
+        /// native size includes it.
+        /// </summary>
+        Thickness Padding { set; }
+
         string Text { get; set; }
         string PlaceholderText { get; set; }
         bool Multiline { get; set; }
@@ -248,6 +256,13 @@ namespace XForms.Platform
         bool IsHorizontalScrollingEnabled { get; set; }
 
         KeyboardDismissMode KeyboardDismissMode { set; }
+
+        /// <summary>
+        /// Space around the content, inside the scrolling area: the content
+        /// scrolls beneath it, and its ends scroll clear of it (the safe area
+        /// the scroll viewer reaches into).
+        /// </summary>
+        Thickness ContentInset { set; }
 
         float VerticalOffset { get; }
 

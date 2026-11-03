@@ -19,6 +19,17 @@ namespace XForms.iOS.Renderers
             this.SetNativeElement(this._nativeScrollView);
         }
 
+        public Thickness ContentInset
+        {
+            set
+            {
+                var inset = new UIEdgeInsets(value.Top, value.Left, value.Bottom, value.Right);
+                this._nativeScrollView.ContentInset = inset;
+                this._nativeScrollView.ScrollIndicatorInsets = inset;
+                this._nativeScrollView.SetNeedsLayout();
+            }
+        }
+
         public KeyboardDismissMode KeyboardDismissMode
         {
             set

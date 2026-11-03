@@ -88,6 +88,14 @@ namespace XForms.Win32.Renderers
             set;
         }
 
+        // No safe area to reach into
+        public Thickness ContentInset
+        {
+            set
+            {
+            }
+        }
+
         // No soft keyboard
         public KeyboardDismissMode KeyboardDismissMode
         {

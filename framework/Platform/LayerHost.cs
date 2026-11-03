@@ -160,6 +160,18 @@ namespace XForms.Platform
         }
 
         /// <summary>
+        /// Whether focus rings show: after keys moved focus, not after a tap
+        /// or a click.
+        /// </summary>
+        public bool IsFocusRingVisible
+        {
+            get
+            {
+                return View.IsFocusRingVisible;
+            }
+        }
+
+        /// <summary>
         /// Draws a ring around this layer's focused lightweight view, above its
         /// lightweight content.
         /// </summary>

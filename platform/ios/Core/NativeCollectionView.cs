@@ -59,6 +59,9 @@ namespace XForms.iOS
             ListLayout layout)
             : base(CGRect.Empty, CreateLayout(layout))
         {
+            // The framework sets the insets (a page keeps clear of the system's
+            // bars; a view that reaches into them insets its content)
+            this.ContentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentBehavior.Never;
             this.BackgroundColor = UIColor.Clear;
             this.RegisterClassForCell(typeof(NativeCollectionViewCell), NativeCollectionViewCell.CellReuseIdentifier);
         }

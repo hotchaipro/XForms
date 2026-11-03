@@ -15,7 +15,9 @@ namespace XForms.iOS
         public NativeScrollView()
         {
             this.IsVerticalScrollingEnabled = true;
-            this.KeyboardDismissMode = UIScrollViewKeyboardDismissMode.Interactive;
+            // The framework sets the insets (a page keeps clear of the system's
+            // bars; a view that reaches into them insets its content)
+            this.ContentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentBehavior.Never;
             this.AlwaysBounceVertical = true;
         }
 

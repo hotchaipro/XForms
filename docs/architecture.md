@@ -565,6 +565,12 @@ A press finds its view by hit testing, which only looks inside a view's
 frame: a child pushed outside its parent (a negative margin) draws there but
 can't be pressed there.
 
+**Focus from a press.** A pressed control takes keyboard focus, and if a
+text box had it, typing ends: the soft keyboard hides. A drag that becomes a
+scroll focuses nothing, and pressing another text box moves the keyboard to
+it. Focus rings show only after keys move focus (Tab, the arrows), never
+after a tap or a click, as the web's `:focus-visible` does.
+
 Keyboard input goes to the focused view through public `View` API:
 - `Focusable`. Views with a tap gesture are focusable by default.
 - `Focus()`, `IsFocused`, and `GotFocus`/`LostFocus` (with the overrides

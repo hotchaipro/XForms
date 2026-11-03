@@ -62,4 +62,41 @@ namespace XForms.Test
             toggle.Text = this._areBarsHidden ? "Bring the bars back" : "Slide the bars away";
         }
     }
+
+    /// <summary>
+    /// A list that reaches under the home indicator: its rows scroll beneath
+    /// it, and the last one scrolls clear of it.
+    /// </summary>
+    public class SafeAreaListPage : Page
+    {
+        protected override View Build()
+        {
+            var topBar = new Border()
+            {
+                Background = this.ActualTheme.Colors.Accent,
+                ExtendsIntoSafeArea = SafeAreaEdges.Top | SafeAreaEdges.Left | SafeAreaEdges.Right,
+                Child = new TextBlock() { Text = "List under the home indicator", Foreground = Colors.White, FontSize = 18, Margin = new Thickness(16, 12) },
+            };
+
+            var items = new System.Collections.Generic.List<string>();
+            for (int i = 1; i <= 60; i += 1)
+            {
+                items.Add($"Row {i}");
+            }
+
+            var list = new ListView<string>()
+            {
+                ItemsSource = items,
+                ItemViewFactory = ItemViewFactory<string>.Create(
+                    () => new TextBlock() { Margin = new Thickness(16, 10), FontSize = 16 },
+                    (view, item) => view.Text = item),
+                ExtendsIntoSafeArea = SafeAreaEdges.Bottom | SafeAreaEdges.Left | SafeAreaEdges.Right,
+            };
+
+            var layout = new DockPanel();
+            layout.Children.Add(topBar, Dock.Top);
+            layout.Children.Add(list, Dock.CenterOverlay);
+            return layout;
+        }
+    }
 }

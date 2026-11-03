@@ -21,6 +21,9 @@ namespace XForms.iOS
             : base(CGRect.Empty, UITableViewStyle.Plain)
         {
             this.SeparatorStyle = UITableViewCellSeparatorStyle.None;
+            // The framework sets the insets (a page keeps clear of the system's
+            // bars; a view that reaches into them insets its content)
+            this.ContentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentBehavior.Never;
             this.AllowsSelection = false;
             this.BackgroundColor = UIColor.Clear;
             this.RowHeight = UITableView.AutomaticDimension;

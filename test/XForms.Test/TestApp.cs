@@ -116,6 +116,7 @@ namespace XForms.Test
             routes.Add("/", _ => new TextAndListPage());
             routes.Add("/pickers", _ => new PickersPage());
             routes.Add("/safe-area", _ => new SafeAreaPage());
+            routes.Add("/safe-area-list", _ => new SafeAreaListPage());
             routes.Add("/forms", _ => new FormsPage());
             routes.Add("/feedback", _ => new FeedbackPage());
             routes.Add("/structure", _ => new StructurePage());

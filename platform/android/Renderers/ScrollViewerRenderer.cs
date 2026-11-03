@@ -7,6 +7,20 @@ namespace XForms.Android.Renderers
 {
     internal class ScrollViewerRenderer : ViewRenderer<AndroidScrollView>, IScrollViewerRenderer
     {
+        // The content scrolls beneath the padding
+        public Thickness ContentInset
+        {
+            set
+            {
+                this._nativeScrollView.SetClipToPadding(false);
+                this._nativeScrollView.SetPadding(
+                    (int)Math.Round(this.DevicePixelsToPixels(value.Left)),
+                    (int)Math.Round(this.DevicePixelsToPixels(value.Top)),
+                    (int)Math.Round(this.DevicePixelsToPixels(value.Right)),
+                    (int)Math.Round(this.DevicePixelsToPixels(value.Bottom)));
+            }
+        }
+
         // Interactive (iOS's keyboard following the drag) is a drag here
         public KeyboardDismissMode KeyboardDismissMode
         {

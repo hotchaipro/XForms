@@ -108,7 +108,7 @@ namespace XForms.iOS
 
             // A focused view with a layer of its own has its ring inside it,
             // as a lightweight view's is around it
-            if (this._owner.IsFocused)
+            if (this._owner.IsFocused && LayerHost.For(this._owner).IsFocusRingVisible)
             {
                 var bounds = this.Bounds;
                 var ring = UIBezierPath.FromRoundedRect(new CGRect(bounds.X + 1, bounds.Y + 1, bounds.Width - 2, bounds.Height - 2), 4);

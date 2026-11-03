@@ -61,6 +61,11 @@ namespace XForms.Primitives
         /// Whether scrolling hides the soft keyboard: none (the default), on a
         /// drag, or interactively (the keyboard follows the drag, on iOS).
         /// </summary>
+        internal override void OnSafeAreaExtensionChanged()
+        {
+            this.Native?.ContentInset = this.SafeAreaExtension;
+        }
+
         public KeyboardDismissMode KeyboardDismissMode
         {
             get
@@ -191,7 +196,8 @@ namespace XForms.Primitives
             var native = this.Native;
             if (this._isVerticalScrollingEnabled.HasValue) native.IsVerticalScrollingEnabled = this._isVerticalScrollingEnabled.Value;
             if (this._isHorizontalScrollingEnabled.HasValue) native.IsHorizontalScrollingEnabled = this._isHorizontalScrollingEnabled.Value;
-            if (this._keyboardDismissMode != KeyboardDismissMode.None) native.KeyboardDismissMode = this._keyboardDismissMode;
+            native.KeyboardDismissMode = this._keyboardDismissMode;
+            if (this.SafeAreaExtension != Thickness.Zero) native.ContentInset = this.SafeAreaExtension;
 
             var content = this._content;
             if (null != content)

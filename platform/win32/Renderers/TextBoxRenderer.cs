@@ -43,7 +43,7 @@ namespace XForms.Win32.Renderers
         private const uint ES_WANTRETURN = 0x1000;
 
         private const float FontSize = 15.0f;
-        private const float Padding = 6.0f;
+        private Thickness _padding = TextBox.DefaultPadding;
 
         private HWND _hwnd;
         private bool _multiline;
@@ -444,6 +444,15 @@ namespace XForms.Win32.Renderers
         }
 
         // NOTE: RichEdit draws its caret in the text color
+        public Thickness Padding
+        {
+            set
+            {
+                // The text box lays out again, which places the window
+                this._padding = value;
+            }
+        }
+
         public Color AccentColor
         {
             set
@@ -459,7 +468,7 @@ namespace XForms.Win32.Renderers
             // Until RichEdit reports its content height, assume a single line
             float height = (this._contentHeight > 0) ? this._contentHeight : (FontSize * 1.4f);
 
-            return new Size(width, Math.Min(height + (2 * Padding), availableSize.Height));
+            return new Size(width, Math.Min(height + this._padding.Top + this._padding.Bottom, availableSize.Height));
         }
 
         public override void ArrangeNative(
@@ -491,11 +500,11 @@ namespace XForms.Win32.Renderers
 
             var bounds = new RECT()
             {
-                left = (int)Math.Round(origin.X * scale),
-                top = (int)Math.Round((origin.Y + Padding) * scale),
+                left = (int)Math.Round((origin.X + this._padding.Left) * scale),
+                top = (int)Math.Round((origin.Y + this._padding.Top) * scale),
             };
-            bounds.right = bounds.left + (int)Math.Round(frame.Width * scale);
-            bounds.bottom = bounds.top + (int)Math.Round(Math.Max(0, frame.Height - (2 * Padding)) * scale);
+            bounds.right = bounds.left + (int)Math.Round(Math.Max(0, frame.Width - this._padding.Left - this._padding.Right) * scale);
+            bounds.bottom = bounds.top + (int)Math.Round(Math.Max(0, frame.Height - this._padding.Top - this._padding.Bottom) * scale);
 
             bool isShown = this.IsShownOnScreen && ((Environment.GetEnvironmentVariable("XFORMS_NOHIDE") == "1") || !this.IsShowingPlaceholder); // TEMP
 
@@ -549,7 +558,7 @@ namespace XForms.Win32.Renderers
                 // NOTE: Offset to line up with RichEdit's own text margin
                 drawContext.DrawText(
                     this._placeholderText,
-                    new Rect(1, Padding, Math.Max(0, frame.Width - 2), Math.Max(0, frame.Height - (2 * Padding))),
+                    new Rect(1 + this._padding.Left, this._padding.Top, Math.Max(0, frame.Width - 2 - this._padding.Left - this._padding.Right), Math.Max(0, frame.Height - this._padding.Top - this._padding.Bottom)),
                     this._placeholderColor,
                     format);
             }

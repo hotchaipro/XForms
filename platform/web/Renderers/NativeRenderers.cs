@@ -59,6 +59,14 @@ namespace XForms.Web.Renderers
             set { this._isVerticalScrollingEnabled = value; this.ApplyOverflow(); this.InvalidateMeasure(); }
         }
 
+        // No safe area to reach into
+        public Thickness ContentInset
+        {
+            set
+            {
+            }
+        }
+
         // Interactive (iOS's keyboard following the drag) is a drag here
         public KeyboardDismissMode KeyboardDismissMode
         {
@@ -708,8 +716,9 @@ namespace XForms.Web.Renderers
     [SupportedOSPlatform("browser")]
     internal sealed class TextBoxRenderer : ViewRenderer, ITextBoxRenderer
     {
-        private const float Padding = 6;
         private const float FontSize = 15;
+
+        private Thickness _padding = TextBox.DefaultPadding;
 
         private int _inputId;
         private bool _isMultiline;
@@ -763,7 +772,8 @@ namespace XForms.Web.Renderers
             Js.SetStyle(id, "border", "none");
             Js.SetStyle(id, "outline", "none");
             Js.SetStyle(id, "background", "transparent");
-            Js.SetStyle(id, "padding", Px(Padding));
+            Js.SetStyle(id, "box-sizing", "border-box");
+            this.ApplyPadding();
             Js.SetStyle(id, "resize", "none");
             Js.SetStyle(id, "user-select", "text");
             Js.SetStyle(id, "-webkit-user-select", "text");
@@ -918,6 +928,22 @@ namespace XForms.Web.Renderers
             this.Delegate.OnNativeSubmitted();
         }
 
+        public Thickness Padding
+        {
+            set
+            {
+                this._padding = value;
+                this.ApplyPadding();
+                this.InvalidateMeasure();
+            }
+        }
+
+        private void ApplyPadding()
+        {
+            var p = this._padding;
+            Js.SetStyle(this._inputId, "padding", $"{Px(p.Top)} {Px(p.Right)} {Px(p.Bottom)} {Px(p.Left)}");
+        }
+
         public override Size MeasureNative(
             Size availableSize)
         {
@@ -925,7 +951,7 @@ namespace XForms.Web.Renderers
             float lines = this._isMultiline ? 3 : 1;
             return new Size(
                 float.IsInfinity(availableSize.Width) ? 200 : availableSize.Width,
-                (float)Math.Ceiling(((ascent + descent) * 1.2f * lines) + (2 * Padding)));
+                (float)Math.Ceiling(((ascent + descent) * 1.2f * lines) + this._padding.Top + this._padding.Bottom));
         }
 
         public override Color BackgroundColor

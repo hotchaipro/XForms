@@ -34,6 +34,14 @@ namespace XForms.Primitives
         private Color? _foregroundColor;
         private Color? _placeholderColor;
         private Color? _accentColor;
+        private Thickness _padding = DefaultPadding;
+
+        /// <summary>
+        /// The space around the text inside the box: 12 at the sides and 11
+        /// above and below by default, so a single line is a comfortable
+        /// touch target (about 44 high).
+        /// </summary>
+        public static readonly Thickness DefaultPadding = new Thickness(12, 11);
 
         /// <summary>
         /// The text box's background: by default, the theme's surface color.
@@ -106,6 +114,29 @@ namespace XForms.Primitives
                 this._accentColor = value;
                 this.ApplyColors();
                 this.OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// The space between the box's edges and its text (and placeholder):
+        /// the box's background fills it, and a tap in it focuses the box.
+        /// </summary>
+        public Thickness Padding
+        {
+            get
+            {
+                return this._padding;
+            }
+
+            set
+            {
+                if (value != this._padding)
+                {
+                    this._padding = value;
+                    this.Native?.Padding = value;
+                    this.InvalidateMeasure();
+                    this.OnPropertyChanged();
+                }
             }
         }
 
@@ -514,6 +545,7 @@ namespace XForms.Primitives
 
             var native = this.Native;
             this.ApplyColors();
+            native.Padding = this._padding;
             this._isApplyingValues = true;
             try
             {

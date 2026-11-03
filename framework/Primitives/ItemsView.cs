@@ -249,7 +249,7 @@ namespace XForms.Primitives
             this.ApplyColors();
             if (!this._padding.Equals(Thickness.Zero))
             {
-                native.Padding = this._padding;
+                native.Padding = this.NativePadding;
             }
 
             if (this._layout != ListLayout.Vertical)
@@ -330,9 +330,29 @@ namespace XForms.Primitives
             set
             {
                 this._padding = value;
-                this.Native?.Padding = value;
+                this.Native?.Padding = this.NativePadding;
                 this.OnPropertyChanged();
             }
+        }
+
+        // The padding, with the safe area the list reaches into
+        private Thickness NativePadding
+        {
+            get
+            {
+                var padding = this._padding;
+                var extension = this.SafeAreaExtension;
+                return new Thickness(
+                    padding.Left + extension.Left,
+                    padding.Top + extension.Top,
+                    padding.Right + extension.Right,
+                    padding.Bottom + extension.Bottom);
+            }
+        }
+
+        internal override void OnSafeAreaExtensionChanged()
+        {
+            this.Native?.Padding = this.NativePadding;
         }
 
         /// <summary>

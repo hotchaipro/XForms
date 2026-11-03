@@ -181,6 +181,15 @@ namespace XForms.iOS.Renderers
             }
         }
 
+        public Thickness Padding
+        {
+            set
+            {
+                this._container.Padding = new UIEdgeInsets(value.Top, value.Left, value.Bottom, value.Right);
+                this._container.RequestLayout();
+            }
+        }
+
         public Color AccentColor
         {
             set
@@ -652,6 +661,27 @@ namespace XForms.iOS.Renderers
                 set;
             }
 
+            /// <summary>
+            /// The space around the editor and placeholder.
+            /// </summary>
+            public UIEdgeInsets Padding
+            {
+                get;
+                set;
+            }
+
+            // A tap in the padding focuses the editor
+            public override void TouchesEnded(
+                Foundation.NSSet touches,
+                UIEvent evt)
+            {
+                base.TouchesEnded(touches, evt);
+                if ((null != this._editor) && !this._editor.IsFirstResponder)
+                {
+                    this._editor.BecomeFirstResponder();
+                }
+            }
+
             public UIView Editor
             {
                 get
@@ -695,19 +725,29 @@ namespace XForms.iOS.Renderers
             public override CoreGraphics.CGSize SizeThatFits(
                 CoreGraphics.CGSize size)
             {
-                var editorSize = this._editor?.SizeThatFits(size) ?? CoreGraphics.CGSize.Empty;
-                var placeholderSize = this._placeholder?.SizeThatFits(size) ?? CoreGraphics.CGSize.Empty;
+                var padding = this.Padding;
+                var inner = new CoreGraphics.CGSize(
+                    (nfloat)Math.Max(0, size.Width - padding.Left - padding.Right),
+                    (nfloat)Math.Max(0, size.Height - padding.Top - padding.Bottom));
+                var editorSize = this._editor?.SizeThatFits(inner) ?? CoreGraphics.CGSize.Empty;
+                var placeholderSize = this._placeholder?.SizeThatFits(inner) ?? CoreGraphics.CGSize.Empty;
 
                 return new CoreGraphics.CGSize(
-                    Math.Max(editorSize.Width, placeholderSize.Width),
-                    Math.Max(editorSize.Height, placeholderSize.Height));
+                    Math.Max(editorSize.Width, placeholderSize.Width) + padding.Left + padding.Right,
+                    Math.Max(editorSize.Height, placeholderSize.Height) + padding.Top + padding.Bottom);
             }
 
             public override void LayoutSubviews()
             {
                 base.LayoutSubviews();
 
-                var bounds = this.Bounds;
+                var padding = this.Padding;
+                var outer = this.Bounds;
+                var bounds = new CoreGraphics.CGRect(
+                    outer.X + padding.Left,
+                    outer.Y + padding.Top,
+                    (nfloat)Math.Max(0, outer.Width - padding.Left - padding.Right),
+                    (nfloat)Math.Max(0, outer.Height - padding.Top - padding.Bottom));
                 var fittingSize = new CoreGraphics.CGSize(bounds.Width, nfloat.MaxValue);
 
                 var editor = this._editor;
@@ -716,14 +756,14 @@ namespace XForms.iOS.Renderers
                     // A single-line field centers vertically; a text view starts at the top
                     var height = (nfloat)Math.Min(editor.SizeThatFits(fittingSize).Height, bounds.Height);
                     var top = (editor is UITextField) ? (bounds.Height - height) / 2 : 0;
-                    editor.Frame = new CoreGraphics.CGRect(0, top, bounds.Width, height);
+                    editor.Frame = new CoreGraphics.CGRect(bounds.X, bounds.Y + top, bounds.Width, height);
                 }
 
                 var placeholder = this._placeholder;
                 if (null != placeholder)
                 {
                     var height = (nfloat)Math.Min(placeholder.SizeThatFits(fittingSize).Height, bounds.Height);
-                    placeholder.Frame = new CoreGraphics.CGRect(0, 0, bounds.Width, height);
+                    placeholder.Frame = new CoreGraphics.CGRect(bounds.X, bounds.Y, bounds.Width, height);
                 }
             }
         }

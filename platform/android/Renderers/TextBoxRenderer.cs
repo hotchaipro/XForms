@@ -207,6 +207,18 @@ namespace XForms.Android.Renderers
             }
         }
 
+        public Thickness Padding
+        {
+            set
+            {
+                this._nativeTextEntry.SetPadding(
+                    (int)Math.Round(this.DevicePixelsToPixels(value.Left)),
+                    (int)Math.Round(this.DevicePixelsToPixels(value.Top)),
+                    (int)Math.Round(this.DevicePixelsToPixels(value.Right)),
+                    (int)Math.Round(this.DevicePixelsToPixels(value.Bottom)));
+            }
+        }
+
         public Color AccentColor
         {
             set

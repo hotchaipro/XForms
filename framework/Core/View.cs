@@ -1475,6 +1475,8 @@ namespace XForms
         internal bool MoveFocus(
             bool isForward)
         {
+            SetFocusRingVisible(true);
+
             var root = this;
             while (root.KeyboardParent is View parent)
             {
@@ -1579,7 +1581,7 @@ namespace XForms
             DrawingContext context)
         {
             var focused = this._focusedLightweight;
-            if ((null == focused) || !focused.IsLightweight || (focused.LayerView != this))
+            if ((null == focused) || !focused.IsLightweight || (focused.LayerView != this) || !_isFocusRingVisible)
             {
                 return;
             }
@@ -2334,6 +2336,27 @@ namespace XForms
             }
         }
 
+        /// <summary>
+        /// How far the view reaches into the safe area (see
+        /// <see cref="ExtendsIntoSafeArea"/>).
+        /// </summary>
+        internal Thickness SafeAreaExtension
+        {
+            get
+            {
+                return this._safeAreaExtension;
+            }
+        }
+
+        /// <summary>
+        /// The view reaches into the safe area by another amount: a scrolling
+        /// view insets its content by it instead, so its content scrolls
+        /// beneath the system's bars, and its ends can scroll clear of them.
+        /// </summary>
+        internal virtual void OnSafeAreaExtensionChanged()
+        {
+        }
+
         // An extending view along the edge of a page's safe area grows through
         // the page's insets there (the rectangle is in the parent's coordinates)
         private Rect ExtendIntoSafeArea(
@@ -2390,7 +2413,12 @@ namespace XForms
                 page.SetExtendedEdges(this, edges);
             }
 
-            this._safeAreaExtension = extension;
+            if (extension != this._safeAreaExtension)
+            {
+                this._safeAreaExtension = extension;
+                this.OnSafeAreaExtensionChanged();
+            }
+
             return new Rect(
                 rect.X - extension.Left,
                 rect.Y - extension.Top,
@@ -3096,12 +3124,22 @@ namespace XForms
             switch (e.State)
             {
                 case PointerInputState.Began:
+                    SetFocusRingVisible(false);
+
                     // The view that takes a press gets its moves: remember
                     // where it started, for an ancestor's gesture to take over
                     if (isClaimed)
                     {
                         _drags ??= new Dictionary<int, Drag>();
                         _drags[e.PointerId] = new Drag() { Origin = this, Start = e.Position };
+
+                        // A pressed control takes focus (without a ring), and
+                        // typing in a text box ends: the soft keyboard hides
+                        if (this.Focusable && !(this is Primitives.TextBox) && !this.IsFocused)
+                        {
+                            this.Application?.Renderer.EndTextEntry();
+                            this.Focus();
+                        }
                     }
 
                     break;
@@ -3553,6 +3591,40 @@ namespace XForms
             }
         }
 
+        // The view with keyboard focus, and whether its ring shows
+        private static View _focusedView;
+        private static bool _isFocusRingVisible;
+
+        /// <summary>
+        /// Whether focus rings show: after keys move focus (Tab, the arrows),
+        /// not after a tap or a click, as the web's :focus-visible.
+        /// </summary>
+        internal static bool IsFocusRingVisible
+        {
+            get
+            {
+                return _isFocusRingVisible;
+            }
+        }
+
+        // The keyboard shows focus rings, a pointer hides them
+        internal static void SetFocusRingVisible(
+            bool isVisible)
+        {
+            if (isVisible == _isFocusRingVisible)
+            {
+                return;
+            }
+
+            _isFocusRingVisible = isVisible;
+            var focused = _focusedView;
+            if (null != focused)
+            {
+                var layer = focused.IsLightweight ? focused.LayerView : focused;
+                layer?.Native?.InvalidateLayerContent();
+            }
+        }
+
         /// <summary>
         /// Whether the view has keyboard focus.
         /// </summary>
@@ -3568,6 +3640,15 @@ namespace XForms
                 if (value != this._isFocused)
                 {
                     this._isFocused = value;
+                    if (value)
+                    {
+                        _focusedView = this;
+                    }
+                    else if (_focusedView == this)
+                    {
+                        _focusedView = null;
+                    }
+
                     this.OnFocusChangedCore(value);
 
                     if (value)
@@ -3689,6 +3770,8 @@ namespace XForms
         internal bool RouteKeyDown(
             KeyEventArgs e)
         {
+            SetFocusRingVisible(true);
+
             for (var view = this; null != view; view = view.KeyboardParent)
             {
                 if (view.DispatchKeyDown(e))
