@@ -165,6 +165,14 @@ namespace XForms.Win32
             }
         }
 
+        // No system bar at the bottom of the screen
+        public Color? BottomSafeAreaColor
+        {
+            set
+            {
+            }
+        }
+
         public Size MinimumWindowSize
         {
             set

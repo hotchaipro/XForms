@@ -168,6 +168,14 @@ namespace XForms.Web
             }
         }
 
+        // No system bar at the bottom of the screen
+        public Color? BottomSafeAreaColor
+        {
+            set
+            {
+            }
+        }
+
         public bool CanOpenWindows => false;
 
         public IWindowRenderer OpenWindow(

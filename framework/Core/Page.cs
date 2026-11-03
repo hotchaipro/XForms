@@ -12,6 +12,7 @@ namespace XForms
         private View _content;
         private Color? _backgroundColor;
         private bool _usesSafeArea = true;
+        private Color? _bottomSafeAreaColor;
 
         public Page()
         {
@@ -67,6 +68,36 @@ namespace XForms
                 if (value != this._usesSafeArea)
                 {
                     this._usesSafeArea = value;
+                    if (this.HasRenderer)
+                    {
+                        this.Application.UpdateSafeAreaUse();
+                    }
+
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        /// <summary>
+        /// The color under the system's bar at the bottom of the screen (the
+        /// home indicator on iOS, the navigation bar on Android) while the page
+        /// uses the safe area. Set it to the color of a bar docked at the
+        /// page's bottom, so the bar reaches the screen's edge with its
+        /// buttons clear of the system's. Null (the default): the page's
+        /// background.
+        /// </summary>
+        public Color? BottomSafeAreaColor
+        {
+            get
+            {
+                return this._bottomSafeAreaColor;
+            }
+
+            set
+            {
+                if (value != this._bottomSafeAreaColor)
+                {
+                    this._bottomSafeAreaColor = value;
                     if (this.HasRenderer)
                     {
                         this.Application.UpdateSafeAreaUse();

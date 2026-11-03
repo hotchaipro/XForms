@@ -65,6 +65,24 @@ namespace XForms.iOS.Renderers
         }
 
         /// <summary>
+        /// The color of the band under the home indicator, below a page that
+        /// uses the safe area (a bar docked at its bottom reaching the screen's
+        /// edge), or null for none: the page's own background shows there.
+        /// </summary>
+        internal Color? HomeIndicatorBandColor
+        {
+            set
+            {
+                var band = ((RootView)this.NativeElement).HomeIndicatorBand;
+                band.Hidden = !value.HasValue;
+                if (value.HasValue)
+                {
+                    band.BackgroundColor = value.Value.ToUIColor();
+                }
+            }
+        }
+
+        /// <summary>
         /// Goes back a page, if the app can. Returns whether it did.
         /// </summary>
         internal static bool GoBack()
@@ -256,6 +274,7 @@ namespace XForms.iOS.Renderers
             {
                 this._frame = frame;
                 this.AddSubview(this.StatusBarBand);
+                this.AddSubview(this.HomeIndicatorBand);
                 UIKeyboard.Notifications.ObserveWillChangeFrame(this.Keyboard_WillChangeFrame);
                 UIKeyboard.Notifications.ObserveWillHide((sender, e) => this.SetKeyboardOverlap(0));
                 UIKeyboard.Notifications.ObserveDidShow((sender, e) => this.RevealFirstResponder());
@@ -324,6 +343,14 @@ namespace XForms.iOS.Renderers
                 get;
             } = new NativeView() { UserInteractionEnabled = false };
 
+            /// <summary>
+            /// The background under the home indicator, when the page gives one.
+            /// </summary>
+            internal NativeView HomeIndicatorBand
+            {
+                get;
+            } = new NativeView() { UserInteractionEnabled = false, Hidden = true };
+
             public override void SafeAreaInsetsDidChange()
             {
                 base.SafeAreaInsetsDidChange();
@@ -340,7 +367,7 @@ namespace XForms.iOS.Renderers
                 // has a transform)
                 foreach (var page in this.Subviews)
                 {
-                    if (page != this.StatusBarBand)
+                    if ((page != this.StatusBarBand) && (page != this.HomeIndicatorBand))
                     {
                         Place(page, new Rect(0, 0, (float)this.Bounds.Width, (float)height));
                     }
@@ -348,6 +375,11 @@ namespace XForms.iOS.Renderers
 
                 this.StatusBarBand.Frame = new CoreGraphics.CGRect(0, 0, this.Bounds.Width, this.SafeAreaInsets.Top);
                 this.BringSubviewToFront(this.StatusBarBand);
+
+                // Under the home indicator, unless the keyboard covers it
+                nfloat bottom = (0 < this._keyboardOverlap) ? 0 : this.SafeAreaInsets.Bottom;
+                this.HomeIndicatorBand.Frame = new CoreGraphics.CGRect(0, this.Bounds.Height - bottom, this.Bounds.Width, bottom);
+                this.BringSubviewToFront(this.HomeIndicatorBand);
 
                 LayerHost.For(this._frame).NotifyRootSize(new Size((float)this.Bounds.Width, (float)height));
 
@@ -387,6 +419,7 @@ namespace XForms.iOS.Renderers
             }
 
             this.NativeElement.BringSubviewToFront(((RootView)this.NativeElement).StatusBarBand);
+            this.NativeElement.BringSubviewToFront(((RootView)this.NativeElement).HomeIndicatorBand);
         }
 
         public void RemovePage(
@@ -400,6 +433,7 @@ namespace XForms.iOS.Renderers
         {
             this.NativeElement.BringSubviewToFront((NativeView)page.Renderer.NativeElement);
             this.NativeElement.BringSubviewToFront(((RootView)this.NativeElement).StatusBarBand);
+            this.NativeElement.BringSubviewToFront(((RootView)this.NativeElement).HomeIndicatorBand);
         }
     }
 }

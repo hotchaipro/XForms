@@ -1107,7 +1107,9 @@ namespace XForms
         /// </summary>
         internal void UpdateSafeAreaUse()
         {
-            this.Renderer.ExtendsIntoSafeArea = !(this._rootFrame?.CurrentPage?.UsesSafeArea ?? true);
+            var page = this._rootFrame?.CurrentPage;
+            this.Renderer.ExtendsIntoSafeArea = !(page?.UsesSafeArea ?? true);
+            this.Renderer.BottomSafeAreaColor = (page?.UsesSafeArea ?? false) ? page.BottomSafeAreaColor : null;
         }
 
         /// <summary>

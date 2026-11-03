@@ -70,12 +70,15 @@ namespace XForms.Android.Renderers
             var theme = this._theme ?? this._application.Theme;
             bool isLightTheme = (theme.Mode == ThemeMode.Light);
 
-            // The status bar takes the title bar colors; the navigation bar follows the theme
+            // The status bar takes the title bar colors; the navigation bar
+            // the page's bottom color, or the theme's background
             this._androidApplication.SetStatusBarColors(
                 this._titleBarAccentColor ?? theme.Colors.Background,
                 this._titleBarForegroundColor.HasValue ? !IsLightColor(this._titleBarForegroundColor.Value) : isLightTheme);
 
-            this._androidApplication.SetNavigationBarColors(theme.Colors.Background, isLightTheme);
+            this._androidApplication.SetNavigationBarColors(
+                this._bottomSafeAreaColor ?? theme.Colors.Background,
+                this._bottomSafeAreaColor.HasValue ? IsLightColor(this._bottomSafeAreaColor.Value) : isLightTheme);
         }
 
         private static bool IsLightColor(
@@ -161,6 +164,17 @@ namespace XForms.Android.Renderers
             set
             {
                 this._androidApplication.ExtendsIntoSafeArea = value;
+            }
+        }
+
+        private Color? _bottomSafeAreaColor;
+
+        public Color? BottomSafeAreaColor
+        {
+            set
+            {
+                this._bottomSafeAreaColor = value;
+                this.UpdateSystemBars();
             }
         }
 

@@ -64,6 +64,13 @@ namespace XForms.Platform
         bool ExtendsIntoSafeArea { set; }
 
         /// <summary>
+        /// The color under the system's bar at the bottom of the screen, below
+        /// a page that uses the safe area (its <see cref="Page.BottomSafeAreaColor"/>),
+        /// or null for the page's background.
+        /// </summary>
+        Color? BottomSafeAreaColor { set; }
+
+        /// <summary>
         /// Whether the app can open windows besides its main one.
         /// </summary>
         bool CanOpenWindows { get; }

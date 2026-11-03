@@ -94,3 +94,5 @@ virtual XForms.View.SetAccessibilityRangeValue(double value) -> bool
 virtual XForms.View.SetUserState(object state) -> void
 XForms.View.TabIndex.get -> int
 XForms.View.TabIndex.set -> void
+XForms.Page.BottomSafeAreaColor.get -> XForms.Color?
+XForms.Page.BottomSafeAreaColor.set -> void

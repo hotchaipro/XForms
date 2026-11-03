@@ -204,6 +204,17 @@ they need:
   screen size; SoonerOrLater's `MainActivity` is the pattern), so
   re-creation is rare. Use a theme without an action bar.
 
+**System bars.** A page uses the safe area unless it sets
+`Page.UsesSafeArea` to false. The bars around a page that uses it take the
+app's colors. At the top, `TitleBar.AccentColor` (or the theme's
+background) fills the status bar: Android colors its status bar, and iOS
+puts a band of that color over the top inset. The status bar's text is
+light or dark to match `TitleBar.ForegroundColor`. At the bottom,
+`Page.BottomSafeAreaColor` fills the system's bar (Android's navigation
+bar, a band under iOS's home indicator), so a bar docked at the page's
+bottom reaches the screen's edge while its buttons stay clear. Without it,
+the page's background shows there.
+
 ## Navigation
 
 An app's pages are reached by **path**, such as `/item/42`. The app lists

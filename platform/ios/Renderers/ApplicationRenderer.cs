@@ -173,6 +173,17 @@ namespace XForms.iOS.Renderers
             }
         }
 
+        public Color? BottomSafeAreaColor
+        {
+            set
+            {
+                if (this._rootFrame?.Renderer is FrameRenderer frameRenderer)
+                {
+                    frameRenderer.HomeIndicatorBandColor = value;
+                }
+            }
+        }
+
         public Size MinimumWindowSize
         {
             set
