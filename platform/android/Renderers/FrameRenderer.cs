@@ -22,11 +22,21 @@ namespace XForms.Android.Renderers
 #endif
 
             this.SetNativeElement(this._nativeFrame);
+            Root = frame;
 
             // The root frame is the window's content: report its size
             this._nativeFrame.LayoutChange += (sender, e) => LayerHost.For(frame).NotifyRootSize(new Size(
                 this.PixelsToDevicePixels(e.Right - e.Left),
                 this.PixelsToDevicePixels(e.Bottom - e.Top)));
+        }
+
+        /// <summary>
+        /// The window's root frame (Android shows one window).
+        /// </summary>
+        internal static Frame Root
+        {
+            get;
+            private set;
         }
 
         // Pages stay in the frame (hidden when not showing), so transitions can

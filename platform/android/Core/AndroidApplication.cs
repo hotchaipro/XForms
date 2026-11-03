@@ -40,7 +40,7 @@ namespace XForms.Android
         private bool _isNavigationBarLight;
         private Action _backHandler;
         private BackCallback _backCallback;
-        private BackKeyWindowCallback _backKeyCallback;
+        private KeyWindowCallback _keyCallback;
 
         // The system bars and cutout, and the soft keyboard, in pixels
         private global::Android.Graphics.Rect _barInsets = new global::Android.Graphics.Rect();
@@ -213,6 +213,18 @@ namespace XForms.Android
                 this.UnregisterBack(previous);
             }
 
+            // The window's callback (the activity) sees keys first: Back
+            // before Android 13, and Tab when nothing has focus
+            if (activity.Window.Callback is KeyWindowCallback installed)
+            {
+                this._keyCallback = installed;
+            }
+            else
+            {
+                this._keyCallback = new KeyWindowCallback(activity.Window.Callback, this);
+                activity.Window.Callback = this._keyCallback;
+            }
+
             this.SetBackHandler(this._backHandler);
             this.UpdateSystemBarAppearance();
         }
@@ -359,13 +371,9 @@ namespace XForms.Android
                     this._backCallback = null;
                 }
             }
-            else if (null == this._backKeyCallback)
-            {
-                // Before Android 13, Back is a key event, which the window's
-                // callback (the activity) sees first
-                this._backKeyCallback = new BackKeyWindowCallback(activity.Window.Callback, this);
-                activity.Window.Callback = this._backKeyCallback;
-            }
+
+            // Before Android 13, Back is a key event, which the window's
+            // callback (KeyWindowCallback) gives to OnBackKey
         }
 
         private void UnregisterBack(
@@ -381,12 +389,31 @@ namespace XForms.Android
                 this._backCallback = null;
             }
 
-            if ((null != this._backKeyCallback) && (activity.Window?.Callback == this._backKeyCallback))
+            if ((null != this._keyCallback) && (activity.Window?.Callback == this._keyCallback))
             {
-                activity.Window.Callback = this._backKeyCallback.Inner;
+                activity.Window.Callback = this._keyCallback.Inner;
             }
 
-            this._backKeyCallback = null;
+            this._keyCallback = null;
+        }
+
+        // Tab when nothing in the window has focus: starts in tab order
+        private bool OnTabWithoutFocus(
+            KeyEvent e)
+        {
+            var root = Renderers.FrameRenderer.Root;
+            if ((null != this._activity?.CurrentFocus) || (null == root)
+                || ((e.MetaState & ~(MetaKeyStates.ShiftOn | MetaKeyStates.ShiftLeftOn | MetaKeyStates.ShiftRightOn)) != 0))
+            {
+                return false;
+            }
+
+            if (e.Action == KeyEventActions.Down)
+            {
+                LayerHost.For(root).MoveFocus(isForward: !e.IsShiftPressed);
+            }
+
+            return true;
         }
 
         // A Back key the app handles (before Android 13)
@@ -690,13 +717,16 @@ namespace XForms.Android
 
         /// <summary>
         /// The activity's window callback, but with the Back key going to the
-        /// app while it can go back (before Android 13, where Back is a key).
+        /// app while it can go back (before Android 13, where Back is a key),
+        /// and Tab, when nothing has focus, starting at the first (or last)
+        /// view in tab order rather than where Android's search by position
+        /// would.
         /// </summary>
-        private sealed class BackKeyWindowCallback : Java.Lang.Object, global::Android.Views.Window.ICallback
+        private sealed class KeyWindowCallback : Java.Lang.Object, global::Android.Views.Window.ICallback
         {
             private readonly AndroidApplication _owner;
 
-            public BackKeyWindowCallback(
+            public KeyWindowCallback(
                 global::Android.Views.Window.ICallback inner,
                 AndroidApplication owner)
             {
@@ -708,7 +738,12 @@ namespace XForms.Android
 
             public bool DispatchKeyEvent(KeyEvent e)
             {
-                if ((e.KeyCode == Keycode.Back) && this._owner.OnBackKey(e))
+                if ((e.KeyCode == Keycode.Back) && !OperatingSystem.IsAndroidVersionAtLeast(33) && this._owner.OnBackKey(e))
+                {
+                    return true;
+                }
+
+                if ((e.KeyCode == Keycode.Tab) && this._owner.OnTabWithoutFocus(e))
                 {
                     return true;
                 }
