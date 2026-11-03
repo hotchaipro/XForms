@@ -547,6 +547,14 @@ export function focus(id) {
     elements.get(id)?.focus({ preventScroll: true });
 }
 
+// The focused text entry gives up focus (hiding a soft keyboard)
+export function endTextEntry() {
+    const element = document.activeElement;
+    if (element && (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA')) {
+        element.blur();
+    }
+}
+
 // Where an element is in the viewport: [x, y, width, height]
 export function getRect(id) {
     const rect = elements.get(id).getBoundingClientRect();

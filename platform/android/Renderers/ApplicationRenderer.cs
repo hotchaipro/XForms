@@ -167,6 +167,11 @@ namespace XForms.Android.Renderers
             }
         }
 
+        public void EndTextEntry()
+        {
+            this._androidApplication.EndTextEntry();
+        }
+
         private Color? _bottomSafeAreaColor;
 
         public Color? BottomSafeAreaColor

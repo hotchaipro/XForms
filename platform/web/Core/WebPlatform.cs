@@ -168,6 +168,11 @@ namespace XForms.Web
             }
         }
 
+        public void EndTextEntry()
+        {
+            Js.EndTextEntry();
+        }
+
         // No system bar at the bottom of the screen
         public Color? BottomSafeAreaColor
         {

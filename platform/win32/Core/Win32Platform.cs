@@ -165,6 +165,11 @@ namespace XForms.Win32
             }
         }
 
+        // No soft keyboard to hide: a light-dismiss popup takes focus itself
+        public void EndTextEntry()
+        {
+        }
+
         // No system bar at the bottom of the screen
         public Color? BottomSafeAreaColor
         {

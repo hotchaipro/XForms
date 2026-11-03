@@ -480,6 +480,21 @@ namespace XForms.Android
         /// <summary>
         /// Colors the area behind the navigation bar, with icons that contrast with it.
         /// </summary>
+        /// <summary>
+        /// The focused text entry, if one has focus, gives it up (the root
+        /// frame takes it) and the soft keyboard hides.
+        /// </summary>
+        internal void EndTextEntry()
+        {
+            var focused = this._activity?.CurrentFocus;
+            if (focused is EditText)
+            {
+                var inputMethods = (global::Android.Views.InputMethods.InputMethodManager)this._activity.GetSystemService(Context.InputMethodService);
+                inputMethods?.HideSoftInputFromWindow(focused.WindowToken, global::Android.Views.InputMethods.HideSoftInputFlags.None);
+                focused.ClearFocus();
+            }
+        }
+
         internal void SetNavigationBarColors(
             Color background,
             bool isLightBackground)

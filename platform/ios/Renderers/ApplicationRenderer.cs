@@ -173,6 +173,17 @@ namespace XForms.iOS.Renderers
             }
         }
 
+        // The first responder resigns if it's a text field (the root then
+        // takes keyboard focus), hiding the keyboard
+        public void EndTextEntry()
+        {
+            var window = this._nativeApplicationDelegate.Window;
+            if (Renderers.FrameRenderer.FocusedView(window) is XForms.Primitives.TextBox)
+            {
+                UIKit.UIApplication.SharedApplication.SendAction(new ObjCRuntime.Selector("resignFirstResponder"), null, null, null);
+            }
+        }
+
         public Color? BottomSafeAreaColor
         {
             set

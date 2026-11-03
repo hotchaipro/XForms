@@ -71,6 +71,12 @@ namespace XForms.Platform
         Color? BottomSafeAreaColor { set; }
 
         /// <summary>
+        /// Takes keyboard focus off the text entry that has it, if one does,
+        /// hiding the soft keyboard.
+        /// </summary>
+        void EndTextEntry();
+
+        /// <summary>
         /// Whether the app can open windows besides its main one.
         /// </summary>
         bool CanOpenWindows { get; }

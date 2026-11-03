@@ -111,6 +111,14 @@ namespace XForms.Primitives
             }
 
             this._isOpen = true;
+
+            // A picker or menu opens over the screen, not behind the soft
+            // keyboard: typing ends (a suggestion list keeps it)
+            if (this.IsLightDismissEnabled)
+            {
+                this.Application.Renderer.EndTextEntry();
+            }
+
             this.Renderer.Show();
             this.Application.OnPopupShown(this);
         }

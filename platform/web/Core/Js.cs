@@ -135,6 +135,9 @@ namespace XForms.Web
         [JSImport("focus", Module)]
         public static partial void Focus(int id);
 
+        [JSImport("endTextEntry", Module)]
+        public static partial void EndTextEntry();
+
         [JSImport("getFocusedId", Module)]
         public static partial int GetFocusedId();
 
