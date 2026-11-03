@@ -36,6 +36,35 @@ namespace XForms.iOS.Renderers
         }
 
         /// <summary>
+        /// Colors the status bar: its band (above a page that uses the safe
+        /// area), and its text, light or dark.
+        /// </summary>
+        internal void SetStatusBarColors(
+            Color background,
+            bool isLightContent)
+        {
+            ((RootView)this.NativeElement).StatusBarBand.BackgroundColor = background.ToUIColor();
+            var controller = (RootViewController)this._viewController;
+            if (controller.IsLightContent != isLightContent)
+            {
+                controller.IsLightContent = isLightContent;
+                controller.SetNeedsStatusBarAppearanceUpdate();
+            }
+        }
+
+        /// <summary>
+        /// Whether the status bar's band shows: not when the page draws under
+        /// the status bar itself.
+        /// </summary>
+        internal bool ShowsStatusBarBand
+        {
+            set
+            {
+                ((RootView)this.NativeElement).StatusBarBand.Hidden = !value;
+            }
+        }
+
+        /// <summary>
         /// Goes back a page, if the app can. Returns whether it did.
         /// </summary>
         internal static bool GoBack()
@@ -122,6 +151,17 @@ namespace XForms.iOS.Renderers
                 {
                     return true;
                 }
+            }
+
+            internal bool IsLightContent
+            {
+                get;
+                set;
+            }
+
+            public override UIStatusBarStyle PreferredStatusBarStyle()
+            {
+                return this.IsLightContent ? UIStatusBarStyle.LightContent : UIStatusBarStyle.DarkContent;
             }
 
             public override void ViewDidAppear(
@@ -215,6 +255,7 @@ namespace XForms.iOS.Renderers
                 Frame frame)
             {
                 this._frame = frame;
+                this.AddSubview(this.StatusBarBand);
                 UIKeyboard.Notifications.ObserveWillChangeFrame(this.Keyboard_WillChangeFrame);
                 UIKeyboard.Notifications.ObserveWillHide((sender, e) => this.SetKeyboardOverlap(0));
                 UIKeyboard.Notifications.ObserveDidShow((sender, e) => this.RevealFirstResponder());
@@ -274,6 +315,21 @@ namespace XForms.iOS.Renderers
                 return null;
             }
 
+            /// <summary>
+            /// The status bar's background (the title bar's accent), above the
+            /// pages, as Android's status bar is.
+            /// </summary>
+            internal NativeView StatusBarBand
+            {
+                get;
+            } = new NativeView() { UserInteractionEnabled = false };
+
+            public override void SafeAreaInsetsDidChange()
+            {
+                base.SafeAreaInsetsDidChange();
+                this.SetNeedsLayout();
+            }
+
             public override void LayoutSubviews()
             {
                 base.LayoutSubviews();
@@ -282,8 +338,14 @@ namespace XForms.iOS.Renderers
                 // The pages lay themselves out in their views: above the keyboard
                 foreach (var page in this.Subviews)
                 {
-                    page.Frame = new CoreGraphics.CGRect(0, 0, this.Bounds.Width, height);
+                    if (page != this.StatusBarBand)
+                    {
+                        page.Frame = new CoreGraphics.CGRect(0, 0, this.Bounds.Width, height);
+                    }
                 }
+
+                this.StatusBarBand.Frame = new CoreGraphics.CGRect(0, 0, this.Bounds.Width, this.SafeAreaInsets.Top);
+                this.BringSubviewToFront(this.StatusBarBand);
 
                 LayerHost.For(this._frame).NotifyRootSize(new Size((float)this.Bounds.Width, (float)height));
 
@@ -321,6 +383,8 @@ namespace XForms.iOS.Renderers
                 nativePage.Frame = this.NativeElement.Bounds;
                 nativePage.AutoresizingMask = UIViewAutoresizing.FlexibleDimensions;
             }
+
+            this.NativeElement.BringSubviewToFront(((RootView)this.NativeElement).StatusBarBand);
         }
 
         public void RemovePage(
@@ -333,6 +397,7 @@ namespace XForms.iOS.Renderers
             Page page)
         {
             this.NativeElement.BringSubviewToFront((NativeView)page.Renderer.NativeElement);
+            this.NativeElement.BringSubviewToFront(((RootView)this.NativeElement).StatusBarBand);
         }
     }
 }

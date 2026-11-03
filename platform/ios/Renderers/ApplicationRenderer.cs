@@ -9,7 +9,8 @@ namespace XForms.iOS.Renderers
         private Frame _rootFrame;
         private ApplicationHost _applicationHost;
         private IosApplication _nativeApplicationDelegate;
-        //private Color? _titleBarAccentColor, _titleBarForegroundColor;
+        private Color? _titleBarAccentColor, _titleBarForegroundColor;
+        private Theme _theme;
 
         public ApplicationRenderer(
             XForms.Application application,
@@ -46,14 +47,50 @@ namespace XForms.iOS.Renderers
 
         public Color? TitleBarAccentColor
         {
-            get;
-            set;
+            get
+            {
+                return this._titleBarAccentColor;
+            }
+
+            set
+            {
+                this._titleBarAccentColor = value;
+                this.UpdateStatusBar();
+            }
         }
 
         public Color? TitleBarForegroundColor
         {
-            get;
-            set;
+            get
+            {
+                return this._titleBarForegroundColor;
+            }
+
+            set
+            {
+                this._titleBarForegroundColor = value;
+                this.UpdateStatusBar();
+            }
+        }
+
+        // The status bar takes the title bar colors, as on Android: its band
+        // the accent (or the theme's background), its text light or dark
+        private void UpdateStatusBar()
+        {
+            if (this._rootFrame?.Renderer is FrameRenderer frameRenderer)
+            {
+                var theme = this._theme ?? this._application.Theme;
+                frameRenderer.SetStatusBarColors(
+                    this._titleBarAccentColor ?? theme.Colors.Background,
+                    this._titleBarForegroundColor.HasValue ? IsLightColor(this._titleBarForegroundColor.Value) : (theme.Mode != ThemeMode.Light));
+            }
+        }
+
+        private static bool IsLightColor(
+            Color color)
+        {
+            // Perceived brightness
+            return ((0.299 * color.R) + (0.587 * color.G) + (0.114 * color.B)) > 160;
         }
 
         public ThemeMode SystemThemeMode
@@ -121,11 +158,17 @@ namespace XForms.iOS.Renderers
         {
             set
             {
-                // The current page's view keeps its content in the safe area
+                // The current page's view keeps its content in the safe area,
+                // below the status bar's band
                 if (this._rootFrame?.CurrentPage?.Renderer?.NativeElement is NativeLayoutView page)
                 {
                     page.RespectsSafeArea = !value;
                     page.InvalidateContentLayout();
+                }
+
+                if (this._rootFrame?.Renderer is FrameRenderer frameRenderer)
+                {
+                    frameRenderer.ShowsStatusBarBand = !value;
                 }
             }
         }
@@ -165,6 +208,9 @@ namespace XForms.iOS.Renderers
         public void ApplyTheme(
             Theme theme)
         {
+            this._theme = theme;
+            this.UpdateStatusBar();
+
             // System views (keyboards, menus) follow the app's mode
             var window = this._nativeApplicationDelegate.Window;
             if (null != window)
@@ -216,6 +262,7 @@ namespace XForms.iOS.Renderers
             var frameRenderer = (FrameRenderer)frame.Renderer;
 
             this._nativeApplicationDelegate.SetRootViewController(frameRenderer.ViewController);
+            this.UpdateStatusBar();
         }
 
         public void OnNavigationComplete()
