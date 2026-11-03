@@ -206,6 +206,12 @@ namespace XForms
             }
 
             leaving?.OnNavigatedFrom(new NavigationEventArgs(mode));
+
+            // Typing on a page that leaves ends: its keyboard goes with it
+            if ((null != leaving) && HasFocusedTextBox(leaving))
+            {
+                this.Application.Renderer.EndTextEntry();
+            }
             arriving.OnNavigatedTo(new NavigationEventArgs(mode));
 
             if ((null != leaving) && (transition != PageTransition.None))
@@ -223,6 +229,26 @@ namespace XForms
                     leaving.OnRemovedFromBackStack();
                 }
             }
+        }
+
+        private static bool HasFocusedTextBox(
+            View view)
+        {
+            if ((view is Primitives.TextBox textBox) && textBox.IsFocused)
+            {
+                return true;
+            }
+
+            var children = view.DrawingOrderChildren;
+            for (int i = 0; i < children.Count; i += 1)
+            {
+                if (HasFocusedTextBox(children[i]))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
