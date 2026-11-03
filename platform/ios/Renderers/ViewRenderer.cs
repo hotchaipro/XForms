@@ -100,7 +100,7 @@ namespace XForms.iOS.Renderers
             }
         }
 
-        private static void Place(
+        internal static void Place(
             UIView view,
             Rect frame)
         {

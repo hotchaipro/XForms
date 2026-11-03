@@ -336,11 +336,13 @@ namespace XForms.iOS.Renderers
                 var height = (nfloat)Math.Max(0, this.Bounds.Height - this._keyboardOverlap);
 
                 // The pages lay themselves out in their views: above the keyboard
+                // (placed by bounds and center, as a page sliding in or out
+                // has a transform)
                 foreach (var page in this.Subviews)
                 {
                     if (page != this.StatusBarBand)
                     {
-                        page.Frame = new CoreGraphics.CGRect(0, 0, this.Bounds.Width, height);
+                        Place(page, new Rect(0, 0, (float)this.Bounds.Width, (float)height));
                     }
                 }
 
@@ -380,8 +382,8 @@ namespace XForms.iOS.Renderers
             if (nativePage.Superview != this.NativeElement)
             {
                 this.NativeElement.AddSubview(nativePage);
-                nativePage.Frame = this.NativeElement.Bounds;
-                nativePage.AutoresizingMask = UIViewAutoresizing.FlexibleDimensions;
+                this.NativeElement.SetNeedsLayout();
+                this.NativeElement.LayoutIfNeeded();
             }
 
             this.NativeElement.BringSubviewToFront(((RootView)this.NativeElement).StatusBarBand);
