@@ -16,6 +16,12 @@ namespace XForms.iOS
     {
         private bool _isRowHeightUpdatePending;
         private readonly System.Collections.Generic.List<Action> _rowHeightUpdateCompletions = new System.Collections.Generic.List<Action>();
+        private readonly System.Collections.Generic.List<Action> _rowHeightUpdateAnimations = new System.Collections.Generic.List<Action>();
+
+        // How long row height changes gather before the rows animate: what an
+        // update changes over a few frames (a command bar, then the details
+        // the deselected item hides) moves as one
+        private static readonly TimeSpan RowHeightUpdateDelay = TimeSpan.FromMilliseconds(50);
 
         public NativeListView()
             : base(CGRect.Empty, UITableViewStyle.Plain)
@@ -43,11 +49,17 @@ namespace XForms.iOS
         /// item that revealed its command bar.
         /// </summary>
         internal void InvalidateRowHeights(
-            Action completion = null)
+            Action completion = null,
+            Action animation = null)
         {
             if (null != completion)
             {
                 this._rowHeightUpdateCompletions.Add(completion);
+            }
+
+            if (null != animation)
+            {
+                this._rowHeightUpdateAnimations.Add(animation);
             }
 
             if (this._isRowHeightUpdatePending)
@@ -57,24 +69,35 @@ namespace XForms.iOS
 
             this._isRowHeightUpdatePending = true;
 
-            this.BeginInvokeOnMainThread(() =>
-            {
-                this._isRowHeightUpdatePending = false;
+            CoreFoundation.DispatchQueue.MainQueue.DispatchAfter(
+                new CoreFoundation.DispatchTime(CoreFoundation.DispatchTime.Now, RowHeightUpdateDelay),
+                () =>
+                {
+                    this._isRowHeightUpdatePending = false;
 
-                var completions = this._rowHeightUpdateCompletions.ToArray();
-                this._rowHeightUpdateCompletions.Clear();
+                    var completions = this._rowHeightUpdateCompletions.ToArray();
+                    this._rowHeightUpdateCompletions.Clear();
+                    var animations = this._rowHeightUpdateAnimations.ToArray();
+                    this._rowHeightUpdateAnimations.Clear();
 
-                // An empty batch update re-queries row heights and animates the change
-                this.PerformBatchUpdates(
-                    null,
-                    (finished) =>
-                    {
-                        foreach (var action in completions)
+                    // An empty batch update re-queries row heights and animates
+                    // the change, with what moves along with it
+                    this.PerformBatchUpdates(
+                        () =>
                         {
-                            action();
-                        }
-                    });
-            });
+                            foreach (var action in animations)
+                            {
+                                action();
+                            }
+                        },
+                        (finished) =>
+                        {
+                            foreach (var action in completions)
+                            {
+                                action();
+                            }
+                        });
+                });
         }
     }
 
@@ -260,10 +283,12 @@ namespace XForms.iOS
             if (Math.Abs(requiredHeight - (float)bounds.Height) > 0.5f)
             {
                 Action completion = null;
+                Action animation = null;
 
                 // Closing: the content has already lost what it hid (such as the
-                // command bar), so cover it with a picture of the last frame shown
-                // while the rows below slide back up over it
+                // command bar and details), so cover it with a picture of the last
+                // frame shown, which fades as the rows below slide back up over
+                // it: nothing is left half covered, and nothing snaps at the end
                 if ((requiredHeight < (float)bounds.Height) && (null == this._closingSnapshot) && (null != this.Window))
                 {
                     var snapshot = this.ContentView.SnapshotView(false);
@@ -273,11 +298,18 @@ namespace XForms.iOS
                         this.ContentView.AddSubview(snapshot);
                         this._closingSnapshot = snapshot;
 
-                        completion = this.RemoveClosingSnapshot;
+                        completion = () =>
+                        {
+                            if (this._closingSnapshot == snapshot)
+                            {
+                                this.RemoveClosingSnapshot();
+                            }
+                        };
+                        animation = () => UIView.Animate(0.3, () => snapshot.Alpha = 0);
                     }
                 }
 
-                this.FindListView()?.InvalidateRowHeights(completion);
+                this.FindListView()?.InvalidateRowHeights(completion, animation);
             }
 
             // Lay the content out at its full height and let the cell clip it, so
