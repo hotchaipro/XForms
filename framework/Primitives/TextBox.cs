@@ -442,6 +442,7 @@ namespace XForms.Primitives
 
         public new void Focus()
         {
+            View.FocusRequests += 1;
             var native = this.Native;
             if (null != native)
             {

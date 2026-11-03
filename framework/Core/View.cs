@@ -3081,6 +3081,7 @@ namespace XForms
             PointerEventArgs e)
         {
             e.OriginalSource ??= this;
+            int focusRequests = FocusRequests;
 
             // A drag an ancestor's gesture took over goes on to it
             Drag drag = null;
@@ -3166,7 +3167,9 @@ namespace XForms
                         // On release, after the tap has run, so the layout
                         // the keyboard leaves doesn't move the control from
                         // under the press
-                        if ((e.State == PointerInputState.Ended) && this.Focusable && !(this is Primitives.TextBox) && !this.IsFocused)
+                        // (Not when the tap moved focus itself, such as to a
+                        // text box on the page it opened)
+                        if ((e.State == PointerInputState.Ended) && (focusRequests == FocusRequests) && this.Focusable && !(this is Primitives.TextBox) && !this.IsFocused)
                         {
                             this.Application?.Renderer.EndTextEntry();
                             this.Focus();
@@ -3606,6 +3609,12 @@ namespace XForms
             }
         }
 
+        /// <summary>
+        /// Counts the moves of keyboard focus, asked for or made, so a tap can
+        /// tell whether it moved focus itself.
+        /// </summary>
+        internal static int FocusRequests;
+
         // The view with keyboard focus, and whether its ring shows
         private static View _focusedView;
         private static bool _isFocusRingVisible;
@@ -3658,6 +3667,7 @@ namespace XForms
                     if (value)
                     {
                         _focusedView = this;
+                        FocusRequests += 1;
                     }
                     else if (_focusedView == this)
                     {
@@ -3688,6 +3698,8 @@ namespace XForms
         /// </summary>
         public bool Focus()
         {
+            FocusRequests += 1;
+
             // A layer with focus inside it takes it back from its lightweight
             // view
             if (this._hasNativeFocus && (null != this._focusedLightweight))
