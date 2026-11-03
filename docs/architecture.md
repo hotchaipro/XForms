@@ -563,7 +563,16 @@ layer tracks which lightweight view inside it is focused, routes keys to it
 and draws its focus ring. Tab and Shift+Tab follow the view tree, lightweight
 and native views alike, on every platform (Android and iOS would otherwise
 order native views by position, which puts a layer before the views inside
-it).
+it). Among siblings, Tab goes by `View.TabIndex` (lower first; unset is
+`int.MaxValue`, as in WinUI), then drawing order, and finishes a view's
+descendants before its next sibling. A control whose drawing order isn't its
+reading order sets it on its parts without drawing them differently:
+`NavigationView` draws its content beneath the pane but gives the menu
+button, the pane and the content 0, 1 and 2. When nothing has focus, Tab
+starts at the first view in that order (or Shift+Tab at the last): on iOS
+the root view controller holds focus then, and on Android the root frame
+does, so Android neither gives focus to the first child it draws nor
+searches by position.
 
 ## Accessibility
 

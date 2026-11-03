@@ -17,7 +17,11 @@ else, so apps look the same on every platform. See `README.md`. SoonerOrLater
   (build-time generator recommended over the spike's run-time parser).
 - Unverified: Win32 from the keyboard (scripted input is blocked when another window holds the
   foreground), what VoiceOver and TalkBack say, a real iPhone or iPad.
-- Known bug: Tab reaches a navigation view's content before its pane.
+- Known bugs (found 2026-11-03, with the Tab order fix below):
+  - With a narrow navigation view's drawer open, Tab goes on into the content behind it.
+  - A navigation view's pane items are a Tab stop each (WinUI makes them one, with arrow keys).
+- Fixed 2026-11-03: Tab reached a navigation view's content before its pane. Tab now follows
+  `View.TabIndex`, then drawing order.
 
 ## Layout
 

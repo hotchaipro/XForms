@@ -3595,8 +3595,24 @@ Win32, Android and the browser, as before.
     Android; moving between text boxes with the keyboard up on the iPhone.
     Not checked: Win32 from the keyboard (real input was blocked: another
     process held the foreground), and VoiceOver's and TalkBack's speech.
-    Found, not fixed: Tab reaches a navigation view's content before its
-    pane (its children are in drawing order, which Tab follows).
+    Found then, fixed 2026-11-03: Tab reached a navigation view's content
+    before its pane (its children are in drawing order, which Tab
+    followed). Now `View.TabIndex` (WinUI's name; lower first, unset is
+    `int.MaxValue`) orders siblings for Tab, then drawing order, in the
+    framework's focus walk and Win32's; `NavigationView` gives its menu
+    button, pane and content 0, 1 and 2 and draws as before. On Android
+    a text box's Tab goes through the same walk, and the root frame holds
+    focus when nothing else does (as iOS's root view controller), so the
+    first Tab, at start or after a tap, starts in tab order instead of at
+    the first child Android finds or by position. Five unit tests of the
+    order (`TabOrderTests`). Checked by keyboard: the browser (headless
+    Edge: wide, narrow, Shift+Tab, and the drawer opened from the menu
+    button), the Android tablet emulator (Tab and Shift+Tab from nothing,
+    after a tap, and between text boxes on the forms page) and the iPad
+    simulator (Tab; idb sends no Shift). Not checked: Win32 from the
+    keyboard (still blocked). Found, not fixed: with a narrow navigation
+    view's drawer open, Tab goes on into the content behind it; the pane's
+    items are a Tab stop each (WinUI makes them one, with arrow keys).
 
 29. **Later: `XForms.Xaml`.** The proof of concept in `spikes/XForms.Xaml`
     becomes a layer over the framework and controls, including templates
