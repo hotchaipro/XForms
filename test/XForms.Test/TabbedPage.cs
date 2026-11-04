@@ -20,7 +20,12 @@ namespace XForms.Test
                 VerticalAlignment = VerticalAlignment.Stretch,
             };
 
-            var frame = new Frame();
+            // Behind the frame, which is transparent where no page is: a
+            // label that shows when the first or last tab is pulled past it
+            pageLayout.Children.Add(
+                new TextBlock() { Text = "behind", FontSize = 18, HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(8, 0) },
+                Dock.CenterOverlay);
+            var frame = new Frame() { Background = Colors.Transparent };
             var tabBar = new TabStrip()
             {
                 Height = 70,

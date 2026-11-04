@@ -145,6 +145,12 @@ namespace XForms.Platform
         /// Draws the page above the frame's other pages.
         /// </summary>
         void BringToFront(Page page);
+
+        /// <summary>
+        /// The frame's background, behind its pages (see
+        /// <see cref="Frame.Background"/>).
+        /// </summary>
+        Color BackgroundColor { get; set; }
     }
 
     internal interface ITextBlockRenderer : IViewRenderer

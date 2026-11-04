@@ -34,6 +34,42 @@ namespace XForms
         {
         }
 
+        private Color? _background;
+
+        /// <summary>
+        /// The frame's background, behind its pages: where a page isn't (as
+        /// it slides, or is pulled past the end), what's behind the frame
+        /// shows through a transparent one. Null (the default) for the
+        /// platform's (the system background on iOS; none elsewhere).
+        /// </summary>
+        public Color? Background
+        {
+            get
+            {
+                return this._background;
+            }
+
+            set
+            {
+                this._background = value;
+                if (value.HasValue && this.HasRenderer)
+                {
+                    this.Renderer.BackgroundColor = value.Value;
+                }
+
+                this.OnPropertyChanged();
+            }
+        }
+
+        internal override void OnRendererCreated()
+        {
+            base.OnRendererCreated();
+            if (this._background.HasValue)
+            {
+                this.Renderer.BackgroundColor = this._background.Value;
+            }
+        }
+
         [PlatformContract]
         internal new IFrameRenderer Renderer
         {
