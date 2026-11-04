@@ -107,8 +107,10 @@ namespace XForms.Test
 
         protected override View Build()
         {
-            // Tab two is a list of two-line rows (it fills in from the first
-            // frame of a swipe to it)
+            // Tab two is a list of rows with a title and (on most) a detail
+            // line, hidden until a moment after the page is built, while the
+            // page is still hidden (it fills in from the first frame of a swipe
+            // to it)
             if (this._name == "two")
             {
                 var rows = new System.Collections.Generic.List<int>();
@@ -117,13 +119,36 @@ namespace XForms.Test
                     rows.Add(i);
                 }
 
-                return new ListView<int>()
+                var list = new ListView<int>()
                 {
                     ItemsSource = rows,
+                    IsVisible = false,
+                    ExtendsIntoSafeArea = SafeAreaEdges.Bottom | SafeAreaEdges.Left | SafeAreaEdges.Right,
                     ItemViewFactory = ItemViewFactory<int>.Create(
-                        () => new TextBlock() { Margin = new Thickness(20, 10), FontSize = 18 },
-                        (view, row) => view.Text = "Task " + row + "\nWednesday, November " + row + " (in " + row + " days)"),
+                        () =>
+                        {
+                            var row = new StackPanel() { Margin = new Thickness(20, 12), Spacing = 2 };
+                            row.Children.Add(new TextBlock() { FontSize = 21, TextWrapping = TextWrapping.Wrap });
+                            row.Children.Add(new TextBlock() { FontSize = 14 });
+                            return row;
+                        },
+                        (view, row) =>
+                        {
+                            ((TextBlock)view.Children[0]).Text = "Old task number " + row;
+                            var detail = (TextBlock)view.Children[1];
+                            detail.Text = "Wednesday, November " + row + " (in " + row + " days)";
+                            detail.IsVisible = (row % 3) != 0;
+                        }),
                 };
+
+                var timer = new DispatcherTimer() { Interval = TimeSpan.FromMilliseconds(500) };
+                timer.Tick += (sender, e) =>
+                {
+                    timer.Stop();
+                    list.IsVisible = true;
+                };
+                timer.Start();
+                return list;
             }
 
             return new TextBlock()
