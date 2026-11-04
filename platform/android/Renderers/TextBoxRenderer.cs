@@ -207,6 +207,59 @@ namespace XForms.Android.Renderers
             }
         }
 
+        // The background is a rounded shape, with the border as its stroke
+        private readonly global::Android.Graphics.Drawables.GradientDrawable _background = new global::Android.Graphics.Drawables.GradientDrawable();
+        private bool _isBackgroundSet;
+
+        public override Color BackgroundColor
+        {
+            get
+            {
+                return base.BackgroundColor;
+            }
+
+            set
+            {
+                this._background.SetColor(NativeConversions.ToAndroidColor(value));
+                this.UseBackground();
+            }
+        }
+
+        public float CornerRadius
+        {
+            set
+            {
+                this._background.SetCornerRadius(this.DevicePixelsToPixels(value));
+                this.UseBackground();
+            }
+        }
+
+        public void SetBorder(
+            Color color,
+            float width)
+        {
+            this._background.SetStroke((int)Math.Round(this.DevicePixelsToPixels(width)), NativeConversions.ToAndroidColor(color));
+            this.UseBackground();
+        }
+
+        // NOTE: Setting the background replaces the edit text's padding, so
+        // the padding is set again after
+        private void UseBackground()
+        {
+            if (!this._isBackgroundSet)
+            {
+                this._isBackgroundSet = true;
+                int left = this._nativeTextEntry.PaddingLeft, top = this._nativeTextEntry.PaddingTop;
+                int right = this._nativeTextEntry.PaddingRight, bottom = this._nativeTextEntry.PaddingBottom;
+                this._nativeTextEntry.Background = this._background;
+                this._nativeTextEntry.SetPadding(left, top, right, bottom);
+            }
+            else
+            {
+                this._nativeTextEntry.InvalidateDrawable(this._background);
+            }
+        }
+
         public Thickness Padding
         {
             set

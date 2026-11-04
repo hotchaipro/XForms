@@ -25,8 +25,7 @@ namespace XForms.Controls
                 throw new ArgumentNullException(nameof(menuItem));
             }
 
-            this.Width = 72;
-            this.Height = 50;
+            this.Width = 96;
 
             this.MenuBar = menuBar;
             this.MenuItem = menuItem;

@@ -45,8 +45,6 @@ namespace XForms.Controls
 
         public ToggleButton()
         {
-            this.Width = 72;
-            this.Height = 60;
 
             this.GestureRecognizers.Add(new TapGestureRecognizer(this));
         }
@@ -109,6 +107,7 @@ namespace XForms.Controls
             {
                 this._icon = value;
 
+                this.InvalidateMeasure();
                 this.InvalidateVisual();
             }
         }
@@ -124,6 +123,7 @@ namespace XForms.Controls
             {
                 this._text = value;
 
+                this.InvalidateMeasure();
                 this.InvalidateVisual();
             }
         }

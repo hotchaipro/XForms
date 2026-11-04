@@ -443,6 +443,28 @@ namespace XForms.Win32.Renderers
             }
         }
 
+        private float _cornerRadius;
+        private Color _borderColor;
+        private float _borderWidth;
+
+        public float CornerRadius
+        {
+            set
+            {
+                this._cornerRadius = value;
+                this.InvalidateRender();
+            }
+        }
+
+        public void SetBorder(
+            Color color,
+            float width)
+        {
+            this._borderColor = color;
+            this._borderWidth = width;
+            this.InvalidateRender();
+        }
+
         // NOTE: RichEdit draws its caret in the text color
         public Thickness Padding
         {
@@ -543,8 +565,15 @@ namespace XForms.Win32.Renderers
         {
             var frame = this.Frame;
 
-            // The field background behind the edit window's padding
-            drawContext.FillRectangle(new Rect(0, 0, frame.Width, frame.Height), this._fieldColor);
+            // The field background behind the edit window's padding, and the
+            // border inside its edge
+            var bounds = new Rect(0, 0, frame.Width, frame.Height);
+            drawContext.FillRoundedRectangle(bounds, this._cornerRadius, this._fieldColor);
+            if (this._borderWidth > 0)
+            {
+                float inset = this._borderWidth / 2;
+                drawContext.DrawRoundedRectangle(bounds.Deflate(inset, inset), Math.Max(0, this._cornerRadius - inset), this._borderColor, this._borderWidth);
+            }
 
             if (this.IsShowingPlaceholder)
             {

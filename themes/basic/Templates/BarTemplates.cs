@@ -3,20 +3,57 @@ using XForms.Controls;
 
 namespace XForms.Themes.Basic
 {
-    // The Basic look of the menu bar: in the strong accent color in light mode
-    // (white reads on it), and on the surface color otherwise
+    // The menu bar: on the page's background, below a hairline
     internal sealed class MenuBarTemplate : ControlTemplate<MenuBar>
     {
         protected override Color? Background(
             MenuBar control)
         {
-            return BarBackground(control.ActualTheme);
+            return control.ActualTheme.Colors.Background;
         }
 
-        internal static Color BarBackground(
-            Theme theme)
+        protected override void Apply(
+            MenuBar control,
+            TemplateContext context)
         {
-            return (theme.Mode != ThemeMode.Light) ? theme.Colors.Surface : theme.Colors.StrongAccent;
+            var hairline = Hairline(control.ActualTheme, VerticalAlignment.Top);
+            context.AddPart(hairline);
+            context.State = hairline;
+        }
+
+        protected override void Unapply(
+            MenuBar control,
+            TemplateContext context)
+        {
+            if (context.State is Border hairline)
+            {
+                context.RemovePart(hairline);
+            }
+        }
+
+        protected override void OnThemeChanged(
+            MenuBar control,
+            TemplateContext context)
+        {
+            if (context.State is Border hairline)
+            {
+                hairline.Background = control.ActualTheme.Colors.Outline;
+            }
+        }
+
+        // A bar's edge: a line in the outline color across it
+        internal static Border Hairline(
+            Theme theme,
+            VerticalAlignment edge)
+        {
+            return new Border()
+            {
+                Height = 1,
+                Background = theme.Colors.Outline,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = edge,
+                IsHitTestVisible = false,
+            };
         }
     }
 
@@ -35,6 +72,7 @@ namespace XForms.Themes.Basic
         private sealed class Parts
         {
             public Border Underline;
+            public Border Hairline;
 
             // The tabs' grid: where its first cell is, and how wide each is
             public float CellLeft;
@@ -50,16 +88,6 @@ namespace XForms.Themes.Basic
             return (theme.Mode == ThemeMode.Light) ? theme.Colors.StrongAccent : theme.Colors.Accent;
         }
 
-        private static Color HairlineColor(
-            Theme theme)
-        {
-            switch (theme.Mode)
-            {
-                case ThemeMode.Light: return Color.FromRgb(0xe2, 0xe2, 0xe2);
-                case ThemeMode.Dark: return Color.FromRgb(0x33, 0x33, 0x33);
-                default: return theme.Colors.Outline;
-            }
-        }
 
         protected override Color? Background(
             TabStrip control)
@@ -81,8 +109,10 @@ namespace XForms.Themes.Basic
                 IsHitTestVisible = false,
                 IsVisible = false,
             };
+            var hairline = MenuBarTemplate.Hairline(control.ActualTheme, VerticalAlignment.Bottom);
+            context.AddPart(hairline);
             context.AddPart(underline);
-            var parts = new Parts() { Underline = underline };
+            var parts = new Parts() { Underline = underline, Hairline = hairline };
             context.State = parts;
             AllParts.AddOrUpdate(control, parts);
         }
@@ -94,6 +124,7 @@ namespace XForms.Themes.Basic
             if (context.State is Parts parts)
             {
                 context.RemovePart(parts.Underline);
+                context.RemovePart(parts.Hairline);
             }
 
             AllParts.Remove(control);
@@ -106,15 +137,8 @@ namespace XForms.Themes.Basic
             if (context.State is Parts parts)
             {
                 parts.Underline.Background = SelectedColor(control.ActualTheme);
+                parts.Hairline.Background = control.ActualTheme.Colors.Outline;
             }
-        }
-
-        protected override void Render(
-            TabStrip control,
-            DrawingContext drawingContext)
-        {
-            var size = control.Bounds.Size;
-            drawingContext.FillRectangle(new Rect(0, size.Height - HairlineHeight, size.Width, HairlineHeight), HairlineColor(control.ActualTheme));
         }
 
         // The underline sits at the bottom of the first of the tabs' cells,

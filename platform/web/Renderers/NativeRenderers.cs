@@ -944,6 +944,23 @@ namespace XForms.Web.Renderers
             Js.SetStyle(this._inputId, "padding", $"{Px(p.Top)} {Px(p.Right)} {Px(p.Bottom)} {Px(p.Left)}");
         }
 
+        public float CornerRadius
+        {
+            set
+            {
+                Js.SetStyle(this.Id, "border-radius", Px(value));
+                Js.SetStyle(this._inputId, "border-radius", Px(value));
+            }
+        }
+
+        // An inset shadow: inside the edge, following its corners
+        public void SetBorder(
+            Color color,
+            float width)
+        {
+            Js.SetStyle(this._inputId, "box-shadow", (width > 0) ? $"inset 0 0 0 {Px(width)} {Css(color)}" : null);
+        }
+
         public override Size MeasureNative(
             Size availableSize)
         {

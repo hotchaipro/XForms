@@ -555,3 +555,5 @@ XForms.Input.SwipingEventArgs.Distance.get -> float
 XForms.Input.SwipingEventArgs.Phase.get -> XForms.Input.SwipePhase
 XForms.Input.SwipingEventArgs.SwipingEventArgs(XForms.Input.SwipePhase phase, int direction, float distance, float velocity) -> void
 XForms.Input.SwipingEventArgs.Velocity.get -> float
+XForms.Controls.MenuItem.IsSubtleStyle.get -> bool
+XForms.Controls.MenuItem.IsSubtleStyle.set -> void

@@ -198,6 +198,17 @@ namespace XForms.Platform
         /// </summary>
         Thickness Padding { set; }
 
+        /// <summary>
+        /// How round the box's corners (and its background's) are.
+        /// </summary>
+        float CornerRadius { set; }
+
+        /// <summary>
+        /// A border inside the box's edges, following its corners (the accent,
+        /// while it's focused), or none for a width of 0.
+        /// </summary>
+        void SetBorder(Color color, float width);
+
         string Text { get; set; }
         string PlaceholderText { get; set; }
         bool Multiline { get; set; }

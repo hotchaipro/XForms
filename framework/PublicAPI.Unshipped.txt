@@ -151,3 +151,5 @@ override XForms.Shadow.GetHashCode() -> int
 override XForms.Shadow.ToString() -> string
 static XForms.Shadow.operator !=(XForms.Shadow left, XForms.Shadow right) -> bool
 static XForms.Shadow.operator ==(XForms.Shadow left, XForms.Shadow right) -> bool
+XForms.Primitives.TextBox.CornerRadius.get -> float
+XForms.Primitives.TextBox.CornerRadius.set -> void

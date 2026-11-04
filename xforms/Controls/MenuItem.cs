@@ -58,6 +58,7 @@ namespace XForms.Controls
         private Bitmap _icon;
         private string _text;
         private bool _isVisible;
+        private bool _isSubtleStyle;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -120,6 +121,24 @@ namespace XForms.Controls
             if ((null != this._command) && this._command.CanExecute(null))
             {
                 this._command.Execute(null);
+            }
+        }
+
+        /// <summary>
+        /// Whether the item is in the subtle style (gray, as for cancel or
+        /// delete) rather than the accent color (the default).
+        /// </summary>
+        public bool IsSubtleStyle
+        {
+            get
+            {
+                return this._isSubtleStyle;
+            }
+
+            set
+            {
+                this._isSubtleStyle = value;
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsSubtleStyle)));
             }
         }
 

@@ -190,6 +190,24 @@ namespace XForms.iOS.Renderers
             }
         }
 
+        // The layer rounds its background and draws the border inside its edge
+        public float CornerRadius
+        {
+            set
+            {
+                this._container.Layer.CornerRadius = value;
+            }
+        }
+
+        public void SetBorder(
+            Color color,
+            float width)
+        {
+            var layer = this._container.Layer;
+            layer.BorderWidth = width;
+            layer.BorderColor = (width > 0) ? color.ToCGColor() : null;
+        }
+
         public Color AccentColor
         {
             set

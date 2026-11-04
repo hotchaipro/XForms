@@ -35,6 +35,10 @@ namespace XForms.Primitives
         private Color? _placeholderColor;
         private Color? _accentColor;
         private Thickness _padding = DefaultPadding;
+        private float _cornerRadius = 6;
+
+        // The border a focused box shows, in its accent color
+        private const float FocusBorderWidth = 2;
 
         /// <summary>
         /// The space around the text inside the box: 12 at the sides and 11
@@ -137,6 +141,45 @@ namespace XForms.Primitives
                     this.InvalidateMeasure();
                     this.OnPropertyChanged();
                 }
+            }
+        }
+
+        /// <summary>
+        /// How round the box's corners are: 6 by default. While the box has
+        /// focus, a border in its <see cref="AccentColor"/> shows inside its
+        /// edges, following them.
+        /// </summary>
+        public float CornerRadius
+        {
+            get
+            {
+                return this._cornerRadius;
+            }
+
+            set
+            {
+                if (value != this._cornerRadius)
+                {
+                    this._cornerRadius = value;
+                    this.Native?.CornerRadius = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        internal override void OnFocusChangedCore(
+            bool isFocused)
+        {
+            base.OnFocusChangedCore(isFocused);
+            this.ApplyBorder();
+        }
+
+        private void ApplyBorder()
+        {
+            var native = this.Native;
+            if (null != native)
+            {
+                native.SetBorder(this.AccentColor, this.IsFocused ? FocusBorderWidth : 0);
             }
         }
 
@@ -496,6 +539,7 @@ namespace XForms.Primitives
                 native.ForegroundColor = this.ForegroundColor;
                 native.PlaceholderColor = this.PlaceholderColor;
                 native.AccentColor = this.AccentColor;
+                this.ApplyBorder();
             }
         }
 
@@ -547,6 +591,8 @@ namespace XForms.Primitives
             var native = this.Native;
             this.ApplyColors();
             native.Padding = this._padding;
+            native.CornerRadius = this._cornerRadius;
+            this.ApplyBorder();
             this._isApplyingValues = true;
             try
             {

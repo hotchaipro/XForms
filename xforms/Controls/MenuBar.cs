@@ -5,14 +5,21 @@ using XForms.Primitives;
 
 namespace XForms.Controls
 {
+    /// <summary>
+    /// A bar of commands, usually at the bottom of a page: each item's icon
+    /// over its label, centered together a gap apart. Its theme's template
+    /// draws it.
+    /// </summary>
     public class MenuBar : TemplatedContentControl, IMenuItemContainer
     {
-        private DockPanel _buttonsLayout;
+        private StackPanel _buttonsLayout;
 
         public MenuBar()
         {
-            this._buttonsLayout = new DockPanel()
+            this._buttonsLayout = new StackPanel()
             {
+                Orientation = Orientation.Horizontal,
+                Spacing = 40,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Stretch,
             };
@@ -20,7 +27,7 @@ namespace XForms.Controls
             this.HorizontalAlignment = HorizontalAlignment.Stretch;
             this.VerticalAlignment = VerticalAlignment.Top;
 
-            this.Height = 50;
+            this.Height = 68;
 
             this.MenuItems = new MenuItemCollection(this);
 
@@ -41,7 +48,7 @@ namespace XForms.Controls
             }
 
             var menuButton = new MenuButton(this, menuItem);
-            this._buttonsLayout.Children.Add(menuButton, Dock.Left);
+            this._buttonsLayout.Children.Add(menuButton);
         }
     }
 }
