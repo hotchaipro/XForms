@@ -3,11 +3,13 @@
 namespace XForms.Themes.Basic
 {
     /// <summary>
-    /// The accent where it must read: text and icons in the accent, and fills
-    /// with text or marks on them, use the strong accent in light mode (white
-    /// reads on it, and it reads on white). Dark mode's accent is already
-    /// lightened to read on the dark background. Marks that only show where
-    /// something is (a selection bar, a progress track) stay the accent.
+    /// The accent where it must read: accent fills with text or marks on
+    /// them use the strong accent in both modes (white reads on it); accent
+    /// text and icons use it in light mode (it reads on white), and the
+    /// accent in dark mode (lightened only as far as it must be to read on
+    /// black). So both modes show the chosen color wherever it reads. Marks
+    /// that only show where something is (a selection bar, a progress track)
+    /// stay the accent.
     /// </summary>
     internal static class AccentColors
     {
@@ -26,7 +28,7 @@ namespace XForms.Themes.Basic
         public static Color Fill(
             Theme theme)
         {
-            return (theme.Mode == ThemeMode.Light) ? theme.Colors.StrongAccent : theme.Colors.Accent;
+            return theme.Colors.StrongAccent;
         }
 
         /// <summary>
@@ -35,7 +37,7 @@ namespace XForms.Themes.Basic
         public static Color OnFill(
             Theme theme)
         {
-            return (theme.Mode == ThemeMode.Light) ? theme.Colors.OnStrongAccent : theme.Colors.OnAccent;
+            return theme.Colors.OnStrongAccent;
         }
     }
 }
