@@ -48,6 +48,12 @@ namespace XForms.Platform
         /// </summary>
         float SystemTextScale { get; }
 
+        /// <summary>
+        /// The size of a text box's text, before the text scale: the
+        /// platform's own (iOS's body text, Android's edit text).
+        /// </summary>
+        float TextEntryFontSize { get; }
+
         string WindowTitle { set; }
 
         bool CanResizeWindow { get; }

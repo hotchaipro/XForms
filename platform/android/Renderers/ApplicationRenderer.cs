@@ -136,6 +136,27 @@ namespace XForms.Android.Renderers
         // scaled pixels
         public float SystemTextScale => this._androidApplication.ActivityOrContext.Resources.Configuration.FontScale;
 
+        // An edit text's own size (the theme's), in scaled pixels
+        private float _textEntryFontSize;
+
+        public float TextEntryFontSize
+        {
+            get
+            {
+                if (this._textEntryFontSize <= 0)
+                {
+                    var context = this._androidApplication.ActivityOrContext;
+                    var metrics = context.Resources.DisplayMetrics;
+                    using (var edit = new global::Android.Widget.EditText(context))
+                    {
+                        this._textEntryFontSize = edit.TextSize / (metrics.Density * context.Resources.Configuration.FontScale);
+                    }
+                }
+
+                return this._textEntryFontSize;
+            }
+        }
+
         public string WindowTitle
         {
             set

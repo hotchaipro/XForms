@@ -48,6 +48,20 @@ namespace XForms.Primitives
         public static readonly Thickness DefaultPadding = new Thickness(12, 11);
 
         /// <summary>
+        /// The size of a text box's text on this platform, before the
+        /// application's <see cref="Application.TextScale"/>: 17 (iOS's body
+        /// text), Android's edit text size, or 15 on the desktop and the web.
+        /// Fields that sit beside text boxes (pickers) use it, so they match.
+        /// </summary>
+        public static float DefaultFontSize
+        {
+            get
+            {
+                return Application.Current?.Renderer.TextEntryFontSize ?? 15;
+            }
+        }
+
+        /// <summary>
         /// The text box's background: by default, the theme's surface color.
         /// </summary>
         public Color BackgroundColor

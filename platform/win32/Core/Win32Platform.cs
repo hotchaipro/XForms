@@ -91,6 +91,9 @@ namespace XForms.Win32
 
         public float SystemTextScale => SystemTheme.TextScale;
 
+        // The text box's own size (its renderer's)
+        public float TextEntryFontSize => 15;
+
         public string WindowTitle
         {
             set

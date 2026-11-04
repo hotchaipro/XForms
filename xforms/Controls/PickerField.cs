@@ -14,13 +14,10 @@ namespace XForms.Controls
     /// </summary>
     public abstract class PickerField : TemplatedControl
     {
-        protected const float FontSize = 15.0f;
-        private const float VerticalPadding = 7.0f;
-
         /// <summary>
-        /// Where the text starts.
+        /// Where the text starts: as a text box's does.
         /// </summary>
-        public const float TextInset = 11.0f;
+        public const float TextInset = 12.0f;
 
         /// <summary>
         /// The width of the glyph's area, at the end of the field.
@@ -130,13 +127,14 @@ namespace XForms.Controls
         protected abstract void OpenPicker();
 
         /// <summary>
-        /// The field's text format, which it measures with.
+        /// The field's text format, which it measures with: a text box's text
+        /// size, so a field and a text box beside it match.
         /// </summary>
         public TextFormat CreateTextFormat()
         {
             return new TextFormat()
             {
-                FontSize = FontSize,
+                FontSize = TextBox.DefaultFontSize,
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Center,
             };
@@ -150,7 +148,7 @@ namespace XForms.Controls
 
             return new Size(
                 Math.Min(width, availableSize.Width),
-                Math.Min(lineHeight + (2 * VerticalPadding), availableSize.Height));
+                Math.Min(lineHeight + TextBox.DefaultPadding.Top + TextBox.DefaultPadding.Bottom, availableSize.Height));
         }
 
         // NOTE: Moves aren't claimed, so a drag that starts here can still scroll

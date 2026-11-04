@@ -557,3 +557,4 @@ XForms.Input.SwipingEventArgs.SwipingEventArgs(XForms.Input.SwipePhase phase, in
 XForms.Input.SwipingEventArgs.Velocity.get -> float
 XForms.Controls.MenuItem.IsSubtleStyle.get -> bool
 XForms.Controls.MenuItem.IsSubtleStyle.set -> void
+const XForms.Controls.PickerField.TextInset = 12 -> float

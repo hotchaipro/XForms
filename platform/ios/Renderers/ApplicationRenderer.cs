@@ -127,6 +127,9 @@ namespace XForms.iOS.Renderers
         // Dynamic Type: the body text size over its default
         public float SystemTextScale => (float)UIKit.UIFontMetrics.DefaultMetrics.GetScaledValue(1);
 
+        // A text box's is the body text style, 17 points before Dynamic Type
+        public float TextEntryFontSize => 17;
+
         public string WindowTitle
         {
             set

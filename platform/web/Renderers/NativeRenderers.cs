@@ -964,11 +964,13 @@ namespace XForms.Web.Renderers
         public override Size MeasureNative(
             Size availableSize)
         {
+            // A line is the font's height (the input's normal line height), as
+            // drawn text's is, so a picker field beside it matches
             var (ascent, descent) = TextLayouts.FontMetrics(FontCss);
             float lines = this._isMultiline ? 3 : 1;
             return new Size(
                 float.IsInfinity(availableSize.Width) ? 200 : availableSize.Width,
-                (float)Math.Ceiling(((ascent + descent) * 1.2f * lines) + this._padding.Top + this._padding.Bottom));
+                (float)Math.Ceiling(((ascent + descent) * lines) + this._padding.Top + this._padding.Bottom));
         }
 
         public override Color BackgroundColor

@@ -139,6 +139,9 @@ namespace XForms.Web
         // NOTE: The browser zooms the page itself
         public float SystemTextScale => 1;
 
+        // The text box's own size (its renderer's)
+        public float TextEntryFontSize => 15;
+
         public string WindowTitle
         {
             set
