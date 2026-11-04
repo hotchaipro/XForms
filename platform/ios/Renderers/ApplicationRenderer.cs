@@ -33,8 +33,8 @@ namespace XForms.iOS.Renderers
             nativeApplication.Suspending += Application_Suspending;
             nativeApplication.Resuming += Application_Resuming;
 
-            // Increased contrast changes while the app runs; dark mode is reread
-            // when the app becomes active
+            // Dark mode and increased contrast change while the app runs
+            nativeApplication.SystemStyleChanged += (sender, e) => this._applicationHost.SystemThemeChanged();
             Foundation.NSNotificationCenter.DefaultCenter.AddObserver(
                 UIKit.UIView.DarkerSystemColorsStatusDidChangeNotification,
                 (notification) => this._applicationHost.SystemThemeChanged());
@@ -101,7 +101,10 @@ namespace XForms.iOS.Renderers
                     return ThemeMode.HighContrast;
                 }
 
-                return (UIKit.UITraitCollection.CurrentTraitCollection.UserInterfaceStyle == UIKit.UIUserInterfaceStyle.Dark)
+                // The scene's: the window's and its views' are the mode the app
+                // asked for (see ApplyTheme)
+                var traits = this._nativeApplicationDelegate.WindowScene?.TraitCollection ?? UIKit.UITraitCollection.CurrentTraitCollection;
+                return (traits.UserInterfaceStyle == UIKit.UIUserInterfaceStyle.Dark)
                     ? ThemeMode.Dark
                     : ThemeMode.Light;
             }
@@ -241,11 +244,15 @@ namespace XForms.iOS.Renderers
             this._theme = theme;
             this.UpdateStatusBar();
 
-            // System views (keyboards, menus) follow the app's mode
+            // System views (keyboards, menus) follow the app's mode: the
+            // system's, if the app follows it
             var window = this._nativeApplicationDelegate.Window;
             if (null != window)
             {
-                window.OverrideUserInterfaceStyle = (theme.Mode == ThemeMode.Light) ? UIKit.UIUserInterfaceStyle.Light : UIKit.UIUserInterfaceStyle.Dark;
+                bool isFollowing = (null == this._application.RequestedThemeMode) && (theme.Mode != ThemeMode.HighContrast);
+                window.OverrideUserInterfaceStyle = isFollowing
+                    ? UIKit.UIUserInterfaceStyle.Unspecified
+                    : (theme.Mode == ThemeMode.Light) ? UIKit.UIUserInterfaceStyle.Light : UIKit.UIUserInterfaceStyle.Dark;
                 window.TintColor = theme.Colors.Accent.ToUIColor();
             }
         }

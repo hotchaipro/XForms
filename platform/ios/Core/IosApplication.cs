@@ -26,6 +26,7 @@ namespace XForms.iOS
         private static XForms.Application _pendingApplication;
 
         private readonly NSObject[] _observers = new NSObject[3];
+        private IUITraitChangeRegistration _styleObserver;
         private UIViewController _rootViewController;
         private UIWindowScene _windowScene;
         private UIWindow _window;
@@ -254,6 +255,26 @@ namespace XForms.iOS
             this._observers[0] = center.AddObserver(UIScene.WillDeactivateNotification, (notification) => this.Suspending?.Invoke(this, EventArgs.Empty), windowScene);
             this._observers[1] = center.AddObserver(UIScene.DidActivateNotification, (notification) => this.Resuming?.Invoke(this, EventArgs.Empty), windowScene);
             this._observers[2] = center.AddObserver(UIScene.DidDisconnectNotification, (notification) => this.OnDisconnected(), windowScene);
+
+            // Dark mode, as it changes while the app shows (before iOS 17, it's
+            // reread as the scene becomes active). The window's own mode isn't
+            // the system's, so the scene is watched.
+            if (OperatingSystem.IsIOSVersionAtLeast(17))
+            {
+                this._styleObserver = windowScene.RegisterForTraitChanges(
+                    new[] { typeof(UITraitUserInterfaceStyle) },
+                    (IUITraitEnvironment environment, UITraitCollection previous) => this.OnSystemStyleChanged());
+            }
+        }
+
+        // In the background, iOS changes the mode for its snapshots of the app:
+        // the mode is reread as the scene becomes active
+        private void OnSystemStyleChanged()
+        {
+            if (UISceneActivationState.Background != this._windowScene?.ActivationState)
+            {
+                this.SystemStyleChanged?.Invoke(this, EventArgs.Empty);
+            }
         }
 
         private void OnDisconnected()
@@ -273,6 +294,16 @@ namespace XForms.iOS
                     this._observers[i] = null;
                 }
             }
+
+            if (null != this._styleObserver)
+            {
+                if (OperatingSystem.IsIOSVersionAtLeast(17))
+                {
+                    this._windowScene?.UnregisterForTraitChanges(this._styleObserver);
+                }
+
+                this._styleObserver = null;
+            }
         }
 
         // ── What the platform uses ─────────────────────────────────────────
@@ -282,6 +313,9 @@ namespace XForms.iOS
         internal event EventHandler Suspending;
 
         internal event EventHandler Resuming;
+
+        // The system's dark mode changed while the app shows
+        internal event EventHandler SystemStyleChanged;
 
         internal void SetRootViewController(
             UIViewController viewController)

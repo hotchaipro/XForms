@@ -161,6 +161,14 @@ namespace XForms
             {
                 this._requestedThemeMode = value;
                 this.UpdateTheme();
+
+                // Asking for the mode already in use (or following the system
+                // in it) leaves the theme as it is, not what the platform's own
+                // parts follow
+                if (this.IsStarted)
+                {
+                    this.Renderer.ApplyTheme(this.Theme);
+                }
             }
         }
 
