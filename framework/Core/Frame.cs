@@ -14,6 +14,10 @@ namespace XForms
         private readonly Stack<Page> _backStack = new Stack<Page>();
         private Page _currentPage;
         private PageSwitch _pageSwitch;
+
+        // Every page the frame holds, shown or not (pushed pages, such as
+        // tabs, are in neither the back stack nor current), in the order added
+        private readonly List<Page> _pages = new List<Page>();
         private PageBounce _pageBounce;
 
         /// <summary>
@@ -401,6 +405,11 @@ namespace XForms
             bool isNew = (page.Parent != this);
             page.AttachTo(this);
             this.Renderer.AddPage(page);
+            if (!this._pages.Contains(page))
+            {
+                this._pages.Add(page);
+            }
+
             if (isNew)
             {
                 page.NotifyAttached();
@@ -411,6 +420,7 @@ namespace XForms
             Page page)
         {
             this.Renderer.RemovePage(page);
+            this._pages.Remove(page);
             page.NotifyDetached();
         }
 
@@ -423,20 +433,12 @@ namespace XForms
             }
         }
 
-        // Pages in the back stack keep their native objects, so they restyle
-        // too, and are ready when they come back
+        // Every page the frame holds keeps its native objects (the back
+        // stack's, and pushed pages such as tabs), so they all restyle too,
+        // and are ready when they're shown
         internal override IEnumerable<Element> GetThemedChildElements()
         {
-            foreach (var page in this._backStack)
-            {
-                yield return page;
-            }
-
-            var currentPage = this._currentPage;
-            if (null != currentPage)
-            {
-                yield return currentPage;
-            }
+            return this._pages.ToArray();
         }
     }
 }
