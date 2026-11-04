@@ -122,8 +122,7 @@ namespace XForms.Test
                     ItemsSource = rows,
                     ItemViewFactory = ItemViewFactory<int>.Create(
                         () => new TextBlock() { Margin = new Thickness(20, 10), FontSize = 18 },
-                        (view, row) => view.Text = "Task " + row + "
-Wednesday, November " + row + " (in " + row + " days)"),
+                        (view, row) => view.Text = "Task " + row + "\nWednesday, November " + row + " (in " + row + " days)"),
                 };
             }
 
