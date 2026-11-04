@@ -247,6 +247,7 @@ namespace XForms.Themes.Basic
         private static readonly TextFormat LabelFormat = new TextFormat()
         {
             FontSize = 10.0f,
+            FontWeight = FontWeight.Medium,
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Bottom,
         };
@@ -346,6 +347,7 @@ namespace XForms.Themes.Basic
         private static readonly TextFormat LabelFormat = new TextFormat()
         {
             FontSize = 11.0f,
+            FontWeight = FontWeight.Medium,
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Top,
         };
@@ -399,6 +401,7 @@ namespace XForms.Themes.Basic
         private static readonly TextFormat LabelFormat = new TextFormat()
         {
             FontSize = 12.0f,
+            FontWeight = FontWeight.Medium,
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Top,
         };
@@ -540,6 +543,7 @@ namespace XForms.Themes.Basic
         private static readonly TextFormat LabelFormat = new TextFormat()
         {
             FontSize = 9.0f,
+            FontWeight = FontWeight.Medium,
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Bottom,
         };
