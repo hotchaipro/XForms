@@ -192,6 +192,41 @@ namespace XForms
             }
         }
 
+        /// <summary>
+        /// How far the page's views reach past its bounds into the safe area
+        /// (a nested page's views reach into the main page's): what the page
+        /// draws beyond them, which its edge shadow follows as it slides.
+        /// </summary>
+        internal Thickness DrawnOutset
+        {
+            get
+            {
+                if (null == this._extendingViews)
+                {
+                    return Thickness.Zero;
+                }
+
+                var size = this.Bounds.Size;
+                float left = 0, top = 0, right = 0, bottom = 0;
+                foreach (var view in this._extendingViews.Keys)
+                {
+                    // The view's (extended) frame, in the page's coordinates
+                    var rect = view.Bounds;
+                    for (var parent = view.Parent as View; (null != parent) && (parent != this); parent = parent.Parent as View)
+                    {
+                        rect = new Rect(rect.X + parent.Bounds.X, rect.Y + parent.Bounds.Y, rect.Width, rect.Height);
+                    }
+
+                    left = Math.Max(left, -rect.X);
+                    top = Math.Max(top, -rect.Y);
+                    right = Math.Max(right, rect.Right - size.Width);
+                    bottom = Math.Max(bottom, rect.Bottom - size.Height);
+                }
+
+                return new Thickness(left, top, right, bottom);
+            }
+        }
+
         internal void SetExtendedEdges(
             View view,
             SafeAreaEdges edges)

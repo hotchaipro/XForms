@@ -170,7 +170,7 @@ namespace XForms.Android.Renderers
                     return;
                 }
 
-                nativeView.OutlineProvider = new ShadowOutlineProvider(value, this.DevicePixelsToPixels(value.CornerRadius));
+                nativeView.OutlineProvider = new ShadowOutlineProvider(value, this.DevicePixelsToPixels(1));
                 nativeView.Elevation = this.DevicePixelsToPixels(Math.Max(value.Blur / 2, value.Offset.Y));
                 if (OperatingSystem.IsAndroidVersionAtLeast(28))
                 {
@@ -184,27 +184,33 @@ namespace XForms.Android.Renderers
         private sealed class ShadowOutlineProvider : ViewOutlineProvider
         {
             private readonly Shadow _shadow;
-            private readonly float _cornerRadius;
+            private readonly float _density;
 
             public ShadowOutlineProvider(
                 Shadow shadow,
-                float cornerRadius)
+                float density)
             {
                 this._shadow = shadow;
-                this._cornerRadius = cornerRadius;
+                this._density = density;
             }
 
+            // The shape, grown by the outset (in device-independent pixels)
             public override void GetOutline(
                 AndroidView view,
                 global::Android.Graphics.Outline outline)
             {
+                var outset = this._shadow.Outset;
+                int left = (int)Math.Round(-outset.Left * this._density);
+                int top = (int)Math.Round(-outset.Top * this._density);
+                int right = view.Width + (int)Math.Round(outset.Right * this._density);
+                int bottom = view.Height + (int)Math.Round(outset.Bottom * this._density);
                 if (this._shadow.Shape == ShadowShape.Ellipse)
                 {
-                    outline.SetOval(0, 0, view.Width, view.Height);
+                    outline.SetOval(left, top, right, bottom);
                 }
                 else
                 {
-                    outline.SetRoundRect(0, 0, view.Width, view.Height, this._cornerRadius);
+                    outline.SetRoundRect(left, top, right, bottom, this._shadow.CornerRadius * this._density);
                 }
             }
         }

@@ -48,5 +48,24 @@ namespace XForms
         /// The rectangle's corner radius.
         /// </summary>
         public float CornerRadius { get; init; }
+
+        /// <summary>
+        /// How far the shape reaches past the view's bounds on each side, for
+        /// a view whose content does (such as a page whose views reach into
+        /// the safe area beyond it): zero by default.
+        /// </summary>
+        public Thickness Outset { get; init; }
+
+        /// <summary>
+        /// The shape's rectangle, for a view of a size: its bounds, grown by
+        /// the outset.
+        /// </summary>
+        [Platform.PlatformContract]
+        internal Rect ShapeBounds(
+            Size size)
+        {
+            var outset = this.Outset;
+            return new Rect(-outset.Left, -outset.Top, size.Width + outset.Left + outset.Right, size.Height + outset.Top + outset.Bottom);
+        }
     }
 }

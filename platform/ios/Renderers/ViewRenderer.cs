@@ -134,7 +134,8 @@ namespace XForms.iOS.Renderers
             }
 
             var color = shadow.Color;
-            var bounds = new CGRect(CGPoint.Empty, this._nativeView.Bounds.Size);
+            var size = this._nativeView.Bounds.Size;
+            var bounds = shadow.ShapeBounds(new Size((float)size.Width, (float)size.Height)).ToCGRect();
             layer.ShadowColor = Color.FromArgb(0xff, color.R, color.G, color.B).ToCGColor();
             layer.ShadowOpacity = color.A / 255.0f;
             layer.ShadowOffset = new CGSize(shadow.Offset.X, shadow.Offset.Y);

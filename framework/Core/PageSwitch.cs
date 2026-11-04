@@ -36,7 +36,7 @@ namespace XForms
             this._animator = page.GetOrCreateAnimator();
             this._animator.Opacity = 1;
             this._animator.Translation = this._offset;
-            page.Shadow = PageTransition.EdgeShadow;
+            PageTransition.ShowEdgeShadow(page);
         }
 
         /// <summary>
@@ -133,7 +133,7 @@ namespace XForms
             this._page = page;
             this._animator = page.GetOrCreateAnimator();
             this._animator.Translation = Point.Zero;
-            page.Shadow = PageTransition.EdgeShadow;
+            PageTransition.ShowEdgeShadow(page);
         }
 
         /// <summary>
@@ -173,10 +173,7 @@ namespace XForms
 
             this._isEnded = true;
             await this._animator.TranslateTo(Point.Zero, this._frame.TransitionDuration, SpringBackEasing);
-            if (this._page.Shadow == PageTransition.EdgeShadow)
-            {
-                this._page.Shadow = null;
-            }
+            PageTransition.HideEdgeShadow(this._page);
 
             this._frame.OnPageBounceEnded(this);
         }

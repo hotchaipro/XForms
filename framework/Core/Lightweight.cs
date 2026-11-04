@@ -477,7 +477,7 @@ namespace XForms
                 // The shadow is outside the view, so its clip doesn't cut it
                 if (null != renderer.Shadow)
                 {
-                    context.FillShadow(new Rect(0, 0, frame.Width, frame.Height), renderer.Shadow);
+                    context.FillShadow(renderer.Shadow.ShapeBounds(frame.Size), renderer.Shadow);
                 }
 
                 var clip = renderer.ClipsToBounds ? context.PushClip(new Rect(0, 0, frame.Width, frame.Height)) : default;

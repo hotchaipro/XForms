@@ -34,11 +34,34 @@ namespace XForms
         /// The soft shadow along a sliding page's edges, so the edge shows
         /// even over a page of the same color.
         /// </summary>
-        internal static readonly Shadow EdgeShadow = new Shadow()
+        private static readonly Shadow EdgeShadow = new Shadow()
         {
             Color = Color.FromArgb(0x40, 0, 0, 0),
             Blur = 16,
         };
+
+        /// <summary>
+        /// Gives the page its edge shadow, around all it draws (its views
+        /// reaching into the safe area beyond it too).
+        /// </summary>
+        internal static void ShowEdgeShadow(
+            Page page)
+        {
+            page.Shadow = EdgeShadow with { Outset = page.DrawnOutset };
+        }
+
+        /// <summary>
+        /// Takes the page's edge shadow away (a shadow of the app's own stays).
+        /// </summary>
+        internal static void HideEdgeShadow(
+            Page page)
+        {
+            var shadow = page.Shadow;
+            if ((null != shadow) && ((shadow with { Outset = Thickness.Zero }) == EdgeShadow))
+            {
+                page.Shadow = null;
+            }
+        }
 
         /// <summary>
         /// Moves the page on top in (as a page arrives) or out (as it leaves,
@@ -73,7 +96,7 @@ namespace XForms
 
                 var animator = context.Animator;
                 animator.Opacity = 1;
-                context.Page.Shadow = EdgeShadow;
+                ShowEdgeShadow(context.Page);
                 if (context.IsLeaving)
                 {
                     animator.Translation = Point.Zero;
@@ -83,10 +106,7 @@ namespace XForms
                 {
                     animator.Translation = offset;
                     await animator.TranslateTo(Point.Zero, context.Duration, DecelerateEasing);
-                    if (context.Page.Shadow == EdgeShadow)
-                    {
-                        context.Page.Shadow = null;
-                    }
+                    HideEdgeShadow(context.Page);
                 }
             }
         }

@@ -230,10 +230,7 @@ namespace XForms
 
             var hidden = (pageSwitch.Page == this._currentPage) ? pageSwitch.LeavingPage : pageSwitch.Page;
             this.HidePage(hidden, remove: false);
-            if (pageSwitch.Page.Shadow == PageTransition.EdgeShadow)
-            {
-                pageSwitch.Page.Shadow = null;
-            }
+            PageTransition.HideEdgeShadow(pageSwitch.Page);
         }
 
         /// <summary>
@@ -345,7 +342,7 @@ namespace XForms
                 animator.Rotation = default;
                 animator.Opacity = 1;
             }
-            page.Shadow = null;
+            PageTransition.HideEdgeShadow(page);
 
             if (remove)
             {

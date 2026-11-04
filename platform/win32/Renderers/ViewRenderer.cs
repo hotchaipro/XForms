@@ -554,7 +554,7 @@ namespace XForms.Win32.Renderers
         {
             var shadow = this._shadow;
             float scale = this.Host.Scale;
-            int margin = (int)Math.Ceiling((null == shadow) ? 0 : (shadow.Blur + Math.Max(Math.Abs(shadow.Offset.X), Math.Abs(shadow.Offset.Y)) + 2));
+            int margin = (int)Math.Ceiling((null == shadow) ? 0 : (shadow.Blur + Math.Max(Math.Abs(shadow.Offset.X), Math.Abs(shadow.Offset.Y)) + Math.Max(Math.Max(shadow.Outset.Left, shadow.Outset.Right), Math.Max(shadow.Outset.Top, shadow.Outset.Bottom)) + 2));
             int width = (int)Math.Ceiling((this._frame.Width + (2 * margin)) * scale);
             int height = (int)Math.Ceiling((this._frame.Height + (2 * margin)) * scale);
             if ((null == shadow) || shadow.Color.IsTransparent || (null == this._layers) || (this._frame.Width <= 0) || (this._frame.Height <= 0))
@@ -618,7 +618,7 @@ namespace XForms.Win32.Renderers
 
                 var drawContext = new DrawContext(context, new Rect(0, 0, width / scale, height / scale));
                 drawContext.Clear(Colors.Transparent);
-                drawContext.FillShadow(new Rect(margin, margin, this._frame.Width, this._frame.Height), shadow);
+                drawContext.FillShadow(shadow.ShapeBounds(this._frame.Size).Offset(margin, margin), shadow);
                 drawContext.Release();
             }
             finally
@@ -1100,7 +1100,7 @@ namespace XForms.Win32.Renderers
                 if (null != child._shadow)
                 {
                     clip.Dispose();
-                    drawContext.FillShadow(bounds, child._shadow);
+                    drawContext.FillShadow(child._shadow.ShapeBounds(bounds.Size), child._shadow);
                     clip = child._clipToBounds ? drawContext.PushClip(bounds) : default;
                 }
 
