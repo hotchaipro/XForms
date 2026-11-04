@@ -662,7 +662,6 @@ abstract XForms.Controls.PickerField.DisplayText.get -> string
 abstract XForms.Controls.PickerField.MaximumTextWidth.get -> float
 abstract XForms.Controls.PickerField.OpenPicker() -> void
 const XForms.Controls.CalendarView.CellSize = 40 -> float
-const XForms.Controls.ComboBoxItemsView.RowHeight = 36 -> float
 const XForms.Controls.PickerField.GlyphWidth = 34 -> float
 override XForms.Controls.Border.BackgroundColor.get -> XForms.Color
 override XForms.Controls.Border.Padding.get -> XForms.Thickness

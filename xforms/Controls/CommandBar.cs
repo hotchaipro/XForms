@@ -85,12 +85,34 @@ namespace XForms.Controls
             }
         }
 
-        // Roomy buttons (a comfortable touch target each, a gap apart) when
-        // they fit across the bar; otherwise compact ones, side by side
-        private const float RoomyButtonWidth = 64;
-        private const float RoomyButtonHeight = 56;
-        private const float RoomyGap = 12;
-        private const float CompactButtonSize = 48;
+        // Buttons side by side, each a cell this wide plus its share of the
+        // spacing (half on each side of its icon and label, so a tap between
+        // two lands on the nearer); taller when spaced. Without room for the
+        // spacing across the bar, they go back to side by side.
+        private const float ButtonSize = 48;
+        private const float SpacedButtonHeight = 56;
+        private float _buttonSpacing;
+
+        /// <summary>
+        /// The space between neighbouring buttons' icons and labels (a
+        /// command list's CommandBarButtonSpacing): 0 by default.
+        /// </summary>
+        internal float ButtonSpacing
+        {
+            get
+            {
+                return this._buttonSpacing;
+            }
+
+            set
+            {
+                if (value != this._buttonSpacing)
+                {
+                    this._buttonSpacing = value;
+                    this.InvalidateMeasure();
+                }
+            }
+        }
 
         protected override Size MeasureOverride(
             Size availableSize)
@@ -99,7 +121,7 @@ namespace XForms.Controls
             return base.MeasureOverride(availableSize);
         }
 
-        // Sizes the buttons for the width: roomy if the visible ones fit
+        // Sizes the buttons for the width: spaced if the visible ones fit
         private void FitButtons(
             float width)
         {
@@ -114,30 +136,23 @@ namespace XForms.Controls
                 count += button.IsVisible ? 1 : 0;
             }
 
-            float roomyWidth = (count * RoomyButtonWidth) + (Math.Max(0, count - 1) * RoomyGap);
-            bool isRoomy = float.IsInfinity(width) || (roomyWidth <= width);
-
-            // The left group's buttons have the gap after them; the right
-            // group's, before
-            foreach (var button in this._primaryButtons.Buttons)
+            float spacing = Math.Max(0, this._buttonSpacing);
+            if (!float.IsInfinity(width) && ((count * (ButtonSize + spacing)) > width))
             {
-                Size(button, isRoomy, new Thickness(0, 0, isRoomy ? RoomyGap : 0, 0));
+                spacing = 0;
             }
 
-            foreach (var button in this._secondaryButtons.Buttons)
+            float buttonWidth = ButtonSize + spacing;
+            float buttonHeight = (spacing > 0) ? SpacedButtonHeight : ButtonSize;
+            foreach (var buttons in new[] { this._primaryButtons.Buttons, this._secondaryButtons.Buttons })
             {
-                Size(button, isRoomy, new Thickness(isRoomy ? RoomyGap : 0, 0, 0, 0));
-            }
-
-            static void Size(CommandBarButton button, bool isRoomy, Thickness margin)
-            {
-                float width = isRoomy ? RoomyButtonWidth : CompactButtonSize;
-                float height = isRoomy ? RoomyButtonHeight : CompactButtonSize;
-                if ((button.Width != width) || (button.Height != height) || (button.Margin != margin))
+                foreach (var button in buttons)
                 {
-                    button.Width = width;
-                    button.Height = height;
-                    button.Margin = margin;
+                    if ((button.Width != buttonWidth) || (button.Height != buttonHeight))
+                    {
+                        button.Width = buttonWidth;
+                        button.Height = buttonHeight;
+                    }
                 }
             }
         }

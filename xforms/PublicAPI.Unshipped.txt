@@ -331,13 +331,11 @@ XForms.Controls.ViewAttachments.extension(XForms.View).ContextFlyout.set -> void
 XForms.Controls.ViewAttachments.extension(XForms.View).ToolTip.get -> string
 XForms.Controls.ViewAttachments.extension(XForms.View).ToolTip.set -> void
 const XForms.Controls.AutoSuggestBox.MaximumSuggestions = 8 -> int
-const XForms.Controls.AutoSuggestBoxListView.RowHeight = 36 -> float
 const XForms.Controls.CheckBox.BoxSize = 20 -> float
 const XForms.Controls.CheckBox.TextGap = 8 -> float
 const XForms.Controls.Expander.HeaderHeight = 48 -> float
 const XForms.Controls.InfoBar.IconSize = 20 -> float
 const XForms.Controls.InfoBar.Spacing = 12 -> float
-const XForms.Controls.MenuFlyoutView.RowHeight = 36 -> float
 const XForms.Controls.MenuFlyoutView.TextInset = 40 -> float
 const XForms.Controls.NavigationView.BarHeight = 48 -> float
 const XForms.Controls.NavigationView.CompactThreshold = 640 -> float
@@ -566,3 +564,8 @@ XForms.Controls.CommandListView.CommandBarBackground.get -> XForms.Color?
 XForms.Controls.CommandListView.CommandBarBackground.set -> void
 override XForms.Controls.CommandBar.BackgroundColor.get -> XForms.Color
 override XForms.Controls.CommandBar.MeasureOverride(XForms.Size availableSize) -> XForms.Size
+XForms.Controls.CommandListView.CommandBarButtonSpacing.get -> float
+XForms.Controls.CommandListView.CommandBarButtonSpacing.set -> void
+const XForms.Controls.ComboBoxItemsView.RowHeight = 48 -> float
+const XForms.Controls.AutoSuggestBoxListView.RowHeight = 48 -> float
+const XForms.Controls.MenuFlyoutView.RowHeight = 48 -> float

@@ -77,6 +77,33 @@ namespace XForms.Controls
         }
 
         private Color? _commandBarBackground;
+        private float _commandBarButtonSpacing;
+
+        /// <summary>
+        /// The space between neighbouring command bar buttons' icons and
+        /// labels: 0 (the default) puts them side by side. Each button's
+        /// touch area takes its share of the space, so a tap between two
+        /// lands on the nearer; spaced buttons are taller too. If the bar
+        /// hasn't room for the spacing, its buttons go side by side.
+        /// </summary>
+        public float CommandBarButtonSpacing
+        {
+            get
+            {
+                return this._commandBarButtonSpacing;
+            }
+
+            set
+            {
+                this._commandBarButtonSpacing = value;
+                foreach (var container in this.RealizedContainers)
+                {
+                    (container as CommandListViewItemContainer)?.ApplyCommandBarBackground();
+                }
+
+                this.OnPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// The background behind an item's command bar, or null (the default)
@@ -244,9 +271,11 @@ namespace XForms.Controls
             }
         }
 
+        // The list's look for the command bar: its background and spacing
         internal void ApplyCommandBarBackground()
         {
             this._commandBar.Background = this.CommandListView?.CommandBarBackground ?? Colors.Transparent;
+            this._commandBar.ButtonSpacing = this.CommandListView?.CommandBarButtonSpacing ?? 0;
         }
 
         protected override void AddContent(

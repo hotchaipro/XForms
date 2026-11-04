@@ -76,7 +76,7 @@ namespace XForms.Controls
     /// </summary>
     public sealed class MenuFlyoutView : TemplatedControl
     {
-        public const float RowHeight = 36.0f;
+        public const float RowHeight = 48.0f;
 
         /// <summary>
         /// The space before an item's text (its icon goes in it).
