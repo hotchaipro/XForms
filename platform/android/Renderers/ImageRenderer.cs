@@ -26,7 +26,15 @@ namespace XForms.Android.Renderers
         public void SetTint(
             Color tint)
         {
-            this._nativeImageView.SetColorFilter(tint.ToAndroidColor());
+            // The tint through the image's alpha; none when transparent
+            if (tint.IsTransparent)
+            {
+                this._nativeImageView.ClearColorFilter();
+            }
+            else
+            {
+                this._nativeImageView.SetColorFilter(tint.ToAndroidColor(), global::Android.Graphics.PorterDuff.Mode.SrcIn);
+            }
         }
 
         public async void SetSource(

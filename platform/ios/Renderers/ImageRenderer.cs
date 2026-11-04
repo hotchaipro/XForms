@@ -12,6 +12,8 @@ namespace XForms.iOS.Renderers
     {
         private UIImageView _nativeImageView;
         private ImageSource _imageSource;
+        private UIImage _image;
+        private Color _tint = Colors.Transparent;
 
         public ImageRenderer(
             Image imageControl)
@@ -27,7 +29,22 @@ namespace XForms.iOS.Renderers
         public void SetTint(
             Color tint)
         {
+            this._tint = tint;
             this._nativeImageView.TintColor = tint.ToUIColor();
+            this.ShowImage();
+        }
+
+        // A tinted image is a template: its alpha, in the tint (as on the
+        // other platforms); untinted, its own colors
+        private void ShowImage()
+        {
+            var image = this._image;
+            if ((null != image) && !this._tint.IsTransparent)
+            {
+                image = image.ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+            }
+
+            this._nativeImageView.Image = image;
         }
 
         public async void SetSource(
@@ -46,15 +63,16 @@ namespace XForms.iOS.Renderers
                 string resourceName = Path.GetFileName(fileImageSource.Path).ToLowerInvariant();
                 // Loaded off the UI thread; shown on it (UIKit's views are only
                 // touched there), where the await comes back to
-                var image = await Task.Run(() => UIImage.FromBundle(resourceName));
-                this._nativeImageView.Image = image;
+                this._image = await Task.Run(() => UIImage.FromBundle(resourceName));
+                this.ShowImage();
             }
             else
             {
                 var bitmapImageSource = source as BitmapImageSource;
                 if (null != bitmapImageSource)
                 {
-                    this._nativeImageView.Image = (((BitmapRenderer)bitmapImageSource.Bitmap.Renderer).NativeImage);
+                    this._image = ((BitmapRenderer)bitmapImageSource.Bitmap.Renderer).NativeImage;
+                    this.ShowImage();
                 }
                 else
                 {
