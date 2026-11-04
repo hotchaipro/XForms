@@ -14,6 +14,7 @@ namespace XForms
         private readonly Stack<Page> _backStack = new Stack<Page>();
         private Page _currentPage;
         private PageSwitch _pageSwitch;
+        private PageBounce _pageBounce;
 
         /// <summary>
         /// The window a root frame shows in, for a window the app opened; null
@@ -159,7 +160,7 @@ namespace XForms
             }
 
             var currentPage = this._currentPage;
-            if ((null == currentPage) || (page == currentPage) || (null != this._pageSwitch))
+            if ((null == currentPage) || (page == currentPage) || (null != this._pageSwitch) || (null != this._pageBounce))
             {
                 return null;
             }
@@ -179,6 +180,35 @@ namespace XForms
             this._pageSwitch = new PageSwitch(this, page, currentPage, mode);
             page.IsVisible = true;
             return this._pageSwitch;
+        }
+
+        /// <summary>
+        /// Starts pulling the current page sideways as a gesture moves where
+        /// there's no page to switch to (past the first or last tab): it moves
+        /// as far as the bounce's <see cref="PageBounce.Offset"/>, with its edge
+        /// shadow, and springs back when released. Returns null if there's no
+        /// current page, or a switch or another bounce is under way.
+        /// </summary>
+        public PageBounce BeginBounce()
+        {
+            var currentPage = this._currentPage;
+            if ((null == currentPage) || (null != this._pageSwitch) || (null != this._pageBounce))
+            {
+                return null;
+            }
+
+            this._pageBounce = new PageBounce(this, currentPage);
+            return this._pageBounce;
+        }
+
+        // A bounce sprang back
+        internal void OnPageBounceEnded(
+            PageBounce pageBounce)
+        {
+            if (this._pageBounce == pageBounce)
+            {
+                this._pageBounce = null;
+            }
         }
 
         // A switch completes: its page is the current one, as the rest of its

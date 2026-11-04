@@ -155,3 +155,8 @@ XForms.Primitives.TextBox.CornerRadius.get -> float
 XForms.Primitives.TextBox.CornerRadius.set -> void
 static XForms.Primitives.TextBox.DefaultFontSize.get -> float
 static XForms.Primitives.TextBox.DefaultLineHeight.get -> float
+XForms.Frame.BeginBounce() -> XForms.PageBounce
+XForms.PageBounce
+XForms.PageBounce.Offset.get -> float
+XForms.PageBounce.Offset.set -> void
+XForms.PageBounce.ReleaseAsync() -> System.Threading.Tasks.Task

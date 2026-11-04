@@ -60,6 +60,7 @@ namespace XForms.Controls
         private float _selectionPosition;
         private TabSwitch _switch;
         private TabSwitch _swipeSwitch;
+        private PageBounce _swipeBounce;
         private bool _isUpdatingChecks;
 
         public event EventHandler<TabSelectionChangedEventArgs> SelectionChanged;
@@ -259,6 +260,8 @@ namespace XForms.Controls
         /// edge goes all the way; released, the switch completes past a third
         /// of the way, or with a flick, and goes back otherwise. A swipe to the
         /// right goes to the previous tab, as it pulls in the page on the left.
+        /// Past the first or last tab, the page rubber-bands: it follows the
+        /// finger with more and more resistance, and springs back.
         /// </summary>
         public void FollowSwipe(
             SwipingEventArgs e)
@@ -272,10 +275,17 @@ namespace XForms.Controls
             {
                 case SwipePhase.Began:
                     this._swipeSwitch?.Cancel();
+                    this.ReleaseSwipeBounce();
                     this._swipeSwitch = this.BeginSwitch(-e.Direction);
                     if (null != this._swipeSwitch)
                     {
                         this._swipeSwitch.Progress = this.SwipeProgress(e.Distance);
+                    }
+                    else if ((null == this._switch) && (null != this._selection) && (null == this.ItemAt(this.SelectedIndex - e.Direction)))
+                    {
+                        // No tab that way: the page rubber-bands
+                        this._swipeBounce = this._frame?.BeginBounce();
+                        this.MoveSwipeBounce(e);
                     }
                     break;
 
@@ -284,10 +294,15 @@ namespace XForms.Controls
                     {
                         this._swipeSwitch.Progress = this.SwipeProgress(e.Distance);
                     }
+                    else
+                    {
+                        this.MoveSwipeBounce(e);
+                    }
                     break;
 
                 case SwipePhase.Ended:
                 {
+                    this.ReleaseSwipeBounce();
                     var swipeSwitch = this._swipeSwitch;
                     this._swipeSwitch = null;
                     if (null != swipeSwitch)
@@ -310,7 +325,39 @@ namespace XForms.Controls
                 case SwipePhase.Canceled:
                     this._swipeSwitch?.Cancel();
                     this._swipeSwitch = null;
+                    this.ReleaseSwipeBounce();
                     break;
+            }
+        }
+
+        // A rubber band, as a scroll view's end: the page moves less and less
+        // the further it's pulled, toward a little over half the frame's width
+        private void MoveSwipeBounce(
+            SwipingEventArgs e)
+        {
+            var bounce = this._swipeBounce;
+            if (null == bounce)
+            {
+                return;
+            }
+
+            float width = this._frame.Bounds.Width;
+            if (width <= 0)
+            {
+                return;
+            }
+
+            float offset = (1 - (1 / ((e.Distance * 0.55f / width) + 1))) * width;
+            bounce.Offset = e.Direction * offset;
+        }
+
+        private void ReleaseSwipeBounce()
+        {
+            var bounce = this._swipeBounce;
+            this._swipeBounce = null;
+            if (null != bounce)
+            {
+                _ = bounce.ReleaseAsync();
             }
         }
 

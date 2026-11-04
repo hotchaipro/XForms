@@ -109,4 +109,76 @@ namespace XForms
             return TimeSpan.FromTicks((long)(this._frame.TransitionDuration.Ticks * Math.Clamp(share, 0, 1)));
         }
     }
+
+    /// <summary>
+    /// A frame's current page pulled sideways by a gesture with nowhere to go
+    /// (see <see cref="Frame.BeginBounce"/>), such as past the last tab: it
+    /// moves by the <see cref="Offset"/>, then springs back.
+    /// </summary>
+    public sealed class PageBounce
+    {
+        private static readonly EasingFunction SpringBackEasing = new CubicEase(EasingMode.EaseOut);
+
+        private readonly Frame _frame;
+        private readonly Page _page;
+        private readonly Animator _animator;
+        private float _offset;
+        private bool _isEnded;
+
+        internal PageBounce(
+            Frame frame,
+            Page page)
+        {
+            this._frame = frame;
+            this._page = page;
+            this._animator = page.GetOrCreateAnimator();
+            this._animator.Translation = Point.Zero;
+            page.Shadow = PageTransition.EdgeShadow;
+        }
+
+        /// <summary>
+        /// How far the page is pulled, in points: to the right for a positive
+        /// offset. The gesture damps it, so the page resists the further it's
+        /// pulled.
+        /// </summary>
+        public float Offset
+        {
+            get
+            {
+                return this._offset;
+            }
+
+            set
+            {
+                if (this._isEnded)
+                {
+                    return;
+                }
+
+                this._offset = value;
+                this._animator.Translation = new Point(value, 0);
+            }
+        }
+
+        /// <summary>
+        /// Springs the page back into place, in the frame's
+        /// <see cref="Frame.TransitionDuration"/>.
+        /// </summary>
+        public async Task ReleaseAsync()
+        {
+            if (this._isEnded)
+            {
+                return;
+            }
+
+            this._isEnded = true;
+            await this._animator.TranslateTo(Point.Zero, this._frame.TransitionDuration, SpringBackEasing);
+            if (this._page.Shadow == PageTransition.EdgeShadow)
+            {
+                this._page.Shadow = null;
+            }
+
+            this._frame.OnPageBounceEnded(this);
+        }
+    }
 }
