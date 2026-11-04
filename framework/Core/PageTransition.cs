@@ -47,7 +47,13 @@ namespace XForms
         internal static void ShowEdgeShadow(
             Page page)
         {
+            // In dark mode, a glow: a shadow wouldn't show on a dark page
             var shadow = EdgeShadow with { Outset = page.DrawnOutset };
+            if (page.ActualTheme.Mode != ThemeMode.Light)
+            {
+                shadow = shadow with { Color = Shadow.GlowColor };
+            }
+
             page.Shadow = shadow;
             EdgeShadows.AddOrUpdate(page, shadow);
         }

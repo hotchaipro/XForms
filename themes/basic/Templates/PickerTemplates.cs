@@ -104,21 +104,45 @@ namespace XForms.Themes.Basic
             CornerRadius = CornerRadius,
         };
 
+        // In dark mode, a glow centered on the frame's edges: a shadow
+        // wouldn't show on a dark page
+        private static readonly Shadow FrameGlow = FrameShadow with
+        {
+            Color = Shadow.GlowColor,
+            Offset = Point.Zero,
+        };
+
+        private static Shadow ShadowFor(
+            Theme theme)
+        {
+            return (theme.Mode == ThemeMode.Light) ? FrameShadow : FrameGlow;
+        }
+
         protected override void Apply(
             PopupFrame control,
             TemplateContext context)
         {
             context.CreateOwnAnimator();
-            control.Shadow = FrameShadow;
+            control.Shadow = ShadowFor(control.ActualTheme);
         }
 
         protected override void Unapply(
             PopupFrame control,
             TemplateContext context)
         {
-            if (control.Shadow == FrameShadow)
+            if ((control.Shadow == FrameShadow) || (control.Shadow == FrameGlow))
             {
                 control.Shadow = null;
+            }
+        }
+
+        protected override void OnThemeChanged(
+            PopupFrame control,
+            TemplateContext context)
+        {
+            if ((control.Shadow == FrameShadow) || (control.Shadow == FrameGlow))
+            {
+                control.Shadow = ShadowFor(control.ActualTheme);
             }
         }
 

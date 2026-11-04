@@ -24,6 +24,14 @@ namespace XForms
     public sealed record Shadow
     {
         /// <summary>
+        /// What an elevated surface casts on a dark background in place of a
+        /// shadow, which wouldn't show there: a faint white glow (14%),
+        /// centered on its edges. Frames' sliding pages and themes' popups use
+        /// it in dark mode.
+        /// </summary>
+        public static readonly Color GlowColor = Color.FromArgb(0x24, 0xff, 0xff, 0xff);
+
+        /// <summary>
         /// The shadow's color, with its opacity: black at 30% by default.
         /// </summary>
         public Color Color { get; init; } = Color.FromArgb(0x4d, 0, 0, 0);
