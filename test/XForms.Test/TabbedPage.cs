@@ -107,6 +107,26 @@ namespace XForms.Test
 
         protected override View Build()
         {
+            // Tab two is a list of two-line rows (it fills in from the first
+            // frame of a swipe to it)
+            if (this._name == "two")
+            {
+                var rows = new System.Collections.Generic.List<int>();
+                for (int i = 1; i <= 30; i += 1)
+                {
+                    rows.Add(i);
+                }
+
+                return new ListView<int>()
+                {
+                    ItemsSource = rows,
+                    ItemViewFactory = ItemViewFactory<int>.Create(
+                        () => new TextBlock() { Margin = new Thickness(20, 10), FontSize = 18 },
+                        (view, row) => view.Text = "Task " + row + "
+Wednesday, November " + row + " (in " + row + " days)"),
+                };
+            }
+
             return new TextBlock()
             {
                 Text = "Tab " + this._name,
