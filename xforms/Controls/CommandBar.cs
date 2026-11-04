@@ -97,6 +97,21 @@ namespace XForms.Controls
         /// The space between neighbouring buttons' icons and labels (a
         /// command list's CommandBarButtonSpacing): 0 by default.
         /// </summary>
+        // The buttons' label size (a command list's CommandBarLabelFontSize)
+        internal float? LabelFontSize
+        {
+            set
+            {
+                foreach (var buttons in new[] { this._primaryButtons.Buttons, this._secondaryButtons.Buttons })
+                {
+                    foreach (var button in buttons)
+                    {
+                        button.LabelFontSize = value;
+                    }
+                }
+            }
+        }
+
         internal float ButtonSpacing
         {
             get

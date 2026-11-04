@@ -569,3 +569,7 @@ XForms.Controls.CommandListView.CommandBarButtonSpacing.set -> void
 const XForms.Controls.ComboBoxItemsView.RowHeight = 48 -> float
 const XForms.Controls.AutoSuggestBoxListView.RowHeight = 48 -> float
 const XForms.Controls.MenuFlyoutView.RowHeight = 48 -> float
+XForms.Controls.CommandListView.CommandBarLabelFontSize.get -> float?
+XForms.Controls.CommandListView.CommandBarLabelFontSize.set -> void
+XForms.Controls.CommandBarButton.LabelFontSize.get -> float?
+XForms.Controls.CommandBarButton.LabelFontSize.set -> void

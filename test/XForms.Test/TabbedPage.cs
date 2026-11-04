@@ -157,7 +157,7 @@ namespace XForms.Test
             // bar: four commands, and edit at the end
             if (this._name == "three")
             {
-                var list = new CommandListView() { CommandBarButtonSpacing = 12 };
+                var list = new CommandListView() { CommandBarButtonSpacing = 12, CommandBarLabelFontSize = 11 };
                 foreach (var text in new[] { "never", "schedule", "soon", "done" })
                 {
                     list.CommandBarCommands.PrimaryCommands.Add(new UICommand() { Text = text, Icon = ThemeResources.Default.AboutLogo, Command = new RelayCommand(() => { }) });

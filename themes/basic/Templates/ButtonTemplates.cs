@@ -576,7 +576,19 @@ namespace XForms.Themes.Basic
             // A fixed size icon over the label, centered together in the
             // button (all of which takes taps): a roomier button has more
             // space around them, not a bigger icon
-            float textHeight = (float)Math.Ceiling(LabelFormat.FontSize * 1.3f);
+            var format = LabelFormat;
+            if (control.LabelFontSize.HasValue)
+            {
+                format = new TextFormat()
+                {
+                    FontSize = control.LabelFontSize.Value,
+                    FontWeight = LabelFormat.FontWeight,
+                    HorizontalAlignment = LabelFormat.HorizontalAlignment,
+                    VerticalAlignment = LabelFormat.VerticalAlignment,
+                };
+            }
+
+            float textHeight = (float)Math.Ceiling(format.FontSize * 1.3f);
             float imageDimension = Math.Min(MaxIconSize, Math.Min(bounds.Width, bounds.Height - textHeight - IconLabelGap));
             float top = (bounds.Height - (imageDimension + IconLabelGap + textHeight)) / 2;
             Rect imageBounds = new Rect(bounds.Center.X - (imageDimension / 2f), top, imageDimension, imageDimension);
@@ -584,7 +596,7 @@ namespace XForms.Themes.Basic
             drawContext.DrawImage(control.Icon, imageBounds, accent);
 
             Rect textBounds = new Rect(bounds.X, imageBounds.Bottom + IconLabelGap, bounds.Width, textHeight);
-            drawContext.DrawText(control.Text, textBounds, accent, LabelFormat);
+            drawContext.DrawText(control.Text, textBounds, accent, format);
         }
     }
 }

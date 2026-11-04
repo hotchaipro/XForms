@@ -78,6 +78,30 @@ namespace XForms.Controls
 
         private Color? _commandBarBackground;
         private float _commandBarButtonSpacing;
+        private float? _commandBarLabelFontSize;
+
+        /// <summary>
+        /// The command bar buttons' label size, or null (the default) for the
+        /// theme's. The icon and label stay centered together in the button.
+        /// </summary>
+        public float? CommandBarLabelFontSize
+        {
+            get
+            {
+                return this._commandBarLabelFontSize;
+            }
+
+            set
+            {
+                this._commandBarLabelFontSize = value;
+                foreach (var container in this.RealizedContainers)
+                {
+                    (container as CommandListViewItemContainer)?.ApplyCommandBarBackground();
+                }
+
+                this.OnPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// The space between neighbouring command bar buttons' icons and
@@ -271,11 +295,14 @@ namespace XForms.Controls
             }
         }
 
-        // The list's look for the command bar: its background and spacing
+        // The list's look for the command bar: its background, spacing and
+        // label size
         internal void ApplyCommandBarBackground()
         {
             this._commandBar.Background = this.CommandListView?.CommandBarBackground ?? Colors.Transparent;
             this._commandBar.ButtonSpacing = this.CommandListView?.CommandBarButtonSpacing ?? 0;
+            var labelFontSize = this.CommandListView?.CommandBarLabelFontSize;
+            this._commandBar.LabelFontSize = (labelFontSize > 0) ? labelFontSize : null;
         }
 
         protected override void AddContent(
