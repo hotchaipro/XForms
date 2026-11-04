@@ -90,7 +90,6 @@ namespace XForms.iOS
             ArgumentNullException.ThrowIfNull(application);
 
             _pendingApplication = application;
-            AppBadge.Watch(application);
             UIApplication.Main(args, null, typeof(XFormsAppDelegate));
         }
 
@@ -338,6 +337,13 @@ namespace XForms.iOS
                 NSDictionary launchOptions)
             {
                 RegisterBackgroundRefresh();
+
+                // The icon shows the app's count once the app has launched
+                if (null != _pendingApplication)
+                {
+                    AppBadge.Watch(_pendingApplication);
+                }
+
                 return true;
             }
 

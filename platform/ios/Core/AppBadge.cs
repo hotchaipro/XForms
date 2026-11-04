@@ -58,6 +58,13 @@ namespace XForms.iOS
         private static void Apply(
             int count)
         {
+            // Not before the app has launched (it's shown once it has)
+            var application = UIApplication.SharedApplication;
+            if (null == application)
+            {
+                return;
+            }
+
             if (OperatingSystem.IsIOSVersionAtLeast(16))
             {
                 UNUserNotificationCenter.Current.SetBadgeCount(count, null);
@@ -68,7 +75,7 @@ namespace XForms.iOS
             if ((0 == count) || !OperatingSystem.IsIOSVersionAtLeast(16))
             {
 #pragma warning disable CA1422
-                UIApplication.SharedApplication.ApplicationIconBadgeNumber = count;
+                application.ApplicationIconBadgeNumber = count;
 #pragma warning restore CA1422
             }
         }
