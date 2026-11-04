@@ -85,7 +85,7 @@ namespace XForms.Themes.Basic
         internal static Color SelectedColor(
             Theme theme)
         {
-            return (theme.Mode == ThemeMode.Light) ? theme.Colors.StrongAccent : theme.Colors.Accent;
+            return AccentColors.Text(theme);
         }
 
 

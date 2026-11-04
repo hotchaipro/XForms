@@ -33,8 +33,8 @@ namespace XForms.Themes.Basic
             var colors = theme.Colors;
             var defaults = new ButtonStyle()
             {
-                Background = control.IsAlertStyle ? colors.Error : colors.Accent,
-                Foreground = control.IsAlertStyle ? colors.OnError : colors.OnAccent,
+                Background = control.IsAlertStyle ? colors.Error : AccentColors.Fill(theme),
+                Foreground = control.IsAlertStyle ? colors.OnError : AccentColors.OnFill(theme),
                 CornerRadius = theme.Shapes.SmallCornerRadius,
                 TextStyle = theme.Typography.Label,
             };
@@ -140,10 +140,10 @@ namespace XForms.Themes.Basic
             }
             else if (this.IsChecked(control))
             {
-                drawContext.FillEllipse(buttonBounds, colors.Accent);
+                drawContext.FillEllipse(buttonBounds, AccentColors.Fill(control.ActualTheme));
                 if (null != icon)
                 {
-                    drawContext.DrawImage(icon, imageBounds, Colors.White);
+                    drawContext.DrawImage(icon, imageBounds, AccentColors.OnFill(control.ActualTheme));
                 }
             }
             else
@@ -302,8 +302,8 @@ namespace XForms.Themes.Basic
             }
             else if (control.IsChecked)
             {
-                drawContext.FillEllipse(buttonBounds, colors.Accent);
-                drawContext.DrawText(control.Text, bounds, Colors.White, LetterFormat);
+                drawContext.FillEllipse(buttonBounds, AccentColors.Fill(control.ActualTheme));
+                drawContext.DrawText(control.Text, bounds, AccentColors.OnFill(control.ActualTheme), LetterFormat);
             }
             else
             {
@@ -564,7 +564,7 @@ namespace XForms.Themes.Basic
             DrawingContext drawContext)
         {
             var bounds = new Rect(0, 0, control.Bounds.Width, control.Bounds.Height);
-            var accent = control.ActualTheme.Colors.Accent;
+            var accent = AccentColors.Text(control.ActualTheme);
 
             float imageDimension = Math.Min(bounds.Width, bounds.Height) * 0.65f;
             float textHeight = bounds.Height * 0.35f;

@@ -237,8 +237,8 @@ namespace XForms.Themes.Basic
 
                     if (isSelected)
                     {
-                        drawContext.FillEllipse(center, Radius, Radius, colors.Accent);
-                        textColor = colors.Background;
+                        drawContext.FillEllipse(center, Radius, Radius, AccentColors.Fill(control.ActualTheme));
+                        textColor = AccentColors.OnFill(control.ActualTheme);
                     }
                     else if ((control.PressedPart == CalendarViewPart.Day) && (control.PressedDate == date) && isEnabled)
                     {
@@ -247,7 +247,7 @@ namespace XForms.Themes.Basic
 
                     if (date == today)
                     {
-                        drawContext.DrawEllipse(center, Radius, Radius, isSelected ? colors.Background : colors.Accent, 1.5f);
+                        drawContext.DrawEllipse(center, Radius, Radius, isSelected ? AccentColors.OnFill(control.ActualTheme) : AccentColors.Text(control.ActualTheme), 1.5f);
                     }
 
                     if (control.IsFocused && (date == control.FocusedDate))

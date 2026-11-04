@@ -14,7 +14,7 @@ namespace XForms.Themes.Basic
             TemplatedControl control)
         {
             var colors = control.ActualTheme.Colors;
-            return control.IsEnabled ? colors.Accent : colors.Disabled;
+            return control.IsEnabled ? AccentColors.Fill(control.ActualTheme) : colors.Disabled;
         }
 
         // The color of an outline or an empty track
@@ -59,7 +59,7 @@ namespace XForms.Themes.Basic
                 var fill = FormColors.Active(control);
                 drawContext.FillRoundedRectangle(box, Radius, control.IsPressed ? fill.MultiplyAlpha(0.8f) : fill);
 
-                var mark = control.IsEnabled ? colors.OnAccent : colors.Background;
+                var mark = control.IsEnabled ? AccentColors.OnFill(control.ActualTheme) : colors.Background;
                 var center = box.Center;
                 if (control.IsChecked == true)
                 {
@@ -115,7 +115,7 @@ namespace XForms.Themes.Basic
             if (control.IsOn)
             {
                 drawContext.FillRoundedRectangle(track, radius, FormColors.Active(control));
-                drawContext.FillEllipse(knobCenter, knobRadius, knobRadius, control.IsEnabled ? colors.OnAccent : colors.Background);
+                drawContext.FillEllipse(knobCenter, knobRadius, knobRadius, control.IsEnabled ? AccentColors.OnFill(control.ActualTheme) : colors.Background);
             }
             else
             {
@@ -351,7 +351,7 @@ namespace XForms.Themes.Basic
             drawContext.Clear(Colors.Transparent);
 
             var band = new Rect(4, Middle * TimePickerView.RowHeight, Math.Max(0, control.Bounds.Width - 8), TimePickerView.RowHeight);
-            drawContext.FillRoundedRectangle(band, 4, colors.Accent);
+            drawContext.FillRoundedRectangle(band, 4, AccentColors.Fill(control.ActualTheme));
 
             for (int column = 0; column < control.ColumnCount; column += 1)
             {
@@ -364,14 +364,14 @@ namespace XForms.Themes.Basic
                         drawContext.FillRectangle(bounds.Deflate(4, 2), FormPressed(colors));
                     }
 
-                    var color = (row == Middle) ? colors.OnAccent : colors.SubtleForeground;
+                    var color = (row == Middle) ? AccentColors.OnFill(control.ActualTheme) : colors.SubtleForeground;
                     drawContext.DrawText(control.GetText(column, row - Middle), bounds, color, RowFormat);
                 }
 
                 if (control.IsFocused && (column == control.FocusedColumn))
                 {
                     var bounds = control.GetRowBounds(column, Middle);
-                    drawContext.DrawRoundedRectangle(bounds.Deflate(6, 4), 4, colors.OnAccent, 2);
+                    drawContext.DrawRoundedRectangle(bounds.Deflate(6, 4), 4, AccentColors.OnFill(control.ActualTheme), 2);
                 }
             }
 

@@ -91,7 +91,7 @@ namespace XForms.Themes.Basic
                 case InfoBarSeverity.Success: return Color.FromRgb(0x2E, 0x9E, 0x44);
                 case InfoBarSeverity.Warning: return Color.FromRgb(0xE8, 0x9E, 0x00);
                 case InfoBarSeverity.Error: return colors.Error;
-                default: return colors.Accent;
+                default: return AccentColors.Text(control.ActualTheme);
             }
         }
 
