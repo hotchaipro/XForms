@@ -153,6 +153,21 @@ namespace XForms.Test
                 return list;
             }
 
+            // Tab three is a command list, its second row showing its command
+            // bar: four commands, and edit at the end
+            if (this._name == "three")
+            {
+                var list = new CommandListView();
+                foreach (var text in new[] { "never", "schedule", "soon", "done" })
+                {
+                    list.CommandBarCommands.PrimaryCommands.Add(new UICommand() { Text = text, Icon = ThemeResources.Default.AboutLogo, Command = new RelayCommand(() => { }) });
+                }
+
+                list.CommandBarCommands.SecondaryCommands.Add(new UICommand() { Text = "edit", Icon = ThemeResources.Default.AboutLogo, Command = new RelayCommand(() => { }) });
+                list.Bind(new RowsSource(12));
+                return list;
+            }
+
             return new TextBlock()
             {
                 Text = "Tab " + this._name,
@@ -160,6 +175,55 @@ namespace XForms.Test
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
             };
+        }
+
+        // Rows numbered from 1
+        private sealed class RowsSource : XForms.Primitives.ItemsViewSource
+        {
+            private readonly int _count;
+
+            public RowsSource(
+                int count)
+            {
+                this._count = count;
+            }
+
+            public override int Count => this._count;
+
+            public override object this[int index] => index + 1;
+
+            public override int IndexOf(
+                object item)
+            {
+                return (item is int row) ? row - 1 : -1;
+            }
+
+            public override View GetItemView(
+                View reuseView,
+                object item)
+            {
+                var view = reuseView as RowView ?? new RowView();
+                view.Item = item;
+                return view;
+            }
+        }
+
+        // A row's title; the second row shows its command bar
+        private sealed class RowView : CommandListViewItem
+        {
+            private readonly TextBlock _title = new TextBlock() { FontSize = 18, Margin = new Thickness(20, 14) };
+
+            public RowView()
+            {
+                this.Content = this._title;
+            }
+
+            protected override void OnItemChanged()
+            {
+                int row = (int)this.Item;
+                this._title.Text = "Task " + row;
+                this.IsCommandBarVisible = (row == 2);
+            }
         }
     }
 }

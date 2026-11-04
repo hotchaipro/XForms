@@ -565,3 +565,4 @@ XForms.Controls.ListView.SelectionBackground.set -> void
 XForms.Controls.CommandListView.CommandBarBackground.get -> XForms.Color?
 XForms.Controls.CommandListView.CommandBarBackground.set -> void
 override XForms.Controls.CommandBar.BackgroundColor.get -> XForms.Color
+override XForms.Controls.CommandBar.MeasureOverride(XForms.Size availableSize) -> XForms.Size

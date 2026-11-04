@@ -44,10 +44,17 @@ namespace XForms.Controls
                 throw new ArgumentNullException(nameof(button));
             }
 
-            button.Width = 48f;
-            button.Height = 48f;
-
+            this._buttons.Add(button);
             this._commandBar.ButtonsLayout.Children.Add(button, this._buttonRegion);
+            this._commandBar.InvalidateMeasure();
+        }
+
+        internal IReadOnlyList<CommandBarButton> Buttons
+        {
+            get
+            {
+                return this._buttons;
+            }
         }
     }
 

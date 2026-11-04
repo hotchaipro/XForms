@@ -540,12 +540,15 @@ namespace XForms.Themes.Basic
     {
         private const float PressedScale = 0.9f;
 
+        private const float MaxIconSize = 28;
+        private const float IconLabelGap = 2;
+
         private static readonly TextFormat LabelFormat = new TextFormat()
         {
             FontSize = 9.0f,
             FontWeight = FontWeight.Medium,
             HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Bottom,
+            VerticalAlignment = VerticalAlignment.Top,
         };
 
         protected override void OnStateChanged(
@@ -570,17 +573,17 @@ namespace XForms.Themes.Basic
             var bounds = new Rect(0, 0, control.Bounds.Width, control.Bounds.Height);
             var accent = control.ActualTheme.Colors.Accent;
 
-            float imageDimension = Math.Min(bounds.Width, bounds.Height) * 0.65f;
-            float textHeight = bounds.Height * 0.35f;
-            Rect imageBounds = new Rect(
-                bounds.Center.X - (imageDimension / 2f),
-                bounds.Center.Y - ((imageDimension + textHeight) / 2f),
-                imageDimension,
-                imageDimension);
+            // A fixed size icon over the label, centered together in the
+            // button (all of which takes taps): a roomier button has more
+            // space around them, not a bigger icon
+            float textHeight = (float)Math.Ceiling(LabelFormat.FontSize * 1.3f);
+            float imageDimension = Math.Min(MaxIconSize, Math.Min(bounds.Width, bounds.Height - textHeight - IconLabelGap));
+            float top = (bounds.Height - (imageDimension + IconLabelGap + textHeight)) / 2;
+            Rect imageBounds = new Rect(bounds.Center.X - (imageDimension / 2f), top, imageDimension, imageDimension);
 
             drawContext.DrawImage(control.Icon, imageBounds, accent);
 
-            Rect textBounds = new Rect(bounds.X, imageBounds.Bottom, bounds.Width, bounds.Bottom - imageBounds.Bottom);
+            Rect textBounds = new Rect(bounds.X, imageBounds.Bottom + IconLabelGap, bounds.Width, textHeight);
             drawContext.DrawText(control.Text, textBounds, accent, LabelFormat);
         }
     }

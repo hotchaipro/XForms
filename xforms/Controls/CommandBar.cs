@@ -85,6 +85,63 @@ namespace XForms.Controls
             }
         }
 
+        // Roomy buttons (a comfortable touch target each, a gap apart) when
+        // they fit across the bar; otherwise compact ones, side by side
+        private const float RoomyButtonWidth = 64;
+        private const float RoomyButtonHeight = 56;
+        private const float RoomyGap = 12;
+        private const float CompactButtonSize = 48;
+
+        protected override Size MeasureOverride(
+            Size availableSize)
+        {
+            this.FitButtons(availableSize.Width - this._buttonsLayout.Margin.Left - this._buttonsLayout.Margin.Right);
+            return base.MeasureOverride(availableSize);
+        }
+
+        // Sizes the buttons for the width: roomy if the visible ones fit
+        private void FitButtons(
+            float width)
+        {
+            int count = 0;
+            foreach (var button in this._primaryButtons.Buttons)
+            {
+                count += button.IsVisible ? 1 : 0;
+            }
+
+            foreach (var button in this._secondaryButtons.Buttons)
+            {
+                count += button.IsVisible ? 1 : 0;
+            }
+
+            float roomyWidth = (count * RoomyButtonWidth) + (Math.Max(0, count - 1) * RoomyGap);
+            bool isRoomy = float.IsInfinity(width) || (roomyWidth <= width);
+
+            // The left group's buttons have the gap after them; the right
+            // group's, before
+            foreach (var button in this._primaryButtons.Buttons)
+            {
+                Size(button, isRoomy, new Thickness(0, 0, isRoomy ? RoomyGap : 0, 0));
+            }
+
+            foreach (var button in this._secondaryButtons.Buttons)
+            {
+                Size(button, isRoomy, new Thickness(isRoomy ? RoomyGap : 0, 0, 0, 0));
+            }
+
+            static void Size(CommandBarButton button, bool isRoomy, Thickness margin)
+            {
+                float width = isRoomy ? RoomyButtonWidth : CompactButtonSize;
+                float height = isRoomy ? RoomyButtonHeight : CompactButtonSize;
+                if ((button.Width != width) || (button.Height != height) || (button.Margin != margin))
+                {
+                    button.Width = width;
+                    button.Height = height;
+                    button.Margin = margin;
+                }
+            }
+        }
+
         internal DockPanel ButtonsLayout
         {
             get
