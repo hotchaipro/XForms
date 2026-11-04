@@ -44,6 +44,18 @@ namespace XForms.iOS
             return size;
         }
 
+        // Whether the table's rows are its source's (one section)
+        private bool HasCurrentRows()
+        {
+            var source = this.Source;
+            if ((null == source) || (this.NumberOfSections() < 1))
+            {
+                return true;
+            }
+
+            return this.NumberOfRowsInSection(0) == source.RowsInSection(this, 0);
+        }
+
         /// <summary>
         /// Lets the table pick up rows whose content changed height, such as an
         /// item that revealed its command bar.
@@ -79,6 +91,23 @@ namespace XForms.iOS
                     this._rowHeightUpdateCompletions.Clear();
                     var animations = this._rowHeightUpdateAnimations.ToArray();
                     this._rowHeightUpdateAnimations.Clear();
+
+                    // The rows may have changed since the heights did (a row's
+                    // command bar closed as its item left the list): a batch
+                    // update then sees rows it wasn't told about, and throws.
+                    // Apply any reload still pending first; if the table's rows
+                    // still differ from its source's, reload them instead.
+                    this.LayoutIfNeeded();
+                    if (!this.HasCurrentRows())
+                    {
+                        this.ReloadData();
+                        foreach (var action in completions)
+                        {
+                            action();
+                        }
+
+                        return;
+                    }
 
                     // An empty batch update re-queries row heights and animates
                     // the change, with what moves along with it
