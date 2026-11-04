@@ -128,8 +128,15 @@ namespace XForms.Themes.Basic
         {
             var bounds = new Rect(0, 0, control.Bounds.Width, control.Bounds.Height);
 
+            var theme = control.ActualTheme;
             drawContext.Clear(Colors.Transparent);
-            drawContext.FillRoundedRectangle(bounds, CornerRadius, control.ActualTheme.Colors.Background);
+            drawContext.FillRoundedRectangle(bounds, CornerRadius, PopupColors.Card(theme));
+
+            var edge = PopupColors.Edge(theme);
+            if (!edge.IsTransparent)
+            {
+                drawContext.DrawRoundedRectangle(bounds.Deflate(0.5f, 0.5f), CornerRadius - 0.5f, edge, 1);
+            }
         }
     }
 
@@ -163,7 +170,7 @@ namespace XForms.Themes.Basic
                 }
                 else if ((i == selectedIndex) || ((i == control.HighlightedIndex) && control.IsFocused))
                 {
-                    drawContext.FillRectangle(highlight, colors.Surface);
+                    drawContext.FillRectangle(highlight, PopupColors.Highlight(control.ActualTheme));
                 }
 
                 if (i == selectedIndex)

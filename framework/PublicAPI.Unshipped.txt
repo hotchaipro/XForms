@@ -164,5 +164,6 @@ XForms.Shadow.Outset.get -> XForms.Thickness
 XForms.Shadow.Outset.init -> void
 XForms.View.HitTestOutset.get -> XForms.Thickness
 XForms.View.HitTestOutset.set -> void
-XForms.Primitives.Popup.ScrimColor.get -> XForms.Color
+XForms.Primitives.Popup.ScrimColor.get -> XForms.Color?
 XForms.Primitives.Popup.ScrimColor.set -> void
+virtual XForms.Primitives.Popup.GetDefaultScrimColor(XForms.Theme theme) -> XForms.Color

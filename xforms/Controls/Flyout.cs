@@ -13,16 +13,19 @@ namespace XForms.Controls
     {
         private readonly FlyoutFrame _frame = new FlyoutFrame();
 
-        /// <summary>
-        /// The scrim a flyout lays over the rest of the window by default: a
-        /// light dim.
-        /// </summary>
-        public static readonly Color DefaultScrimColor = Color.FromArgb(0x40, 0, 0, 0);
-
         public Flyout()
         {
             base.Content = this._frame;
-            this.ScrimColor = DefaultScrimColor;
+        }
+
+        /// <summary>
+        /// A flyout dims the rest of the window: lightly (25% black), and
+        /// more in dark mode (50%), where a light dim wouldn't show.
+        /// </summary>
+        protected override Color GetDefaultScrimColor(
+            Theme theme)
+        {
+            return Color.FromArgb((theme.Mode == ThemeMode.Light) ? (byte)0x40 : (byte)0x80, 0, 0, 0);
         }
 
         /// <summary>

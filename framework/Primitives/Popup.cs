@@ -81,14 +81,14 @@ namespace XForms.Primitives
             }
         }
 
-        private Color _scrimColor = Colors.Transparent;
+        private Color? _scrimColor;
 
         /// <summary>
         /// A color laid over the rest of the window while the popup is open,
         /// such as a dim black, which a press on dismisses it as before;
         /// transparent (the default) for none.
         /// </summary>
-        public Color ScrimColor
+        public Color? ScrimColor
         {
             get
             {
@@ -98,7 +98,27 @@ namespace XForms.Primitives
             set
             {
                 this._scrimColor = value;
-                this.Native?.ScrimColor = value;
+                this.Native?.ScrimColor = this.ActualScrimColor;
+            }
+        }
+
+        /// <summary>
+        /// The scrim when <see cref="ScrimColor"/> is null, for the theme the
+        /// popup shows in: none (transparent) for a popup.
+        /// </summary>
+        protected virtual Color GetDefaultScrimColor(
+            Theme theme)
+        {
+            return Colors.Transparent;
+        }
+
+        // The scrim shown: the popup's own, or its default for its theme
+        private Color ActualScrimColor
+        {
+            get
+            {
+                var theme = this._content?.ActualTheme ?? this.Application?.Theme;
+                return this._scrimColor ?? ((null != theme) ? this.GetDefaultScrimColor(theme) : Colors.Transparent);
             }
         }
 
@@ -140,6 +160,7 @@ namespace XForms.Primitives
                 this.Application.Renderer.EndTextEntry();
             }
 
+            this.Renderer.ScrimColor = this.ActualScrimColor;
             this.Renderer.Show();
             this.Application.OnPopupShown(this);
         }
@@ -196,7 +217,7 @@ namespace XForms.Primitives
             var native = this.Native;
             native.PlacementTarget = this._placementTarget;
             native.IsLightDismissEnabled = this._isLightDismissEnabled;
-            native.ScrimColor = this._scrimColor;
+            native.ScrimColor = this.ActualScrimColor;
 
             var content = this._content;
             if (null != content)

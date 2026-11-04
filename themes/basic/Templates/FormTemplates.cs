@@ -520,7 +520,7 @@ namespace XForms.Themes.Basic
                 }
                 else if (i == control.HighlightedIndex)
                 {
-                    drawContext.FillRectangle(highlight, colors.Surface);
+                    drawContext.FillRectangle(highlight, PopupColors.Highlight(control.ActualTheme));
                     drawContext.FillRectangle(new Rect(isRightToLeft ? highlight.Right - 3 : 4, row.Y + ((RowHeight - 16) / 2), 3, 16), colors.Accent);
                 }
 

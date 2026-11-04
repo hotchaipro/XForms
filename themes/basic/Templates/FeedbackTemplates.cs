@@ -57,7 +57,7 @@ namespace XForms.Themes.Basic
                 }
                 else if (i == control.HighlightedIndex)
                 {
-                    drawContext.FillRoundedRectangle(highlight, 4, colors.Surface);
+                    drawContext.FillRoundedRectangle(highlight, 4, PopupColors.Highlight(control.ActualTheme));
                     if (control.IsFocused)
                     {
                         drawContext.FillRectangle(new Rect(isRightToLeft ? highlight.Right - 3 : 4, row.Y + ((RowHeight - 16) / 2), 3, 16), colors.Accent);
