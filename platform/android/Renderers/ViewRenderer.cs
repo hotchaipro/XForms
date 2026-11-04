@@ -158,6 +158,9 @@ namespace XForms.Android.Renderers
             }
         }
 
+        // An unblurred shadow's line (see Shadow)
+        private GradientDrawable _hairline;
+
         // NOTE: Android draws a view's shadow from its elevation and outline,
         // with its own light: the shadow's blur and offset set how high the
         // view floats, and its color the shadow's (from API 28)
@@ -171,6 +174,16 @@ namespace XForms.Android.Renderers
                     return;
                 }
 
+                if (null != this._hairline)
+                {
+                    if (nativeView.Foreground == this._hairline)
+                    {
+                        nativeView.Foreground = null;
+                    }
+
+                    this._hairline = null;
+                }
+
                 if ((null == value) || value.Color.IsTransparent)
                 {
                     nativeView.Elevation = 0;
@@ -179,6 +192,17 @@ namespace XForms.Android.Renderers
                         nativeView.OutlineProvider = ViewOutlineProvider.Background;
                     }
 
+                    return;
+                }
+
+                if ((value.Blur <= 0) && (Point.Zero == value.Offset))
+                {
+                    nativeView.Elevation = 0;
+                    this._hairline = new GradientDrawable();
+                    this._hairline.SetColor(global::Android.Graphics.Color.Transparent);
+                    this._hairline.SetStroke(Math.Max(1, (int)Math.Round(this.DevicePixelsToPixels(1))), value.Color.ToAndroidColor());
+                    this._hairline.SetCornerRadius(this.DevicePixelsToPixels(value.CornerRadius));
+                    nativeView.Foreground = this._hairline;
                     return;
                 }
 

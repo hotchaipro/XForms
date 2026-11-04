@@ -32,7 +32,7 @@ namespace XForms
 
         /// <summary>
         /// The soft shadow along a sliding page's edges, so the edge shows
-        /// even over a page of the same color.
+        /// even over a page of the same color (in dark mode, a hairline).
         /// </summary>
         private static readonly Shadow EdgeShadow = new Shadow()
         {
@@ -47,7 +47,26 @@ namespace XForms
         internal static void ShowEdgeShadow(
             Page page)
         {
-            page.Shadow = EdgeShadow with { Outset = page.DrawnOutset };
+            var outset = page.DrawnOutset;
+            var theme = page.ActualTheme;
+            Shadow shadow;
+            if (theme.Mode == ThemeMode.Light)
+            {
+                shadow = EdgeShadow with { Outset = outset };
+            }
+            else
+            {
+                // A shadow can't show on a dark page: a hairline in the
+                // outline color, 1 past the page's edges, shows them instead
+                shadow = new Shadow()
+                {
+                    Color = theme.Colors.Outline,
+                    Outset = new Thickness(outset.Left + 1, outset.Top + 1, outset.Right + 1, outset.Bottom + 1),
+                };
+            }
+
+            page.Shadow = shadow;
+            EdgeShadows.AddOrUpdate(page, shadow);
         }
 
         /// <summary>
@@ -56,12 +75,18 @@ namespace XForms
         internal static void HideEdgeShadow(
             Page page)
         {
-            var shadow = page.Shadow;
-            if ((null != shadow) && ((shadow with { Outset = Thickness.Zero }) == EdgeShadow))
+            if (EdgeShadows.TryGetValue(page, out var shadow))
             {
-                page.Shadow = null;
+                EdgeShadows.Remove(page);
+                if (page.Shadow == shadow)
+                {
+                    page.Shadow = null;
+                }
             }
         }
+
+        // The edge shadows given to pages, so only those are taken away
+        private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<Page, Shadow> EdgeShadows = new System.Runtime.CompilerServices.ConditionalWeakTable<Page, Shadow>();
 
         /// <summary>
         /// Moves the page on top in (as a page arrives) or out (as it leaves,
