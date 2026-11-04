@@ -65,11 +65,17 @@ namespace XForms
             }
         }
 
-        // The bands go in the insets, outside the content's area
+        // The bands go in the insets, outside the content's area (a nested
+        // page's, in the main page's insets it sits against)
         internal override void OnContentArranged(
             Size finalSize)
         {
             var insets = this.SafeAreaPadding;
+            if (Thickness.Zero == insets)
+            {
+                insets = this.NestedReach;
+            }
+
             float width = finalSize.Width + insets.Left + insets.Right;
             this._topBand.Arrange(new Rect(-insets.Left, -insets.Top, width, insets.Top));
             this._bottomBand.Arrange(new Rect(-insets.Left, finalSize.Height, width, insets.Bottom));
@@ -77,11 +83,22 @@ namespace XForms
         }
 
         // The bands show where the page keeps clear of the system's bars and
-        // no view of its own reaches
+        // no view of its own reaches. A nested page (a tab's) fills the main
+        // page's insets it sits against with its background, whatever its
+        // views do, so it reaches the screen's edges as it slides.
         private void UpdateBands()
         {
             var insets = this.SafeAreaPadding;
             var application = this.Application;
+            if (Thickness.Zero == insets)
+            {
+                var reach = this.NestedReach;
+                this._topBand.Color = this.BackgroundColor;
+                this._topBand.IsVisible = 0 < reach.Top;
+                this._bottomBand.Color = this.BackgroundColor;
+                this._bottomBand.IsVisible = 0 < reach.Bottom;
+                return;
+            }
 
             this._topBand.Color = application?.TitleBar.AccentColor ?? this.ActualTheme.Colors.Background;
             this._topBand.IsVisible = (0 < insets.Top) && !this._extendedEdges.HasFlag(SafeAreaEdges.Top);
@@ -89,6 +106,55 @@ namespace XForms
             var bottomColor = this._bottomSafeAreaColor;
             this._bottomBand.Color = bottomColor ?? Colors.Transparent;
             this._bottomBand.IsVisible = (0 < insets.Bottom) && bottomColor.HasValue && !this._extendedEdges.HasFlag(SafeAreaEdges.Bottom);
+        }
+
+        /// <summary>
+        /// For a page in a frame inside another page (a tab's): how far it
+        /// reaches into that page's safe-area insets, on the edges it sits
+        /// flush against (what it fills, with its background, as far as the
+        /// screen's edges). Zero for a page with insets of its own.
+        /// </summary>
+        internal Thickness NestedReach
+        {
+            get
+            {
+                if ((Thickness.Zero != this.SafeAreaPadding) || !(this.Parent is Frame frame))
+                {
+                    return Thickness.Zero;
+                }
+
+                // The page fills its frame (which the platform places it in):
+                // the frame's place in the main page, which has the insets
+                Page main = null;
+                float x = 0, y = 0;
+                for (View view = frame; view.Parent is View parent; view = parent)
+                {
+                    x += view.Bounds.X;
+                    y += view.Bounds.Y;
+                    if ((parent is Page page) && (Thickness.Zero != page.SafeAreaPadding))
+                    {
+                        main = page;
+                        break;
+                    }
+                }
+
+                if (null == main)
+                {
+                    return Thickness.Zero;
+                }
+
+                const float Tolerance = 0.5f;
+                var insets = main.SafeAreaPadding;
+                // (A page's frame is the platform's to place: its size is the
+                // one it last laid out at)
+                var mainSize = main.ContentArrangeSize;
+                var size = frame.Bounds.Size;
+                return new Thickness(
+                    ((0 < insets.Left) && (Math.Abs(x - insets.Left) < Tolerance)) ? insets.Left : 0,
+                    ((0 < insets.Top) && (Math.Abs(y - insets.Top) < Tolerance)) ? insets.Top : 0,
+                    ((0 < insets.Right) && (Math.Abs((x + size.Width) - (mainSize.Width - insets.Right)) < Tolerance)) ? insets.Right : 0,
+                    ((0 < insets.Bottom) && (Math.Abs((y + size.Height) - (mainSize.Height - insets.Bottom)) < Tolerance)) ? insets.Bottom : 0);
+            }
         }
 
         protected override Color GetBackgroundColor()
@@ -201,13 +267,15 @@ namespace XForms
         {
             get
             {
+                // A nested page fills what it reaches with its background
+                var reach = this.NestedReach;
                 if (null == this._extendingViews)
                 {
-                    return Thickness.Zero;
+                    return reach;
                 }
 
                 var size = this.Bounds.Size;
-                float left = 0, top = 0, right = 0, bottom = 0;
+                float left = reach.Left, top = reach.Top, right = reach.Right, bottom = reach.Bottom;
                 foreach (var view in this._extendingViews.Keys)
                 {
                     // The view's (extended) frame, in the page's coordinates

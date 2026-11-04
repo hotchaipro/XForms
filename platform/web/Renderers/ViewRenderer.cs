@@ -344,6 +344,7 @@ namespace XForms.Web.Renderers
                 }
 
                 // NOTE: CSS spreads a shadow evenly: the outset's smallest side
+                // (a shape cut short on some sides isn't drawn so)
                 var outset = value.Outset;
                 float spread = Math.Max(0, Math.Min(Math.Min(outset.Left, outset.Top), Math.Min(outset.Right, outset.Bottom)));
                 Js.SetStyle(this.Id, "box-shadow", string.Format(CultureInfo.InvariantCulture, "{0}px {1}px {2}px {3}px {4}", value.Offset.X, value.Offset.Y, value.Blur, spread, Css(value.Color)));

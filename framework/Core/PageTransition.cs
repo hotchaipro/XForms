@@ -45,10 +45,22 @@ namespace XForms
         /// reaching into the safe area beyond it too).
         /// </summary>
         internal static void ShowEdgeShadow(
-            Page page)
+            Page page,
+            bool isHorizontal = true)
         {
+            // Only the moving edges cast it: along the others, the shape stops
+            // short of the page's ends by the blur (so it doesn't spill over
+            // what's beside the frame, such as a tab bar), or goes on past the
+            // screen's edge where the page reaches it
+            var reach = page.DrawnOutset;
+            float blur = EdgeShadow.Blur;
+            float Along(float edgeReach) => (0 < edgeReach) ? edgeReach + blur : -blur;
+            var outset = isHorizontal
+                ? new Thickness(reach.Left, Along(reach.Top), reach.Right, Along(reach.Bottom))
+                : new Thickness(Along(reach.Left), reach.Top, Along(reach.Right), reach.Bottom);
+
             // In dark mode, a glow: a shadow wouldn't show on a dark page
-            var shadow = EdgeShadow with { Outset = page.DrawnOutset };
+            var shadow = EdgeShadow with { Outset = outset };
             if (page.ActualTheme.Mode != ThemeMode.Light)
             {
                 shadow = shadow with { Color = Shadow.GlowColor };
@@ -110,7 +122,7 @@ namespace XForms
 
                 var animator = context.Animator;
                 animator.Opacity = 1;
-                ShowEdgeShadow(context.Page);
+                ShowEdgeShadow(context.Page, isHorizontal: !this._vertical);
                 if (context.IsLeaving)
                 {
                     animator.Translation = Point.Zero;

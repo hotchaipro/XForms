@@ -2867,6 +2867,18 @@ namespace XForms
         }
 
         /// <summary>
+        /// The size the view last laid its content out at (a page's, where the
+        /// platform places the page).
+        /// </summary>
+        internal Size ContentArrangeSize
+        {
+            get
+            {
+                return this._contentArrangeSize;
+            }
+        }
+
+        /// <summary>
         /// Called once the children are arranged within the padding.
         /// </summary>
         internal virtual void OnContentArranged(
