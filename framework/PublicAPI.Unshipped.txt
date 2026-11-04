@@ -154,3 +154,4 @@ static XForms.Shadow.operator ==(XForms.Shadow left, XForms.Shadow right) -> boo
 XForms.Primitives.TextBox.CornerRadius.get -> float
 XForms.Primitives.TextBox.CornerRadius.set -> void
 static XForms.Primitives.TextBox.DefaultFontSize.get -> float
+static XForms.Primitives.TextBox.DefaultLineHeight.get -> float

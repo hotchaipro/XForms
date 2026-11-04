@@ -54,6 +54,13 @@ namespace XForms.Platform
         /// </summary>
         float TextEntryFontSize { get; }
 
+        /// <summary>
+        /// The height of a single-line text box's line, at the current text
+        /// scale (without its padding), or 0 where it's the line drawn text
+        /// measures.
+        /// </summary>
+        float TextEntryLineHeight { get; }
+
         string WindowTitle { set; }
 
         bool CanResizeWindow { get; }

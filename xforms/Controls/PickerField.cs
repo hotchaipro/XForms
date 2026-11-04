@@ -143,7 +143,13 @@ namespace XForms.Controls
         protected override Size MeasureOverride(
             Size availableSize)
         {
-            float lineHeight = TextLayout.Measure("Ag", this.CreateTextFormat()).Height;
+            // A text box's line, so the field is a text box's height
+            float lineHeight = TextBox.DefaultLineHeight;
+            if (lineHeight <= 0)
+            {
+                lineHeight = TextLayout.Measure("Ag", this.CreateTextFormat()).Height;
+            }
+
             float width = TextInset + this.MaximumTextWidth + GlyphWidth;
 
             return new Size(

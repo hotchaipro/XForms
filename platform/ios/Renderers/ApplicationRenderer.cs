@@ -130,6 +130,30 @@ namespace XForms.iOS.Renderers
         // A text box's is the body text style, 17 points before Dynamic Type
         public float TextEntryFontSize => 17;
 
+        // A text field's own height for the body font, at the text size it
+        // was measured for
+        private float _textEntryLineHeight;
+        private nfloat _textEntryLineHeightPointSize;
+
+        public float TextEntryLineHeight
+        {
+            get
+            {
+                var font = UIKit.UIFont.GetPreferredFontForTextStyle(UIKit.UIFontTextStyle.Body);
+                if (font.PointSize != this._textEntryLineHeightPointSize)
+                {
+                    using (var textField = new UIKit.UITextField() { Font = font, BorderStyle = UIKit.UITextBorderStyle.None })
+                    {
+                        this._textEntryLineHeight = (float)Math.Ceiling(textField.SizeThatFits(new CoreGraphics.CGSize(10000, 10000)).Height);
+                    }
+
+                    this._textEntryLineHeightPointSize = font.PointSize;
+                }
+
+                return this._textEntryLineHeight;
+            }
+        }
+
         public string WindowTitle
         {
             set

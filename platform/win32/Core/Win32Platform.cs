@@ -94,6 +94,9 @@ namespace XForms.Win32
         // The text box's own size (its renderer's)
         public float TextEntryFontSize => 15;
 
+        // As drawn text measures it
+        public float TextEntryLineHeight => 0;
+
         public string WindowTitle
         {
             set

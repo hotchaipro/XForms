@@ -62,6 +62,20 @@ namespace XForms.Primitives
         }
 
         /// <summary>
+        /// The height of a single-line text box's line on this platform, at
+        /// the current text scale, without its padding; or 0 where it's the
+        /// line text of <see cref="DefaultFontSize"/> measures. Fields beside
+        /// text boxes size themselves with it, so they're the same height.
+        /// </summary>
+        public static float DefaultLineHeight
+        {
+            get
+            {
+                return Application.Current?.Renderer.TextEntryLineHeight ?? 0;
+            }
+        }
+
+        /// <summary>
         /// The text box's background: by default, the theme's surface color.
         /// </summary>
         public Color BackgroundColor

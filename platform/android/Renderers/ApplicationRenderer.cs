@@ -139,6 +139,9 @@ namespace XForms.Android.Renderers
         // An edit text's own size (the theme's), in scaled pixels
         private float _textEntryFontSize;
 
+        // As drawn text measures it
+        public float TextEntryLineHeight => 0;
+
         public float TextEntryFontSize
         {
             get
