@@ -28,12 +28,11 @@ namespace XForms.iOS
             }
 
             Watched.Add(application, null);
+            // The icon shows the app's count from the start: 0 clears what an
+            // earlier version left on it
             var host = ApplicationHost.For(application);
             host.BadgeCountChanged += (sender, e) => Show(host.BadgeCount);
-            if (0 != host.BadgeCount)
-            {
-                Show(host.BadgeCount);
-            }
+            Show(host.BadgeCount);
         }
 
         private static void Show(
@@ -63,9 +62,14 @@ namespace XForms.iOS
             {
                 UNUserNotificationCenter.Current.SetBadgeCount(count, null);
             }
-            else
+
+            // Clearing needs no permission this way, nor on earlier versions
+            // NOTE: Obsolete from iOS 17, but it still clears the badge
+            if ((0 == count) || !OperatingSystem.IsIOSVersionAtLeast(16))
             {
+#pragma warning disable CA1422
                 UIApplication.SharedApplication.ApplicationIconBadgeNumber = count;
+#pragma warning restore CA1422
             }
         }
     }

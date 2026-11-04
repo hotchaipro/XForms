@@ -1104,12 +1104,10 @@ namespace XForms
 
             set
             {
-                value = Math.Max(0, value);
-                if (value != this._badgeCount)
-                {
-                    this._badgeCount = value;
-                    this.BadgeCountChanged?.Invoke(this, EventArgs.Empty);
-                }
+                // NOTE: The same count is shown again: the icon is outside the
+                // app (an earlier version's count can be on it)
+                this._badgeCount = Math.Max(0, value);
+                this.BadgeCountChanged?.Invoke(this, EventArgs.Empty);
             }
         }
 
