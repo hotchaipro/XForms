@@ -15,6 +15,30 @@ namespace XForms.iOS
     internal class NativeLayoutView : UIView
     {
         private readonly View _owner;
+        private Thickness _hitTestOutset;
+
+        /// <summary>
+        /// How far past its bounds the view takes touches.
+        /// </summary>
+        internal Thickness HitTestOutset
+        {
+            get
+            {
+                return this._hitTestOutset;
+            }
+
+            set
+            {
+                this._hitTestOutset = value;
+            }
+        }
+
+        public override bool PointInside(
+            CGPoint point,
+            UIEvent uievent)
+        {
+            return OutsetHitView.IsInside(this.Bounds, this._hitTestOutset, point);
+        }
         private readonly NativePointerInput _pointerInput = new NativePointerInput();
         private bool _isMeasureValid;
         private Size _measuredAvailableSize;

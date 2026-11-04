@@ -590,7 +590,12 @@ first. Two rules keep scrolling native:
 
 A press finds its view by hit testing, which only looks inside a view's
 frame: a child pushed outside its parent (a negative margin) draws there but
-can't be pressed there.
+can't be pressed there. A view's `HitTestOutset` takes presses past its
+frame too (a bigger touch target than it looks): views drawn above it still
+take presses on themselves, and what's beneath it loses them in the outset.
+Each platform does it natively (UIKit's point-inside test, which the view's
+animation wrappers widen too; an Android layer routing a press in a child's
+outset to it; a CSS pseudo-element; Win32's own hit test).
 
 **Focus from a tap.** A tapped control takes keyboard focus as the press
 is released (after the tap has run), and if a text box had it, typing ends:

@@ -136,6 +136,14 @@ namespace XForms
 
         private Shadow _shadow;
 
+        // The framework hit-tests lightweight views (see View.HitTestOutset)
+        public Thickness HitTestOutset
+        {
+            set
+            {
+            }
+        }
+
         public virtual Size MeasureNative(
             Size availableSize)
         {

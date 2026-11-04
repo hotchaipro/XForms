@@ -12,6 +12,7 @@ namespace XForms.iOS.Renderers
         private AnimationLayer[] _layers;
         private UIView _rootView;
         private Shadow _shadow;
+        private Thickness _hitTestOutset;
 
         public ViewRenderer(
             View view)
@@ -103,6 +104,31 @@ namespace XForms.iOS.Renderers
             if (null != this._shadow)
             {
                 this.UpdateShadow();
+            }
+        }
+
+        // The view (when it's a layout view) and the animation layers that
+        // wrap it take touches as far out
+        public Thickness HitTestOutset
+        {
+            set
+            {
+                this._hitTestOutset = value;
+                if (this._nativeView is NativeLayoutView layoutView)
+                {
+                    layoutView.HitTestOutset = value;
+                }
+
+                if (null != this._layers)
+                {
+                    foreach (var layer in this._layers)
+                    {
+                        if (layer.View is OutsetHitView wrapper)
+                        {
+                            wrapper.HitTestOutset = value;
+                        }
+                    }
+                }
             }
         }
 
@@ -245,7 +271,7 @@ namespace XForms.iOS.Renderers
             UIView inner = nativeView;
             for (int i = count - 2; i >= 0; i -= 1)
             {
-                var wrapper = new UIView();
+                var wrapper = new OutsetHitView() { HitTestOutset = this._hitTestOutset };
                 wrapper.AddSubview(inner);
                 layers[i] = new AnimationLayer(wrapper);
                 inner = wrapper;

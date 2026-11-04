@@ -373,6 +373,21 @@ namespace XForms.Web.Renderers
             }
         }
 
+        // A pseudo-element behind the element's content, reaching past it,
+        // takes presses as the element (the page's style sheet places it)
+        public Thickness HitTestOutset
+        {
+            set
+            {
+                bool hasOutset = Thickness.Zero != value;
+                Js.SetAttribute(this.Id, "data-hit-outset", hasOutset ? string.Empty : null);
+                Js.SetStyle(this.Id, "--xf-hit-left", hasOutset ? Px(value.Left) : null);
+                Js.SetStyle(this.Id, "--xf-hit-top", hasOutset ? Px(value.Top) : null);
+                Js.SetStyle(this.Id, "--xf-hit-right", hasOutset ? Px(value.Right) : null);
+                Js.SetStyle(this.Id, "--xf-hit-bottom", hasOutset ? Px(value.Bottom) : null);
+            }
+        }
+
         public bool IsHitTestVisible
         {
             get

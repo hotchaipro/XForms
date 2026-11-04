@@ -162,3 +162,5 @@ XForms.PageBounce.Offset.set -> void
 XForms.PageBounce.ReleaseAsync() -> System.Threading.Tasks.Task
 XForms.Shadow.Outset.get -> XForms.Thickness
 XForms.Shadow.Outset.init -> void
+XForms.View.HitTestOutset.get -> XForms.Thickness
+XForms.View.HitTestOutset.set -> void

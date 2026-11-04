@@ -60,6 +60,8 @@ namespace XForms.Test
                 Height = 68,
                 Icon = ThemeResources.Default.AboutLogo,
                 AccessibilityLabel = "Add (swipe to switch tabs)",
+                // A bigger touch target than it looks
+                HitTestOutset = new Thickness(24),
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
             };

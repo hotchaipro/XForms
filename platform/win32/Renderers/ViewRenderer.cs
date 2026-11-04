@@ -83,6 +83,7 @@ namespace XForms.Win32.Renderers
         // The shadow, drawn into a visual of its own behind the view's, in its
         // innermost animation layer (a lightweight view's layer draws it)
         private Shadow _shadow;
+        private Thickness _hitTestOutset;
         private IDCompositionVisual2* _shadowVisual;
         private IDCompositionSurface* _shadowSurface;
         private int _shadowSurfaceWidth, _shadowSurfaceHeight;
@@ -530,6 +531,14 @@ namespace XForms.Win32.Renderers
             }
         }
 
+        public Thickness HitTestOutset
+        {
+            set
+            {
+                this._hitTestOutset = value;
+            }
+        }
+
         public Shadow Shadow
         {
             set
@@ -736,7 +745,15 @@ namespace XForms.Win32.Renderers
                 }
             }
 
-            return isInside ? this : null;
+            if (isInside)
+            {
+                return this;
+            }
+
+            // Its outset takes the press too (its children came first)
+            var outset = this._hitTestOutset;
+            bool isInOutset = (x >= -outset.Left) && (y >= -outset.Top) && (x < this._frame.Width + outset.Right) && (y < this._frame.Height + outset.Bottom);
+            return isInOutset ? this : null;
         }
 
         /// <summary>

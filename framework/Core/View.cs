@@ -102,6 +102,11 @@ namespace XForms
                 native.Shadow = this._shadow;
             }
 
+            if (Thickness.Zero != this._hitTestOutset)
+            {
+                native.HitTestOutset = this._hitTestOutset;
+            }
+
             this.CreateAnimationLayers(native);
 
             // A container gets its children and background
@@ -1289,6 +1294,17 @@ namespace XForms
                 {
                     hit = child.HitTestLightweight(new Point(point.X - frame.X, point.Y - frame.Y)) ?? child;
                 }
+                else
+                {
+                    // Its outset takes the press too
+                    var outset = child._hitTestOutset;
+                    if ((Thickness.Zero != outset)
+                        && (point.X >= frame.X - outset.Left) && (point.Y >= frame.Y - outset.Top)
+                        && (point.X < frame.Right + outset.Right) && (point.Y < frame.Bottom + outset.Bottom))
+                    {
+                        hit = child;
+                    }
+                }
             }
 
             return hit;
@@ -2134,6 +2150,7 @@ namespace XForms
         private int _zIndex;
         private bool _clipToBounds;
         private Shadow _shadow;
+        private Thickness _hitTestOutset;
         private Rect _frame;
         private Size _contentMeasureSize = new Size(float.NaN, float.NaN);
         private Size _contentArrangeSize;
@@ -2572,6 +2589,35 @@ namespace XForms
                 {
                     this._shadow = value;
                     this.Native?.Shadow = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        /// <summary>
+        /// How far past its bounds the view takes presses (taps and gestures
+        /// alike), on each side: a bigger touch target than it looks, as
+        /// UIKit's <c>point(inside:)</c> and Android's touch delegates give.
+        /// Zero by default. A view drawn above it still takes presses on
+        /// itself; what's beneath it doesn't, in the outset.
+        /// </summary>
+        /// <remarks>
+        /// The outset reaches only as far as the view's parents take presses:
+        /// a lightweight view's stops at its lightweight ancestors' bounds.
+        /// </remarks>
+        public Thickness HitTestOutset
+        {
+            get
+            {
+                return this._hitTestOutset;
+            }
+
+            set
+            {
+                if (value != this._hitTestOutset)
+                {
+                    this._hitTestOutset = value;
+                    this.Native?.HitTestOutset = value;
                     this.OnPropertyChanged();
                 }
             }

@@ -62,6 +62,13 @@ namespace XForms.Platform
         Shadow Shadow { set; }
 
         /// <summary>
+        /// How far past its bounds the native view takes presses (see
+        /// <see cref="View.HitTestOutset"/>); lightweight views' are the
+        /// framework's.
+        /// </summary>
+        Thickness HitTestOutset { set; }
+
+        /// <summary>
         /// Creates the view's animation layers, one per animator, outermost
         /// first: each wraps the next, and the innermost wraps the view's own
         /// content and children. Called once, when the native view is created,

@@ -146,6 +146,18 @@ namespace XForms.Android.Renderers
             }
         }
 
+        // Its parent layer routes touches in the outset to it
+        public Thickness HitTestOutset
+        {
+            set
+            {
+                if (null != this._nativeView)
+                {
+                    HitTestOutsets.Set(this._nativeView, value, this.DevicePixelsToPixels(1));
+                }
+            }
+        }
+
         // NOTE: Android draws a view's shadow from its elevation and outline,
         // with its own light: the shadow's blur and offset set how high the
         // view floats, and its color the shadow's (from API 28)

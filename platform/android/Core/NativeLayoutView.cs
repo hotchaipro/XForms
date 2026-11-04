@@ -1,6 +1,7 @@
 using System;
 using Android.Views;
 using XForms.Platform;
+using AndroidView = Android.Views.View;
 
 namespace XForms.Android
 {
@@ -13,6 +14,87 @@ namespace XForms.Android
     internal class NativeLayoutView : ViewGroup
     {
         private readonly XForms.View _owner;
+
+        // The child a touch in its hit-test outset went to, until it lifts
+        private AndroidView _outsetTarget;
+
+        /// <summary>
+        /// Touches go to the children as usual, except one that lands in a
+        /// child's hit-test outset (see <see cref="View.HitTestOutset"/>) and
+        /// on no child drawn above it: it goes to that child.
+        /// </summary>
+        public override bool DispatchTouchEvent(
+            MotionEvent e)
+        {
+            if (e.ActionMasked == MotionEventActions.Down)
+            {
+                this._outsetTarget = this.FindOutsetTarget(e.GetX(), e.GetY());
+            }
+
+            var target = this._outsetTarget;
+            if (null == target)
+            {
+                return base.DispatchTouchEvent(e);
+            }
+
+            if ((e.ActionMasked == MotionEventActions.Up) || (e.ActionMasked == MotionEventActions.Cancel))
+            {
+                this._outsetTarget = null;
+            }
+
+            var local = MotionEvent.Obtain(e);
+            try
+            {
+                local.OffsetLocation(this.ScrollX - target.GetX(), this.ScrollY - target.GetY());
+                return target.DispatchTouchEvent(local);
+            }
+            finally
+            {
+                local.Recycle();
+            }
+        }
+
+        // The child on top under the point, counting its outset; null when it's
+        // under the point anyway, or none is
+        private AndroidView FindOutsetTarget(
+            float x,
+            float y)
+        {
+            x += this.ScrollX;
+            y += this.ScrollY;
+
+            // Topmost first: by elevation, then drawing order
+            AndroidView best = null;
+            float bestZ = float.NegativeInfinity;
+            int bestIndex = -1;
+            bool bestIsInside = false;
+            for (int i = 0; i < this.ChildCount; i += 1)
+            {
+                var child = this.GetChildAt(i);
+                if ((child.Visibility != ViewStates.Visible) || !child.Enabled)
+                {
+                    continue;
+                }
+
+                float left = child.GetX(), top = child.GetY();
+                bool isInside = (x >= left) && (y >= top) && (x < left + child.Width) && (y < top + child.Height);
+                if (!isInside && !HitTestOutsets.IsInOutset(child, x, y))
+                {
+                    continue;
+                }
+
+                float z = child.GetZ();
+                if ((null == best) || (z > bestZ) || ((z == bestZ) && (i > bestIndex)))
+                {
+                    best = child;
+                    bestZ = z;
+                    bestIndex = i;
+                    bestIsInside = isInside;
+                }
+            }
+
+            return bestIsInside ? null : best;
+        }
 
         public NativeLayoutView(
             global::Android.Content.Context context,
