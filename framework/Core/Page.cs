@@ -42,6 +42,16 @@ namespace XForms
                 this.IsVisible = false;
             }
 
+            // A native view of its own: a nested page's bands are outside the
+            // page's bounds, where its layer can't draw
+            internal override bool IsLightweightType
+            {
+                get
+                {
+                    return false;
+                }
+            }
+
             public Color Color
             {
                 get
