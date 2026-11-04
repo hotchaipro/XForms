@@ -123,7 +123,7 @@ namespace XForms.Controls
             }
         }
 
-        protected override bool IsPickerOpen
+        public override bool IsPickerOpen
         {
             get
             {
@@ -148,7 +148,7 @@ namespace XForms.Controls
                     PlacementTarget = this,
                     Content = new CalendarFrame(this._calendar),
                 };
-                this._popup.Closed += (sender, e) => this.NotifyAccessibilityStateChanged();
+                this._popup.Closed += (sender, e) => this.OnPickerOpenChanged();
             }
 
             if (this._popup.IsOpen)
@@ -161,6 +161,7 @@ namespace XForms.Controls
 
             bool hasKeyboardFocus = this.IsFocused;
             this._popup.Show();
+            this.OnPickerOpenChanged();
             this.NotifyAccessibilityStateChanged();
 
             // From the keyboard, the arrow keys move through the days

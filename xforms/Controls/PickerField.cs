@@ -67,14 +67,25 @@ namespace XForms.Controls
         }
 
         /// <summary>
-        /// Whether the picker's popup is open.
+        /// Whether the picker's popup is open (a theme shows the field as
+        /// focused meanwhile).
         /// </summary>
-        protected virtual bool IsPickerOpen
+        public virtual bool IsPickerOpen
         {
             get
             {
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Call when the popup opens or closes: the field redraws, and
+        /// assistive technology hears it's expanded or collapsed.
+        /// </summary>
+        private protected void OnPickerOpenChanged()
+        {
+            this.NotifyAccessibilityStateChanged();
+            this.OnStateChanged();
         }
 
         /// <summary>

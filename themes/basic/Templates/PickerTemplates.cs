@@ -8,10 +8,14 @@ namespace XForms.Themes.Basic
     // popups in a thin frame
 
     // A picker's field: the value (or a placeholder) and a glyph at the end,
-    // darkening while pressed
+    // on a rounded surface as a text box is, darkening while pressed, with a
+    // text box's focus border while its popup is open
     internal abstract class PickerFieldTemplate<TControl> : ControlTemplate<TControl>
         where TControl : PickerField
     {
+        private const float CornerRadius = 6;
+        private const float FocusBorderWidth = 2;
+
         // The glyph, centered in its area
         protected abstract void RenderGlyph(DrawingContext drawContext, Rect bounds, Color color);
 
@@ -23,10 +27,16 @@ namespace XForms.Themes.Basic
             var colors = control.ActualTheme.Colors;
 
             drawContext.Clear(Colors.Transparent);
-            drawContext.FillRectangle(bounds, colors.Surface);
+            drawContext.FillRoundedRectangle(bounds, CornerRadius, colors.Surface);
             if (control.IsPressed)
             {
-                drawContext.FillRectangle(bounds, colors.Foreground.MultiplyAlpha(0.08f));
+                drawContext.FillRoundedRectangle(bounds, CornerRadius, colors.Foreground.MultiplyAlpha(0.08f));
+            }
+
+            if (control.IsPickerOpen)
+            {
+                float inset = FocusBorderWidth / 2;
+                drawContext.DrawRoundedRectangle(bounds.Deflate(inset, inset), CornerRadius - inset, colors.Accent, FocusBorderWidth);
             }
 
             var textBounds = new Rect(PickerField.TextInset, 0, Math.Max(0, bounds.Width - PickerField.TextInset - PickerField.GlyphWidth), bounds.Height);

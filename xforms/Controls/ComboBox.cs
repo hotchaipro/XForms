@@ -184,7 +184,7 @@ namespace XForms.Controls
             return;
         }
 
-        protected override bool IsPickerOpen
+        public override bool IsPickerOpen
         {
             get
             {
@@ -212,7 +212,7 @@ namespace XForms.Controls
                     PlacementTarget = this,
                     Content = new ComboBoxDropDown(this, this._itemsView),
                 };
-                this._popup.Closed += (sender, e) => this.NotifyAccessibilityStateChanged();
+                this._popup.Closed += (sender, e) => this.OnPickerOpenChanged();
             }
 
             if (this._popup.IsOpen)
@@ -223,6 +223,7 @@ namespace XForms.Controls
             bool hasKeyboardFocus = this.IsFocused;
             this._itemsView.Reset();
             this._popup.Show();
+            this.OnPickerOpenChanged();
             this.NotifyAccessibilityStateChanged();
             this._itemsView.BringHighlightIntoView(animated: false);
 
