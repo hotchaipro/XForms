@@ -406,10 +406,10 @@ namespace XForms.Themes.Basic
             }
 
             var theme = control.ActualTheme;
-            Color foreground = control.IsSubtleStyle ? theme.Colors.Foreground : Colors.White;
+            Color foreground = control.IsSubtleStyle ? theme.Colors.Foreground : theme.Colors.OnStrongAccent;
             Color background = control.IsSubtleStyle
                 ? ((theme.Mode != ThemeMode.Light) ? Color.FromRgb(0x33, 0x33, 0x33) : theme.Colors.Background)
-                : theme.Colors.Accent;
+                : theme.Colors.StrongAccent;
             Color pressedBackground = control.IsSubtleStyle ? background : Colors.White;
             Color pressedForeground = control.IsSubtleStyle ? foreground : Colors.Gray;
 

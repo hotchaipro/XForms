@@ -35,6 +35,16 @@ namespace XForms
         /// <summary>Text and icons on the accent color.</summary>
         public Color OnAccent { get; init; }
 
+        /// <summary>
+        /// The accent, deep enough for white text and icons on it (at least
+        /// 4.5:1): filled buttons and bars. The same hue as the accent, darker
+        /// if it needs to be (see <see cref="Theme.StrongColor"/>).
+        /// </summary>
+        public Color StrongAccent { get; init; }
+
+        /// <summary>Text and icons on the strong accent color.</summary>
+        public Color OnStrongAccent { get; init; }
+
         /// <summary>A page's background.</summary>
         public Color Background { get; init; }
 
@@ -151,6 +161,8 @@ namespace XForms
                     {
                         Accent = accent,
                         OnAccent = ContrastingColor(accent),
+                        StrongAccent = StrongColor(accentColor),
+                        OnStrongAccent = XForms.Colors.White,
                         Background = XForms.Colors.Black,
                         Foreground = Color.FromRgb(0xcc, 0xcc, 0xcc),
                         SubtleForeground = Color.FromRgb(0x99, 0x99, 0x99),
@@ -170,6 +182,8 @@ namespace XForms
                     {
                         Accent = Color.FromRgb(0xff, 0xff, 0x00),
                         OnAccent = XForms.Colors.Black,
+                        StrongAccent = Color.FromRgb(0xff, 0xff, 0x00),
+                        OnStrongAccent = XForms.Colors.Black,
                         Background = XForms.Colors.Black,
                         Foreground = XForms.Colors.White,
                         SubtleForeground = XForms.Colors.White,
@@ -186,6 +200,8 @@ namespace XForms
                     {
                         Accent = accentColor,
                         OnAccent = ContrastingColor(accentColor),
+                        StrongAccent = StrongColor(accentColor),
+                        OnStrongAccent = XForms.Colors.White,
                         Background = XForms.Colors.White,
                         Foreground = XForms.Colors.Black,
                         SubtleForeground = Color.FromRgb(0x66, 0x66, 0x66),
@@ -205,15 +221,110 @@ namespace XForms
         public static Color ContrastingColor(
             Color color)
         {
-            // Relative luminance (sRGB, roughly linearized)
-            double Channel(byte value)
+            return (Luminance(color) > 0.4) ? XForms.Colors.Black : XForms.Colors.White;
+        }
+
+        /// <summary>
+        /// The color, darkened (keeping its hue and saturation) until white on
+        /// it has a contrast of at least 4.5:1, the WCAG's for text; a color
+        /// that already has it is returned as it is.
+        /// </summary>
+        public static Color StrongColor(
+            Color color)
+        {
+            // White's contrast with a color is 1.05 / (L + 0.05)
+            const double MaxLuminance = (1.05 / 4.5) - 0.05;
+            if (Luminance(color) <= MaxLuminance)
             {
-                double c = value / 255.0;
-                return (c <= 0.03928) ? c / 12.92 : Math.Pow((c + 0.055) / 1.055, 2.4);
+                return color;
             }
 
-            double luminance = (0.2126 * Channel(color.R)) + (0.7152 * Channel(color.G)) + (0.0722 * Channel(color.B));
-            return (luminance > 0.4) ? XForms.Colors.Black : XForms.Colors.White;
+            // Lower the HSL lightness in small steps, so the color stays as
+            // light as it can
+            ToHsl(color, out double hue, out double saturation, out double lightness);
+            var strong = color;
+            while ((Luminance(strong) > MaxLuminance) && (lightness > 0))
+            {
+                lightness = Math.Max(0, lightness - 0.005);
+                strong = FromHsl(color.A, hue, saturation, lightness);
+            }
+
+            return strong;
+        }
+
+        // Relative luminance (sRGB, linearized)
+        private static double Luminance(
+            Color color)
+        {
+            static double Channel(byte value)
+            {
+                double c = value / 255.0;
+                return (c <= 0.04045) ? c / 12.92 : Math.Pow((c + 0.055) / 1.055, 2.4);
+            }
+
+            return (0.2126 * Channel(color.R)) + (0.7152 * Channel(color.G)) + (0.0722 * Channel(color.B));
+        }
+
+        private static void ToHsl(
+            Color color,
+            out double hue,
+            out double saturation,
+            out double lightness)
+        {
+            double r = color.R / 255.0, g = color.G / 255.0, b = color.B / 255.0;
+            double max = Math.Max(r, Math.Max(g, b));
+            double min = Math.Min(r, Math.Min(g, b));
+            double delta = max - min;
+
+            lightness = (max + min) / 2;
+            if (delta == 0)
+            {
+                hue = 0;
+                saturation = 0;
+                return;
+            }
+
+            saturation = (lightness <= 0.5) ? delta / (max + min) : delta / (2 - max - min);
+            if (max == r)
+            {
+                hue = ((g - b) / delta) + ((g < b) ? 6 : 0);
+            }
+            else if (max == g)
+            {
+                hue = ((b - r) / delta) + 2;
+            }
+            else
+            {
+                hue = ((r - g) / delta) + 4;
+            }
+
+            hue /= 6;
+        }
+
+        private static Color FromHsl(
+            byte alpha,
+            double hue,
+            double saturation,
+            double lightness)
+        {
+            double q = (lightness <= 0.5) ? lightness * (1 + saturation) : lightness + saturation - (lightness * saturation);
+            double p = (2 * lightness) - q;
+
+            static double Channel(double p, double q, double t)
+            {
+                t = (t < 0) ? t + 1 : ((t > 1) ? t - 1 : t);
+                if (t < 1.0 / 6) return p + ((q - p) * 6 * t);
+                if (t < 0.5) return q;
+                if (t < 2.0 / 3) return p + ((q - p) * ((2.0 / 3) - t) * 6);
+                return p;
+            }
+
+            static byte Byte(double value) => (byte)Math.Round(Math.Clamp(value, 0, 1) * 255);
+            return Color.FromArgb(
+                alpha,
+                Byte(Channel(p, q, hue + (1.0 / 3))),
+                Byte(Channel(p, q, hue)),
+                Byte(Channel(p, q, hue - (1.0 / 3))));
         }
 
         private static Color Mix(

@@ -3,8 +3,8 @@ using XForms.Controls;
 
 namespace XForms.Themes.Basic
 {
-    // The Basic look of the bars: in the accent color in light mode, and on
-    // the surface color otherwise
+    // The Basic look of the menu bar: in the strong accent color in light mode
+    // (white reads on it), and on the surface color otherwise
     internal sealed class MenuBarTemplate : ControlTemplate<MenuBar>
     {
         protected override Color? Background(
@@ -16,7 +16,7 @@ namespace XForms.Themes.Basic
         internal static Color BarBackground(
             Theme theme)
         {
-            return (theme.Mode != ThemeMode.Light) ? theme.Colors.Surface : theme.Colors.Accent;
+            return (theme.Mode != ThemeMode.Light) ? theme.Colors.Surface : theme.Colors.StrongAccent;
         }
     }
 
