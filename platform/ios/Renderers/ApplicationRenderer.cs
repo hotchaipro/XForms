@@ -217,6 +217,9 @@ namespace XForms.iOS.Renderers
             EventArgs e)
         {
             this._applicationHost.Suspend();
+
+            // Going into the background: the next refresh is scheduled
+            BackgroundRefresh.Schedule(this._applicationHost.Application);
         }
 
         private void Application_Resuming(

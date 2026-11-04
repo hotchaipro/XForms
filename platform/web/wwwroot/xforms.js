@@ -77,6 +77,16 @@ export async function init() {
 
 // Elements
 
+// The app's badge (an installed app's icon), where the browser has the
+// Badging API
+export function setBadge(count) {
+    if (count > 0) {
+        navigator.setAppBadge?.(count)?.catch(() => { });
+    } else {
+        navigator.clearAppBadge?.()?.catch(() => { });
+    }
+}
+
 export function create(kind) {
     const element = document.createElement(kind);
     const id = nextId++;

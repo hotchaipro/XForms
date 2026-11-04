@@ -255,7 +255,13 @@ namespace XForms.Web
 
                 // Saved once the app has suspended (and saved its state)
                 host.Suspending += WebFiles.Save;
-                ApplicationHost.For(application).Start(new WebPlatform(host), WebHost.GetStartStack());
+                var applicationHost = ApplicationHost.For(application);
+                applicationHost.BadgeCountChanged += (sender, e) => Js.SetBadge(applicationHost.BadgeCount);
+                applicationHost.Start(new WebPlatform(host), WebHost.GetStartStack());
+                if (0 != applicationHost.BadgeCount)
+                {
+                    Js.SetBadge(applicationHost.BadgeCount);
+                }
             }
             catch (Exception ex)
             {

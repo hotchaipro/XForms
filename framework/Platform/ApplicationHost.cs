@@ -123,6 +123,53 @@ namespace XForms.Platform
         }
 
         /// <summary>
+        /// The number the app's icon shows (0 for none).
+        /// </summary>
+        public int BadgeCount
+        {
+            get
+            {
+                return this._application.BadgeCount;
+            }
+        }
+
+        /// <summary>
+        /// Raised when <see cref="BadgeCount"/> changes, before the app starts
+        /// too (in a background refresh).
+        /// </summary>
+        public event EventHandler BadgeCountChanged
+        {
+            add
+            {
+                this._application.BadgeCountChanged += value;
+            }
+
+            remove
+            {
+                this._application.BadgeCountChanged -= value;
+            }
+        }
+
+        /// <summary>
+        /// How often the app asks to be woken in the background, or null.
+        /// </summary>
+        public TimeSpan? BackgroundRefreshInterval
+        {
+            get
+            {
+                return this._application.BackgroundRefreshInterval;
+            }
+        }
+
+        /// <summary>
+        /// The system woke the app in the background: it refreshes.
+        /// </summary>
+        public Task RefreshInBackgroundAsync()
+        {
+            return this._application.RefreshInBackgroundAsync();
+        }
+
+        /// <summary>
         /// The app went into the background: it saves its state.
         /// </summary>
         public void Suspend()

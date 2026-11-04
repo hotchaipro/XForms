@@ -855,6 +855,29 @@ other threads.
 | Keyboard focus | Native focus, layer-tracked for lightweight views; view-tree Tab order (a list or tree is one stop) | The same (first responder; the root view controller when nothing else has it) | Tab order, focus ring, activation | `tabindex` and the browser's focus; lightweight focus as elsewhere |
 | Suspend and resume | Activity pause and resume | Scene resigning and becoming active | Minimized, closed or Windows shutting down; restored | The page hidden or shown |
 | Interop | .NET for Android | .NET for iOS | Source-generated (CsWin32, `GeneratedComInterface`): trimmable and Native AOT-compatible | `[JSImport]`, `[JSExport]` |
+| App badge (`Application.BadgeCount`) | Not shown | The icon's badge (asks to allow badges the first time) | Not shown | An installed app's (the Badging API) |
+| Background refresh | None | A background app refresh task | None | None |
+
+**Badge and background refresh.** `Application.BadgeCount` is the number on
+the app's icon; an app keeps it current by setting it as it suspends
+(`OnSuspend`) and when the system wakes it. With
+`Application.BackgroundRefreshInterval` set, iOS may wake the app in the
+background (no sooner than the interval, and when it judges best) to call
+`OnBackgroundRefreshAsync`, in which the app reloads its data and sets the
+badge, in about 30 seconds. The app may not have started then (no scene, no
+page). XForms schedules it as the app suspends and again each time it runs.
+The app's Info.plist declares it, or there's none:
+
+```xml
+<key>UIBackgroundModes</key>
+<array><string>fetch</string></array>
+<key>BGTaskSchedulerPermittedIdentifiers</key>
+<array><string>$(PRODUCT_BUNDLE_IDENTIFIER).refresh</string></array>
+```
+
+(`<bundle identifier>.refresh`, spelled out where the build doesn't expand
+the variable.) An app with its own app delegate calls
+`IosApplication.RegisterBackgroundRefresh()` from `FinishedLaunching`.
 
 ## Current state
 

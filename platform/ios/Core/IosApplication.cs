@@ -90,6 +90,7 @@ namespace XForms.iOS
             ArgumentNullException.ThrowIfNull(application);
 
             _pendingApplication = application;
+            AppBadge.Watch(application);
             UIApplication.Main(args, null, typeof(XFormsAppDelegate));
         }
 
@@ -133,6 +134,7 @@ namespace XForms.iOS
             var host = new IosApplication();
             Current = host;
             host.AttachTo(windowScene);
+            AppBadge.Watch(application);
             ApplicationHost.For(application).Start(new NativePlatform(host), GetStartStack(windowScene, connectionOptions));
             return host;
         }
@@ -302,6 +304,30 @@ namespace XForms.iOS
             }
         }
 
+        /// <summary>
+        /// The app <see cref="Run(string[], XForms.Application)"/> runs, before
+        /// a scene starts it (as in a background refresh).
+        /// </summary>
+        internal static XForms.Application PendingApplication
+        {
+            get
+            {
+                return _pendingApplication;
+            }
+        }
+
+        /// <summary>
+        /// Lets the system wake the app in the background (see
+        /// <see cref="XForms.Application.BackgroundRefreshInterval"/>). XForms'
+        /// own app delegate calls it; an app's own calls it from
+        /// <c>FinishedLaunching</c>, since iOS takes the registration only
+        /// before the app finishes launching.
+        /// </summary>
+        public static void RegisterBackgroundRefresh()
+        {
+            BackgroundRefresh.Register();
+        }
+
         // XForms' own app delegate, for Run(args, app): it supplies the scene
         // configuration, with XForms' scene delegate
         [Register("XFormsAppDelegate")]
@@ -311,6 +337,7 @@ namespace XForms.iOS
                 UIApplication application,
                 NSDictionary launchOptions)
             {
+                RegisterBackgroundRefresh();
                 return true;
             }
 

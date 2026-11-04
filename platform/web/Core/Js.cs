@@ -67,6 +67,9 @@ namespace XForms.Web
         [JSImport("setTitle", Module)]
         public static partial void SetTitle(string title);
 
+        [JSImport("setBadge", Module)]
+        public static partial void SetBadge(int count);
+
         // Text
 
         [JSImport("measureText", Module)]

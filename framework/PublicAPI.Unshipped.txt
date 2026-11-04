@@ -168,3 +168,8 @@ XForms.Primitives.Popup.ScrimColor.get -> XForms.Color?
 XForms.Primitives.Popup.ScrimColor.set -> void
 virtual XForms.Primitives.Popup.GetDefaultScrimColor(XForms.Theme theme) -> XForms.Color
 static readonly XForms.Shadow.GlowColor -> XForms.Color
+XForms.Application.BadgeCount.get -> int
+XForms.Application.BadgeCount.set -> void
+XForms.Application.BackgroundRefreshInterval.get -> System.TimeSpan?
+XForms.Application.BackgroundRefreshInterval.set -> void
+virtual XForms.Application.OnBackgroundRefreshAsync() -> System.Threading.Tasks.Task

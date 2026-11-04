@@ -1085,6 +1085,68 @@ namespace XForms
         {
         }
 
+        private int _badgeCount;
+
+        /// <summary>
+        /// The number on the app's icon, such as the tasks due: 0 (the
+        /// default) for none. On iOS the first count asks the user to allow
+        /// badges; on the web an installed app shows it (the Badging API).
+        /// Android and Windows don't show it. Set it as the app suspends (see
+        /// <see cref="OnSuspend"/>) and in <see cref="OnBackgroundRefreshAsync"/>
+        /// to keep it current.
+        /// </summary>
+        public int BadgeCount
+        {
+            get
+            {
+                return this._badgeCount;
+            }
+
+            set
+            {
+                value = Math.Max(0, value);
+                if (value != this._badgeCount)
+                {
+                    this._badgeCount = value;
+                    this.BadgeCountChanged?.Invoke(this, EventArgs.Empty);
+                }
+            }
+        }
+
+        // The platform shows the count (even before the app starts, in a
+        // background refresh)
+        internal event EventHandler BadgeCountChanged;
+
+        /// <summary>
+        /// How often the system may wake the app in the background to call
+        /// <see cref="OnBackgroundRefreshAsync"/>, at the soonest, or null (the
+        /// default) for never. The system decides when, from how the app is
+        /// used. iOS only (a background app refresh task, which the app's
+        /// Info.plist declares; see the docs).
+        /// </summary>
+        public TimeSpan? BackgroundRefreshInterval
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Called when the system wakes the app in the background (see
+        /// <see cref="BackgroundRefreshInterval"/>): reload the app's data and
+        /// update what shows outside it, such as <see cref="BadgeCount"/>, in
+        /// about 30 seconds. The app may not have started (no page shows), as
+        /// when the system launched it for this.
+        /// </summary>
+        protected virtual Task OnBackgroundRefreshAsync()
+        {
+            return Task.CompletedTask;
+        }
+
+        internal Task RefreshInBackgroundAsync()
+        {
+            return this.OnBackgroundRefreshAsync();
+        }
+
         /// <summary>
         /// Save application state and stop any background activity.
         /// </summary>
