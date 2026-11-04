@@ -89,23 +89,47 @@ namespace XForms.Themes.Basic
         }
     }
 
-    // A popup's frame: the app's background inside a thin border
+    // A popup's frame: the app's background, rounded, floating on a soft
+    // shadow (on a layer of its own, which casts it)
     internal sealed class PopupFrameTemplate : ControlTemplate<PopupFrame>
     {
+        private const float CornerRadius = 14;
+
+        // CSS's 0 8px 28px rgba(0, 0, 0, 0.3)
+        private static readonly Shadow FrameShadow = new Shadow()
+        {
+            Color = Color.FromArgb(0x4d, 0, 0, 0),
+            Offset = new Point(0, 8),
+            Blur = 28,
+            CornerRadius = CornerRadius,
+        };
+
+        protected override void Apply(
+            PopupFrame control,
+            TemplateContext context)
+        {
+            context.CreateOwnAnimator();
+            control.Shadow = FrameShadow;
+        }
+
+        protected override void Unapply(
+            PopupFrame control,
+            TemplateContext context)
+        {
+            if (control.Shadow == FrameShadow)
+            {
+                control.Shadow = null;
+            }
+        }
+
         protected override void Render(
             PopupFrame control,
             DrawingContext drawContext)
         {
             var bounds = new Rect(0, 0, control.Bounds.Width, control.Bounds.Height);
-            var colors = control.ActualTheme.Colors;
-            const float Thickness = PopupFrame.BorderThickness;
 
             drawContext.Clear(Colors.Transparent);
-            drawContext.FillRectangle(bounds, colors.Background);
-            drawContext.DrawRectangle(
-                bounds.Deflate(Thickness / 2, Thickness / 2),
-                colors.SubtleForeground.MultiplyAlpha(0.4f),
-                Thickness);
+            drawContext.FillRoundedRectangle(bounds, CornerRadius, control.ActualTheme.Colors.Background);
         }
     }
 

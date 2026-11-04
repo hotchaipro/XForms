@@ -21,6 +21,16 @@ namespace XForms.iOS.Renderers
         private readonly UIControl _dismissLayer;
         private View _content;
         private bool _isOpen;
+        private Color _scrimColor = Colors.Transparent;
+
+        public Color ScrimColor
+        {
+            set
+            {
+                this._scrimColor = value;
+                this._dismissLayer.BackgroundColor = value.ToUIColor();
+            }
+        }
 
         public PopupRenderer(
             Popup popup)
@@ -103,9 +113,13 @@ namespace XForms.iOS.Renderers
             this._isOpen = true;
             this._previousFocus = FrameRenderer.FocusedView(window);
 
-            if (this.IsLightDismissEnabled)
+            // The layer beneath takes presses outside (light dismiss), and
+            // shows the scrim
+            if (this.IsLightDismissEnabled || !this._scrimColor.IsTransparent)
             {
                 this._dismissLayer.Frame = window.Bounds;
+                this._dismissLayer.BackgroundColor = this._scrimColor.ToUIColor();
+                this._dismissLayer.UserInteractionEnabled = this.IsLightDismissEnabled;
                 window.AddSubview(this._dismissLayer);
             }
 

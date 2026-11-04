@@ -275,7 +275,7 @@ namespace XForms.Controls
             {
                 get
                 {
-                    return BorderThickness + VerticalPadding;
+                    return ContentInset + VerticalPadding;
                 }
             }
 
@@ -284,7 +284,7 @@ namespace XForms.Controls
             {
                 float width = Math.Max(
                     this._picker.Bounds.Width,
-                    this._picker.MaximumTextWidth + (2 * PickerField.TextInset) + (2 * BorderThickness));
+                    this._picker.MaximumTextWidth + (2 * PickerField.TextInset) + (2 * ContentInset));
                 width = Math.Min(width, availableSize.Width);
 
                 // As tall as the items, up to the space available
@@ -293,7 +293,7 @@ namespace XForms.Controls
                     availableSize.Height);
 
                 this._scrollView.Measure(new Size(
-                    Math.Max(0, width - (2 * BorderThickness)),
+                    Math.Max(0, width - (2 * ContentInset)),
                     Math.Max(0, height - (2 * Inset))));
 
                 return new Size(width, height);
@@ -303,9 +303,9 @@ namespace XForms.Controls
                 Size finalSize)
             {
                 this._scrollView.Arrange(new Rect(
-                    BorderThickness,
+                    ContentInset,
                     Inset,
-                    Math.Max(0, finalSize.Width - (2 * BorderThickness)),
+                    Math.Max(0, finalSize.Width - (2 * ContentInset)),
                     Math.Max(0, finalSize.Height - (2 * Inset))));
             }
         }

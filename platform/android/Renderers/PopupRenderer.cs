@@ -82,7 +82,41 @@ namespace XForms.Android.Renderers
             }
         }
 
+        private Color _scrimColor = Colors.Transparent;
+
+        // Android dims behind a window in black: the scrim's opacity sets how much
+        public Color ScrimColor
+        {
+            set
+            {
+                this._scrimColor = value;
+            }
+        }
+
         public void Show()
+        {
+            this.ShowNative();
+            this.ApplyScrim();
+        }
+
+        private void ApplyScrim()
+        {
+            if (this._scrimColor.IsTransparent || !this._nativePopup.IsShowing)
+            {
+                return;
+            }
+
+            var root = this._nativePopup.ContentView?.RootView;
+            if (root?.LayoutParameters is WindowManagerLayoutParams parameters)
+            {
+                parameters.Flags |= WindowManagerFlags.DimBehind;
+                parameters.DimAmount = this._scrimColor.A / 255.0f;
+                var windowManager = global::Android.Runtime.Extensions.JavaCast<IWindowManager>(this.NativeContext.GetSystemService(global::Android.Content.Context.WindowService));
+                windowManager?.UpdateViewLayout(root, parameters);
+            }
+        }
+
+        private void ShowNative()
         {
             var target = this.PlacementTarget;
             int gap = (int)NativeConversions.DevicePixelsToPixels(this.NativeContext, AnchorGap);

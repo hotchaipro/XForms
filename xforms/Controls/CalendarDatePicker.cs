@@ -189,7 +189,7 @@ namespace XForms.Controls
             public CalendarFrame(
                 CalendarView calendar)
             {
-                calendar.Margin = new Thickness(BorderThickness);
+                calendar.Margin = new Thickness(ContentInset);
                 this.Content = calendar;
             }
         }

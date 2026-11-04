@@ -3,15 +3,17 @@
 namespace XForms.Controls
 {
     /// <summary>
-    /// The frame around a picker's popup (its list or calendar): its theme's
-    /// template draws it, with a border <see cref="BorderThickness"/> wide.
+    /// The frame around a popup's content (a picker's list or calendar, a
+    /// flyout's): its theme's template draws it, and its content stays
+    /// <see cref="ContentInset"/> inside its edges.
     /// </summary>
     public abstract class PopupFrame : TemplatedControl
     {
         /// <summary>
-        /// The width of the frame's border, which its content stays inside.
+        /// How far inside the frame's edges its content stays, clear of its
+        /// rounded corners.
         /// </summary>
-        public const float BorderThickness = 1.0f;
+        public const float ContentInset = 6.0f;
 
         protected PopupFrame()
         {

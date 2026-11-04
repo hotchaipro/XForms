@@ -345,7 +345,7 @@ namespace XForms.Controls
                 this._popup.Closed += (sender, e) => this.NotifyAccessibilityStateChanged();
             }
 
-            this._list.Width = this.Bounds.Width - (2 * PopupFrame.BorderThickness);
+            this._list.Width = this.Bounds.Width - (2 * PopupFrame.ContentInset);
             this._list.InvalidateMeasure();
             this._list.InvalidateVisual();
             if (!this._popup.IsOpen)
@@ -462,7 +462,7 @@ namespace XForms.Controls
             public SuggestionFrame(
                 AutoSuggestBoxListView list)
             {
-                list.Margin = new Thickness(BorderThickness);
+                list.Margin = new Thickness(ContentInset);
                 this.Content = list;
             }
         }

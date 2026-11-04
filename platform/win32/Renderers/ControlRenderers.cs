@@ -191,6 +191,12 @@ namespace XForms.Win32.Renderers
             set;
         } = true;
 
+        public Color ScrimColor
+        {
+            get;
+            set;
+        } = Colors.Transparent;
+
         void IOverlay.Place(
             Size windowSize)
         {

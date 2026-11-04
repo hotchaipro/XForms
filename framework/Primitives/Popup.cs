@@ -81,6 +81,27 @@ namespace XForms.Primitives
             }
         }
 
+        private Color _scrimColor = Colors.Transparent;
+
+        /// <summary>
+        /// A color laid over the rest of the window while the popup is open,
+        /// such as a dim black, which a press on dismisses it as before;
+        /// transparent (the default) for none.
+        /// </summary>
+        public Color ScrimColor
+        {
+            get
+            {
+                return this._scrimColor;
+            }
+
+            set
+            {
+                this._scrimColor = value;
+                this.Native?.ScrimColor = value;
+            }
+        }
+
         public View PlacementTarget
         {
             get
@@ -175,6 +196,7 @@ namespace XForms.Primitives
             var native = this.Native;
             native.PlacementTarget = this._placementTarget;
             native.IsLightDismissEnabled = this._isLightDismissEnabled;
+            native.ScrimColor = this._scrimColor;
 
             var content = this._content;
             if (null != content)

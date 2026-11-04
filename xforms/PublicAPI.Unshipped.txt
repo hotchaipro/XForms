@@ -558,3 +558,5 @@ XForms.Input.SwipingEventArgs.Velocity.get -> float
 XForms.Controls.MenuItem.IsSubtleStyle.get -> bool
 XForms.Controls.MenuItem.IsSubtleStyle.set -> void
 const XForms.Controls.PickerField.TextInset = 12 -> float
+const XForms.Controls.PopupFrame.ContentInset = 6 -> float
+static readonly XForms.Controls.Flyout.DefaultScrimColor -> XForms.Color

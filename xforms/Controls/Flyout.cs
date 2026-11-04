@@ -13,9 +13,16 @@ namespace XForms.Controls
     {
         private readonly FlyoutFrame _frame = new FlyoutFrame();
 
+        /// <summary>
+        /// The scrim a flyout lays over the rest of the window by default: a
+        /// light dim.
+        /// </summary>
+        public static readonly Color DefaultScrimColor = Color.FromArgb(0x40, 0, 0, 0);
+
         public Flyout()
         {
             base.Content = this._frame;
+            this.ScrimColor = DefaultScrimColor;
         }
 
         /// <summary>
@@ -58,7 +65,7 @@ namespace XForms.Controls
                 {
                     if (null != value)
                     {
-                        value.Margin = new Thickness(BorderThickness);
+                        value.Margin = new Thickness(ContentInset);
                     }
 
                     this.Content = value;

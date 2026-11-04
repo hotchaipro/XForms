@@ -356,6 +356,12 @@ namespace XForms.Platform
         /// </summary>
         bool IsLightDismissEnabled { get; set; }
 
+        /// <summary>
+        /// The color over the rest of the window while the popup is open, or
+        /// transparent for none.
+        /// </summary>
+        Color ScrimColor { set; }
+
         void Show();
 
         void Close();

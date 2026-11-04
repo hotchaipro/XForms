@@ -1085,6 +1085,17 @@ namespace XForms.Web.Renderers
             set;
         }
 
+        private Color _scrimColor = Colors.Transparent;
+
+        // The backdrop beneath the popup shows it
+        public Color ScrimColor
+        {
+            set
+            {
+                this._scrimColor = value;
+            }
+        }
+
         public bool IsLightDismissEnabled
         {
             get;
@@ -1105,6 +1116,7 @@ namespace XForms.Web.Renderers
             // Without light dismiss, presses outside the content go through
             // the backdrop to the page
             Js.SetStyle(this._backdropId, "pointer-events", this.IsLightDismissEnabled ? null : "none");
+            Js.SetStyle(this._backdropId, "background", this._scrimColor.IsTransparent ? null : string.Format(System.Globalization.CultureInfo.InvariantCulture, "rgba({0},{1},{2},{3:0.###})", this._scrimColor.R, this._scrimColor.G, this._scrimColor.B, this._scrimColor.A / 255.0));
             if ((this._content?.Renderer is ViewRenderer content) && !this.IsLightDismissEnabled)
             {
                 Js.SetStyle(content.Id, "pointer-events", "auto");

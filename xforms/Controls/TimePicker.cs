@@ -275,7 +275,7 @@ namespace XForms.Controls
             public TimeFrame(
                 TimePickerView view)
             {
-                view.Margin = new Thickness(BorderThickness);
+                view.Margin = new Thickness(ContentInset);
                 this.Content = view;
             }
         }

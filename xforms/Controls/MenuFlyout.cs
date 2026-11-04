@@ -62,7 +62,7 @@ namespace XForms.Controls
             public MenuFrame(
                 MenuFlyoutView view)
             {
-                view.Margin = new Thickness(BorderThickness);
+                view.Margin = new Thickness(ContentInset);
                 this.Content = view;
             }
         }
