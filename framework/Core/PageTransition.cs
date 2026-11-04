@@ -32,7 +32,7 @@ namespace XForms
 
         /// <summary>
         /// The soft shadow along a sliding page's edges, so the edge shows
-        /// even over a page of the same color (in dark mode, a hairline).
+        /// even over a page of the same color.
         /// </summary>
         private static readonly Shadow EdgeShadow = new Shadow()
         {
@@ -47,24 +47,7 @@ namespace XForms
         internal static void ShowEdgeShadow(
             Page page)
         {
-            var outset = page.DrawnOutset;
-            var theme = page.ActualTheme;
-            Shadow shadow;
-            if (theme.Mode == ThemeMode.Light)
-            {
-                shadow = EdgeShadow with { Outset = outset };
-            }
-            else
-            {
-                // A shadow can't show on a dark page: a hairline in the
-                // outline color, 1 past the page's edges, shows them instead
-                shadow = new Shadow()
-                {
-                    Color = theme.Colors.Outline,
-                    Outset = new Thickness(outset.Left + 1, outset.Top + 1, outset.Right + 1, outset.Bottom + 1),
-                };
-            }
-
+            var shadow = EdgeShadow with { Outset = page.DrawnOutset };
             page.Shadow = shadow;
             EdgeShadows.AddOrUpdate(page, shadow);
         }

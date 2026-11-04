@@ -145,9 +145,8 @@ namespace XForms
         }
 
         /// <summary>
-        /// XForms' colors for a mode, around an accent color. In dark mode the
-        /// accent is lightened as far as it needs to be to read on the black
-        /// background (see <see cref="BrightColor"/>).
+        /// XForms' colors for a mode, around an accent color, which both modes
+        /// use as it is.
         /// </summary>
         public static ColorScheme CreateColors(
             ThemeMode mode,
@@ -157,11 +156,10 @@ namespace XForms
             {
                 case ThemeMode.Dark:
                 {
-                    var accent = BrightColor(accentColor);
                     return new ColorScheme()
                     {
-                        Accent = accent,
-                        OnAccent = ContrastingColor(accent),
+                        Accent = accentColor,
+                        OnAccent = ContrastingColor(accentColor),
                         StrongAccent = StrongColor(accentColor),
                         OnStrongAccent = XForms.Colors.White,
                         Background = XForms.Colors.Black,
@@ -251,35 +249,6 @@ namespace XForms
             }
 
             return strong;
-        }
-
-        /// <summary>
-        /// The color, lightened (keeping its hue and saturation) until it has
-        /// a contrast of at least 4.5:1 on black, the WCAG's for text; a color
-        /// that already has it is returned as it is. The mirror of
-        /// <see cref="StrongColor"/>, for dark backgrounds.
-        /// </summary>
-        public static Color BrightColor(
-            Color color)
-        {
-            // A color's contrast with black is (L + 0.05) / 0.05
-            const double MinLuminance = (4.5 * 0.05) - 0.05;
-            if (Luminance(color) >= MinLuminance)
-            {
-                return color;
-            }
-
-            // Raise the HSL lightness in small steps, so the color stays as
-            // deep as it can
-            ToHsl(color, out double hue, out double saturation, out double lightness);
-            var bright = color;
-            while ((Luminance(bright) < MinLuminance) && (lightness < 1))
-            {
-                lightness = Math.Min(1, lightness + 0.005);
-                bright = FromHsl(color.A, hue, saturation, lightness);
-            }
-
-            return bright;
         }
 
         // Relative luminance (sRGB, linearized)

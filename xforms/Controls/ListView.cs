@@ -105,6 +105,30 @@ namespace XForms.Controls
     /// </summary>
     public class ListView : ItemsView
     {
+        private Color? _selectionBackground;
+
+        /// <summary>
+        /// The tint over a selected row, or null (the default) for the theme's.
+        /// </summary>
+        public Color? SelectionBackground
+        {
+            get
+            {
+                return this._selectionBackground;
+            }
+
+            set
+            {
+                this._selectionBackground = value;
+                foreach (var container in this.RealizedContainers)
+                {
+                    container.InvalidateVisual();
+                }
+
+                this.OnPropertyChanged();
+            }
+        }
+
         private readonly List<object> _selectedItems = new List<object>();
         private SelectionMode _selectionMode = SelectionMode.Single;
 

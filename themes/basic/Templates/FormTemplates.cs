@@ -14,7 +14,7 @@ namespace XForms.Themes.Basic
             TemplatedControl control)
         {
             var colors = control.ActualTheme.Colors;
-            return control.IsEnabled ? AccentColors.Fill(control.ActualTheme) : colors.Disabled;
+            return control.IsEnabled ? control.ActualTheme.Colors.Accent : colors.Disabled;
         }
 
         // The color of an outline or an empty track
@@ -59,7 +59,7 @@ namespace XForms.Themes.Basic
                 var fill = FormColors.Active(control);
                 drawContext.FillRoundedRectangle(box, Radius, control.IsPressed ? fill.MultiplyAlpha(0.8f) : fill);
 
-                var mark = control.IsEnabled ? AccentColors.OnFill(control.ActualTheme) : colors.Background;
+                var mark = control.IsEnabled ? control.ActualTheme.Colors.OnAccent : colors.Background;
                 var center = box.Center;
                 if (control.IsChecked == true)
                 {
@@ -115,7 +115,7 @@ namespace XForms.Themes.Basic
             if (control.IsOn)
             {
                 drawContext.FillRoundedRectangle(track, radius, FormColors.Active(control));
-                drawContext.FillEllipse(knobCenter, knobRadius, knobRadius, control.IsEnabled ? AccentColors.OnFill(control.ActualTheme) : colors.Background);
+                drawContext.FillEllipse(knobCenter, knobRadius, knobRadius, control.IsEnabled ? control.ActualTheme.Colors.OnAccent : colors.Background);
             }
             else
             {
@@ -351,7 +351,7 @@ namespace XForms.Themes.Basic
             drawContext.Clear(Colors.Transparent);
 
             var band = new Rect(4, Middle * TimePickerView.RowHeight, Math.Max(0, control.Bounds.Width - 8), TimePickerView.RowHeight);
-            drawContext.FillRoundedRectangle(band, 4, AccentColors.Fill(control.ActualTheme));
+            drawContext.FillRoundedRectangle(band, 4, control.ActualTheme.Colors.Accent);
 
             for (int column = 0; column < control.ColumnCount; column += 1)
             {
@@ -364,14 +364,14 @@ namespace XForms.Themes.Basic
                         drawContext.FillRectangle(bounds.Deflate(4, 2), FormPressed(colors));
                     }
 
-                    var color = (row == Middle) ? AccentColors.OnFill(control.ActualTheme) : colors.SubtleForeground;
+                    var color = (row == Middle) ? control.ActualTheme.Colors.OnAccent : colors.SubtleForeground;
                     drawContext.DrawText(control.GetText(column, row - Middle), bounds, color, RowFormat);
                 }
 
                 if (control.IsFocused && (column == control.FocusedColumn))
                 {
                     var bounds = control.GetRowBounds(column, Middle);
-                    drawContext.DrawRoundedRectangle(bounds.Deflate(6, 4), 4, AccentColors.OnFill(control.ActualTheme), 2);
+                    drawContext.DrawRoundedRectangle(bounds.Deflate(6, 4), 4, control.ActualTheme.Colors.OnAccent, 2);
                 }
             }
 
@@ -520,7 +520,7 @@ namespace XForms.Themes.Basic
                 }
                 else if (i == control.HighlightedIndex)
                 {
-                    drawContext.FillRectangle(highlight, PopupColors.Highlight(control.ActualTheme));
+                    drawContext.FillRectangle(highlight, control.ActualTheme.Colors.Surface);
                     drawContext.FillRectangle(new Rect(isRightToLeft ? highlight.Right - 3 : 4, row.Y + ((RowHeight - 16) / 2), 3, 16), colors.Accent);
                 }
 

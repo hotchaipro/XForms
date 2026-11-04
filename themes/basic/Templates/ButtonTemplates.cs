@@ -33,8 +33,8 @@ namespace XForms.Themes.Basic
             var colors = theme.Colors;
             var defaults = new ButtonStyle()
             {
-                Background = control.IsAlertStyle ? colors.Error : AccentColors.Fill(theme),
-                Foreground = control.IsAlertStyle ? colors.OnError : AccentColors.OnFill(theme),
+                Background = control.IsAlertStyle ? colors.Error : theme.Colors.Accent,
+                Foreground = control.IsAlertStyle ? colors.OnError : theme.Colors.OnAccent,
                 CornerRadius = theme.Shapes.SmallCornerRadius,
                 TextStyle = theme.Typography.Label,
             };
@@ -140,10 +140,10 @@ namespace XForms.Themes.Basic
             }
             else if (this.IsChecked(control))
             {
-                drawContext.FillEllipse(buttonBounds, AccentColors.Fill(control.ActualTheme));
+                drawContext.FillEllipse(buttonBounds, control.ActualTheme.Colors.Accent);
                 if (null != icon)
                 {
-                    drawContext.DrawImage(icon, imageBounds, AccentColors.OnFill(control.ActualTheme));
+                    drawContext.DrawImage(icon, imageBounds, control.ActualTheme.Colors.OnAccent);
                 }
             }
             else
@@ -217,8 +217,8 @@ namespace XForms.Themes.Basic
             Color foreground;
             if (control.IsChecked)
             {
-                drawContext.FillRoundedRectangle(bounds, radius, colors.StrongAccent);
-                foreground = colors.OnStrongAccent;
+                drawContext.FillRoundedRectangle(bounds, radius, colors.Accent);
+                foreground = colors.OnAccent;
             }
             else
             {
@@ -302,8 +302,8 @@ namespace XForms.Themes.Basic
             }
             else if (control.IsChecked)
             {
-                drawContext.FillEllipse(buttonBounds, AccentColors.Fill(control.ActualTheme));
-                drawContext.DrawText(control.Text, bounds, AccentColors.OnFill(control.ActualTheme), LetterFormat);
+                drawContext.FillEllipse(buttonBounds, control.ActualTheme.Colors.Accent);
+                drawContext.DrawText(control.Text, bounds, control.ActualTheme.Colors.OnAccent, LetterFormat);
             }
             else
             {
@@ -507,10 +507,10 @@ namespace XForms.Themes.Basic
             }
 
             var theme = control.ActualTheme;
-            Color foreground = control.IsSubtleStyle ? theme.Colors.Foreground : theme.Colors.OnStrongAccent;
+            Color foreground = control.IsSubtleStyle ? theme.Colors.Foreground : theme.Colors.OnAccent;
             Color background = control.IsSubtleStyle
                 ? ((theme.Mode != ThemeMode.Light) ? Color.FromRgb(0x33, 0x33, 0x33) : theme.Colors.Background)
-                : theme.Colors.StrongAccent;
+                : theme.Colors.Accent;
             Color pressedBackground = control.IsSubtleStyle ? background : Colors.White;
             Color pressedForeground = control.IsSubtleStyle ? foreground : Colors.Gray;
 
@@ -564,7 +564,7 @@ namespace XForms.Themes.Basic
             DrawingContext drawContext)
         {
             var bounds = new Rect(0, 0, control.Bounds.Width, control.Bounds.Height);
-            var accent = AccentColors.Text(control.ActualTheme);
+            var accent = control.ActualTheme.Colors.Accent;
 
             float imageDimension = Math.Min(bounds.Width, bounds.Height) * 0.65f;
             float textHeight = bounds.Height * 0.35f;

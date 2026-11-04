@@ -128,15 +128,8 @@ namespace XForms.Themes.Basic
         {
             var bounds = new Rect(0, 0, control.Bounds.Width, control.Bounds.Height);
 
-            var theme = control.ActualTheme;
             drawContext.Clear(Colors.Transparent);
-            drawContext.FillRoundedRectangle(bounds, CornerRadius, PopupColors.Card(theme));
-
-            var edge = PopupColors.Edge(theme);
-            if (!edge.IsTransparent)
-            {
-                drawContext.DrawRoundedRectangle(bounds.Deflate(0.5f, 0.5f), CornerRadius - 0.5f, edge, 1);
-            }
+            drawContext.FillRoundedRectangle(bounds, CornerRadius, control.ActualTheme.Colors.Background);
         }
     }
 
@@ -170,7 +163,7 @@ namespace XForms.Themes.Basic
                 }
                 else if ((i == selectedIndex) || ((i == control.HighlightedIndex) && control.IsFocused))
                 {
-                    drawContext.FillRectangle(highlight, PopupColors.Highlight(control.ActualTheme));
+                    drawContext.FillRectangle(highlight, control.ActualTheme.Colors.Surface);
                 }
 
                 if (i == selectedIndex)
@@ -268,8 +261,8 @@ namespace XForms.Themes.Basic
 
                     if (isSelected)
                     {
-                        drawContext.FillEllipse(center, Radius, Radius, AccentColors.Fill(control.ActualTheme));
-                        textColor = AccentColors.OnFill(control.ActualTheme);
+                        drawContext.FillEllipse(center, Radius, Radius, control.ActualTheme.Colors.Accent);
+                        textColor = control.ActualTheme.Colors.OnAccent;
                     }
                     else if ((control.PressedPart == CalendarViewPart.Day) && (control.PressedDate == date) && isEnabled)
                     {
@@ -278,7 +271,7 @@ namespace XForms.Themes.Basic
 
                     if (date == today)
                     {
-                        drawContext.DrawEllipse(center, Radius, Radius, isSelected ? AccentColors.OnFill(control.ActualTheme) : AccentColors.Text(control.ActualTheme), 1.5f);
+                        drawContext.DrawEllipse(center, Radius, Radius, isSelected ? control.ActualTheme.Colors.OnAccent : control.ActualTheme.Colors.Accent, 1.5f);
                     }
 
                     if (control.IsFocused && (date == control.FocusedDate))

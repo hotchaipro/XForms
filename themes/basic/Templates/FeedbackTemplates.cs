@@ -57,7 +57,7 @@ namespace XForms.Themes.Basic
                 }
                 else if (i == control.HighlightedIndex)
                 {
-                    drawContext.FillRoundedRectangle(highlight, 4, PopupColors.Highlight(control.ActualTheme));
+                    drawContext.FillRoundedRectangle(highlight, 4, control.ActualTheme.Colors.Surface);
                     if (control.IsFocused)
                     {
                         drawContext.FillRectangle(new Rect(isRightToLeft ? highlight.Right - 3 : 4, row.Y + ((RowHeight - 16) / 2), 3, 16), colors.Accent);
@@ -91,7 +91,7 @@ namespace XForms.Themes.Basic
                 case InfoBarSeverity.Success: return Color.FromRgb(0x2E, 0x9E, 0x44);
                 case InfoBarSeverity.Warning: return Color.FromRgb(0xE8, 0x9E, 0x00);
                 case InfoBarSeverity.Error: return colors.Error;
-                default: return AccentColors.Text(control.ActualTheme);
+                default: return control.ActualTheme.Colors.Accent;
             }
         }
 

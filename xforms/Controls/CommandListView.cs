@@ -76,6 +76,31 @@ namespace XForms.Controls
             get;
         }
 
+        private Color? _commandBarBackground;
+
+        /// <summary>
+        /// The background behind an item's command bar, or null (the default)
+        /// for none: the selected row's tint shows through.
+        /// </summary>
+        public Color? CommandBarBackground
+        {
+            get
+            {
+                return this._commandBarBackground;
+            }
+
+            set
+            {
+                this._commandBarBackground = value;
+                foreach (var container in this.RealizedContainers)
+                {
+                    (container as CommandListViewItemContainer)?.ApplyCommandBarBackground();
+                }
+
+                this.OnPropertyChanged();
+            }
+        }
+
         public override ListViewItem CreateItemContainer()
         {
             return new CommandListViewItemContainer();
@@ -219,6 +244,11 @@ namespace XForms.Controls
             }
         }
 
+        internal void ApplyCommandBarBackground()
+        {
+            this._commandBar.Background = this.CommandListView?.CommandBarBackground ?? Colors.Transparent;
+        }
+
         protected override void AddContent(
             View content)
         {
@@ -242,6 +272,7 @@ namespace XForms.Controls
                 this._commandBarCommands = commands;
             }
             this._commandBar.CommandParameter = this.Item;
+            this.ApplyCommandBarBackground();
 
             // Reset swipe defaults
             this._swipeItem.Animator.Stop();

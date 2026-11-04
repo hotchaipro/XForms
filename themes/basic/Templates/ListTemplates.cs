@@ -16,7 +16,7 @@ namespace XForms.Themes.Basic
             drawingContext.FillRectangle(bounds, colors.Background);
             if (control.IsSelected)
             {
-                drawingContext.FillRectangle(bounds, colors.Accent.MultiplyAlpha(0.18f));
+                drawingContext.FillRectangle(bounds, control.ListView?.SelectionBackground ?? colors.Accent.MultiplyAlpha(0.18f));
             }
         }
     }

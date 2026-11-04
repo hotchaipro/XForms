@@ -560,3 +560,8 @@ XForms.Controls.MenuItem.IsSubtleStyle.set -> void
 const XForms.Controls.PickerField.TextInset = 12 -> float
 const XForms.Controls.PopupFrame.ContentInset = 6 -> float
 override XForms.Controls.Flyout.GetDefaultScrimColor(XForms.Theme theme) -> XForms.Color
+XForms.Controls.ListView.SelectionBackground.get -> XForms.Color?
+XForms.Controls.ListView.SelectionBackground.set -> void
+XForms.Controls.CommandListView.CommandBarBackground.get -> XForms.Color?
+XForms.Controls.CommandListView.CommandBarBackground.set -> void
+override XForms.Controls.CommandBar.BackgroundColor.get -> XForms.Color

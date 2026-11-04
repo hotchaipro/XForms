@@ -57,6 +57,34 @@ namespace XForms.Controls
             this.Content = this._buttonsLayout;
         }
 
+        private Color _background = Colors.Transparent;
+
+        // Behind the buttons (a command list's CommandBarBackground)
+        internal Color Background
+        {
+            get
+            {
+                return this._background;
+            }
+
+            set
+            {
+                if (value != this._background)
+                {
+                    this._background = value;
+                    this.InvalidateBackground();
+                }
+            }
+        }
+
+        public override Color BackgroundColor
+        {
+            get
+            {
+                return this._background;
+            }
+        }
+
         internal DockPanel ButtonsLayout
         {
             get
