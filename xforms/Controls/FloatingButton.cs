@@ -127,8 +127,24 @@ namespace XForms.Controls
                 return;
             }
 
+            bool showsPressed = this.ShowsPressedLook;
             this.OnTapBegan();
-            this.IsPressed = true;
+            if (showsPressed)
+            {
+                this.IsPressed = true;
+            }
+        }
+
+        /// <summary>
+        /// Whether a press shows the pressed look (a flyout's button closing
+        /// its flyout doesn't: it goes straight back to its closed look).
+        /// </summary>
+        internal virtual bool ShowsPressedLook
+        {
+            get
+            {
+                return true;
+            }
         }
 
         void ITapGestureDelegate.OnTapEnded()

@@ -215,9 +215,11 @@ namespace XForms.Controls
 
             this._isExpanded = false;
 
-            // Unrotate and scale the button back to the collapsed state
-            var nowait = this._innerButton.FlyoutAnimator.RotateTo(Angle.FromDegrees(0), this.ActualTheme.Motion.Medium, new CubicEase(EasingMode.EaseOut));
-            nowait = this._innerButton.FlyoutAnimator.ScaleTo(1.0f, this.ActualTheme.Motion.Medium, new CubicEase(EasingMode.EaseOut));
+            // The button is back in its collapsed state at once (no pressed
+            // look, no growing back), as the buttons retract
+            this._innerButton.FlyoutAnimator.Rotation = Angle.FromDegrees(0);
+            this._innerButton.FlyoutAnimator.Scale = 1.0f;
+            AnimationHandle nowait;
 
             var animationTasks = new List<Task>();
 
@@ -266,6 +268,15 @@ namespace XForms.Controls
 
                 this._outerButton = outerButton;
                 this.IsSubtleStyle = true;
+            }
+
+            // Closing the flyout shows no pressed look
+            internal override bool ShowsPressedLook
+            {
+                get
+                {
+                    return !this._outerButton.IsExpanded;
+                }
             }
 
             // Labeled by the flyout button's label
