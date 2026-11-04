@@ -72,6 +72,15 @@ namespace XForms.Input
             private set;
         }
 
+        // A flick on a view inside the swiped one (a row's button) swipes it
+        protected override bool IsDragGesture
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override void Reset()
         {
             base.Reset();

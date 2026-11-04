@@ -173,3 +173,4 @@ XForms.Application.BadgeCount.set -> void
 XForms.Application.BackgroundRefreshInterval.get -> System.TimeSpan?
 XForms.Application.BackgroundRefreshInterval.set -> void
 virtual XForms.Application.OnBackgroundRefreshAsync() -> System.Threading.Tasks.Task
+virtual XForms.GestureRecognizer.IsDragGesture.get -> bool

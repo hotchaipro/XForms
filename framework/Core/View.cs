@@ -3184,6 +3184,15 @@ namespace XForms
                 return true;
             }
 
+            // A quick drag that lifts past the slop before a move handed it
+            // over goes to an ancestor's drag gesture first (a flick on a row's
+            // button swipes the row; the button's press is canceled)
+            if ((e.State == PointerInputState.Ended) && (null != drag) && (drag.Origin == this) && (null == drag.Taker) && this.OfferReleaseToAncestors(drag, e))
+            {
+                _drags.Remove(e.PointerId);
+                return true;
+            }
+
             if (this.Application.FilterPointerInput(this, e))
             {
                 return true;
@@ -3335,9 +3344,7 @@ namespace XForms
             Drag drag,
             PointerEventArgs e)
         {
-            float dx = e.Position.X - drag.Start.X;
-            float dy = e.Position.Y - drag.Start.Y;
-            if ((dx * dx) + (dy * dy) <= (Application.TouchSlop * Application.TouchSlop))
+            if (!IsPastDragSlop(drag, e))
             {
                 return false;
             }
@@ -3360,6 +3367,64 @@ namespace XForms
                 }
 
                 ancestor.DispatchToGestureRecognizers(offered.ToTaker(new PointerEventArgs(e.PointerId, e.DeviceType, e.Position, PointerInputState.Canceled, false, e.KeyModifiers)));
+            }
+
+            return false;
+        }
+
+        // How far a press moves before it's a drag an ancestor may take over:
+        // a swipe's slop
+        private const float DragSlop = 10.0f;
+
+        private static bool IsPastDragSlop(
+            Drag drag,
+            PointerEventArgs e)
+        {
+            float dx = e.Position.X - drag.Start.X;
+            float dy = e.Position.Y - drag.Start.Y;
+            return ((dx * dx) + (dy * dy)) >= (DragSlop * DragSlop);
+        }
+
+        // A drag that lifted past the slop before a move handed it over (too
+        // quick for moves to arrive) is offered, pressed and released, to the
+        // nearest ancestor with a drag gesture: if it takes it, the pressed
+        // view's press is canceled
+        private bool OfferReleaseToAncestors(
+            Drag drag,
+            PointerEventArgs e)
+        {
+            if (!IsPastDragSlop(drag, e))
+            {
+                return false;
+            }
+
+            for (var ancestor = this.Parent as View; null != ancestor; ancestor = ancestor.Parent as View)
+            {
+                bool followsDrags = false;
+                if (null != ancestor._gestureRecognizers)
+                {
+                    foreach (var recognizer in ancestor._gestureRecognizers)
+                    {
+                        followsDrags |= recognizer.FollowsDrags;
+                    }
+                }
+
+                if (!followsDrags)
+                {
+                    continue;
+                }
+
+                var offered = new Drag() { Origin = this, Start = drag.Start, Taker = ancestor };
+                var start = new PointerEventArgs(e.PointerId, e.DeviceType, drag.Start, PointerInputState.Began, true, e.KeyModifiers) { OriginalSource = e.OriginalSource };
+                ancestor.DispatchToGestureRecognizers(offered.ToTaker(start));
+                if (ancestor.DispatchToGestureRecognizers(offered.ToTaker(e)))
+                {
+                    this.DispatchPointerEvent(new PointerEventArgs(e.PointerId, e.DeviceType, e.Position, PointerInputState.Canceled, false, e.KeyModifiers));
+                    return true;
+                }
+
+                ancestor.DispatchToGestureRecognizers(offered.ToTaker(new PointerEventArgs(e.PointerId, e.DeviceType, e.Position, PointerInputState.Canceled, false, e.KeyModifiers)));
+                return false;
             }
 
             return false;

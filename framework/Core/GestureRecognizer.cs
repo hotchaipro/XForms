@@ -114,6 +114,27 @@ namespace XForms
         /// Whether the recognizer gets every pointer pressed on its view (as a
         /// pinch does). Otherwise it follows only the first one, until released.
         /// </summary>
+        /// <summary>
+        /// Whether the gesture follows drags (a swipe, a pan): a quick drag
+        /// that starts on a view inside it and lifts before a move hands it
+        /// over (a flick on a row's button) is offered to it as it lifts.
+        /// </summary>
+        protected virtual bool IsDragGesture
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        internal bool FollowsDrags
+        {
+            get
+            {
+                return this.IsDragGesture;
+            }
+        }
+
         protected virtual bool TracksMultiplePointers
         {
             get

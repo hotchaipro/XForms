@@ -579,3 +579,4 @@ XForms.Controls.FlyoutButton.MinimumRadius.get -> float
 XForms.Controls.FlyoutButton.MinimumRadius.set -> void
 const XForms.Input.SwipeGestureRecognizer.Slop = 10 -> float
 XForms.Input.SwipeGestureRecognizer.Velocity.get -> float
+override XForms.Input.SwipeGestureRecognizer.IsDragGesture.get -> bool
