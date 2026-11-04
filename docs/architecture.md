@@ -267,7 +267,18 @@ may return null (the item is gone), which counts as no match.
 - `NavigationStack` is the stack as paths, oldest first, and a page's
   `NavigationPath` its own.
 - A `Frame` inside a page (tabs) shows pages the page makes itself: they
-  aren't in the back stack, have no path and aren't restored.
+  aren't in the back stack, have no path and aren't restored. A
+  `TabStrip` given the frame (`TabStrip.Frame`) switches its pages as the
+  selection changes.
+- **Following a gesture:** `Frame.BeginReplace(page, mode)` starts a
+  `PageSwitch` whose `Progress` (0 to 1) slides the page in as far, then
+  `CompleteAsync` or `CancelAsync` plays the rest of the slide, in the
+  share of `TransitionDuration` left. The page is current (and hears it's
+  navigated to) as it completes. `TabStrip.BeginSwitch(direction)` does the
+  same for the next or previous tab, its selection indicator following,
+  and `TabStrip.FollowSwipe` drives one from a swipe (such as
+  `FloatingButton.Swiping`): the pages move at twice the finger's speed,
+  and a release completes past a third of the way, or with a flick.
 
 **The start.** After `OnStart`, XForms shows the first pages: the stack the
 platform gives (restored, an address, a link), or the app's `StartPath`
@@ -490,7 +501,8 @@ combine drawing with native text.
 - images (optionally tinted);
 - text.
 
-It can push a clip, a transform or group opacity. Text is laid out with a
+It can push a clip, a transform or group opacity, and draw the shadow a
+rectangle or ellipse casts (`FillShadow`). Text is laid out with a
 `TextLayout`: a `TextFormat` (family, size, weight, style, alignment,
 wrapping, trimming, maximum lines) and optional styled spans. A layout is
 measured once and drawn, so controls can size themselves to their text.
@@ -532,6 +544,21 @@ frame.
 
 XForms' `ProgressRing` is an arc drawn once and spun by its own
 animator.
+
+**Shadows.** `View.Shadow` is a drop shadow beneath a view, outside its
+bounds, as CSS's `box-shadow` (color, offset, blur radius), cast by its
+bounds or the ellipse in them. It's beneath the view's innermost animator,
+so it moves, scales and fades with the view. A lightweight view's layer
+draws it with `FillShadow`; a native view's is the platform's own:
+- iOS: the layer's shadow, along a path of the shape.
+- Android: elevation, with an outline of the shape (Android lights it, so
+  the blur and offset only set how high the view floats).
+- The browser: `box-shadow`.
+- Win32: a visual behind the view's, in its innermost animation layer
+  (approximating the blur); a view without animators has none.
+
+A frame gives a page a soft shadow while it slides, so its edge shows over
+a page of the same color.
 
 ## Input
 

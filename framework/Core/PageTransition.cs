@@ -31,6 +31,16 @@ namespace XForms
         public static PageTransition None { get; } = new NoTransition();
 
         /// <summary>
+        /// The soft shadow along a sliding page's edges, so the edge shows
+        /// even over a page of the same color.
+        /// </summary>
+        internal static readonly Shadow EdgeShadow = new Shadow()
+        {
+            Color = Color.FromArgb(0x40, 0, 0, 0),
+            Blur = 16,
+        };
+
+        /// <summary>
         /// Moves the page on top in (as a page arrives) or out (as it leaves,
         /// uncovering the one before). The frame hides the page underneath when
         /// the task completes. A leaving page is left where the transition
@@ -63,6 +73,7 @@ namespace XForms
 
                 var animator = context.Animator;
                 animator.Opacity = 1;
+                context.Page.Shadow = EdgeShadow;
                 if (context.IsLeaving)
                 {
                     animator.Translation = Point.Zero;
@@ -72,6 +83,10 @@ namespace XForms
                 {
                     animator.Translation = offset;
                     await animator.TranslateTo(Point.Zero, context.Duration, DecelerateEasing);
+                    if (context.Page.Shadow == EdgeShadow)
+                    {
+                        context.Page.Shadow = null;
+                    }
                 }
             }
         }

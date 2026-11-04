@@ -463,29 +463,34 @@ namespace XForms.Android
             colorFilter?.Dispose();
         }
 
-        // TODO: Replace with a Shadow property on View
-        // ANDROID: View.Elevation
-        public override void FillEllipseShadow(
+        public override void FillShadow(
             Rect rectangle,
-            Color color,
-            float shadowBlur = 8.0f)
+            Shadow shadow)
         {
-            rectangle = rectangle.Inflate(-2 * shadowBlur, -2 * shadowBlur);
-
-            var rect = ToNativeRectFPixels(rectangle);
-            var shadowDp = NativeConversions.DevicePixelsToPixels(this.NativeContext, shadowBlur);
-
-            var paint = new Paint()
+            if ((null == shadow) || shadow.Color.IsTransparent)
             {
-                Color = color.ToAndroidColor(),
-                AntiAlias = true,
-            };
-            paint.SetShadowLayer(shadowDp, shadowDp, shadowDp, global::Android.Graphics.Color.Black);
-            paint.SetStyle(Paint.Style.Fill);
+                return;
+            }
 
-            this._canvas.DrawOval(rect, paint);
-
-            paint.Dispose();
+            // The shape, blurred: Skia's blur radius r has a standard deviation
+            // of 0.57735 r + 0.5, and CSS's blur is twice the deviation
+            var rect = this.ToNativeRectFPixels(rectangle.Offset(shadow.Offset.X, shadow.Offset.Y));
+            float sigma = NativeConversions.DevicePixelsToPixels(this.NativeContext, shadow.Blur / 2);
+            using (var paint = new Paint() { Color = shadow.Color.ToAndroidColor(), AntiAlias = true })
+            using (var blur = (sigma > 0.5f) ? new BlurMaskFilter((sigma - 0.5f) / 0.57735f, BlurMaskFilter.Blur.Normal) : null)
+            {
+                paint.SetStyle(Paint.Style.Fill);
+                paint.SetMaskFilter(blur);
+                if (shadow.Shape == ShadowShape.Ellipse)
+                {
+                    this._canvas.DrawOval(rect, paint);
+                }
+                else
+                {
+                    float radius = NativeConversions.DevicePixelsToPixels(this.NativeContext, shadow.CornerRadius);
+                    this._canvas.DrawRoundRect(rect, radius, radius, paint);
+                }
+            }
         }
 
         private Paint CreateStrokePaint(

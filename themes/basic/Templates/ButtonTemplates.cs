@@ -324,16 +324,27 @@ namespace XForms.Themes.Basic
         }
     }
 
-    // A tab's icon and label, full size when checked
+    // A tab's icon over its label: gray, and the selection's color (with a
+    // bolder, larger label) when checked; it shrinks a little as it's pressed
     internal sealed class TabStripItemTemplate : ControlTemplate<TabStripItem>
     {
-        private const float UncheckedScale = 0.8f;
+        private const float PressedScale = 0.92f;
+        private const float MaxIconSize = 28;
+        private const float IconLabelGap = 2;
 
         private static readonly TextFormat LabelFormat = new TextFormat()
         {
             FontSize = 12.0f,
             HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Bottom,
+            VerticalAlignment = VerticalAlignment.Top,
+        };
+
+        private static readonly TextFormat CheckedLabelFormat = new TextFormat()
+        {
+            FontSize = 13.0f,
+            FontWeight = FontWeight.SemiBold,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Top,
         };
 
         protected override void OnStateChanged(
@@ -343,18 +354,28 @@ namespace XForms.Themes.Basic
             var feedback = ScaleFeedback.For(context);
             if (control.IsPressed)
             {
-                feedback.To(control.IsChecked ? 0.95f : UncheckedScale - 0.05f, TimeSpan.FromMilliseconds(25), new CubicEase(EasingMode.EaseIn));
-                feedback.Animator.Opacity = 1.0f;
-            }
-            else if (control.IsChecked)
-            {
-                feedback.To(1.0f, control.ActualTheme.Motion.Short, new SpringEase(EasingMode.EaseOut));
-                feedback.Animator.Opacity = 1.0f;
+                feedback.To(PressedScale, TimeSpan.FromMilliseconds(25), new CubicEase(EasingMode.EaseIn));
             }
             else
             {
-                feedback.To(UncheckedScale, control.ActualTheme.Motion.Short, new CubicEase(EasingMode.EaseIn));
-                feedback.Animator.Opacity = (control.ActualTheme.Mode != ThemeMode.Light) ? 1.0f : 0.5f;
+                feedback.To(1.0f, control.ActualTheme.Motion.Short, new SpringEase(EasingMode.EaseOut));
+            }
+        }
+
+        private static Color Foreground(
+            TabStripItem control)
+        {
+            var theme = control.ActualTheme;
+            if (control.IsChecked)
+            {
+                return TabStripTemplate.SelectedColor(theme);
+            }
+
+            switch (theme.Mode)
+            {
+                case ThemeMode.Light: return Color.FromRgb(0x6b, 0x6b, 0x6b);
+                case ThemeMode.Dark: return Color.FromRgb(0x99, 0x99, 0x99);
+                default: return theme.Colors.Foreground;
             }
         }
 
@@ -363,38 +384,54 @@ namespace XForms.Themes.Basic
             DrawingContext drawContext)
         {
             var bounds = new Rect(0, 0, control.Bounds.Width, control.Bounds.Height);
-            var theme = control.ActualTheme;
+            var format = control.IsChecked ? CheckedLabelFormat : LabelFormat;
+            var foreground = Foreground(control);
 
-            float margin = Math.Min(bounds.Width, bounds.Height) * 0.1f;
-            bounds = bounds.Inflate(-margin, -margin);
-
-            float imageDimension = Math.Min(bounds.Width, bounds.Height) * 0.65f;
-            float textHeight = bounds.Height * 0.35f;
-            Rect imageBounds = new Rect(
-                bounds.Center.X - (imageDimension / 2f),
-                bounds.Center.Y - ((imageDimension + textHeight) / 2f),
-                imageDimension,
-                imageDimension);
-            Rect textBounds = new Rect(bounds.X, imageBounds.Bottom, bounds.Width, bounds.Bottom - imageBounds.Bottom);
-
-            Color foreground;
-            if (theme.Mode != ThemeMode.Light)
-            {
-                foreground = control.IsChecked ? theme.Colors.Accent : theme.Colors.SubtleForeground;
-            }
-            else
-            {
-                foreground = Colors.White;
-            }
+            // The icon and label, centered together
+            float textHeight = (float)Math.Ceiling(format.FontSize * 1.25f);
+            float iconSize = Math.Min(MaxIconSize, Math.Min(bounds.Width, bounds.Height - textHeight - IconLabelGap));
+            float top = bounds.Y + ((bounds.Height - (iconSize + IconLabelGap + textHeight)) / 2);
+            Rect imageBounds = new Rect(bounds.Center.X - (iconSize / 2), top, iconSize, iconSize);
+            Rect textBounds = new Rect(bounds.X, imageBounds.Bottom + IconLabelGap, bounds.Width, textHeight);
 
             drawContext.DrawImage(control.Icon, imageBounds, foreground);
-            drawContext.DrawText(control.Text, textBounds, foreground, LabelFormat);
+            drawContext.DrawText(control.Text, textBounds, foreground, format);
         }
     }
 
-    // A round button with a shadow
+    // A round button with a soft shadow beneath it: the circle fills the
+    // button's bounds, and the shadow is outside them
     internal sealed class FloatingButtonTemplate : ControlTemplate<FloatingButton>
     {
+        // CSS's 0 3px 8px rgba(0, 0, 0, 0.3)
+        private static readonly Shadow ButtonShadow = new Shadow()
+        {
+            Color = Color.FromArgb(0x4d, 0, 0, 0),
+            Offset = new Point(0, 3),
+            Blur = 8,
+            Shape = ShadowShape.Ellipse,
+        };
+
+        // The icon's share of the circle's diameter
+        private const float IconScale = 0.47f;
+
+        protected override void Apply(
+            FloatingButton control,
+            TemplateContext context)
+        {
+            control.Shadow = ButtonShadow;
+        }
+
+        protected override void Unapply(
+            FloatingButton control,
+            TemplateContext context)
+        {
+            if (control.Shadow == ButtonShadow)
+            {
+                control.Shadow = null;
+            }
+        }
+
         protected override void Render(
             FloatingButton control,
             DrawingContext drawContext)
@@ -413,23 +450,18 @@ namespace XForms.Themes.Basic
             Color pressedBackground = control.IsSubtleStyle ? background : Colors.White;
             Color pressedForeground = control.IsSubtleStyle ? foreground : Colors.Gray;
 
-            Size shadowPadding = new Size(bounds.Width / 10, bounds.Height / 10);
-            Size shadowThinPadding = new Size(shadowPadding.Width / 2, shadowPadding.Height / 2);
-            Rect buttonRect = bounds.Deflate(shadowPadding.Width, shadowPadding.Height);
-            Rect shadowRect = Rect.FromLTRB(bounds.X, buttonRect.Top - shadowThinPadding.Height, buttonRect.Right + shadowThinPadding.Width, bounds.Bottom);
-            Rect imageRect = buttonRect.Deflate(buttonRect.Width / 6, buttonRect.Height / 6);
-            float blurAmount = Math.Min(shadowPadding.Width, shadowPadding.Height) / 1.5f;
-            Color shadowColor = Colors.Gray;
+            float diameter = Math.Min(bounds.Width, bounds.Height);
+            Rect buttonRect = new Rect(bounds.Center.X - (diameter / 2), bounds.Center.Y - (diameter / 2), diameter, diameter);
+            float iconInset = diameter * (1 - IconScale) / 2;
+            Rect imageRect = buttonRect.Deflate(iconInset, iconInset);
 
             if (control.IsPressed || !control.IsEnabled)
             {
-                drawContext.FillEllipseShadow(shadowRect, shadowColor, blurAmount / 2);
                 drawContext.FillEllipse(buttonRect, pressedBackground);
                 drawContext.DrawImage(control.Icon, imageRect, pressedForeground);
             }
             else
             {
-                drawContext.FillEllipseShadow(shadowRect, shadowColor, blurAmount);
                 drawContext.FillEllipse(buttonRect, background);
                 drawContext.DrawImage(control.Icon, imageRect, foreground);
             }

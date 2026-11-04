@@ -86,10 +86,14 @@ namespace XForms
             Rect rectangle,
             Color color);
 
-        public abstract void FillEllipseShadow(
+        /// <summary>
+        /// Draws the shadow a shape in the rectangle casts (not the shape): a
+        /// view's <see cref="View.Shadow"/>, or one an owner-drawn control
+        /// draws beneath what it draws.
+        /// </summary>
+        public abstract void FillShadow(
             Rect rectangle,
-            Color color,
-            float blurAmount = 8.0f);
+            Shadow shadow);
 
         /// <summary>
         /// Draws a bitmap, optionally tinted; a null bitmap draws nothing.

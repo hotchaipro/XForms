@@ -529,3 +529,29 @@ virtual XForms.Controls.RangeBase.CoerceValue(double value) -> double
 virtual XForms.Controls.UserControl.Build() -> XForms.View
 XForms.Controls.FlyoutButton.IsSubtleStyle.get -> bool
 XForms.Controls.FlyoutButton.IsSubtleStyle.set -> void
+XForms.Controls.FloatingButton.Swiping -> System.EventHandler<XForms.Input.SwipingEventArgs>
+XForms.Controls.TabStrip.BeginSwitch(int direction) -> XForms.Controls.TabSwitch
+XForms.Controls.TabStrip.FollowSwipe(XForms.Input.SwipingEventArgs e) -> void
+XForms.Controls.TabStrip.Frame.get -> XForms.Frame
+XForms.Controls.TabStrip.Frame.set -> void
+XForms.Controls.TabStrip.IsSwitching.get -> bool
+XForms.Controls.TabStrip.Items.get -> System.Collections.Generic.IReadOnlyList<XForms.Controls.TabStripItem>
+XForms.Controls.TabStrip.SelectedIndex.get -> int
+XForms.Controls.TabStrip.SelectionPosition.get -> float
+XForms.Controls.TabStrip.TransitionDuration.get -> System.TimeSpan
+XForms.Controls.TabSwitch
+XForms.Controls.TabSwitch.Cancel() -> void
+XForms.Controls.TabSwitch.Complete() -> void
+XForms.Controls.TabSwitch.Progress.get -> float
+XForms.Controls.TabSwitch.Progress.set -> void
+XForms.Input.SwipePhase
+XForms.Input.SwipePhase.Began = 0 -> XForms.Input.SwipePhase
+XForms.Input.SwipePhase.Canceled = 3 -> XForms.Input.SwipePhase
+XForms.Input.SwipePhase.Ended = 2 -> XForms.Input.SwipePhase
+XForms.Input.SwipePhase.Moved = 1 -> XForms.Input.SwipePhase
+XForms.Input.SwipingEventArgs
+XForms.Input.SwipingEventArgs.Direction.get -> int
+XForms.Input.SwipingEventArgs.Distance.get -> float
+XForms.Input.SwipingEventArgs.Phase.get -> XForms.Input.SwipePhase
+XForms.Input.SwipingEventArgs.SwipingEventArgs(XForms.Input.SwipePhase phase, int direction, float distance, float velocity) -> void
+XForms.Input.SwipingEventArgs.Velocity.get -> float

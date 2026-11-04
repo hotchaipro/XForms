@@ -5,101 +5,115 @@ using XForms.Layouts;
 
 namespace XForms.Test
 {
+    /// <summary>
+    /// Tabs over a frame of same-colored pages (their edges show by their
+    /// shadows as they slide), a floating button whose sideways swipe switches
+    /// tabs as it moves, and a flyout button.
+    /// </summary>
     public class TabbedPage : Page
     {
-        private TabPage1 _tabPage1;
-
         protected override View Build()
         {
-            Size tabButtonSize = new Size(60, 60);
-
-            this._tabPage1 = new TabPage1();
-
             var pageLayout = new DockPanel()
             {
-                Width = 400,
-                Height = 400,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Stretch,
             };
 
+            var frame = new Frame();
             var tabBar = new TabStrip()
             {
-                Height = 60,
+                Height = 70,
+                Frame = frame,
             };
-
             pageLayout.Children.Add(tabBar, Dock.Top);
 
-            tabBar.AddButton(
-                new TabStripItem()
-                {
-                    Width = tabButtonSize.Width,
-                    Height = tabButtonSize.Height,
-                    Text = "one",
-                    Icon = ThemeResources.Default.AboutLogo,
-                },
-                this._tabPage1);
-
-            tabBar.AddButton(
-                new TabStripItem()
-                {
-                    Width = tabButtonSize.Width,
-                    Height = tabButtonSize.Height,
-                    Text = "two",
-                    Icon = ThemeResources.Default.AboutLogo,
-                },
-                this._tabPage1);
-
-            tabBar.AddButton(
-                new TabStripItem()
-                {
-                    Width = tabButtonSize.Width,
-                    Height = tabButtonSize.Height,
-                    Text = "three",
-                    Icon = ThemeResources.Default.AboutLogo,
-                },
-                this._tabPage1);
-
-            tabBar.AddButton(
-                new TabStripItem()
-                {
-                    Width = tabButtonSize.Width,
-                    Height = tabButtonSize.Height,
-                    Text = "four",
-                    Icon = ThemeResources.Default.AboutLogo,
-                },
-                this._tabPage1);
-
-            var menuBar = new MenuBar()
+            string[] names = { "one", "two", "three", "four" };
+            TabStripItem first = null;
+            foreach (var name in names)
             {
+                var page = new TabContentPage(name);
+                var item = new TabStripItem()
+                {
+                    Width = 70,
+                    Height = 70,
+                    Text = name,
+                    Icon = ThemeResources.Default.AboutLogo,
+                };
+                tabBar.AddButton(item, page);
+                frame.Push(page);
+                first ??= item;
+            }
+
+            pageLayout.Children.Add(frame, Dock.CenterOverlay);
+
+            var tray = new DockPanel()
+            {
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                Height = 120,
             };
-            pageLayout.Children.Add(menuBar, Dock.Bottom);
+            pageLayout.Children.Add(tray, Dock.BottomOverlay);
 
-            menuBar.MenuItems.Add(new MenuItem()
+            var addButton = new FloatingButton()
             {
-                Text = "cancel",
+                Width = 68,
+                Height = 68,
                 Icon = ThemeResources.Default.AboutLogo,
-            });
-
-            var deleteMenuItem = new MenuItem()
-            {
-                Text = "delete",
-                Icon = ThemeResources.Default.AboutLogo,
+                AccessibilityLabel = "Add (swipe to switch tabs)",
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
             };
-            menuBar.MenuItems.Add(deleteMenuItem);
+            addButton.Swiping += (sender, e) => tabBar.FollowSwipe(e);
+            tray.Children.Add(addButton, Dock.CenterOverlay);
 
-            menuBar.MenuItems.Add(new MenuItem()
+            var menuButton = new FlyoutButton()
             {
-                Text = "save",
+                Width = 52,
+                Height = 52,
                 Icon = ThemeResources.Default.AboutLogo,
-            });
+                AccessibilityLabel = "Menu",
+                IsSubtleStyle = false,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(20, 0),
+            };
+            for (int i = 0; i < 3; i += 1)
+            {
+                menuButton.AddButton(new FloatingButton()
+                {
+                    Width = 52,
+                    Height = 52,
+                    Icon = ThemeResources.Default.AboutLogo,
+                    AccessibilityLabel = "Item " + (i + 1),
+                });
+            }
+            tray.Children.Add(menuButton, Dock.Right);
 
+            first.IsChecked = true;
             return pageLayout;
         }
     }
 
-    public class TabPage1 : Page
+    // A tab's page: its name, on the background
+    public class TabContentPage : Page
     {
-        public TabPage1()
+        private readonly string _name;
+
+        public TabContentPage(
+            string name)
         {
+            this._name = name;
+        }
+
+        protected override View Build()
+        {
+            return new TextBlock()
+            {
+                Text = "Tab " + this._name,
+                FontSize = 28,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+            };
         }
     }
 }

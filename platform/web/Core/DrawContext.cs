@@ -99,9 +99,14 @@ namespace XForms.Web
             this.FillEllipse(new Point(rectangle.X + (rectangle.Width / 2), rectangle.Y + (rectangle.Height / 2)), rectangle.Width / 2, rectangle.Height / 2, color);
         }
 
-        public override void FillEllipseShadow(Rect rectangle, Color color, float blurAmount = 8.0f)
+        public override void FillShadow(Rect rectangle, Shadow shadow)
         {
-            this.Add(22, rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height, Pack(color), blurAmount);
+            if ((null == shadow) || shadow.Color.IsTransparent)
+            {
+                return;
+            }
+
+            this.Add(22, rectangle.X + shadow.Offset.X, rectangle.Y + shadow.Offset.Y, rectangle.Width, rectangle.Height, Pack(shadow.Color), shadow.Blur, (shadow.Shape == ShadowShape.Ellipse) ? -1 : shadow.CornerRadius);
         }
 
         /// <summary>

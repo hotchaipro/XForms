@@ -387,15 +387,54 @@ namespace XForms.Win32
             this.FillEllipse(rectangle.Center, rectangle.Width / 2, rectangle.Height / 2, color);
         }
 
-        public override void FillEllipseShadow(
+        public override void FillShadow(
             Rect rectangle,
-            Color color,
-            float blurAmount = 8.0f)
+            Shadow shadow)
         {
-            // NOTE: The prototype approximates the blurred shadow with a soft offset ellipse
-            var shadowColor = Color.FromArgb((byte)(color.A / 4), color.R, color.G, color.B);
-            var shadowBounds = rectangle.Deflate(blurAmount, blurAmount).Offset(0, blurAmount / 4);
-            this.FillEllipse(shadowBounds, shadowColor);
+            if ((null == shadow) || shadow.Color.IsTransparent)
+            {
+                return;
+            }
+
+            // NOTE: Approximates the blur with the shape drawn in steps from a
+            // blur inside its edge to one outside it, each faint, so they add
+            // up to the color at the middle and fade out at the edge
+            const int Steps = 8;
+            var bounds = rectangle.Offset(shadow.Offset.X, shadow.Offset.Y);
+            var color = shadow.Color;
+            float blur = shadow.Blur;
+            if (blur <= 0)
+            {
+                this.FillShadowShape(bounds, shadow, color);
+                return;
+            }
+
+            byte alpha = (byte)Math.Max(1, Math.Round(color.A / (float)Steps));
+            var step = Color.FromArgb(alpha, color.R, color.G, color.B);
+            for (int i = 0; i < Steps; i += 1)
+            {
+                float inflate = blur * (((i + 0.5f) / Steps) - 0.5f);
+                var shape = bounds.Inflate(inflate, inflate);
+                if ((shape.Width > 0) && (shape.Height > 0))
+                {
+                    this.FillShadowShape(shape, shadow, step);
+                }
+            }
+        }
+
+        private void FillShadowShape(
+            Rect bounds,
+            Shadow shadow,
+            Color color)
+        {
+            if (shadow.Shape == ShadowShape.Ellipse)
+            {
+                this.FillEllipse(bounds, color);
+            }
+            else
+            {
+                this.FillRoundedRectangle(bounds, Math.Max(0, shadow.CornerRadius), color);
+            }
         }
 
         public override void DrawImage(

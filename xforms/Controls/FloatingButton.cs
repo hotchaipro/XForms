@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using XForms.Input;
 using XForms.Controls;
 using XForms.Primitives;
@@ -29,7 +30,25 @@ namespace XForms.Controls
         private bool _isSubtleStyle;
 
         public event EventHandler Clicked;
+
+        /// <summary>
+        /// The button was swiped sideways and released: 1 to the right, -1 to
+        /// the left.
+        /// </summary>
         public event EventHandler<int> Swiped;
+
+        /// <summary>
+        /// A sideways swipe began, moved, ended or was canceled: for content
+        /// that follows the finger, such as <see cref="TabStrip.FollowSwipe"/>.
+        /// </summary>
+        public event EventHandler<SwipingEventArgs> Swiping;
+
+        // The swipe's recent moves, for its speed as it's released
+        private const int VelocitySamples = 4;
+        private static readonly long VelocityWindow = Stopwatch.Frequency / 10;
+        private readonly long[] _sampleTimes = new long[VelocitySamples];
+        private readonly float[] _sampleDistances = new float[VelocitySamples];
+        private int _sampleCount;
 
         public FloatingButton()
         {
@@ -129,6 +148,9 @@ namespace XForms.Controls
         bool ISwipeGestureDelegate.OnSwipeBegan(
             int direction)
         {
+            this._sampleCount = 0;
+            this.AddSample(0);
+            this.Swiping?.Invoke(this, new SwipingEventArgs(SwipePhase.Began, direction, 0, 0));
             return true;
         }
 
@@ -136,6 +158,8 @@ namespace XForms.Controls
             int direction,
             float dx)
         {
+            this.AddSample(dx);
+            this.Swiping?.Invoke(this, new SwipingEventArgs(SwipePhase.Moved, direction, dx, 0));
             return true;
         }
 
@@ -143,6 +167,8 @@ namespace XForms.Controls
             int direction,
             float dx)
         {
+            this.AddSample(dx);
+            this.Swiping?.Invoke(this, new SwipingEventArgs(SwipePhase.Ended, direction, dx, this.Velocity()));
             this.Swiped?.Invoke(this, direction);
             return true;
         }
@@ -150,7 +176,44 @@ namespace XForms.Controls
         bool ISwipeGestureDelegate.OnSwipeCanceled(
             int direction)
         {
+            this.Swiping?.Invoke(this, new SwipingEventArgs(SwipePhase.Canceled, direction, 0, 0));
             return true;
+        }
+
+        private void AddSample(
+            float distance)
+        {
+            if (this._sampleCount == VelocitySamples)
+            {
+                Array.Copy(this._sampleTimes, 1, this._sampleTimes, 0, VelocitySamples - 1);
+                Array.Copy(this._sampleDistances, 1, this._sampleDistances, 0, VelocitySamples - 1);
+                this._sampleCount -= 1;
+            }
+
+            this._sampleTimes[this._sampleCount] = Stopwatch.GetTimestamp();
+            this._sampleDistances[this._sampleCount] = distance;
+            this._sampleCount += 1;
+        }
+
+        // Points a second, over the recent moves (a finger that stopped before
+        // it lifted has none)
+        private float Velocity()
+        {
+            int last = this._sampleCount - 1;
+            long now = this._sampleTimes[last];
+            int first = last;
+            while ((first > 0) && ((now - this._sampleTimes[first - 1]) <= VelocityWindow))
+            {
+                first -= 1;
+            }
+
+            if (first == last)
+            {
+                return 0;
+            }
+
+            double seconds = (double)(now - this._sampleTimes[first]) / Stopwatch.Frequency;
+            return (seconds > 0) ? (float)((this._sampleDistances[last] - this._sampleDistances[first]) / seconds) : 0;
         }
 
         //protected override void OnPropertyChanged(

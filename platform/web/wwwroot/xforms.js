@@ -403,14 +403,24 @@ export function draw(canvasId, width, height, n, s) {
                 }
                 break;
             }
-            case 22:
-                // A soft shadow under an ellipse
+            case 22: {
+                // A shape's shadow (an ellipse for a radius of -1): the shape
+                // drawn far to the left with its shadow offset back, so only
+                // the shadow shows. The shadow's offset and blur are in device
+                // pixels, which a horizontal offset needs only the scale for.
+                const far = 10000, t = c.getTransform(), scale = Math.hypot(t.a, t.b);
                 c.save();
-                c.shadowColor = color(n[i + 4]); c.shadowBlur = n[i + 5];
-                ellipse(c, n[i] + n[i + 2] / 2, n[i + 1] + n[i + 3] / 2, n[i + 2] / 2, n[i + 3] / 2);
-                c.fillStyle = color(n[i + 4]); c.fill();
+                c.shadowColor = color(n[i + 4]); c.shadowBlur = n[i + 5] * scale;
+                c.shadowOffsetX = far * t.a; c.shadowOffsetY = far * t.b;
+                if (n[i + 6] < 0) {
+                    ellipse(c, n[i] - far + n[i + 2] / 2, n[i + 1] + n[i + 3] / 2, n[i + 2] / 2, n[i + 3] / 2);
+                } else {
+                    roundRect(c, n[i] - far, n[i + 1], n[i + 2], n[i + 3], n[i + 6]);
+                }
+                c.fillStyle = '#000'; c.fill();
                 c.restore();
-                i += 6; break;
+                i += 7; break;
+            }
             case 30: c.clearRect(-1e6, -1e6, 2e6, 2e6); c.fillStyle = color(n[i++]); c.fillRect(-1e6, -1e6, 2e6, 2e6); break;
             default:
                 console.error('XForms: unknown draw command', op);

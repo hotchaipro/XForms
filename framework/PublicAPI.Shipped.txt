@@ -832,7 +832,6 @@ abstract XForms.DrawingContext.DrawText(XForms.TextLayout layout, XForms.Point o
 abstract XForms.DrawingContext.FillEllipse(XForms.Point point, float radiusX, float radiusY, XForms.Color color) -> void
 abstract XForms.DrawingContext.FillEllipse(XForms.Rect rectangle, XForms.Brush brush) -> void
 abstract XForms.DrawingContext.FillEllipse(XForms.Rect rectangle, XForms.Color color) -> void
-abstract XForms.DrawingContext.FillEllipseShadow(XForms.Rect rectangle, XForms.Color color, float blurAmount = 8) -> void
 abstract XForms.DrawingContext.FillGeometry(XForms.PathGeometry geometry, XForms.Brush brush) -> void
 abstract XForms.DrawingContext.FillRectangle(XForms.Rect rectangle, XForms.Brush brush) -> void
 abstract XForms.DrawingContext.FillRectangle(XForms.Rect rectangle, XForms.Color color) -> void

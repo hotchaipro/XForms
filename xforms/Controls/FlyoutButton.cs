@@ -163,18 +163,30 @@ namespace XForms.Controls
                 // Spread the buttons out on an arc
                 // TODO: Handle more than 3 buttons
                 float angle = 45;
+                float step = 0;
                 if (this._buttonCount > 1)
                 {
                     if ((this._buttonCount & 1) == 1)
                     {
-                        angle = 0 + ((float)i * (90 / (float)(this._buttonCount - 1)));
+                        step = 90 / (float)(this._buttonCount - 1);
+                        angle = 0 + ((float)i * step);
                     }
                     else
                     {
-                        angle = 15 + ((float)i * (60 / (float)(this._buttonCount - 1)));
+                        step = 60 / (float)(this._buttonCount - 1);
+                        angle = 15 + ((float)i * step);
                     }
                 }
+
+                // Clear of this button, and far enough out that neighbours on
+                // the arc are a gap apart (the circles fill their bounds)
+                const float Gap = 12;
                 float distance = ((button.Bounds.Size.Width + this._innerButton.Bounds.Size.Width) / 2) + 15;
+                if (step > 0)
+                {
+                    float chord = (float)(2 * Math.Sin(Angle.FromDegrees(step / 2).Radians));
+                    distance = Math.Max(distance, (button.Bounds.Size.Width + Gap) / chord);
+                }
                 var point = Point.Translate(new Point(0, 0), Angle.FromDegrees(angle), -distance);
                 nowait = button.FlyoutAnimator.TranslateTo(point, this.ActualTheme.Motion.Medium, new CubicEase(EasingMode.EaseOut));
 

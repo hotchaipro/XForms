@@ -11,6 +11,7 @@ namespace XForms.iOS.Renderers
         private UIView _nativeView;
         private AnimationLayer[] _layers;
         private UIView _rootView;
+        private Shadow _shadow;
 
         public ViewRenderer(
             View view)
@@ -98,6 +99,49 @@ namespace XForms.iOS.Renderers
                     Place(this._layers[i].View, inner);
                 }
             }
+
+            if (null != this._shadow)
+            {
+                this.UpdateShadow();
+            }
+        }
+
+        public Shadow Shadow
+        {
+            set
+            {
+                this._shadow = value;
+                this.UpdateShadow();
+            }
+        }
+
+        // The layer's own shadow, along a path of its shape (so Core Animation
+        // needn't find the shape in its content)
+        private void UpdateShadow()
+        {
+            var layer = this._nativeView?.Layer;
+            if (null == layer)
+            {
+                return;
+            }
+
+            var shadow = this._shadow;
+            if ((null == shadow) || shadow.Color.IsTransparent)
+            {
+                layer.ShadowOpacity = 0;
+                layer.ShadowPath = null;
+                return;
+            }
+
+            var color = shadow.Color;
+            var bounds = new CGRect(CGPoint.Empty, this._nativeView.Bounds.Size);
+            layer.ShadowColor = Color.FromArgb(0xff, color.R, color.G, color.B).ToCGColor();
+            layer.ShadowOpacity = color.A / 255.0f;
+            layer.ShadowOffset = new CGSize(shadow.Offset.X, shadow.Offset.Y);
+            layer.ShadowRadius = shadow.Blur / 2;
+            layer.ShadowPath = (shadow.Shape == ShadowShape.Ellipse)
+                ? UIBezierPath.FromOval(bounds).CGPath
+                : UIBezierPath.FromRoundedRect(bounds, shadow.CornerRadius).CGPath;
         }
 
         internal static void Place(

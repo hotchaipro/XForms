@@ -55,6 +55,13 @@ namespace XForms.Platform
         bool ClipToBounds { set; }
 
         /// <summary>
+        /// A drop shadow beneath the view, outside its bounds (see
+        /// <see cref="View.Shadow"/>), or null. It's beneath the view's
+        /// innermost animation layer, so it moves with all of them.
+        /// </summary>
+        Shadow Shadow { set; }
+
+        /// <summary>
         /// Creates the view's animation layers, one per animator, outermost
         /// first: each wraps the next, and the innermost wraps the view's own
         /// content and children. Called once, when the native view is created,

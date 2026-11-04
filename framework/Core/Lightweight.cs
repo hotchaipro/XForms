@@ -117,6 +117,25 @@ namespace XForms
             }
         }
 
+        /// <summary>
+        /// The view's shadow, which its layer draws beneath it.
+        /// </summary>
+        public Shadow Shadow
+        {
+            get
+            {
+                return this._shadow;
+            }
+
+            set
+            {
+                this._shadow = value;
+                this.Invalidate();
+            }
+        }
+
+        private Shadow _shadow;
+
         public virtual Size MeasureNative(
             Size availableSize)
         {
@@ -454,6 +473,13 @@ namespace XForms
 
                 var frame = renderer.Frame;
                 var translation = context.PushTransform(System.Numerics.Matrix3x2.CreateTranslation(frame.X, frame.Y));
+
+                // The shadow is outside the view, so its clip doesn't cut it
+                if (null != renderer.Shadow)
+                {
+                    context.FillShadow(new Rect(0, 0, frame.Width, frame.Height), renderer.Shadow);
+                }
+
                 var clip = renderer.ClipsToBounds ? context.PushClip(new Rect(0, 0, frame.Width, frame.Height)) : default;
 
                 var previous = context.LightweightBounds;

@@ -97,6 +97,11 @@ namespace XForms
                 native.ClipToBounds = true;
             }
 
+            if (null != this._shadow)
+            {
+                native.Shadow = this._shadow;
+            }
+
             this.CreateAnimationLayers(native);
 
             // A container gets its children and background
@@ -2128,6 +2133,7 @@ namespace XForms
         private FlowDirection? _flowDirection;
         private int _zIndex;
         private bool _clipToBounds;
+        private Shadow _shadow;
         private Rect _frame;
         private Size _contentMeasureSize = new Size(float.NaN, float.NaN);
         private Size _contentArrangeSize;
@@ -2545,6 +2551,29 @@ namespace XForms
                 this.Native?.ClipToBounds = value;
 
                 this.OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// A drop shadow beneath the view, outside its bounds, or null (the
+        /// default) for none. It moves, scales and fades with the view's
+        /// animators. A frame gives its pages one while they slide.
+        /// </summary>
+        public Shadow Shadow
+        {
+            get
+            {
+                return this._shadow;
+            }
+
+            set
+            {
+                if (value != this._shadow)
+                {
+                    this._shadow = value;
+                    this.Native?.Shadow = value;
+                    this.OnPropertyChanged();
+                }
             }
         }
 

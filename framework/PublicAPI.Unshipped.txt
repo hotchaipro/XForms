@@ -119,3 +119,35 @@ XForms.ColorScheme.StrongAccent.init -> void
 XForms.ColorScheme.OnStrongAccent.get -> XForms.Color
 XForms.ColorScheme.OnStrongAccent.init -> void
 static XForms.Theme.StrongColor(XForms.Color color) -> XForms.Color
+abstract XForms.DrawingContext.FillShadow(XForms.Rect rectangle, XForms.Shadow shadow) -> void
+XForms.Shadow
+XForms.Shadow.Blur.get -> float
+XForms.Shadow.Blur.init -> void
+XForms.Shadow.Color.get -> XForms.Color
+XForms.Shadow.Color.init -> void
+XForms.Shadow.CornerRadius.get -> float
+XForms.Shadow.CornerRadius.init -> void
+XForms.Shadow.Offset.get -> XForms.Point
+XForms.Shadow.Offset.init -> void
+XForms.Shadow.Shape.get -> XForms.ShadowShape
+XForms.Shadow.Shape.init -> void
+XForms.Shadow.Shadow() -> void
+XForms.ShadowShape
+XForms.ShadowShape.Ellipse = 1 -> XForms.ShadowShape
+XForms.ShadowShape.Rectangle = 0 -> XForms.ShadowShape
+XForms.View.Shadow.get -> XForms.Shadow
+XForms.View.Shadow.set -> void
+XForms.Frame.BeginReplace(XForms.Page page, XForms.NavigationMode mode = XForms.NavigationMode.Forward) -> XForms.PageSwitch
+XForms.PageSwitch
+XForms.PageSwitch.Page.get -> XForms.Page
+XForms.PageSwitch.Progress.get -> float
+XForms.PageSwitch.Progress.set -> void
+XForms.PageSwitch.CompleteAsync() -> System.Threading.Tasks.Task
+XForms.PageSwitch.CancelAsync() -> System.Threading.Tasks.Task
+XForms.Shadow.<Clone>$() -> XForms.Shadow
+XForms.Shadow.Equals(XForms.Shadow other) -> bool
+override XForms.Shadow.Equals(object obj) -> bool
+override XForms.Shadow.GetHashCode() -> int
+override XForms.Shadow.ToString() -> string
+static XForms.Shadow.operator !=(XForms.Shadow left, XForms.Shadow right) -> bool
+static XForms.Shadow.operator ==(XForms.Shadow left, XForms.Shadow right) -> bool

@@ -344,22 +344,40 @@ namespace XForms.iOS
             }
         }
 
-        // TODO: Replace with a Shadow property on View
-        public override void FillEllipseShadow(
+        public override void FillShadow(
             Rect rectangle,
-            Color color,
-            float shadowBlur = 8.0f)
+            Shadow shadow)
         {
-            rectangle = rectangle.Inflate(-2 * shadowBlur, -2 * shadowBlur);
+            if ((null == shadow) || shadow.Color.IsTransparent)
+            {
+                return;
+            }
 
-            var rect = rectangle.ToCGRect();
+            // Draws the shape far to the left with its shadow offset back, so
+            // only the shadow shows. The shadow's offset and blur are in device
+            // space, which a horizontal offset needs only the scale for.
+            const float Far = 10000;
+            var context = this._graphicsContext;
+            var ctm = context.GetCTM();
+            var scale = (nfloat)Math.Sqrt((ctm.A * ctm.A) + (ctm.B * ctm.B));
+            var shape = rectangle.Offset(shadow.Offset.X - Far, shadow.Offset.Y).ToCGRect();
 
-            //this._graphicsContext.SaveState();
-            this._graphicsContext.SetShadow(new CGSize(shadowBlur, shadowBlur), shadowBlur, color.ToCGColor());
-            this._graphicsContext.SetFillColor(color.ToCGColor());
-            this._graphicsContext.FillEllipseInRect(rect);
-            this._graphicsContext.SetShadow(CGSize.Empty, 0, null);
-            //this._graphicsContext.RestoreState();
+            context.SaveState();
+            context.SetShadow(new CGSize(ctm.A * Far, ctm.B * Far), shadow.Blur * scale / 2, shadow.Color.ToCGColor());
+            context.SetFillColor(UIColor.Black.CGColor);
+            if (shadow.Shape == ShadowShape.Ellipse)
+            {
+                context.FillEllipseInRect(shape);
+            }
+            else
+            {
+                using (var path = UIBezierPath.FromRoundedRect(shape, shadow.CornerRadius))
+                {
+                    context.AddPath(path.CGPath);
+                    context.FillPath();
+                }
+            }
+            context.RestoreState();
         }
 
         public override void DrawLine(

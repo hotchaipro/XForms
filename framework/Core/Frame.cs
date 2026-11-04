@@ -13,6 +13,7 @@ namespace XForms
     {
         private readonly Stack<Page> _backStack = new Stack<Page>();
         private Page _currentPage;
+        private PageSwitch _pageSwitch;
 
         /// <summary>
         /// The window a root frame shows in, for a window the app opened; null
@@ -142,6 +143,70 @@ namespace XForms
         }
 
         /// <summary>
+        /// Starts showing the page in place of the current one (as
+        /// <see cref="ReplaceAsync"/> does), following a gesture: it slides in
+        /// as far as the switch's <see cref="PageSwitch.Progress"/>, then
+        /// completes or goes back. Returns null if there's no current page,
+        /// it's the page, the current page cancels, or a switch is under way.
+        /// </summary>
+        public PageSwitch BeginReplace(
+            Page page,
+            NavigationMode mode = NavigationMode.Forward)
+        {
+            if (null == page)
+            {
+                throw new ArgumentNullException(nameof(page));
+            }
+
+            var currentPage = this._currentPage;
+            if ((null == currentPage) || (page == currentPage) || (null != this._pageSwitch))
+            {
+                return null;
+            }
+
+            if (!currentPage.OnNavigatingFrom(new NavigationEventArgs(mode)))
+            {
+                return null;
+            }
+
+            this.Attach(page);
+            if (page.IsHotReloadPending)
+            {
+                page.ApplyHotReload();
+            }
+            this.Renderer.BringToFront(page);
+
+            this._pageSwitch = new PageSwitch(this, page, currentPage, mode);
+            page.IsVisible = true;
+            return this._pageSwitch;
+        }
+
+        // A switch completes: its page is the current one, as the rest of its
+        // slide plays
+        internal void OnPageSwitchCompleting(
+            PageSwitch pageSwitch)
+        {
+            this.MakeCurrent(pageSwitch.Page, pageSwitch.LeavingPage, pageSwitch.Mode);
+        }
+
+        // A switch ended: the page that isn't current is hidden
+        internal void OnPageSwitchEnded(
+            PageSwitch pageSwitch)
+        {
+            if (this._pageSwitch == pageSwitch)
+            {
+                this._pageSwitch = null;
+            }
+
+            var hidden = (pageSwitch.Page == this._currentPage) ? pageSwitch.LeavingPage : pageSwitch.Page;
+            this.HidePage(hidden, remove: false);
+            if (pageSwitch.Page.Shadow == PageTransition.EdgeShadow)
+            {
+                pageSwitch.Page.Shadow = null;
+            }
+        }
+
+        /// <summary>
         /// Goes back to the previous page. Completes with false if there's
         /// none, or the current page cancels.
         /// </summary>
@@ -199,6 +264,26 @@ namespace XForms
             }
 
             arriving.IsVisible = true;
+            this.MakeCurrent(arriving, leaving, mode);
+
+            if ((null != leaving) && (transition != PageTransition.None))
+            {
+                var context = new PageTransitionContext(isBack ? leaving : arriving, isBack, slideFromStart, this.Bounds.Size, this.TransitionDuration);
+                await (transition ?? PageTransition.Slide).PlayAsync(context);
+            }
+
+            if ((null != leaving) && (leaving != this._currentPage))
+            {
+                this.HidePage(leaving, removeLeavingPage);
+            }
+        }
+
+        // The arriving page is the current one, and the pages hear so
+        private void MakeCurrent(
+            Page arriving,
+            Page leaving,
+            NavigationMode mode)
+        {
             this._currentPage = arriving;
             if (null == this.Window)
             {
@@ -213,32 +298,29 @@ namespace XForms
                 this.Application.Renderer.EndTextEntry();
             }
             arriving.OnNavigatedTo(new NavigationEventArgs(mode));
+        }
 
-            if ((null != leaving) && (transition != PageTransition.None))
+        // Hides a page that's no longer shown, and puts it back (a transition
+        // leaves a leaving page where it ended: off-screen, or faded out)
+        private void HidePage(
+            Page page,
+            bool remove)
+        {
+            page.IsVisible = false;
+            var animator = page.Animator;
+            if (null != animator)
             {
-                var context = new PageTransitionContext(isBack ? leaving : arriving, isBack, slideFromStart, this.Bounds.Size, this.TransitionDuration);
-                await (transition ?? PageTransition.Slide).PlayAsync(context);
+                animator.Translation = Point.Zero;
+                animator.Scale = 1;
+                animator.Rotation = default;
+                animator.Opacity = 1;
             }
+            page.Shadow = null;
 
-            if ((null != leaving) && (leaving != this._currentPage))
+            if (remove)
             {
-                // Hidden first, then put back (a transition leaves a leaving
-                // page where it ended: off-screen, or faded out)
-                leaving.IsVisible = false;
-                var animator = leaving.Animator;
-                if (null != animator)
-                {
-                    animator.Translation = Point.Zero;
-                    animator.Scale = 1;
-                    animator.Rotation = default;
-                    animator.Opacity = 1;
-                }
-
-                if (removeLeavingPage)
-                {
-                    this.Detach(leaving);
-                    leaving.OnRemovedFromBackStack();
-                }
+                this.Detach(page);
+                page.OnRemovedFromBackStack();
             }
         }
 

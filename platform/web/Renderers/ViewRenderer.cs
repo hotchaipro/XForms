@@ -331,6 +331,26 @@ namespace XForms.Web.Renderers
             }
         }
 
+        // CSS's box shadow, around the element's (rounded) border box
+        public Shadow Shadow
+        {
+            set
+            {
+                if ((null == value) || value.Color.IsTransparent)
+                {
+                    Js.SetStyle(this.Id, "box-shadow", null);
+                    Js.SetStyle(this.Id, "border-radius", null);
+                    return;
+                }
+
+                Js.SetStyle(this.Id, "box-shadow", string.Format(CultureInfo.InvariantCulture, "{0}px {1}px {2}px {3}", value.Offset.X, value.Offset.Y, value.Blur, Css(value.Color)));
+                Js.SetStyle(
+                    this.Id,
+                    "border-radius",
+                    (value.Shape == ShadowShape.Ellipse) ? "50%" : ((value.CornerRadius > 0) ? string.Format(CultureInfo.InvariantCulture, "{0}px", value.CornerRadius) : null));
+            }
+        }
+
         #endregion Layout
 
         #region Properties

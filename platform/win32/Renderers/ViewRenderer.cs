@@ -80,6 +80,13 @@ namespace XForms.Win32.Renderers
         private bool _clipToBounds;
         private Color _backgroundColor = Colors.Transparent;
 
+        // The shadow, drawn into a visual of its own behind the view's, in its
+        // innermost animation layer (a lightweight view's layer draws it)
+        private Shadow _shadow;
+        private IDCompositionVisual2* _shadowVisual;
+        private IDCompositionSurface* _shadowSurface;
+        private int _shadowSurfaceWidth, _shadowSurfaceHeight;
+
         protected ViewRenderer(
             View view,
             bool isContainer)
@@ -497,6 +504,10 @@ namespace XForms.Win32.Renderers
 
                 this.UpdateClip();
                 this.OnResized();
+                if (null != this._shadow)
+                {
+                    this.UpdateShadow();
+                }
             }
 
             if (this._isContainer)
@@ -516,6 +527,127 @@ namespace XForms.Win32.Renderers
             {
                 this._clipToBounds = value;
                 this.UpdateClip();
+            }
+        }
+
+        public Shadow Shadow
+        {
+            set
+            {
+                this._shadow = value;
+                if (this._isLightweight)
+                {
+                    this.InvalidateRender();
+                }
+                else
+                {
+                    this.UpdateShadow();
+                }
+            }
+        }
+
+        // NOTE: A native view's shadow is drawn in its innermost animation
+        // layer, behind its own visual, so it moves with the view; a view
+        // without animators has no shadow (the views that cast one, such as
+        // floating buttons and sliding pages, have them)
+        private void UpdateShadow()
+        {
+            var shadow = this._shadow;
+            float scale = this.Host.Scale;
+            int margin = (int)Math.Ceiling((null == shadow) ? 0 : (shadow.Blur + Math.Max(Math.Abs(shadow.Offset.X), Math.Abs(shadow.Offset.Y)) + 2));
+            int width = (int)Math.Ceiling((this._frame.Width + (2 * margin)) * scale);
+            int height = (int)Math.Ceiling((this._frame.Height + (2 * margin)) * scale);
+            if ((null == shadow) || shadow.Color.IsTransparent || (null == this._layers) || (this._frame.Width <= 0) || (this._frame.Height <= 0))
+            {
+                this.ReleaseShadow();
+                return;
+            }
+
+            if (null == this._shadowVisual)
+            {
+                IDCompositionVisual2* visual;
+                this.Host.CompositionDevice->CreateVisual(&visual);
+                this._shadowVisual = visual;
+
+                // NOTE: With a reference visual, insertAbove false places the
+                // child behind it
+                this._layers[this._layers.Length - 1].Visual->AddVisual((IDCompositionVisual*)visual, false, (IDCompositionVisual*)this._visual);
+            }
+
+            if ((null == this._shadowSurface) || (width != this._shadowSurfaceWidth) || (height != this._shadowSurfaceHeight))
+            {
+                if (null != this._shadowSurface)
+                {
+                    this._shadowSurface->Release();
+                }
+
+                IDCompositionSurface* surface;
+                this.Host.CompositionDevice->CreateSurface(
+                    (uint)width,
+                    (uint)height,
+                    DXGI_FORMAT.DXGI_FORMAT_B8G8R8A8_UNORM,
+                    DXGI_ALPHA_MODE.DXGI_ALPHA_MODE_PREMULTIPLIED,
+                    &surface);
+                this._shadowSurface = surface;
+                this._shadowSurfaceWidth = width;
+                this._shadowSurfaceHeight = height;
+                this._shadowVisual->SetContent((IUnknown*)surface);
+            }
+
+            this._shadowVisual->SetOffsetX(-margin * scale);
+            this._shadowVisual->SetOffsetY(-margin * scale);
+
+            this._shadowSurface->BeginDraw(null, ID2D1DeviceContext.IID_Guid, out var contextPointer, out var surfaceOffset);
+            var context = (ID2D1DeviceContext*)contextPointer;
+            try
+            {
+                context->SetDpi(96, 96);
+                context->SetTransform(new D2D_MATRIX_3X2_F()
+                {
+                    Anonymous = new D2D_MATRIX_3X2_F._Anonymous_e__Union()
+                    {
+                        Anonymous1 = new D2D_MATRIX_3X2_F._Anonymous_e__Union._Anonymous1_e__Struct()
+                        {
+                            m11 = scale,
+                            m22 = scale,
+                            dx = surfaceOffset.X,
+                            dy = surfaceOffset.Y,
+                        },
+                    },
+                });
+
+                var drawContext = new DrawContext(context, new Rect(0, 0, width / scale, height / scale));
+                drawContext.Clear(Colors.Transparent);
+                drawContext.FillShadow(new Rect(margin, margin, this._frame.Width, this._frame.Height), shadow);
+                drawContext.Release();
+            }
+            finally
+            {
+                this._shadowSurface->EndDraw();
+                context->Release();
+            }
+        }
+
+        private void ReleaseShadow()
+        {
+            if (null != this._shadowVisual)
+            {
+                if (null != this._layers)
+                {
+                    this._layers[this._layers.Length - 1].Visual->RemoveVisual((IDCompositionVisual*)this._shadowVisual);
+                }
+
+                this._shadowVisual->SetContent(null);
+                this._shadowVisual->Release();
+                this._shadowVisual = null;
+            }
+
+            if (null != this._shadowSurface)
+            {
+                this._shadowSurface->Release();
+                this._shadowSurface = null;
+                this._shadowSurfaceWidth = 0;
+                this._shadowSurfaceHeight = 0;
             }
         }
 
@@ -964,6 +1096,14 @@ namespace XForms.Win32.Renderers
                 var translation = drawContext.PushTransform(System.Numerics.Matrix3x2.CreateTranslation(frame.X, frame.Y));
                 var clip = child._clipToBounds ? drawContext.PushClip(bounds) : default;
 
+                // The shadow is outside the view, so its clip doesn't cut it
+                if (null != child._shadow)
+                {
+                    clip.Dispose();
+                    drawContext.FillShadow(bounds, child._shadow);
+                    clip = child._clipToBounds ? drawContext.PushClip(bounds) : default;
+                }
+
                 var previous = LayerHost.SetLightweightBounds(drawContext, bounds);
                 try
                 {
@@ -1099,6 +1239,10 @@ namespace XForms.Win32.Renderers
             layers[count - 1].Visual->AddVisual((IDCompositionVisual*)this._visual, false, null);
             this._layers = layers;
             this.UpdateOffset();
+            if (null != this._shadow)
+            {
+                this.UpdateShadow();
+            }
 
             return layers;
         }

@@ -146,6 +146,69 @@ namespace XForms.Android.Renderers
             }
         }
 
+        // NOTE: Android draws a view's shadow from its elevation and outline,
+        // with its own light: the shadow's blur and offset set how high the
+        // view floats, and its color the shadow's (from API 28)
+        public Shadow Shadow
+        {
+            set
+            {
+                var nativeView = this._nativeView;
+                if (null == nativeView)
+                {
+                    return;
+                }
+
+                if ((null == value) || value.Color.IsTransparent)
+                {
+                    nativeView.Elevation = 0;
+                    if (nativeView.OutlineProvider is ShadowOutlineProvider)
+                    {
+                        nativeView.OutlineProvider = ViewOutlineProvider.Background;
+                    }
+
+                    return;
+                }
+
+                nativeView.OutlineProvider = new ShadowOutlineProvider(value, this.DevicePixelsToPixels(value.CornerRadius));
+                nativeView.Elevation = this.DevicePixelsToPixels(Math.Max(value.Blur / 2, value.Offset.Y));
+                if (OperatingSystem.IsAndroidVersionAtLeast(28))
+                {
+                    var color = Color.FromArgb(0xff, value.Color.R, value.Color.G, value.Color.B).ToAndroidColor();
+                    nativeView.SetOutlineSpotShadowColor(color);
+                    nativeView.SetOutlineAmbientShadowColor(color);
+                }
+            }
+        }
+
+        private sealed class ShadowOutlineProvider : ViewOutlineProvider
+        {
+            private readonly Shadow _shadow;
+            private readonly float _cornerRadius;
+
+            public ShadowOutlineProvider(
+                Shadow shadow,
+                float cornerRadius)
+            {
+                this._shadow = shadow;
+                this._cornerRadius = cornerRadius;
+            }
+
+            public override void GetOutline(
+                AndroidView view,
+                global::Android.Graphics.Outline outline)
+            {
+                if (this._shadow.Shape == ShadowShape.Ellipse)
+                {
+                    outline.SetOval(0, 0, view.Width, view.Height);
+                }
+                else
+                {
+                    outline.SetRoundRect(0, 0, view.Width, view.Height, this._cornerRadius);
+                }
+            }
+        }
+
         private int ToMeasureSpec(
             float availableLength)
         {
