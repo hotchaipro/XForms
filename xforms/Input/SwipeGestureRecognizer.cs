@@ -19,8 +19,32 @@ namespace XForms.Input
             int direction);
     }
 
+    /// <summary>
+    /// A sideways swipe (or a tap). A touch that moves
+    /// <see cref="Slop"/> from where it pressed is a swipe if it went mostly
+    /// sideways (and the gesture then claims the pointer from a scrolling
+    /// parent), or nothing if it went mostly up or down (the parent scrolls);
+    /// one that lifts within the slop is a tap. A quick swipe that lifts
+    /// before any move arrives is still a swipe.
+    /// </summary>
     public class SwipeGestureRecognizer : GestureRecognizer
     {
+        /// <summary>
+        /// How far a touch moves before it's a swipe (or a scroll), not a tap.
+        /// </summary>
+        public const float Slop = 10.0f;
+
+        // A swipe is sideways if it moved at least this much sideways for
+        // each point up or down (about 53 degrees from level, or less)
+        private const float SidewaysRatio = 0.75f;
+
+        // The recent moves, for the swipe's speed as it lifts
+        private const int VelocitySamples = 4;
+        private static readonly long VelocityWindow = System.Diagnostics.Stopwatch.Frequency / 10;
+        private readonly long[] _sampleTimes = new long[VelocitySamples];
+        private readonly float[] _sampleDistances = new float[VelocitySamples];
+        private int _sampleCount;
+
         private ISwipeGestureDelegate _delegate;
         private int _swipeDirection;
         private Point _gestureStart;
@@ -35,6 +59,17 @@ namespace XForms.Input
             }
 
             this._delegate = swipeDelegate;
+        }
+
+        /// <summary>
+        /// How fast the swipe was moving its way as it lifted, in points a
+        /// second (negative going back): for a delegate deciding, in
+        /// OnSwipeEnded, whether a short swipe was a flick.
+        /// </summary>
+        public float Velocity
+        {
+            get;
+            private set;
         }
 
         public override void Reset()
@@ -79,99 +114,147 @@ namespace XForms.Input
 
                     this._swipeDirection = 0;
                     this._gestureStart = touch.Position;
+                    this._sampleCount = 0;
+                    this.Velocity = 0;
 
                     this._delegate.OnTapBegan();
                 }
+
+                return;
             }
-            else if (this.State != GestureState.Possible)
+
+            if (this.State == GestureState.Possible)
             {
-                float dx = (float)(touch.Position.X - this._gestureStart.X);
+                return;
+            }
 
-                if (this._swipeDirection == 0)
-                {
-                    this._swipeDirection = Math.Sign(dx);
-                }
+            float rawDx = (float)(touch.Position.X - this._gestureStart.X);
+            float rawDy = (float)(touch.Position.Y - this._gestureStart.Y);
 
-                if (Math.Sign(dx) != this._swipeDirection)
+            // Past the slop, the touch is a swipe if it went mostly sideways
+            if ((this.State == GestureState.Began)
+                && ((touch.State == PointerInputState.Moved) || (touch.State == PointerInputState.Ended))
+                && (((rawDx * rawDx) + (rawDy * rawDy)) >= (Slop * Slop)))
+            {
+                if (Math.Abs(rawDx) >= Math.Abs(rawDy) * SidewaysRatio)
                 {
-                    dx = 0;
+                    this._swipeDirection = Math.Sign(rawDx);
+                    this.State = GestureState.Changed;
+                    this.AddSample(0);
+                    this._delegate.OnSwipeBegan(this._swipeDirection);
                 }
                 else
                 {
-                    dx = Math.Abs(dx);
-                }
-
-                double dy = Math.Abs(touch.Position.Y - this._gestureStart.Y);
-
-                if (touch.State == PointerInputState.Moved)
-                {
-                    if (this.State == GestureState.Began)
-                    {
-                        if (dx >= Application.TouchSlop)
-                        {
-                            this._delegate.OnSwipeBegan(this._swipeDirection);
-
-                            this.State = GestureState.Changed;
-                        }
-                        else if (dy >= Application.TouchSlop)
-                        {
-                            this.State = GestureState.Failed;
-
-                            this._delegate.OnTapEnded();
-                        }
-                    }
-                    else if (this.State == GestureState.Changed)
-                    {
-                        this._delegate.OnSwipeMoved(this._swipeDirection, dx);
-                    }
-
-                    // NOTE: A handled move claims the pointer exclusively, so only
-                    // claim it once a swipe is under way; until then (and after a
-                    // vertical drag fails the swipe) a scrolling parent may take over
-                    result.DidHandleEvent = (this.State == GestureState.Changed);
-                }
-                else if (touch.State == PointerInputState.Ended)
-                {
-                    if (this.State == GestureState.Began)
-                    {
-                        this.State = GestureState.Recognized;
-
-                        this._delegate.OnTapped();
-
-                        this._delegate.OnTapEnded();
-                    }
-                    else if (this.State == GestureState.Changed)
-                    {
-                        this._delegate.OnSwipeEnded(this._swipeDirection, dx);
-
-                        this._delegate.OnTapEnded();
-
-                        this.State = GestureState.Recognized;
-                    }
-                    else
-                    {
-                        this.State = GestureState.Failed;
-                    }
-                }
-                else if (touch.State == PointerInputState.Canceled)
-                {
-                    if (this.State == GestureState.Began)
-                    {
-                        this._delegate.OnTapEnded();
-                    }
-                    else if (this.State == GestureState.Changed)
-                    {
-                        this._delegate.OnSwipeCanceled(this._swipeDirection);
-
-                        this._delegate.OnTapEnded();
-                    }
-
-                    if (this.State != GestureState.Possible)
-                    {
-                        this.State = GestureState.Canceled;
-                    }
+                    // Up or down: the parent scrolls, and it's no tap
+                    this.State = GestureState.Failed;
+                    this._delegate.OnTapEnded();
+                    result.DidHandleEvent = false;
+                    return;
                 }
             }
+
+            // The distance its way (0 once it's gone back past where it began)
+            float dx = Math.Max(0, rawDx * this._swipeDirection);
+
+            if (touch.State == PointerInputState.Moved)
+            {
+                if (this.State == GestureState.Changed)
+                {
+                    this.AddSample(dx);
+                    this._delegate.OnSwipeMoved(this._swipeDirection, dx);
+                }
+
+                // NOTE: A handled move claims the pointer exclusively, so only
+                // claim it once a swipe is under way; until then (and after a
+                // vertical drag fails the swipe) a scrolling parent may take over
+                result.DidHandleEvent = (this.State == GestureState.Changed);
+            }
+            else if (touch.State == PointerInputState.Ended)
+            {
+                if (this.State == GestureState.Began)
+                {
+                    // Within the slop: a tap
+                    this.State = GestureState.Recognized;
+
+                    this._delegate.OnTapped();
+
+                    this._delegate.OnTapEnded();
+                }
+                else if (this.State == GestureState.Changed)
+                {
+                    this.AddSample(dx);
+                    this.Velocity = this.MeasureVelocity();
+                    this._delegate.OnSwipeMoved(this._swipeDirection, dx);
+                    this._delegate.OnSwipeEnded(this._swipeDirection, dx);
+
+                    this._delegate.OnTapEnded();
+
+                    this.State = GestureState.Recognized;
+                }
+                else
+                {
+                    this.State = GestureState.Failed;
+                }
+            }
+            else if (touch.State == PointerInputState.Canceled)
+            {
+                if (this.State == GestureState.Began)
+                {
+                    this._delegate.OnTapEnded();
+                }
+                else if (this.State == GestureState.Changed)
+                {
+                    this._delegate.OnSwipeCanceled(this._swipeDirection);
+
+                    this._delegate.OnTapEnded();
+                }
+
+                if (this.State != GestureState.Possible)
+                {
+                    this.State = GestureState.Canceled;
+                }
+            }
+        }
+
+        private void AddSample(
+            float distance)
+        {
+            if (this._sampleCount == VelocitySamples)
+            {
+                Array.Copy(this._sampleTimes, 1, this._sampleTimes, 0, VelocitySamples - 1);
+                Array.Copy(this._sampleDistances, 1, this._sampleDistances, 0, VelocitySamples - 1);
+                this._sampleCount -= 1;
+            }
+
+            this._sampleTimes[this._sampleCount] = System.Diagnostics.Stopwatch.GetTimestamp();
+            this._sampleDistances[this._sampleCount] = distance;
+            this._sampleCount += 1;
+        }
+
+        // Points a second, over the recent moves (a finger that stopped before
+        // it lifted has none)
+        private float MeasureVelocity()
+        {
+            int last = this._sampleCount - 1;
+            if (last < 1)
+            {
+                return 0;
+            }
+
+            long now = this._sampleTimes[last];
+            int first = last;
+            while ((first > 0) && ((now - this._sampleTimes[first - 1]) <= VelocityWindow))
+            {
+                first -= 1;
+            }
+
+            if (first == last)
+            {
+                return 0;
+            }
+
+            double seconds = (double)(now - this._sampleTimes[first]) / System.Diagnostics.Stopwatch.Frequency;
+            return (seconds > 0) ? (float)((this._sampleDistances[last] - this._sampleDistances[first]) / seconds) : 0;
         }
     }
 }

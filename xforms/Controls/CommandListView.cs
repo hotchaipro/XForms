@@ -284,7 +284,8 @@ namespace XForms.Controls
             // The swipe recognizer reports taps too, so it replaces the list
             // item's tap recognizer
             this.GestureRecognizers.Clear();
-            this.GestureRecognizers.Add(new SwipeGestureRecognizer(this));
+            this._swipeRecognizer = new SwipeGestureRecognizer(this);
+            this.GestureRecognizers.Add(this._swipeRecognizer);
         }
 
         private CommandListView CommandListView
@@ -422,6 +423,12 @@ namespace XForms.Controls
 
         #region Swipe input
 
+        private SwipeGestureRecognizer _swipeRecognizer;
+
+        // A short swipe this fast (points a second, its way) as it lifts runs
+        // its command: a flick
+        private const float FlickVelocity = 400.0f;
+
         private float _swipeFencePosition;
         private bool _swipeEnabled;
         private bool _longSwipe;
@@ -539,7 +546,7 @@ namespace XForms.Controls
             int direction,
             float dx)
         {
-            if (this._swipeEnabled)
+            if (this._swipeEnabled || this.IsFlick(direction))
             {
                 CompleteSwipe(direction);
             }
@@ -557,6 +564,23 @@ namespace XForms.Controls
             CancelSwipe(direction);
 
             return true;
+        }
+
+        // A quick, short swipe its way runs the (short swipe's) command, if
+        // it can run and doesn't need a long swipe
+        private bool IsFlick(
+            int direction)
+        {
+            if ((this._swipeRecognizer?.Velocity ?? 0) < FlickVelocity)
+            {
+                return false;
+            }
+
+            var swipeCommands = this.CommandListView?.SwipeCommands;
+            bool isLongSwipeRequired = (direction > 0)
+                ? (swipeCommands?.IsLongSwipeRequiredForPrimaryCommands ?? false)
+                : (swipeCommands?.IsLongSwipeRequiredForSecondaryCommands ?? false);
+            return !isLongSwipeRequired && (null != this._swipeCommand) && this._swipeCommand.CanExecute(this.Item);
         }
 
         private void UpdateSwipeCommand(
