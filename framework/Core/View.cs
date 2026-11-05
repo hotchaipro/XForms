@@ -1042,6 +1042,13 @@ namespace XForms
                     return false;
                 }
 
+                // A view raised over its siblings is a layer of its own: its
+                // layer draws lightweight views beneath every native view in it
+                if (0 != this._zIndex)
+                {
+                    return false;
+                }
+
                 return (this.Parent is View parent) && !parent.RequiresNativeChildren;
             }
         }
@@ -2530,7 +2537,9 @@ namespace XForms
         /// <summary>
         /// The view's order among its siblings in a panel: views with a higher
         /// index draw above (and are hit before) views with a lower one. Views
-        /// with the same index keep the order they were added in.
+        /// with the same index keep the order they were added in. To draw over
+        /// a native sibling, such as a frame, set it before the view is shown:
+        /// a view with an index other than 0 is then a layer of its own.
         /// </summary>
         public int ZIndex
         {

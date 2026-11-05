@@ -82,6 +82,23 @@ namespace XForms.Tests
         }
 
         [Fact]
+        public void AViewRaisedOverItsSiblingsIsALayerOfItsOwn()
+        {
+            var plain = new Box();
+            var raised = new Box() { ZIndex = 1 };
+            var tabStrip = new TabStrip();
+
+            var parent = new Box(plain, raised, tabStrip);
+            plain.Parent = parent;
+            raised.Parent = parent;
+            tabStrip.Parent = parent;
+
+            Assert.True(plain.CanBeLightweight);
+            Assert.False(raised.CanBeLightweight);
+            Assert.False(tabStrip.CanBeLightweight);
+        }
+
+        [Fact]
         public void ANavigationViewsPaneComesBeforeItsContent()
         {
             var navigationView = new NavigationView();
