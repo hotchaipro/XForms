@@ -6,6 +6,14 @@ namespace XForms.Primitives
 {
     public class ScrollViewer : View
     {
+        internal override bool ScrollsContent
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         // Its content is a layer of its own
         internal override bool RequiresNativeChildren
         {

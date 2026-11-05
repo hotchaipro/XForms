@@ -64,6 +64,17 @@ namespace XForms.iOS
             this.ContentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentBehavior.Never;
             this.BackgroundColor = UIColor.Clear;
             this.RegisterClassForCell(typeof(NativeCollectionViewCell), NativeCollectionViewCell.CellReuseIdentifier);
+
+            // Touches go straight to the content (see NativeListView)
+            this.DelaysContentTouches = false;
+        }
+
+        // A drag on a native control in the view (a text field) scrolls it too:
+        // with touches not held back, the control has them by then
+        public override bool TouchesShouldCancelInContentView(
+            UIView view)
+        {
+            return true;
         }
 
         private static UICollectionViewFlowLayout CreateLayout(

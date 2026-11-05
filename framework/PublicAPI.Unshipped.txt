@@ -190,3 +190,4 @@ XForms.GestureState.Possible = 1 -> XForms.GestureState
 XForms.GestureState.Ready = 0 -> XForms.GestureState
 XForms.GestureState.Recognized = 2 -> XForms.GestureState
 abstract XForms.GestureRecognizer.OnPointerInput(XForms.PointerEventArgs e) -> void
+XForms.View.IsDragPossible.get -> bool

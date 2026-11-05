@@ -35,6 +35,18 @@ namespace XForms.iOS
             this.RowHeight = UITableView.AutomaticDimension;
             this.EstimatedRowHeight = 60;
             this.KeyboardDismissMode = UIScrollViewKeyboardDismissMode.OnDrag;
+
+            // Touches go straight to the content (the system holds them back
+            // about 150ms by default), so a row's swipe starts with the finger
+            this.DelaysContentTouches = false;
+        }
+
+        // A drag on a native control in the view (a text field) scrolls it too:
+        // with touches not held back, the control has them by then
+        public override bool TouchesShouldCancelInContentView(
+            UIView view)
+        {
+            return true;
         }
 
         public override CGSize SizeThatFits(

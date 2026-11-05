@@ -591,6 +591,13 @@ it can still be either, so drag gestures see each event first. A
 `PanGestureRecognizer.ShouldBegin` can decline a drag as it passes the slop,
 leaving it to others; its `Velocity`, like a swipe's, is its speed as it lifts.
 
+A pressed look shows only once a press is likely to stay one. A touch that may
+yet become a drag (`View.IsDragPossible`: the view or an ancestor has a drag
+gesture, or an ancestor scrolls) starts its tap's press 100ms later, or as it
+lifts, so a swipe or a scroll never flashes it. A mouse, and a view nothing can
+drag, press at once. Input itself isn't delayed: iOS's scrolling views don't hold
+touches back (`DelaysContentTouches`), so a gesture sees a touch as it lands.
+
 Three rules keep scrolling native:
 
 - **A gesture claims Moved events only once it is sure.** A swipe or pan claims

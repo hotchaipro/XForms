@@ -19,6 +19,17 @@ namespace XForms.iOS
             // bars; a view that reaches into them insets its content)
             this.ContentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentBehavior.Never;
             this.AlwaysBounceVertical = true;
+
+            // Touches go straight to the content (see NativeListView)
+            this.DelaysContentTouches = false;
+        }
+
+        // A drag on a native control in the view (a text field) scrolls it too:
+        // with touches not held back, the control has them by then
+        public override bool TouchesShouldCancelInContentView(
+            UIView view)
+        {
+            return true;
         }
 
         public bool IsVerticalScrollingEnabled

@@ -79,7 +79,10 @@ namespace XForms.Input
     /// second tap soon after a first, close to it) and holds (a press held
     /// without moving). A control handles them through its
     /// <see cref="ITapGestureDelegate"/>, which also tells it when a press
-    /// begins and ends (for pressed feedback); an app handles the events.
+    /// begins and ends (for pressed feedback); an app handles the events. A
+    /// touch that may yet become a drag (<see cref="View.IsDragPossible"/>)
+    /// begins its press a moment later, or as it lifts, so a swipe or a scroll
+    /// shows no pressed look.
     /// Activating the view (Enter, Space, a screen reader) taps it, so a view
     /// with a tap recognizer is focusable.
     /// </summary>
@@ -88,10 +91,15 @@ namespace XForms.Input
         private static readonly TimeSpan HoldTime = TimeSpan.FromMilliseconds(500);
         private static readonly TimeSpan DoubleTapTime = TimeSpan.FromMilliseconds(500);
 
+        // How long a touch that may yet become a drag holds back its pressed look
+        private static readonly TimeSpan PressDelay = TimeSpan.FromMilliseconds(100);
+
         private readonly ITapGestureDelegate _delegate;
         private Point _gestureStart;
         private PointerDeviceType _deviceType;
         private DispatcherTimer _holdTimer;
+        private DispatcherTimer _pressTimer;
+        private bool _isPressShown;
         private bool _isHolding;
         private DateTime _lastTapTime;
         private Point _lastTapPosition;
@@ -139,7 +147,7 @@ namespace XForms.Input
         {
             get
             {
-                return this.State == GestureState.Possible;
+                return this._isPressShown;
             }
         }
 
@@ -176,6 +184,7 @@ namespace XForms.Input
                 this._gestureStart = touch.Position;
                 this._deviceType = touch.DeviceType;
                 this._isHolding = false;
+                this._isPressShown = false;
 
                 if (null != this.Holding)
                 {
@@ -183,7 +192,15 @@ namespace XForms.Input
                     this._holdTimer.Start();
                 }
 
-                this._delegate?.OnTapBegan();
+                if ((touch.DeviceType != PointerDeviceType.Mouse) && this.View.IsDragPossible)
+                {
+                    this._pressTimer ??= new DispatcherTimer(PressDelay, this.OnPressTime);
+                    this._pressTimer.Start();
+                }
+                else
+                {
+                    this.ShowPress();
+                }
             }
             else if (touch.State == PointerInputState.Moved)
             {
@@ -197,6 +214,7 @@ namespace XForms.Input
             else if (touch.State == PointerInputState.Ended)
             {
                 this._holdTimer?.Stop();
+                this._pressTimer?.Stop();
 
                 if (this._isHolding)
                 {
@@ -206,6 +224,8 @@ namespace XForms.Input
                 }
                 else if (touch.Position.DistanceTo(this._gestureStart) <= Application.TapSlop)
                 {
+                    // A quick tap's press shows as it lifts
+                    this.ShowPress();
                     this.Recognize();
                     this._delegate?.OnTapped();
                     this.OnTap(touch.Position);
@@ -215,7 +235,7 @@ namespace XForms.Input
                     this.Fail();
                 }
 
-                this._delegate?.OnTapEnded();
+                this.HidePress();
             }
             else if (touch.State == PointerInputState.Canceled)
             {
@@ -247,6 +267,34 @@ namespace XForms.Input
             }
         }
 
+        private void ShowPress()
+        {
+            if (!this._isPressShown)
+            {
+                this._isPressShown = true;
+                this._delegate?.OnTapBegan();
+            }
+        }
+
+        private void HidePress()
+        {
+            if (this._isPressShown)
+            {
+                this._isPressShown = false;
+                this._delegate?.OnTapEnded();
+            }
+        }
+
+        // Still a press after the delay: its look shows
+        internal void OnPressTime()
+        {
+            this._pressTimer?.Stop();
+            if (this.State == GestureState.Possible)
+            {
+                this.ShowPress();
+            }
+        }
+
         private void OnHoldTime()
         {
             this._holdTimer.Stop();
@@ -263,6 +311,7 @@ namespace XForms.Input
         private void EndPress()
         {
             this._holdTimer?.Stop();
+            this._pressTimer?.Stop();
             this.Fail();
 
             if (this._isHolding)
@@ -271,7 +320,7 @@ namespace XForms.Input
                 this.Holding?.Invoke(this.View, new HoldingEventArgs(this._gestureStart, HoldingState.Canceled));
             }
 
-            this._delegate?.OnTapEnded();
+            this.HidePress();
         }
     }
 }

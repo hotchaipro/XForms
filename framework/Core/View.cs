@@ -3328,6 +3328,57 @@ namespace XForms
             return isHandled;
         }
 
+        /// <summary>
+        /// Whether a touch pressed on the view may yet become a drag: the view
+        /// or an ancestor has a drag gesture, or an ancestor scrolls. A control
+        /// holds back its pressed look briefly then, so a press that turns into
+        /// a swipe or a scroll doesn't flash it.
+        /// </summary>
+        public bool IsDragPossible
+        {
+            get
+            {
+                if (this.HasDragRecognizer)
+                {
+                    return true;
+                }
+
+                var view = this.ParentForDrag;
+                while (null != view)
+                {
+                    if (view.ScrollsContent || view.HasDragRecognizer)
+                    {
+                        return true;
+                    }
+
+                    view = view.ParentForDrag;
+                }
+
+                return false;
+            }
+        }
+
+        // The view a drag goes on to: a list's item containers may be held by
+        // native cells, so they name their list
+        private View ParentForDrag
+        {
+            get
+            {
+                return (this.Parent as View) ?? (this as Primitives.ItemContainer)?.ItemsView;
+            }
+        }
+
+        /// <summary>
+        /// Whether the view scrolls what's in it, taking drags on it.
+        /// </summary>
+        internal virtual bool ScrollsContent
+        {
+            get
+            {
+                return false;
+            }
+        }
+
         private bool HasDragRecognizer
         {
             get

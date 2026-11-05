@@ -69,6 +69,14 @@ namespace XForms.Primitives
     /// </remarks>
     public class ItemsView : View
     {
+        internal override bool ScrollsContent
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         private Thickness _padding;
         private Color? _backgroundColor;
         private Color? _accentColor;

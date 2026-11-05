@@ -342,7 +342,7 @@ namespace XForms.Tests
             Lift(row, 12);
 
             Assert.DoesNotContain("tapped", log.Events);
-            Assert.Equal(new[] { "tap began", "tap ended", "swipe began 1", "swipe moved 12", "swipe moved 12", "swipe ended 12" }, log.Events);
+            Assert.Equal(new[] { "swipe began 1", "swipe moved 12", "swipe moved 12", "swipe ended 12" }, log.Events);
         }
 
         // The two used to both run: the swipe commits at 10 points, and a tap
@@ -375,8 +375,8 @@ namespace XForms.Tests
 
             Assert.DoesNotContain(log.Events, e => e.StartsWith("swipe"));
 
-            // Past its slop, the tap is out too
-            Assert.Equal(new[] { "tap began", "tap ended" }, log.Events);
+            // Past its slop, the tap is out too, and no press showed
+            Assert.Empty(log.Events);
         }
 
         [Fact]
@@ -389,7 +389,7 @@ namespace XForms.Tests
             Move(row, 0, 5);
             Cancel(row, 0, 5);
 
-            Assert.Equal(new[] { "tap began", "tap ended" }, log.Events);
+            Assert.Empty(log.Events);
         }
 
         [Fact]
@@ -608,8 +608,7 @@ namespace XForms.Tests
             Move(button, 30);
             Lift(button, 30);
 
-            Assert.DoesNotContain("tapped", buttonLog.Events);
-            Assert.Equal("tap ended", buttonLog.Events[^1]);
+            Assert.Empty(buttonLog.Events);
             Assert.Contains("swipe ended 30", rowLog.Events);
         }
 
@@ -696,6 +695,131 @@ namespace XForms.Tests
 
             Assert.Empty(innerLog.Events);
             Assert.Equal(new[] { "pan started" }, outerLog.Events);
+        }
+
+        #endregion
+
+        #region Pressed looks
+
+        private sealed class Scroller : View
+        {
+            public Scroller(
+                View child)
+            {
+                this.AddVisualChild(child);
+                child.Parent = this;
+            }
+
+            internal override bool ScrollsContent => true;
+        }
+
+        [Fact]
+        public void APressShowsAtOnceWhenNothingCanDragIt()
+        {
+            var log = new Log();
+            var view = new Box();
+            view.GestureRecognizers.Add(new TapGestureRecognizer(log));
+
+            Assert.False(view.IsDragPossible);
+            Press(view);
+
+            Assert.Equal(new[] { "tap began" }, log.Events);
+            Lift(view, 0);
+        }
+
+        [Fact]
+        public void AMousePressShowsAtOnceEvenInAScroller()
+        {
+            var log = new Log();
+            var view = new Box();
+            view.GestureRecognizers.Add(new TapGestureRecognizer(log));
+            _ = new Scroller(view);
+
+            Press(view, device: PointerDeviceType.Mouse);
+
+            Assert.Equal(new[] { "tap began" }, log.Events);
+            Lift(view, 0, device: PointerDeviceType.Mouse);
+        }
+
+        [Fact]
+        public void ADragIsPossibleInAScrollerOrOverADragGesture()
+        {
+            var inScroller = new Box();
+            _ = new Scroller(new Box(inScroller));
+            Assert.True(inScroller.IsDragPossible);
+
+            var inRow = new Box();
+            Row(new Log(), false, inRow);
+            Assert.True(inRow.IsDragPossible);
+
+            Assert.True(Row(new Log()).IsDragPossible);
+        }
+
+        [Fact]
+        public void AScrollTakingATouchInAScrollerShowsNoPress()
+        {
+            var log = new Log();
+            var view = new Box();
+            view.GestureRecognizers.Add(new TapGestureRecognizer(log));
+            _ = new Scroller(view);
+
+            Press(view);
+            Move(view, 0, 8);
+            Cancel(view, 0, 8);
+
+            Assert.Empty(log.Events);
+        }
+
+        [Fact]
+        public void AQuickTapInAScrollerStillShowsItsPressThenTaps()
+        {
+            var log = new Log();
+            var view = new Box();
+            view.GestureRecognizers.Add(new TapGestureRecognizer(log));
+            _ = new Scroller(view);
+
+            Press(view);
+            Assert.Empty(log.Events);
+            Lift(view, 0);
+
+            Assert.Equal(new[] { "tap began", "tapped", "tap ended" }, log.Events);
+        }
+
+        [Fact]
+        public void APressHeldPastTheDelayShowsThenEndsOnce()
+        {
+            var log = new Log();
+            var tap = new TapGestureRecognizer(log);
+            var view = new Box();
+            view.GestureRecognizers.Add(tap);
+            _ = new Scroller(view);
+
+            Press(view);
+            Assert.False(tap.IsPressed);
+
+            tap.OnPressTime();
+            Assert.True(tap.IsPressed);
+            Assert.Equal(new[] { "tap began" }, log.Events);
+
+            Cancel(view, 0, 8);
+            Assert.False(tap.IsPressed);
+            Assert.Equal(new[] { "tap began", "tap ended" }, log.Events);
+        }
+
+        [Fact]
+        public void ThePressDelayEndingAfterTheGestureDoesNothing()
+        {
+            var log = new Log();
+            var tap = new TapGestureRecognizer(log);
+            var view = new Box();
+            view.GestureRecognizers.Add(tap);
+            _ = new Scroller(view);
+
+            Press(view);
+            Cancel(view, 0, 8);
+            tap.OnPressTime();
+
+            Assert.Empty(log.Events);
         }
 
         #endregion
