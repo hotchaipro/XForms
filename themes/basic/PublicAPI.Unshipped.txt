@@ -18,8 +18,8 @@ XForms.Themes.Basic.BasicColors.OnCommand.get -> XForms.Color
 XForms.Themes.Basic.BasicColors.OnCommand.init -> void
 XForms.Themes.Basic.BasicColors.OnPressed.get -> XForms.Color
 XForms.Themes.Basic.BasicColors.OnPressed.init -> void
-XForms.Themes.Basic.BasicColors.OnSeverity.get -> XForms.Color
-XForms.Themes.Basic.BasicColors.OnSeverity.init -> void
+XForms.Themes.Basic.BasicColors.OnSuccess.get -> XForms.Color
+XForms.Themes.Basic.BasicColors.OnSuccess.init -> void
 XForms.Themes.Basic.BasicColors.OnWarning.get -> XForms.Color
 XForms.Themes.Basic.BasicColors.OnWarning.init -> void
 XForms.Themes.Basic.BasicColors.Shadow.get -> XForms.Color

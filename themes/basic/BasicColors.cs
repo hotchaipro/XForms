@@ -25,11 +25,8 @@ namespace XForms.Themes.Basic
         /// <summary>An info bar's warning.</summary>
         public Color Warning { get; init; } = Color.FromRgb(0xE8, 0x9E, 0x00);
 
-        /// <summary>
-        /// The mark in an info bar's icon, on its severity's color, for all
-        /// but a warning.
-        /// </summary>
-        public Color OnSeverity { get; init; } = Colors.White;
+        /// <summary>The mark in an info bar's icon, on the success color.</summary>
+        public Color OnSuccess { get; init; } = Colors.White;
 
         /// <summary>The mark in an info bar's icon, on the warning color.</summary>
         public Color OnWarning { get; init; } = Colors.Black;

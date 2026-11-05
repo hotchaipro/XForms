@@ -10,17 +10,14 @@ namespace XForms.Controls
     public abstract class AppTheme
     {
         /// <summary>
-        /// The package's colors for a mode, around an accent color: plain ones
-        /// (<see cref="ColorScheme.Plain"/>) unless overridden. Where the
-        /// system gives high-contrast colors, the application uses those
-        /// instead, in that mode.
+        /// The package's colors for a mode, around an accent color. A package
+        /// over another gives that one's, or its own. Where the system gives
+        /// high-contrast colors, the application uses those instead, in that
+        /// mode.
         /// </summary>
-        public virtual ColorScheme CreateColors(
+        public abstract ColorScheme CreateColors(
             ThemeMode mode,
-            Color accentColor)
-        {
-            return ColorScheme.Plain(mode, accentColor);
-        }
+            Color accentColor);
 
         /// <summary>
         /// The theme, with this package's tokens, styles and templates added.
