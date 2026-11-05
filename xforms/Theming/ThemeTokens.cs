@@ -146,7 +146,10 @@ namespace XForms.Controls
     /// XForms.Controls' tokens in a theme (its extensions), with defaults when
     /// the theme has none: <c>theme.Typography</c>, <c>theme.Shapes</c>,
     /// <c>theme.Motion</c>, <c>theme.MenuBarStyle</c>,
-    /// <c>theme.CommandBarStyle</c>, <c>theme.PopupRowHeight</c>.
+    /// <c>theme.CommandBarStyle</c>, <c>theme.PopupRowHeight</c>, and the
+    /// controls' styles (<c>theme.CheckBoxStyle</c> and so on), which only a
+    /// theme package has: a control whose theme has no style for it throws,
+    /// as one with no template does.
     /// </summary>
     public static class ThemeTokens
     {
@@ -187,6 +190,30 @@ namespace XForms.Controls
             /// The height of a popup list's rows (see <see cref="Sizes.PopupRowHeight"/>).
             /// </summary>
             public float PopupRowHeight => theme.GetExtension<Sizes>()?.PopupRowHeight ?? ((Application.Current?.IsTouchPrimary ?? false) ? 48 : 36);
+
+            /// <summary>
+            /// How check boxes are laid out.
+            /// </summary>
+            public CheckBoxStyle CheckBoxStyle => Require<CheckBoxStyle>(theme);
+
+            /// <summary>
+            /// How sliders are laid out.
+            /// </summary>
+            public SliderStyle SliderStyle => Require<SliderStyle>(theme);
+
+            /// <summary>
+            /// How calendars are laid out.
+            /// </summary>
+            public CalendarViewStyle CalendarViewStyle => Require<CalendarViewStyle>(theme);
+        }
+
+        private static TStyle Require<TStyle>(
+            Theme theme)
+            where TStyle : class
+        {
+            return theme.GetExtension<TStyle>()
+                ?? throw new InvalidOperationException(
+                    $"The theme has no {typeof(TStyle).Name}. Pass a theme to XFormsApp.Run, such as new BasicTheme() (from XForms.Themes.Basic).");
         }
     }
 }

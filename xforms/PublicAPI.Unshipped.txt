@@ -334,8 +334,6 @@ XForms.Controls.ViewAttachments.extension(XForms.View).ContextFlyout.set -> void
 XForms.Controls.ViewAttachments.extension(XForms.View).ToolTip.get -> string
 XForms.Controls.ViewAttachments.extension(XForms.View).ToolTip.set -> void
 const XForms.Controls.AutoSuggestBox.MaximumSuggestions = 8 -> int
-const XForms.Controls.CheckBox.BoxSize = 20 -> float
-const XForms.Controls.CheckBox.TextGap = 8 -> float
 const XForms.Controls.Expander.HeaderHeight = 48 -> float
 const XForms.Controls.InfoBar.IconSize = 20 -> float
 const XForms.Controls.InfoBar.Spacing = 12 -> float
@@ -349,8 +347,6 @@ const XForms.Controls.NumberBox.SpinButtonWidth = 32 -> float
 const XForms.Controls.PasswordBox.RevealButtonWidth = 36 -> float
 const XForms.Controls.PipsPager.DotSpacing = 20 -> float
 const XForms.Controls.ProgressBar.DefaultHeight = 4 -> float
-const XForms.Controls.Slider.ThumbSize = 20 -> float
-const XForms.Controls.Slider.TouchHeight = 32 -> float
 const XForms.Controls.TimePicker.TwelveHourClock = "12HourClock" -> string
 const XForms.Controls.TimePicker.TwentyFourHourClock = "24HourClock" -> string
 const XForms.Controls.TimePickerView.RowHeight = 40 -> float
@@ -636,3 +632,60 @@ override XForms.Input.PinchGestureRecognizer.OnDetached(XForms.View view) -> voi
 override XForms.Input.PinchGestureRecognizer.OnPointerInput(XForms.PointerEventArgs e) -> void
 override XForms.Input.SwipeGestureRecognizer.OnPointerInput(XForms.PointerEventArgs touch) -> void
 override XForms.Input.TapGestureRecognizer.OnPointerInput(XForms.PointerEventArgs touch) -> void
+XForms.Controls.CheckBoxStyle
+XForms.Controls.CheckBoxStyle.BoxSize.get -> float
+XForms.Controls.CheckBoxStyle.BoxSize.init -> void
+XForms.Controls.CheckBoxStyle.TextGap.get -> float
+XForms.Controls.CheckBoxStyle.TextGap.init -> void
+XForms.Controls.CheckBoxStyle.MinimumHeight.get -> float
+XForms.Controls.CheckBoxStyle.MinimumHeight.init -> void
+XForms.Controls.SliderStyle
+XForms.Controls.SliderStyle.ThumbSize.get -> float
+XForms.Controls.SliderStyle.ThumbSize.init -> void
+XForms.Controls.SliderStyle.TouchHeight.get -> float
+XForms.Controls.SliderStyle.TouchHeight.init -> void
+XForms.Controls.SliderStyle.HeaderGap.get -> float
+XForms.Controls.SliderStyle.HeaderGap.init -> void
+XForms.Controls.SliderStyle.DefaultWidth.get -> float
+XForms.Controls.SliderStyle.DefaultWidth.init -> void
+XForms.Controls.CalendarViewStyle
+XForms.Controls.CalendarViewStyle.CellSize.get -> float
+XForms.Controls.CalendarViewStyle.CellSize.init -> void
+XForms.Controls.CalendarViewStyle.HeaderHeight.get -> float
+XForms.Controls.CalendarViewStyle.HeaderHeight.init -> void
+XForms.Controls.CalendarViewStyle.WeekdayHeight.get -> float
+XForms.Controls.CalendarViewStyle.WeekdayHeight.init -> void
+XForms.Controls.CalendarViewStyle.Inset.get -> float
+XForms.Controls.CalendarViewStyle.Inset.init -> void
+XForms.Controls.CalendarViewStyle.HeaderInset.get -> float
+XForms.Controls.CalendarViewStyle.HeaderInset.init -> void
+XForms.Controls.CalendarViewStyle.<Clone>$() -> XForms.Controls.CalendarViewStyle
+XForms.Controls.CalendarViewStyle.CalendarViewStyle() -> void
+XForms.Controls.CalendarViewStyle.Equals(XForms.Controls.CalendarViewStyle other) -> bool
+XForms.Controls.CheckBoxStyle.<Clone>$() -> XForms.Controls.CheckBoxStyle
+XForms.Controls.CheckBoxStyle.CheckBoxStyle() -> void
+XForms.Controls.CheckBoxStyle.Equals(XForms.Controls.CheckBoxStyle other) -> bool
+XForms.Controls.SliderStyle.<Clone>$() -> XForms.Controls.SliderStyle
+XForms.Controls.SliderStyle.Equals(XForms.Controls.SliderStyle other) -> bool
+XForms.Controls.SliderStyle.SliderStyle() -> void
+XForms.Controls.ThemeTokens.extension(XForms.Theme).CalendarViewStyle.get -> XForms.Controls.CalendarViewStyle
+XForms.Controls.ThemeTokens.extension(XForms.Theme).CheckBoxStyle.get -> XForms.Controls.CheckBoxStyle
+XForms.Controls.ThemeTokens.extension(XForms.Theme).SliderStyle.get -> XForms.Controls.SliderStyle
+override XForms.Controls.CalendarViewStyle.Equals(object obj) -> bool
+override XForms.Controls.CalendarViewStyle.GetHashCode() -> int
+override XForms.Controls.CalendarViewStyle.ToString() -> string
+override XForms.Controls.CheckBoxStyle.Equals(object obj) -> bool
+override XForms.Controls.CheckBoxStyle.GetHashCode() -> int
+override XForms.Controls.CheckBoxStyle.ToString() -> string
+override XForms.Controls.SliderStyle.Equals(object obj) -> bool
+override XForms.Controls.SliderStyle.GetHashCode() -> int
+override XForms.Controls.SliderStyle.ToString() -> string
+static XForms.Controls.CalendarViewStyle.operator !=(XForms.Controls.CalendarViewStyle left, XForms.Controls.CalendarViewStyle right) -> bool
+static XForms.Controls.CalendarViewStyle.operator ==(XForms.Controls.CalendarViewStyle left, XForms.Controls.CalendarViewStyle right) -> bool
+static XForms.Controls.CheckBoxStyle.operator !=(XForms.Controls.CheckBoxStyle left, XForms.Controls.CheckBoxStyle right) -> bool
+static XForms.Controls.CheckBoxStyle.operator ==(XForms.Controls.CheckBoxStyle left, XForms.Controls.CheckBoxStyle right) -> bool
+static XForms.Controls.SliderStyle.operator !=(XForms.Controls.SliderStyle left, XForms.Controls.SliderStyle right) -> bool
+static XForms.Controls.SliderStyle.operator ==(XForms.Controls.SliderStyle left, XForms.Controls.SliderStyle right) -> bool
+static XForms.Controls.ThemeTokens.get_CalendarViewStyle(XForms.Theme theme) -> XForms.Controls.CalendarViewStyle
+static XForms.Controls.ThemeTokens.get_CheckBoxStyle(XForms.Theme theme) -> XForms.Controls.CheckBoxStyle
+static XForms.Controls.ThemeTokens.get_SliderStyle(XForms.Theme theme) -> XForms.Controls.SliderStyle

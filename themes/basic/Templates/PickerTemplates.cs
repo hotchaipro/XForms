@@ -270,6 +270,7 @@ namespace XForms.Themes.Basic
             var today = DateTime.Today;
             var date = control.FirstShownDay;
             var month = control.DisplayedMonth.Month;
+            float radius = (control.ActualTheme.CalendarViewStyle.CellSize / 2) - 3;
 
             for (int row = 0; row < 6; row += 1)
             {
@@ -277,7 +278,6 @@ namespace XForms.Themes.Basic
                 {
                     var cell = control.GetDayBounds(row, column);
                     var center = cell.Center;
-                    const float Radius = (CalendarView.CellSize / 2) - 3;
 
                     bool isEnabled = control.IsDateEnabled(date);
                     bool isInMonth = date.Month == month;
@@ -291,22 +291,22 @@ namespace XForms.Themes.Basic
 
                     if (isSelected)
                     {
-                        drawContext.FillEllipse(center, Radius, Radius, control.ActualTheme.Colors.Accent);
+                        drawContext.FillEllipse(center, radius, radius, control.ActualTheme.Colors.Accent);
                         textColor = control.ActualTheme.Colors.OnAccent;
                     }
                     else if ((control.PressedPart == CalendarViewPart.Day) && (control.PressedDate == date) && isEnabled)
                     {
-                        drawContext.FillEllipse(center, Radius, Radius, colors.Foreground.MultiplyAlpha(0.12f));
+                        drawContext.FillEllipse(center, radius, radius, colors.Foreground.MultiplyAlpha(0.12f));
                     }
 
                     if (date == today)
                     {
-                        drawContext.DrawEllipse(center, Radius, Radius, isSelected ? control.ActualTheme.Colors.OnAccent : control.ActualTheme.Colors.Accent, 1.5f);
+                        drawContext.DrawEllipse(center, radius, radius, isSelected ? control.ActualTheme.Colors.OnAccent : control.ActualTheme.Colors.Accent, 1.5f);
                     }
 
                     if (control.IsFocused && (date == control.FocusedDate))
                     {
-                        drawContext.DrawEllipse(center, Radius + 1.5f, Radius + 1.5f, colors.Foreground, 2);
+                        drawContext.DrawEllipse(center, radius + 1.5f, radius + 1.5f, colors.Foreground, 2);
                     }
 
                     drawContext.DrawText(date.Day.ToString(culture), cell, textColor, DayFormat);

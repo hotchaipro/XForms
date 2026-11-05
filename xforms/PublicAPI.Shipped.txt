@@ -654,7 +654,6 @@ abstract XForms.Controls.Panel.MeasureChildren(XForms.Size availableSize) -> XFo
 abstract XForms.Controls.PickerField.DisplayText.get -> string
 abstract XForms.Controls.PickerField.MaximumTextWidth.get -> float
 abstract XForms.Controls.PickerField.OpenPicker() -> void
-const XForms.Controls.CalendarView.CellSize = 40 -> float
 const XForms.Controls.PickerField.GlyphWidth = 34 -> float
 override XForms.Controls.Border.BackgroundColor.get -> XForms.Color
 override XForms.Controls.Border.Padding.get -> XForms.Thickness
@@ -778,7 +777,6 @@ override XForms.ViewProperty<TView, TValue>.ToString() -> string
 override sealed XForms.Controls.ControlTemplate<TControl>.ControlType.get -> System.Type
 override sealed XForms.Controls.Panel.ArrangeOverride(XForms.Size finalSize) -> void
 override sealed XForms.Controls.Panel.MeasureOverride(XForms.Size availableSize) -> XForms.Size
-static XForms.Controls.CalendarView.NaturalSize.get -> XForms.Size
 static XForms.Controls.ControlTemplates.Empty.get -> XForms.Controls.ControlTemplates
 static XForms.Controls.ControlTemplates.operator !=(XForms.Controls.ControlTemplates left, XForms.Controls.ControlTemplates right) -> bool
 static XForms.Controls.ControlTemplates.operator ==(XForms.Controls.ControlTemplates left, XForms.Controls.ControlTemplates right) -> bool

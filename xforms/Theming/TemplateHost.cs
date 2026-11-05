@@ -29,6 +29,7 @@ namespace XForms.Controls
     {
         private readonly View _view;
         private ControlTemplate _template;
+        private Theme _theme;
         private int _partCount;
 
         public TemplateHost(
@@ -60,9 +61,20 @@ namespace XForms.Controls
                 ?? throw new InvalidOperationException(
                     $"{this._view.GetType().Name} has no template in its theme. Pass a theme to XFormsApp.Run, such as new BasicTheme() (from XForms.Themes.Basic).");
 
+            var previousTheme = this._theme;
+            this._theme = theme;
+
             if (template == this._template)
             {
                 template.OnThemeChangedCore(this._view, this.Context);
+
+                // The view's size may follow the theme's metrics and fonts
+                if (!theme.Equals(previousTheme))
+                {
+                    this._view.InvalidateMeasure();
+                    this._view.InvalidateVisual();
+                }
+
                 return;
             }
 

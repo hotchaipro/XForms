@@ -10,19 +10,11 @@ namespace XForms.Controls
     /// days of the week, and six weeks of days (weeks start on Monday). Days
     /// before the minimum date can't be chosen. With keyboard focus, the arrow
     /// keys move between days, Page Up and Page Down change the month, and Enter
-    /// or Space chooses the day.
+    /// or Space chooses the day. Its theme's template draws it, in the layout
+    /// the calendar measures from the theme's <see cref="CalendarViewStyle"/>.
     /// </summary>
     public class CalendarView : TemplatedControl
     {
-        private const float Inset = 8.0f;
-        private const float HeaderHeight = 40.0f;
-        private const float WeekdayHeight = 28.0f;
-
-        /// <summary>
-        /// The size of a day's cell.
-        /// </summary>
-        public const float CellSize = 40.0f;
-
         private DateTime _month;
         private DateTime? _selectedDate;
         private DateTime _minimumDate = DateTime.MinValue;
@@ -96,24 +88,13 @@ namespace XForms.Controls
             }
         }
 
-        /// <summary>
-        /// The calendar's size.
-        /// </summary>
-        public static Size NaturalSize
-        {
-            get
-            {
-                return new Size(
-                    (7 * CellSize) + (2 * Inset),
-                    HeaderHeight + WeekdayHeight + (6 * CellSize) + (2 * Inset));
-            }
-        }
-
         protected override Size MeasureOverride(
             Size availableSize)
         {
-            var size = NaturalSize;
-            return new Size(Math.Min(size.Width, availableSize.Width), Math.Min(size.Height, availableSize.Height));
+            var style = this.ActualTheme.CalendarViewStyle;
+            float width = (7 * style.CellSize) + (2 * style.Inset);
+            float height = style.HeaderHeight + style.WeekdayHeight + (6 * style.CellSize) + (2 * style.Inset);
+            return new Size(Math.Min(width, availableSize.Width), Math.Min(height, availableSize.Height));
         }
 
         private static DateTime FirstOfMonth(
@@ -161,7 +142,8 @@ namespace XForms.Controls
         {
             get
             {
-                return Math.Max(Inset, (this.Bounds.Width - (7 * CellSize)) / 2);
+                var style = this.ActualTheme.CalendarViewStyle;
+                return Math.Max(style.Inset, (this.Bounds.Width - (7 * style.CellSize)) / 2);
             }
         }
 
@@ -169,7 +151,8 @@ namespace XForms.Controls
         {
             get
             {
-                return Inset + HeaderHeight + WeekdayHeight;
+                var style = this.ActualTheme.CalendarViewStyle;
+                return style.Inset + style.HeaderHeight + style.WeekdayHeight;
             }
         }
 
@@ -180,8 +163,9 @@ namespace XForms.Controls
         {
             get
             {
-                float right = this.GridLeft + (7 * CellSize);
-                return new Rect(right - (2 * CellSize), Inset, CellSize, HeaderHeight);
+                var style = this.ActualTheme.CalendarViewStyle;
+                float right = this.GridLeft + (7 * style.CellSize);
+                return new Rect(right - (2 * style.CellSize), style.Inset, style.CellSize, style.HeaderHeight);
             }
         }
 
@@ -192,8 +176,9 @@ namespace XForms.Controls
         {
             get
             {
-                float right = this.GridLeft + (7 * CellSize);
-                return new Rect(right - CellSize, Inset, CellSize, HeaderHeight);
+                var style = this.ActualTheme.CalendarViewStyle;
+                float right = this.GridLeft + (7 * style.CellSize);
+                return new Rect(right - style.CellSize, style.Inset, style.CellSize, style.HeaderHeight);
             }
         }
 
@@ -204,7 +189,8 @@ namespace XForms.Controls
         {
             get
             {
-                return new Rect(this.GridLeft + 8, Inset, (5 * CellSize) - 8, HeaderHeight);
+                var style = this.ActualTheme.CalendarViewStyle;
+                return new Rect(this.GridLeft + style.HeaderInset, style.Inset, (5 * style.CellSize) - style.HeaderInset, style.HeaderHeight);
             }
         }
 
@@ -215,7 +201,8 @@ namespace XForms.Controls
         public Rect GetWeekdayBounds(
             int column)
         {
-            return new Rect(this.GridLeft + (column * CellSize), Inset + HeaderHeight, CellSize, WeekdayHeight);
+            var style = this.ActualTheme.CalendarViewStyle;
+            return new Rect(this.GridLeft + (column * style.CellSize), style.Inset + style.HeaderHeight, style.CellSize, style.WeekdayHeight);
         }
 
         /// <summary>
@@ -226,7 +213,8 @@ namespace XForms.Controls
             int row,
             int column)
         {
-            return new Rect(this.GridLeft + (column * CellSize), this.GridTop + (row * CellSize), CellSize, CellSize);
+            float cellSize = this.ActualTheme.CalendarViewStyle.CellSize;
+            return new Rect(this.GridLeft + (column * cellSize), this.GridTop + (row * cellSize), cellSize, cellSize);
         }
 
         /// <summary>
@@ -291,10 +279,11 @@ namespace XForms.Controls
 
             float x = point.X - this.GridLeft;
             float y = point.Y - this.GridTop;
-            if ((x >= 0) && (y >= 0) && (x < 7 * CellSize) && (y < 6 * CellSize))
+            float cellSize = this.ActualTheme.CalendarViewStyle.CellSize;
+            if ((x >= 0) && (y >= 0) && (x < 7 * cellSize) && (y < 6 * cellSize))
             {
-                int column = (int)(x / CellSize);
-                int row = (int)(y / CellSize);
+                int column = (int)(x / cellSize);
+                int row = (int)(y / cellSize);
                 date = this.FirstShownDay.AddDays((row * 7) + column);
                 return CalendarViewPart.Day;
             }

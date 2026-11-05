@@ -52,6 +52,9 @@ namespace XForms.Themes.Basic
             var box = control.BoxBounds;
             const float Radius = 4.0f;
 
+            // The mark is drawn for a 20 box, and scales with the theme's
+            float mark = box.Width / 20;
+
             drawContext.Clear(Colors.Transparent);
 
             if (control.IsChecked != false)
@@ -59,16 +62,16 @@ namespace XForms.Themes.Basic
                 var fill = FormColors.Active(control);
                 drawContext.FillRoundedRectangle(box, Radius, control.IsPressed ? fill.MultiplyAlpha(0.8f) : fill);
 
-                var mark = control.IsEnabled ? control.ActualTheme.Colors.OnAccent : colors.Background;
+                var markColor = control.IsEnabled ? control.ActualTheme.Colors.OnAccent : colors.Background;
                 var center = box.Center;
                 if (control.IsChecked == true)
                 {
-                    drawContext.DrawLine(new Point(center.X - 5, center.Y), new Point(center.X - 1.5f, center.Y + 3.5f), mark, 2);
-                    drawContext.DrawLine(new Point(center.X - 1.5f, center.Y + 3.5f), new Point(center.X + 5, center.Y - 4), mark, 2);
+                    drawContext.DrawLine(new Point(center.X - (5 * mark), center.Y), new Point(center.X - (1.5f * mark), center.Y + (3.5f * mark)), markColor, 2 * mark);
+                    drawContext.DrawLine(new Point(center.X - (1.5f * mark), center.Y + (3.5f * mark)), new Point(center.X + (5 * mark), center.Y - (4 * mark)), markColor, 2 * mark);
                 }
                 else
                 {
-                    drawContext.DrawLine(new Point(center.X - 5, center.Y), new Point(center.X + 5, center.Y), mark, 2);
+                    drawContext.DrawLine(new Point(center.X - (5 * mark), center.Y), new Point(center.X + (5 * mark), center.Y), markColor, 2 * mark);
                 }
             }
             else
@@ -164,10 +167,10 @@ namespace XForms.Themes.Basic
 
             // A ring in the background color around an accent dot
             var thumb = control.ThumbCenter;
-            const float Radius = Slider.ThumbSize / 2;
-            float dot = control.IsDragging ? Radius - 3 : (control.IsPressed ? Radius - 6 : Radius - 5);
-            drawContext.FillEllipse(thumb, Radius, Radius, colors.Background);
-            drawContext.DrawEllipse(thumb, Radius - 0.5f, Radius - 0.5f, FormColors.Inactive(control).MultiplyAlpha(0.45f), 1);
+            float radius = control.ActualTheme.SliderStyle.ThumbSize / 2;
+            float dot = Math.Max(0, control.IsDragging ? radius - 3 : (control.IsPressed ? radius - 6 : radius - 5));
+            drawContext.FillEllipse(thumb, radius, radius, colors.Background);
+            drawContext.DrawEllipse(thumb, radius - 0.5f, radius - 0.5f, FormColors.Inactive(control).MultiplyAlpha(0.45f), 1);
             drawContext.FillEllipse(thumb, dot, dot, FormColors.Active(control));
         }
     }

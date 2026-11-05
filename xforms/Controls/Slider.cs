@@ -10,25 +10,13 @@ namespace XForms.Controls
     /// <see cref="SmallChange"/> (Left and Right follow the flow direction),
     /// Page Up and Page Down by <see cref="LargeChange"/>, and Home and End go
     /// to the ends. Its theme's template draws it, in the layout the slider
-    /// measures: the header, then the track across the middle of a
-    /// <see cref="TouchHeight"/> band, inset by half a thumb at each end.
+    /// measures from the theme's <see cref="SliderStyle"/>: the header, then
+    /// the track across the middle of a band, inset by half a thumb at each
+    /// end.
     /// </summary>
     public class Slider : RangeBase
     {
         public static readonly ViewProperty<Slider, double> ValueProperty = new(nameof(Value), v => v.Value, (v, x) => v.Value = x);
-
-        /// <summary>
-        /// The thumb's diameter.
-        /// </summary>
-        public const float ThumbSize = 20.0f;
-
-        /// <summary>
-        /// The height of the band the track runs across, which takes presses.
-        /// </summary>
-        public const float TouchHeight = 32.0f;
-
-        private const float DefaultWidth = 200.0f;
-        private const float HeaderGap = 4.0f;
 
         private string _header;
         private double _stepFrequency = 1;
@@ -229,7 +217,7 @@ namespace XForms.Controls
             get
             {
                 float headerHeight = this.HeaderBounds.Height;
-                return (headerHeight > 0) ? headerHeight + HeaderGap : 0;
+                return (headerHeight > 0) ? headerHeight + this.ActualTheme.SliderStyle.HeaderGap : 0;
             }
         }
 
@@ -241,8 +229,9 @@ namespace XForms.Controls
         {
             get
             {
-                const float Inset = ThumbSize / 2;
-                return new Rect(Inset, this.BandTop + (TouchHeight / 2), Math.Max(0, this.Bounds.Width - (2 * Inset)), 0);
+                var style = this.ActualTheme.SliderStyle;
+                float inset = style.ThumbSize / 2;
+                return new Rect(inset, this.BandTop + (style.TouchHeight / 2), Math.Max(0, this.Bounds.Width - (2 * inset)), 0);
             }
         }
 
@@ -282,9 +271,10 @@ namespace XForms.Controls
         protected override Size MeasureOverride(
             Size availableSize)
         {
-            float width = float.IsInfinity(availableSize.Width) ? DefaultWidth : availableSize.Width;
-            float headerHeight = string.IsNullOrEmpty(this._header) ? 0 : TextLayout.Measure(this._header, this.HeaderFormat).Height + HeaderGap;
-            return new Size(width, Math.Min(headerHeight + TouchHeight, availableSize.Height));
+            var style = this.ActualTheme.SliderStyle;
+            float width = float.IsInfinity(availableSize.Width) ? style.DefaultWidth : availableSize.Width;
+            float headerHeight = string.IsNullOrEmpty(this._header) ? 0 : TextLayout.Measure(this._header, this.HeaderFormat).Height + style.HeaderGap;
+            return new Size(width, Math.Min(headerHeight + style.TouchHeight, availableSize.Height));
         }
 
         private void Step(

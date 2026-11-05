@@ -7,24 +7,12 @@ namespace XForms.Controls
     /// A box and its text, checked or unchecked by a tap, Space or Enter, and,
     /// when <see cref="IsThreeState"/>, also indeterminate (neither): it goes
     /// from unchecked to checked to indeterminate. Its theme's template draws
-    /// it, in the layout the check box measures: a <see cref="BoxSize"/> box
-    /// at the start, then the text after <see cref="TextGap"/>.
+    /// it, in the layout the check box measures from the theme's
+    /// <see cref="CheckBoxStyle"/>: a box at the start, then the text.
     /// </summary>
     public class CheckBox : TemplatedControl, ITapGestureDelegate
     {
         public static readonly ViewProperty<CheckBox, bool?> IsCheckedProperty = new(nameof(IsChecked), v => v.IsChecked, (v, x) => v.IsChecked = x);
-
-        /// <summary>
-        /// The box's size.
-        /// </summary>
-        public const float BoxSize = 20.0f;
-
-        /// <summary>
-        /// The space between the box and the text.
-        /// </summary>
-        public const float TextGap = 8.0f;
-
-        private const float MinimumHeight = 32.0f;
 
         private string _text;
         private bool? _isChecked = false;
@@ -181,8 +169,9 @@ namespace XForms.Controls
         {
             get
             {
-                float x = this.IsRightToLeft ? this.Bounds.Width - BoxSize : 0;
-                return new Rect(x, (this.Bounds.Height - BoxSize) / 2, BoxSize, BoxSize);
+                float size = this.ActualTheme.CheckBoxStyle.BoxSize;
+                float x = this.IsRightToLeft ? this.Bounds.Width - size : 0;
+                return new Rect(x, (this.Bounds.Height - size) / 2, size, size);
             }
         }
 
@@ -193,8 +182,9 @@ namespace XForms.Controls
         {
             get
             {
-                float width = Math.Max(0, this.Bounds.Width - BoxSize - TextGap);
-                float x = this.IsRightToLeft ? 0 : BoxSize + TextGap;
+                var style = this.ActualTheme.CheckBoxStyle;
+                float width = Math.Max(0, this.Bounds.Width - style.BoxSize - style.TextGap);
+                float x = this.IsRightToLeft ? 0 : style.BoxSize + style.TextGap;
                 return new Rect(x, 0, width, this.Bounds.Height);
             }
         }
@@ -202,16 +192,17 @@ namespace XForms.Controls
         protected override Size MeasureOverride(
             Size availableSize)
         {
-            float width = BoxSize;
-            float height = BoxSize;
+            var style = this.ActualTheme.CheckBoxStyle;
+            float width = style.BoxSize;
+            float height = style.BoxSize;
             if (!string.IsNullOrEmpty(this._text))
             {
                 var textSize = TextLayout.Measure(this._text, this.CreateTextFormat());
-                width += TextGap + textSize.Width;
+                width += style.TextGap + textSize.Width;
                 height = Math.Max(height, textSize.Height);
             }
 
-            return new Size(Math.Min(width, availableSize.Width), Math.Min(Math.Max(height, MinimumHeight), availableSize.Height));
+            return new Size(Math.Min(width, availableSize.Width), Math.Min(Math.Max(height, style.MinimumHeight), availableSize.Height));
         }
 
         /// <summary>

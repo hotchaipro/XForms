@@ -82,7 +82,7 @@ namespace XForms.Themes.Basic
         /// <summary>
         /// The theme (with its mode and colors, the system's high-contrast
         /// colors included) with the Basic type
-        /// scale, shapes, motion and control templates. Tokens the theme
+        /// scale, shapes, motion, control styles and templates. Tokens the theme
         /// already has (an app's own) are kept.
         /// </summary>
         public override Theme Apply(
@@ -93,6 +93,9 @@ namespace XForms.Themes.Basic
             theme = WithDefault(theme, new Typography());
             theme = WithDefault(theme, new Shapes());
             theme = WithDefault(theme, new Motion());
+            theme = WithDefault(theme, new CheckBoxStyle() { BoxSize = 20, TextGap = 8, MinimumHeight = 32 });
+            theme = WithDefault(theme, new SliderStyle() { ThumbSize = 20, TouchHeight = 32, HeaderGap = 4, DefaultWidth = 200 });
+            theme = WithDefault(theme, new CalendarViewStyle() { CellSize = 40, HeaderHeight = 40, WeekdayHeight = 28, Inset = 8, HeaderInset = 8 });
             theme = WithDefault(theme, Templates);
             return theme;
         }
