@@ -130,7 +130,9 @@ namespace XForms
 
         /// <summary>
         /// Shows the page, keeping the current one in the back stack. Completes
-        /// when the transition has, or at once if the current page cancels.
+        /// when the transition (by default, the theme's
+        /// <see cref="Theme.PageTransition"/>) has, or at once if the current
+        /// page cancels.
         /// </summary>
         public virtual async Task NavigateAsync(
             Page page,
@@ -335,8 +337,8 @@ namespace XForms
 
             if ((null != leaving) && (transition != PageTransition.None))
             {
-                var context = new PageTransitionContext(isBack ? leaving : arriving, isBack, slideFromStart, this.Bounds.Size, this.TransitionDuration);
-                await (transition ?? PageTransition.Slide).PlayAsync(context);
+                var context = new PageTransitionContext(isBack ? leaving : arriving, isBack ? arriving : leaving, isBack, slideFromStart, this.Bounds.Size, this.TransitionDuration);
+                await (transition ?? this.ActualTheme.PageTransition ?? PageTransition.Slide).PlayAsync(context);
             }
 
             if ((null != leaving) && (leaving != this._currentPage))

@@ -46,6 +46,7 @@ namespace XForms.Test
             var navigation = new WrapPanel() { ItemSpacing = 8, LineSpacing = 8 };
             navigation.Children.Add(this.CreateButton("Next (slide)", () => _ = this.Application.NavigateAsync($"/app/{depth + 1}")));
             navigation.Children.Add(this.CreateButton("Next (fade)", () => _ = this.Application.NavigateAsync($"/app/{depth + 1}", PageTransition.Fade)));
+            navigation.Children.Add(this.CreateButton("Next (slide over)", () => _ = this.Application.NavigateAsync($"/app/{depth + 1}", PageTransition.SlideOver)));
             navigation.Children.Add(this.CreateButton("Back", async () => this.Show($"Went back: {await this.Application.GoBackAsync()}")));
             navigation.Children.Add(this.CreateButton("Stack", () => this.Show($"Stack: {string.Join(" ", this.Application.NavigationStack)}")));
             navigation.Children.Add(this.CreateButton("Pick a color", async () =>

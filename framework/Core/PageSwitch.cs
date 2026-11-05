@@ -6,7 +6,9 @@ namespace XForms
     /// <summary>
     /// A page replacing a frame's current one as a gesture moves (see
     /// <see cref="Frame.BeginReplace"/>): it slides in as far as the
-    /// <see cref="Progress"/>, then completes, or slides back out.
+    /// <see cref="Progress"/>, then completes, or slides back out. The current
+    /// page slides out with it, unless the frame's theme has
+    /// <see cref="PageTransition.SlideOver"/>.
     /// </summary>
     public sealed class PageSwitch
     {
@@ -14,6 +16,7 @@ namespace XForms
 
         private readonly Frame _frame;
         private readonly Animator _animator;
+        private readonly Animator _leavingAnimator;
         private readonly Point _offset;
         private float _progress;
         private bool _isEnded;
@@ -37,6 +40,13 @@ namespace XForms
             this._animator.Opacity = 1;
             this._animator.Translation = this._offset;
             PageTransition.ShowEdgeShadow(page);
+
+            if ((frame.ActualTheme.PageTransition ?? PageTransition.Slide).MovesPageBeneath)
+            {
+                this._leavingAnimator = leavingPage.GetOrCreateAnimator();
+                this._leavingAnimator.Opacity = 1;
+                this._leavingAnimator.Translation = Point.Zero;
+            }
         }
 
         /// <summary>
@@ -67,6 +77,7 @@ namespace XForms
 
                 this._progress = Math.Clamp(value, 0, 1);
                 this._animator.Translation = new Point(this._offset.X * (1 - this._progress), 0);
+                this._leavingAnimator?.Translation = this.LeavingPosition(this._progress);
             }
         }
 
@@ -84,7 +95,10 @@ namespace XForms
 
             this._isEnded = true;
             this._frame.OnPageSwitchCompleting(this);
-            await this._animator.TranslateTo(Point.Zero, this.Remaining(1 - this._progress), DecelerateEasing);
+            var duration = this.Remaining(1 - this._progress);
+            await Task.WhenAll(
+                this._animator.TranslateTo(Point.Zero, duration, DecelerateEasing).Completion,
+                this.MoveLeavingPage(this.LeavingPosition(1), duration));
             this._frame.OnPageSwitchEnded(this);
         }
 
@@ -99,8 +113,25 @@ namespace XForms
             }
 
             this._isEnded = true;
-            await this._animator.TranslateTo(this._offset, this.Remaining(this._progress), DecelerateEasing);
+            var duration = this.Remaining(this._progress);
+            await Task.WhenAll(
+                this._animator.TranslateTo(this._offset, duration, DecelerateEasing).Completion,
+                this.MoveLeavingPage(Point.Zero, duration));
             this._frame.OnPageSwitchEnded(this);
+        }
+
+        // The page leaving stays edge to edge with the page arriving
+        private Point LeavingPosition(
+            float progress)
+        {
+            return new Point(-this._offset.X * progress, 0);
+        }
+
+        private Task MoveLeavingPage(
+            Point position,
+            TimeSpan duration)
+        {
+            return this._leavingAnimator?.TranslateTo(position, duration, DecelerateEasing).Completion ?? Task.CompletedTask;
         }
 
         private TimeSpan Remaining(

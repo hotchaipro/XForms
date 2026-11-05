@@ -43,7 +43,8 @@ namespace XForms.Controls
     /// <see cref="Frame"/> its pages show in, and it switches them as the
     /// selection changes, sliding from the tab's side; or handle
     /// <see cref="SelectionChanged"/>. A switch can also follow a gesture
-    /// (see <see cref="FollowSwipe"/>).
+    /// (see <see cref="FollowSwipe"/>). It draws over its siblings, so a page's
+    /// shadow goes under it, and Tab still reaches it before them.
     /// </summary>
     public class TabStrip : TemplatedContentControl
     {
@@ -76,6 +77,8 @@ namespace XForms.Controls
 
             this.HorizontalAlignment = HorizontalAlignment.Stretch;
             this.VerticalAlignment = VerticalAlignment.Top;
+            this.ZIndex = 1;
+            this.TabIndex = 0;
 
             this.Content = this._buttonsLayout;
         }

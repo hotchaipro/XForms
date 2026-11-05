@@ -525,9 +525,12 @@ created:
 
 The framework gives its own animated views an animator: pages, and the
 children of panels with `ChildTransitions`. A `Frame` moves pages in and
-out with a `PageTransition`: the built-in `Slide` (the default), `SlideUp`,
+out with a `PageTransition`: the built-in `Slide` (both pages move together),
+`SlideOver` (the new page moves over the old one, which stays), `SlideUp`,
 `Fade` and `None`, or a subclass that overrides `PlayAsync` and animates
-the page through the `PageTransitionContext` it's given. Each animator has its own
+the pages through the `PageTransitionContext` it's given. Navigating without
+naming one plays the theme's `Theme.PageTransition` (`Slide` by default); a
+switch following a gesture slides as that does. Each animator has its own
 native layer, nested: the app's outside, a control's own inside it, with
 the view's content and children innermost. The animators' `To` and `From`
 methods (translate, scale, rotate, fade, reveal) run on the platform's
@@ -560,7 +563,8 @@ draws it with `FillShadow`; a native view's is the platform's own:
 
 `Theme.PageEdgeShadow`, if a theme sets it (null by default), is cast by a
 page's moving edges while it slides, so they show over a page of the same
-color.
+color. It runs past the ends of those edges, under whatever draws over the
+frame: a `TabStrip` draws over its siblings (`ZIndex` 1).
 
 ## Input
 

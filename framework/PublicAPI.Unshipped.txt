@@ -174,3 +174,8 @@ XForms.Frame.Background.set -> void
 XForms.Application.IsTouchPrimary.get -> bool
 XForms.Theme.PageEdgeShadow.get -> XForms.Shadow
 XForms.Theme.PageEdgeShadow.init -> void
+XForms.Theme.PageTransition.get -> XForms.PageTransition
+XForms.Theme.PageTransition.init -> void
+XForms.PageTransitionContext.AnimatorBeneath.get -> XForms.Animator
+XForms.PageTransitionContext.PageBeneath.get -> XForms.Page
+static XForms.PageTransition.SlideOver.get -> XForms.PageTransition

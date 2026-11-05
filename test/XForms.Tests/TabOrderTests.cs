@@ -70,6 +70,18 @@ namespace XForms.Tests
         }
 
         [Fact]
+        public void ATabStripDrawsOverItsFrameButTabReachesItFirst()
+        {
+            var tabStrip = new TabStrip();
+            var frame = new Frame();
+
+            var parent = new Box(tabStrip, frame);
+
+            Assert.Equal(new View[] { frame, tabStrip }, parent.DrawingOrderChildren);
+            Assert.Equal(new View[] { tabStrip, frame }, parent.TabOrderChildren);
+        }
+
+        [Fact]
         public void ANavigationViewsPaneComesBeforeItsContent()
         {
             var navigationView = new NavigationView();

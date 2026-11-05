@@ -95,6 +95,15 @@ namespace XForms
         public Shadow PageEdgeShadow { get; init; }
 
         /// <summary>
+        /// How a frame's pages come and go when navigating doesn't name a
+        /// transition; null (the default) for <see cref="XForms.PageTransition.Slide"/>.
+        /// A switch following a gesture always slides: over the current page
+        /// for <see cref="XForms.PageTransition.SlideOver"/>, otherwise
+        /// together with it.
+        /// </summary>
+        public PageTransition PageTransition { get; init; }
+
+        /// <summary>
         /// What control libraries keep in the theme, by type: a type scale,
         /// shapes, motion, default styles for controls (see
         /// <see cref="GetExtension{TExtension}"/>).
