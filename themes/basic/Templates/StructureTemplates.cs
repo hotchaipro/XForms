@@ -130,7 +130,10 @@ namespace XForms.Themes.Basic
             DrawingContext drawContext)
         {
             drawContext.Clear(Colors.Transparent);
-            drawContext.FillRectangle(new Rect(0, 0, control.Bounds.Width, control.Bounds.Height), Colors.Black.MultiplyAlpha(0.35f));
+
+            // Lighter than a flyout's dim: the theme's scrim color at 35%
+            var scrim = control.ActualTheme.Colors.Scrim;
+            drawContext.FillRectangle(new Rect(0, 0, control.Bounds.Width, control.Bounds.Height), Color.FromArgb(0x59, scrim.R, scrim.G, scrim.B));
         }
     }
 

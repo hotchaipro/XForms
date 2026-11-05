@@ -26,6 +26,8 @@ namespace XForms
     /// <remarks>
     /// The roles follow Material 3's color roles, and map to WinUI's theme
     /// resources (accent fill, text fill, card background, control stroke).
+    /// The framework knows the roles, which primitives and platforms use; the
+    /// values are a theme package's (<c>AppTheme.CreateColors</c>).
     /// </remarks>
     public sealed record ColorScheme
     {
@@ -63,6 +65,45 @@ namespace XForms
 
         /// <summary>Text and icons of disabled controls.</summary>
         public Color Disabled { get; init; }
+
+        /// <summary>
+        /// What dims the window behind a flyout or a drawer, with its opacity.
+        /// </summary>
+        public Color Scrim { get; init; }
+
+        /// <summary>
+        /// Plain colors for a mode, for an app with no theme package: black
+        /// and white and a gray, around the accent color. A theme package has
+        /// its own palette (<c>AppTheme.CreateColors</c>).
+        /// </summary>
+        public static ColorScheme Plain(
+            ThemeMode mode,
+            Color accentColor)
+        {
+            bool isLight = mode == ThemeMode.Light;
+            bool isHighContrast = mode == ThemeMode.HighContrast;
+            Color background = isLight ? Colors.White : Colors.Black;
+            Color foreground = isLight ? Colors.Black : Colors.White;
+            Color subtle = isHighContrast ? foreground : Colors.Gray;
+            Color accent = isHighContrast ? foreground : accentColor;
+            Color error = isLight ? Color.FromRgb(0xc0, 0x00, 0x00) : Color.FromRgb(0xff, 0x60, 0x60);
+
+            return new ColorScheme()
+            {
+                Accent = accent,
+                OnAccent = Theme.ContrastingColor(accent),
+                Background = background,
+                Foreground = foreground,
+                SubtleForeground = subtle,
+                Surface = background,
+                OnSurface = foreground,
+                Outline = subtle,
+                Error = error,
+                OnError = Theme.ContrastingColor(error),
+                Disabled = Colors.Gray,
+                Scrim = Color.FromArgb(0x80, 0x00, 0x00, 0x00),
+            };
+        }
     }
 
     /// <summary>
@@ -133,84 +174,6 @@ namespace XForms
             where TExtension : class
         {
             return this with { Extensions = (null == extension) ? this.Extensions.Remove(typeof(TExtension)) : this.Extensions.SetItem(typeof(TExtension), extension) };
-        }
-
-        /// <summary>
-        /// XForms' theme for a mode, around an accent color.
-        /// </summary>
-        public static Theme Create(
-            ThemeMode mode,
-            Color? accentColor = null)
-        {
-            return new Theme()
-            {
-                Mode = mode,
-                Colors = CreateColors(mode, accentColor ?? DefaultAccentColor),
-            };
-        }
-
-        /// <summary>
-        /// XForms' colors for a mode, around an accent color, which both modes
-        /// use as it is.
-        /// </summary>
-        public static ColorScheme CreateColors(
-            ThemeMode mode,
-            Color accentColor)
-        {
-            switch (mode)
-            {
-                case ThemeMode.Dark:
-                {
-                    return new ColorScheme()
-                    {
-                        Accent = accentColor,
-                        OnAccent = ContrastingColor(accentColor),
-                        Background = XForms.Colors.Black,
-                        Foreground = Color.FromRgb(0xcc, 0xcc, 0xcc),
-                        SubtleForeground = Color.FromRgb(0x99, 0x99, 0x99),
-                        Surface = Color.FromRgb(0x1c, 0x1c, 0x1c),
-                        OnSurface = Color.FromRgb(0xdd, 0xdd, 0xdd),
-                        Outline = Color.FromRgb(0x44, 0x44, 0x44),
-                        Error = Color.FromRgb(0xff, 0x8a, 0x80),
-                        OnError = XForms.Colors.Black,
-                        Disabled = Color.FromRgb(0x5c, 0x5c, 0x5c),
-                    };
-                }
-
-                case ThemeMode.HighContrast:
-                    // White on black, as Windows' "Night sky" contrast theme;
-                    // platforms replace these with the system's own colors
-                    return new ColorScheme()
-                    {
-                        Accent = Color.FromRgb(0xff, 0xff, 0x00),
-                        OnAccent = XForms.Colors.Black,
-                        Background = XForms.Colors.Black,
-                        Foreground = XForms.Colors.White,
-                        SubtleForeground = XForms.Colors.White,
-                        Surface = XForms.Colors.Black,
-                        OnSurface = XForms.Colors.White,
-                        Outline = XForms.Colors.White,
-                        Error = Color.FromRgb(0xff, 0x80, 0x80),
-                        OnError = XForms.Colors.Black,
-                        Disabled = Color.FromRgb(0x3f, 0xf2, 0x3f),
-                    };
-
-                default:
-                    return new ColorScheme()
-                    {
-                        Accent = accentColor,
-                        OnAccent = ContrastingColor(accentColor),
-                        Background = XForms.Colors.White,
-                        Foreground = XForms.Colors.Black,
-                        SubtleForeground = Color.FromRgb(0x66, 0x66, 0x66),
-                        Surface = Color.FromRgb(0xf4, 0xf4, 0xf4),
-                        OnSurface = XForms.Colors.Black,
-                        Outline = Color.FromRgb(0xcc, 0xcc, 0xcc),
-                        Error = Color.FromRgb(0xc6, 0x28, 0x28),
-                        OnError = XForms.Colors.White,
-                        Disabled = Color.FromRgb(0xa0, 0xa0, 0xa0),
-                    };
-            }
         }
 
         /// <summary>

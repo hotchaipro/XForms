@@ -13,8 +13,75 @@ namespace XForms.Themes.Basic
     public sealed class BasicTheme : AppTheme
     {
         /// <summary>
-        /// The theme (with its mode and colors, which the framework builds,
-        /// the system's high-contrast colors included) with the Basic type
+        /// Basic's colors for a mode, around an accent color, which light and
+        /// dark use as it is.
+        /// </summary>
+        public override ColorScheme CreateColors(
+            ThemeMode mode,
+            Color accentColor)
+        {
+            switch (mode)
+            {
+                case ThemeMode.Dark:
+                    return new ColorScheme()
+                    {
+                        Accent = accentColor,
+                        OnAccent = Theme.ContrastingColor(accentColor),
+                        Background = Colors.Black,
+                        Foreground = Color.FromRgb(0xcc, 0xcc, 0xcc),
+                        SubtleForeground = Color.FromRgb(0x99, 0x99, 0x99),
+                        Surface = Color.FromRgb(0x1c, 0x1c, 0x1c),
+                        OnSurface = Color.FromRgb(0xdd, 0xdd, 0xdd),
+                        Outline = Color.FromRgb(0x44, 0x44, 0x44),
+                        Error = Color.FromRgb(0xff, 0x8a, 0x80),
+                        OnError = Colors.Black,
+                        Disabled = Color.FromRgb(0x5c, 0x5c, 0x5c),
+
+                        // More than light's, where a light dim wouldn't show
+                        Scrim = Color.FromArgb(0x80, 0, 0, 0),
+                    };
+
+                case ThemeMode.HighContrast:
+                    // White on black, as Windows' "Night sky" contrast theme;
+                    // platforms replace these with the system's own colors
+                    return new ColorScheme()
+                    {
+                        Accent = Color.FromRgb(0xff, 0xff, 0x00),
+                        OnAccent = Colors.Black,
+                        Background = Colors.Black,
+                        Foreground = Colors.White,
+                        SubtleForeground = Colors.White,
+                        Surface = Colors.Black,
+                        OnSurface = Colors.White,
+                        Outline = Colors.White,
+                        Error = Color.FromRgb(0xff, 0x80, 0x80),
+                        OnError = Colors.Black,
+                        Disabled = Color.FromRgb(0x3f, 0xf2, 0x3f),
+                        Scrim = Color.FromArgb(0x80, 0, 0, 0),
+                    };
+
+                default:
+                    return new ColorScheme()
+                    {
+                        Accent = accentColor,
+                        OnAccent = Theme.ContrastingColor(accentColor),
+                        Background = Colors.White,
+                        Foreground = Colors.Black,
+                        SubtleForeground = Color.FromRgb(0x66, 0x66, 0x66),
+                        Surface = Color.FromRgb(0xf4, 0xf4, 0xf4),
+                        OnSurface = Colors.Black,
+                        Outline = Color.FromRgb(0xcc, 0xcc, 0xcc),
+                        Error = Color.FromRgb(0xc6, 0x28, 0x28),
+                        OnError = Colors.White,
+                        Disabled = Color.FromRgb(0xa0, 0xa0, 0xa0),
+                        Scrim = Color.FromArgb(0x40, 0, 0, 0),
+                    };
+            }
+        }
+
+        /// <summary>
+        /// The theme (with its mode and colors, the system's high-contrast
+        /// colors included) with the Basic type
         /// scale, shapes, motion and control templates. Tokens the theme
         /// already has (an app's own) are kept.
         /// </summary>

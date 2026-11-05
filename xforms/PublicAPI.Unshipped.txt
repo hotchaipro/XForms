@@ -1,3 +1,5 @@
+virtual XForms.Controls.AppTheme.CreateColors(XForms.ThemeMode mode, XForms.Color accentColor) -> XForms.ColorScheme
+XForms.Controls.AppTheme.Create(XForms.ThemeMode mode, XForms.Color accentColor) -> XForms.Theme
 XForms.Controls.AutoSuggestBox
 XForms.Controls.AutoSuggestBox.AutoSuggestBox() -> void
 XForms.Controls.AutoSuggestBox.IsSuggestionListOpen.get -> bool
@@ -323,6 +325,7 @@ XForms.Controls.TreeViewNode.IsExpanded.set -> void
 XForms.Controls.TreeViewNode.Tag.get -> object
 XForms.Controls.TreeViewNode.Tag.set -> void
 XForms.Controls.TreeViewNode.TreeViewNode() -> void
+XForms.Controls.UICommand.ForegroundColor.get -> XForms.Color?
 XForms.Controls.UserControl.IsBuilt.get -> bool
 XForms.Controls.ViewAttachments
 XForms.Controls.ViewAttachments.extension(XForms.View)

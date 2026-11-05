@@ -937,8 +937,6 @@ static XForms.Size.operator !=(XForms.Size a, XForms.Size b) -> bool
 static XForms.Size.operator ==(XForms.Size a, XForms.Size b) -> bool
 static XForms.TextLayout.Measure(string text, XForms.TextFormat format, float maxWidth = Infinity) -> XForms.Size
 static XForms.Theme.ContrastingColor(XForms.Color color) -> XForms.Color
-static XForms.Theme.Create(XForms.ThemeMode mode, XForms.Color? accentColor = null) -> XForms.Theme
-static XForms.Theme.CreateColors(XForms.ThemeMode mode, XForms.Color accentColor) -> XForms.ColorScheme
 static XForms.Theme.operator !=(XForms.Theme left, XForms.Theme right) -> bool
 static XForms.Theme.operator ==(XForms.Theme left, XForms.Theme right) -> bool
 static XForms.Thickness.operator !=(XForms.Thickness a, XForms.Thickness b) -> bool

@@ -480,7 +480,6 @@ XForms.Controls.UICommand.CanExecuteChanged -> System.EventHandler
 XForms.Controls.UICommand.Command.get -> System.Windows.Input.ICommand
 XForms.Controls.UICommand.Command.set -> void
 XForms.Controls.UICommand.Execute(object parameter) -> void
-XForms.Controls.UICommand.ForegroundColor.get -> XForms.Color
 XForms.Controls.UICommand.ForegroundColor.set -> void
 XForms.Controls.UICommand.Icon.get -> XForms.Bitmap
 XForms.Controls.UICommand.Icon.set -> void

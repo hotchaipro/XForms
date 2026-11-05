@@ -21,8 +21,8 @@ namespace XForms.Themes.Basic
         }
     }
 
-    // What shows behind a swiped row: the command's icon and text, in white,
-    // on its color (the control's background), dimmed while the swipe isn't
+    // What shows behind a swiped row: the command's icon and text on its
+    // color (the control's background), dimmed while the swipe isn't
     // long enough to run it (the item isn't enabled)
     internal sealed class ListViewSwipeItemTemplate : ControlTemplate<ListViewSwipeItem>
     {
@@ -71,15 +71,16 @@ namespace XForms.Themes.Basic
                 iconSize.Width,
                 iconSize.Height);
             Rect textBounds = bounds.Deflate(imageBounds.Width + Padding, 0);
+            Color foreground = control.Command?.ForegroundColor ?? control.ActualTheme.GetBasicColors().OnCommand;
 
             if (null != control.Icon)
             {
-                drawContext.DrawImage(control.Icon, imageBounds, Colors.White);
+                drawContext.DrawImage(control.Icon, imageBounds, foreground);
             }
 
             if (null != control.Text)
             {
-                drawContext.DrawText(control.Text, textBounds, Colors.White, isPrimary ? PrimaryFormat : SecondaryFormat);
+                drawContext.DrawText(control.Text, textBounds, foreground, isPrimary ? PrimaryFormat : SecondaryFormat);
             }
         }
     }

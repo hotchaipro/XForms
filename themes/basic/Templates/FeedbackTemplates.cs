@@ -86,10 +86,11 @@ namespace XForms.Themes.Basic
             InfoBar control)
         {
             var colors = control.ActualTheme.Colors;
+            var basic = control.ActualTheme.GetBasicColors();
             switch (control.Severity)
             {
-                case InfoBarSeverity.Success: return Color.FromRgb(0x2E, 0x9E, 0x44);
-                case InfoBarSeverity.Warning: return Color.FromRgb(0xE8, 0x9E, 0x00);
+                case InfoBarSeverity.Success: return basic.Success;
+                case InfoBarSeverity.Warning: return basic.Warning;
                 case InfoBarSeverity.Error: return colors.Error;
                 default: return control.ActualTheme.Colors.Accent;
             }
@@ -113,7 +114,8 @@ namespace XForms.Themes.Basic
             var c = icon.Center;
             float r = icon.Width / 2;
             drawContext.FillEllipse(c, r, r, severity);
-            var mark = Colors.White;
+            var basic = control.ActualTheme.GetBasicColors();
+            var mark = basic.OnSeverity;
             switch (control.Severity)
             {
                 case InfoBarSeverity.Success:
@@ -127,8 +129,8 @@ namespace XForms.Themes.Basic
                     break;
 
                 case InfoBarSeverity.Warning:
-                    drawContext.DrawLine(new Point(c.X, c.Y - 5), new Point(c.X, c.Y + 1.5f), Colors.Black, 2);
-                    drawContext.FillEllipse(new Point(c.X, c.Y + 4.5f), 1.2f, 1.2f, Colors.Black);
+                    drawContext.DrawLine(new Point(c.X, c.Y - 5), new Point(c.X, c.Y + 1.5f), basic.OnWarning, 2);
+                    drawContext.FillEllipse(new Point(c.X, c.Y + 4.5f), 1.2f, 1.2f, basic.OnWarning);
                     break;
 
                 default:

@@ -270,17 +270,33 @@ namespace XForms
             ThemeMode mode,
             Color accentColor)
         {
-            var theme = Theme.Create(mode, accentColor);
+            var colors = this.ThemePalette?.Invoke(mode, accentColor) ?? ColorScheme.Plain(mode, accentColor);
+
+            // After the palette, so a package can't lose the system's colors.
+            // A system has no scrim of its own, so that stays the palette's
             if (mode == ThemeMode.HighContrast)
             {
                 var system = this.Renderer.SystemHighContrastColors;
                 if (null != system)
                 {
-                    theme = theme with { Colors = system };
+                    colors = system with { Scrim = colors.Scrim };
                 }
             }
 
+            var theme = new Theme() { Mode = mode, Colors = colors };
             return this.ThemeExtender?.Invoke(theme) ?? theme;
+        }
+
+        /// <summary>
+        /// Makes the colors <see cref="CreateTheme"/> starts from, for a mode
+        /// and accent color: set by what hosts the app, such as a theme
+        /// package's palette. Null (the default) for
+        /// <see cref="ColorScheme.Plain"/>.
+        /// </summary>
+        public Func<ThemeMode, Color, ColorScheme> ThemePalette
+        {
+            get;
+            set;
         }
 
         /// <summary>

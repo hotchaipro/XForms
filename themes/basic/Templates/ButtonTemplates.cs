@@ -135,7 +135,7 @@ namespace XForms.Themes.Basic
                 drawContext.FillEllipse(buttonBounds, colors.SubtleForeground);
                 if (null != icon)
                 {
-                    drawContext.DrawImage(icon, imageBounds, Colors.White);
+                    drawContext.DrawImage(icon, imageBounds, control.ActualTheme.GetBasicColors().OnPressed);
                 }
             }
             else if (this.IsChecked(control))
@@ -243,7 +243,7 @@ namespace XForms.Themes.Basic
             if (control.IsPressed)
             {
                 drawContext.FillEllipse(buttonBounds, colors.SubtleForeground);
-                drawContext.DrawText(control.Text, bounds, Colors.White, LetterFormat);
+                drawContext.DrawText(control.Text, bounds, control.ActualTheme.GetBasicColors().OnPressed, LetterFormat);
             }
             else if (control.IsChecked)
             {
@@ -411,10 +411,9 @@ namespace XForms.Themes.Basic
     // button's bounds, and the shadow is outside them
     internal sealed class FloatingButtonTemplate : ControlTemplate<FloatingButton>
     {
-        // CSS's 0 3px 8px rgba(0, 0, 0, 0.3)
+        // As CSS's 0 3px 8px, in the theme's shadow color
         private static readonly Shadow ButtonShadow = new Shadow()
         {
-            Color = Color.FromArgb(0x4d, 0, 0, 0),
             Offset = new Point(0, 3),
             Blur = 8,
             Shape = ShadowShape.Ellipse,
@@ -427,14 +426,27 @@ namespace XForms.Themes.Basic
             FloatingButton control,
             TemplateContext context)
         {
-            control.Shadow = ButtonShadow;
+            var shadow = ButtonShadow with { Color = control.ActualTheme.GetBasicColors().Shadow };
+            context.State = shadow;
+            control.Shadow = shadow;
+        }
+
+        // The theme's shadow, unless the app gave the button its own
+        protected override void OnThemeChanged(
+            FloatingButton control,
+            TemplateContext context)
+        {
+            if (control.Shadow == (Shadow)context.State)
+            {
+                this.Apply(control, context);
+            }
         }
 
         protected override void Unapply(
             FloatingButton control,
             TemplateContext context)
         {
-            if (control.Shadow == ButtonShadow)
+            if (control.Shadow == (Shadow)context.State)
             {
                 control.Shadow = null;
             }
@@ -451,12 +463,13 @@ namespace XForms.Themes.Basic
             }
 
             var theme = control.ActualTheme;
+            var basic = theme.GetBasicColors();
             Color foreground = control.IsSubtleStyle ? theme.Colors.Foreground : theme.Colors.OnAccent;
             Color background = control.IsSubtleStyle
-                ? ((theme.Mode != ThemeMode.Light) ? Color.FromRgb(0x33, 0x33, 0x33) : theme.Colors.Background)
+                ? (basic.SubtleFloatingBackground ?? ((theme.Mode != ThemeMode.Light) ? BasicColors.DarkSubtleFloatingBackground : theme.Colors.Background))
                 : theme.Colors.Accent;
-            Color pressedBackground = control.IsSubtleStyle ? background : Colors.White;
-            Color pressedForeground = control.IsSubtleStyle ? foreground : Colors.Gray;
+            Color pressedBackground = control.IsSubtleStyle ? background : basic.FloatingPressedBackground;
+            Color pressedForeground = control.IsSubtleStyle ? foreground : basic.FloatingPressedForeground;
 
             float diameter = Math.Min(bounds.Width, bounds.Height);
             Rect buttonRect = new Rect(bounds.Center.X - (diameter / 2), bounds.Center.Y - (diameter / 2), diameter, diameter);

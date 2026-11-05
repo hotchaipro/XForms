@@ -7,18 +7,17 @@ namespace XForms.Controls
 {
     public class UICommand : ICommand
     {
-        public UICommand()
-        {
-            this.ForegroundColor = Colors.White;
-        }
-
         public ICommand Command
         {
             get;
             set;
         }
 
-        public Color ForegroundColor
+        /// <summary>
+        /// The command's icon and text on its <see cref="AccentColor"/>, or
+        /// null (the default) for what its theme chooses.
+        /// </summary>
+        public Color? ForegroundColor
         {
             get;
             set;

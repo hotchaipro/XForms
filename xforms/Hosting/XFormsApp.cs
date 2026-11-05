@@ -10,7 +10,8 @@ namespace XForms
     /// </summary>
     public static partial class XFormsApp
     {
-        // The theme package goes into every theme the app builds
+        // The theme package's palette and tokens go into every theme the app
+        // builds
         private static void Prepare(
             Application application,
             AppTheme theme)
@@ -18,6 +19,7 @@ namespace XForms
             ArgumentNullException.ThrowIfNull(application);
             ArgumentNullException.ThrowIfNull(theme);
 
+            application.ThemePalette = theme.CreateColors;
             application.ThemeExtender = theme.Apply;
         }
     }

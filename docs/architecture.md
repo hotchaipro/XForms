@@ -710,21 +710,50 @@ Native text entries expose themselves natively.
 A `Theme` is an immutable record: a `ThemeMode` (light, dark or high
 contrast), a `ColorScheme` of semantic colors (accent, background, surface
 and error, each with the color of content on it, plus subtle foreground,
-outline and disabled), and **extensions** that control libraries add
-(`GetExtension`, `WithExtension`), as Flutter's theme extensions. The
-framework knows only the mode and colors, which the platforms also fill
-from the system's high-contrast colors. XForms adds its
+outline, disabled and scrim), and **extensions** that control libraries add
+(`GetExtension`, `WithExtension`), as Flutter's theme extensions.
+
+Each layer owns a different part of a color. The framework owns the
+**vocabulary**: the mode and the roles, which its primitives and the platforms
+need, and `ColorScheme.Plain`, black and white and a gray, for an app with no
+theme package. A theme package owns the **values**: its palette for each mode
+(`AppTheme.CreateColors`), and any colors it has no role for, in an extension
+of its own (Basic's `BasicColors`: an info bar's success and warning, pressed
+floating buttons, shadows). An app owns what's its **own**: its accent, its
+brand, and colors with meaning only to it. In high contrast the application
+replaces the package's palette with the system's colors where it has them,
+after the package has given its own, so a package can't lose them by accident;
+only the scrim stays the package's, since systems have none.
+
+XForms adds its
 `Typography`, `Shapes` and `Motion` (read as `theme.Typography` and so on),
 what its controls lay out by (`MenuBarStyle`, `CommandBarStyle`, and
 `Sizes.PopupRowHeight`, by default 48 where touch is the primary input and 36
 where a mouse is: `Application.IsTouchPrimary`) and its controls' templates
 (below); a theme package adds its own styles, such as XForms.Themes.Basic's
-`ButtonStyle`.
+`ButtonStyle` and `BasicColors`.
 
 Basic is a neutral starting point, not any one app's look. An app with a look
 of its own has its own `AppTheme`, which applies Basic and then replaces the
 templates and tokens it wants to:
 `new BasicTheme().Apply(theme).WithTemplate(new MyTabStripTemplate()).WithExtension(new MenuBarStyle { ... })`.
+To replace the colors, it overrides `CreateColors` too, and sets `BasicColors`
+for what has no role:
+
+```csharp
+public sealed class MyTheme : AppTheme
+{
+    public override ColorScheme CreateColors(ThemeMode mode, Color accentColor)
+    {
+        return (mode == ThemeMode.Light) ? MyPalette.Light(accentColor) : MyPalette.Dark(accentColor);
+    }
+
+    public override Theme Apply(Theme theme)
+    {
+        return new BasicTheme().Apply(theme).WithExtension(new BasicColors { Success = MyPalette.Green });
+    }
+}
+```
 
 The application builds its theme with `CreateTheme(mode, accent)` from the
 mode (the system's, unless the app sets `RequestedThemeMode`) and the accent
@@ -764,10 +793,10 @@ state, read-only; the template draws everything else.
 **Choosing a theme.** An app passes its theme package to `XFormsApp.Run`
 (`new BasicTheme()`, an `AppTheme`), and there's no fallback: a templated
 control whose theme has no template for it throws when it's attached,
-saying so. `XFormsApp.Run` sets the framework's `Application.ThemeExtender`
-to the package's `Apply`, which the framework's `CreateTheme` calls on the
-theme it builds; an app's own `CreateTheme` then adjusts that (its brand's
-colors, a type scale, a style):
+saying so. `XFormsApp.Run` sets the framework's `Application.ThemePalette` to
+the package's `CreateColors` and `Application.ThemeExtender` to its `Apply`,
+which the framework's `CreateTheme` calls in turn; an app's own `CreateTheme`
+then adjusts that (its brand's colors, a type scale, a style):
 
 ```csharp
 protected override Theme CreateTheme(ThemeMode mode, Color accentColor)
@@ -776,9 +805,16 @@ protected override Theme CreateTheme(ThemeMode mode, Color accentColor)
 }
 ```
 
+The accent it passes on is the one the palette gets, so an app with a shade of
+its accent for each mode passes `base.CreateTheme(mode, MyAccent.For(mode))`,
+and calls `InvalidateTheme` when its choice changes, rather than setting
+`AccentColor` as the mode changes.
+
 A view's theme can override a template or a style for it and its
 descendants: `view.Theme = theme.WithExtension(new ButtonStyle { ... })`, or
-`theme.WithTemplate(new MyButtonTemplate())`. The mode and accent color
+`theme.WithTemplate(new MyButtonTemplate())`. A section can have a whole theme
+of its own, whatever the app's mode:
+`view.Theme = new BasicTheme().Create(ThemeMode.Dark, accent)`. The mode and accent color
 change at runtime; switching to another theme package doesn't (yet).
 `Border` isn't templated: as WPF's and WinUI's, it draws only what its own
 properties say.

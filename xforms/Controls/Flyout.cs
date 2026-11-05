@@ -19,13 +19,12 @@ namespace XForms.Controls
         }
 
         /// <summary>
-        /// A flyout dims the rest of the window: lightly (25% black), and
-        /// more in dark mode (50%), where a light dim wouldn't show.
+        /// A flyout dims the rest of the window, with its theme's scrim color.
         /// </summary>
         protected override Color GetDefaultScrimColor(
             Theme theme)
         {
-            return Color.FromArgb((theme.Mode == ThemeMode.Light) ? (byte)0x40 : (byte)0x80, 0, 0, 0);
+            return theme.Colors.Scrim;
         }
 
         /// <summary>

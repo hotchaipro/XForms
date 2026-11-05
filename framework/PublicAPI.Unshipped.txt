@@ -1,3 +1,4 @@
+static XForms.ColorScheme.Plain(XForms.ThemeMode mode, XForms.Color accentColor) -> XForms.ColorScheme
 XForms.AccessibilityAction.Decrement = 6 -> XForms.AccessibilityAction
 XForms.AccessibilityAction.Increment = 5 -> XForms.AccessibilityAction
 XForms.AccessibilityRange
@@ -33,6 +34,10 @@ XForms.Application.StartPath.get -> string
 XForms.Application.StartPath.set -> void
 XForms.Application.ThemeExtender.get -> System.Func<XForms.Theme, XForms.Theme>
 XForms.Application.ThemeExtender.set -> void
+XForms.Application.ThemePalette.get -> System.Func<XForms.ThemeMode, XForms.Color, XForms.ColorScheme>
+XForms.Application.ThemePalette.set -> void
+XForms.ColorScheme.Scrim.get -> XForms.Color
+XForms.ColorScheme.Scrim.init -> void
 XForms.ContextRequestedEventArgs
 XForms.ContextRequestedEventArgs.ContextRequestedEventArgs(XForms.Point? position, XForms.PointerDeviceType? deviceType) -> void
 XForms.ContextRequestedEventArgs.DeviceType.get -> XForms.PointerDeviceType?

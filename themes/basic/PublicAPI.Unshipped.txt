@@ -1,3 +1,35 @@
+override XForms.Themes.Basic.BasicColors.Equals(object obj) -> bool
+override XForms.Themes.Basic.BasicColors.GetHashCode() -> int
+override XForms.Themes.Basic.BasicColors.ToString() -> string
+override XForms.Themes.Basic.BasicTheme.CreateColors(XForms.ThemeMode mode, XForms.Color accentColor) -> XForms.ColorScheme
+static XForms.Themes.Basic.BasicColors.operator !=(XForms.Themes.Basic.BasicColors left, XForms.Themes.Basic.BasicColors right) -> bool
+static XForms.Themes.Basic.BasicColors.operator ==(XForms.Themes.Basic.BasicColors left, XForms.Themes.Basic.BasicColors right) -> bool
+XForms.Themes.Basic.BasicColors
+XForms.Themes.Basic.BasicColors.<Clone>$() -> XForms.Themes.Basic.BasicColors
+XForms.Themes.Basic.BasicColors.BasicColors() -> void
+XForms.Themes.Basic.BasicColors.Equals(XForms.Themes.Basic.BasicColors other) -> bool
+XForms.Themes.Basic.BasicColors.FloatingPressedBackground.get -> XForms.Color
+XForms.Themes.Basic.BasicColors.FloatingPressedBackground.init -> void
+XForms.Themes.Basic.BasicColors.FloatingPressedForeground.get -> XForms.Color
+XForms.Themes.Basic.BasicColors.FloatingPressedForeground.init -> void
+XForms.Themes.Basic.BasicColors.Glow.get -> XForms.Color
+XForms.Themes.Basic.BasicColors.Glow.init -> void
+XForms.Themes.Basic.BasicColors.OnCommand.get -> XForms.Color
+XForms.Themes.Basic.BasicColors.OnCommand.init -> void
+XForms.Themes.Basic.BasicColors.OnPressed.get -> XForms.Color
+XForms.Themes.Basic.BasicColors.OnPressed.init -> void
+XForms.Themes.Basic.BasicColors.OnSeverity.get -> XForms.Color
+XForms.Themes.Basic.BasicColors.OnSeverity.init -> void
+XForms.Themes.Basic.BasicColors.OnWarning.get -> XForms.Color
+XForms.Themes.Basic.BasicColors.OnWarning.init -> void
+XForms.Themes.Basic.BasicColors.Shadow.get -> XForms.Color
+XForms.Themes.Basic.BasicColors.Shadow.init -> void
+XForms.Themes.Basic.BasicColors.SubtleFloatingBackground.get -> XForms.Color?
+XForms.Themes.Basic.BasicColors.SubtleFloatingBackground.init -> void
+XForms.Themes.Basic.BasicColors.Success.get -> XForms.Color
+XForms.Themes.Basic.BasicColors.Success.init -> void
+XForms.Themes.Basic.BasicColors.Warning.get -> XForms.Color
+XForms.Themes.Basic.BasicColors.Warning.init -> void
 XForms.Themes.Basic.ButtonStyle
 XForms.Themes.Basic.ButtonStyle.<Clone>$() -> XForms.Themes.Basic.ButtonStyle
 XForms.Themes.Basic.ButtonStyle.Background.get -> XForms.Color?

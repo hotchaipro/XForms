@@ -95,10 +95,9 @@ namespace XForms.Themes.Basic
     {
         private const float CornerRadius = 14;
 
-        // CSS's 0 8px 28px rgba(0, 0, 0, 0.3)
+        // As CSS's 0 8px 28px, in the theme's shadow color
         private static readonly Shadow FrameShadow = new Shadow()
         {
-            Color = Color.FromArgb(0x4d, 0, 0, 0),
             Offset = new Point(0, 8),
             Blur = 28,
             CornerRadius = CornerRadius,
@@ -108,14 +107,16 @@ namespace XForms.Themes.Basic
         // wouldn't show on a dark page
         private static readonly Shadow FrameGlow = FrameShadow with
         {
-            Color = Shadow.GlowColor,
             Offset = Point.Zero,
         };
 
         private static Shadow ShadowFor(
             Theme theme)
         {
-            return (theme.Mode == ThemeMode.Light) ? FrameShadow : FrameGlow;
+            var colors = theme.GetBasicColors();
+            return (theme.Mode == ThemeMode.Light)
+                ? FrameShadow with { Color = colors.Shadow }
+                : FrameGlow with { Color = colors.Glow };
         }
 
         protected override void Apply(
@@ -123,14 +124,16 @@ namespace XForms.Themes.Basic
             TemplateContext context)
         {
             context.CreateOwnAnimator();
-            control.Shadow = ShadowFor(control.ActualTheme);
+            var shadow = ShadowFor(control.ActualTheme);
+            context.State = shadow;
+            control.Shadow = shadow;
         }
 
         protected override void Unapply(
             PopupFrame control,
             TemplateContext context)
         {
-            if ((control.Shadow == FrameShadow) || (control.Shadow == FrameGlow))
+            if (control.Shadow == (Shadow)context.State)
             {
                 control.Shadow = null;
             }
@@ -140,9 +143,12 @@ namespace XForms.Themes.Basic
             PopupFrame control,
             TemplateContext context)
         {
-            if ((control.Shadow == FrameShadow) || (control.Shadow == FrameGlow))
+            // The theme's shadow, unless the app gave the frame its own
+            if (control.Shadow == (Shadow)context.State)
             {
-                control.Shadow = ShadowFor(control.ActualTheme);
+                var shadow = ShadowFor(control.ActualTheme);
+                context.State = shadow;
+                control.Shadow = shadow;
             }
         }
 
