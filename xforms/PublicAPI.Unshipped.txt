@@ -562,7 +562,6 @@ XForms.Controls.ListView.SelectionBackground.set -> void
 override XForms.Controls.CommandBar.MeasureOverride(XForms.Size availableSize) -> XForms.Size
 XForms.Controls.FlyoutButton.ButtonSpacing.get -> float
 XForms.Controls.FlyoutButton.ButtonSpacing.set -> void
-const XForms.Input.SwipeGestureRecognizer.Slop = 10 -> float
 XForms.Input.SwipeGestureRecognizer.Velocity.get -> float
 override XForms.Input.SwipeGestureRecognizer.IsDragGesture.get -> bool
 XForms.Controls.AutoSuggestBoxListView.RowHeight.get -> float
@@ -625,3 +624,12 @@ static XForms.Controls.Sizes.operator ==(XForms.Controls.Sizes left, XForms.Cont
 static XForms.Controls.ThemeTokens.get_CommandBarStyle(XForms.Theme theme) -> XForms.Controls.CommandBarStyle
 static XForms.Controls.ThemeTokens.get_MenuBarStyle(XForms.Theme theme) -> XForms.Controls.MenuBarStyle
 static XForms.Controls.ThemeTokens.get_PopupRowHeight(XForms.Theme theme) -> float
+XForms.Input.PanGestureRecognizer.ShouldBegin.get -> System.Func<XForms.Point, bool>
+XForms.Input.PanGestureRecognizer.ShouldBegin.set -> void
+XForms.Input.PanGestureRecognizer.Velocity.get -> XForms.Point
+override XForms.Input.PanGestureRecognizer.IsDragGesture.get -> bool
+override XForms.Input.PanGestureRecognizer.OnPointerInput(XForms.PointerEventArgs e) -> void
+override XForms.Input.PinchGestureRecognizer.OnDetached(XForms.View view) -> void
+override XForms.Input.PinchGestureRecognizer.OnPointerInput(XForms.PointerEventArgs e) -> void
+override XForms.Input.SwipeGestureRecognizer.OnPointerInput(XForms.PointerEventArgs touch) -> void
+override XForms.Input.TapGestureRecognizer.OnPointerInput(XForms.PointerEventArgs touch) -> void

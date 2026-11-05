@@ -35,7 +35,7 @@ namespace XForms.Controls
             this.AddVisualChild(this._strip);
             this.AddVisualChild(this._previousButton);
             this.AddVisualChild(this._nextButton);
-            this.GestureRecognizers.Add(new PanGestureRecognizer(this) { Directions = PanDirections.Horizontal });
+            this.GestureRecognizers.Add(new PanGestureRecognizer(this) { ShouldBegin = translation => Math.Abs(translation.X) >= Math.Abs(translation.Y) });
             this.Items = new FlipViewItemCollection(this);
         }
 

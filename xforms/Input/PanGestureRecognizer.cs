@@ -2,14 +2,6 @@ using System;
 
 namespace XForms.Input
 {
-    [Flags]
-    public enum PanDirections
-    {
-        Horizontal = 1,
-        Vertical = 2,
-        Both = Horizontal | Vertical,
-    }
-
     public interface IPanGestureDelegate : IGestureRecognizerDelegate
     {
         void OnPanStarted();
@@ -25,13 +17,14 @@ namespace XForms.Input
     }
 
     /// <summary>
-    /// Recognizes a drag in the allowed directions. Once the pointer has moved
-    /// past the touch slop that way, the pan takes the pointer from scrolling
-    /// parents.
+    /// Recognizes a drag. Once the pointer has moved past the drag slop, the
+    /// pan takes the pointer from scrolling parents, unless
+    /// <see cref="ShouldBegin"/> declines it.
     /// </summary>
     public class PanGestureRecognizer : GestureRecognizer
     {
         private readonly IPanGestureDelegate _delegate;
+        private readonly VelocityTracker _velocity = new VelocityTracker();
         private Point _start;
 
         public PanGestureRecognizer(
@@ -42,79 +35,93 @@ namespace XForms.Input
         }
 
         /// <summary>
-        /// The directions the pan follows (both by default). A vertical-only pan
-        /// leaves horizontal drags to others, and the other way around.
+        /// Asked once, as the pointer passes the drag slop, with how far it has
+        /// moved: false leaves the pointer to others, such as a scrolling
+        /// parent (a pan that only goes sideways declines a drag that went
+        /// mostly up or down). Null always begins.
         /// </summary>
-        public PanDirections Directions
+        public Func<Point, bool> ShouldBegin
         {
             get;
             set;
-        } = PanDirections.Both;
+        }
+
+        /// <summary>
+        /// How fast the pan was moving as it lifted, in points a second: for a
+        /// delegate deciding, in OnPanCompleted, whether it was a flick.
+        /// </summary>
+        public Point Velocity
+        {
+            get;
+            private set;
+        }
+
+        // A drag on a view inside the panned one pans it
+        protected override bool IsDragGesture
+        {
+            get
+            {
+                return true;
+            }
+        }
 
         private Point Translation(
             Point position)
         {
-            float dx = this.Directions.HasFlag(PanDirections.Horizontal) ? position.X - this._start.X : 0;
-            float dy = this.Directions.HasFlag(PanDirections.Vertical) ? position.Y - this._start.Y : 0;
-            return new Point(dx, dy);
+            return new Point(position.X - this._start.X, position.Y - this._start.Y);
         }
 
         protected override void OnPointerInput(
-            PointerEventArgs e,
-            ref GestureEventResult result)
+            PointerEventArgs e)
         {
             switch (e.State)
             {
                 case PointerInputState.Began:
                     this._start = e.Position;
-                    result.DidHandleEvent = true;
+                    this.Velocity = Point.Zero;
+                    this._velocity.Clear();
+                    this._velocity.Add(e.Position);
                     break;
 
                 case PointerInputState.Moved:
-                    if (this.State == GestureState.Possible)
-                    {
-                        float dx = Math.Abs(e.Position.X - this._start.X);
-                        float dy = Math.Abs(e.Position.Y - this._start.Y);
-                        bool horizontal = this.Directions.HasFlag(PanDirections.Horizontal) && (dx > Application.TouchSlop) && (dx >= dy);
-                        bool vertical = this.Directions.HasFlag(PanDirections.Vertical) && (dy > Application.TouchSlop) && (dy >= dx);
+                    this._velocity.Add(e.Position);
 
-                        if (horizontal || vertical)
+                    if (this.State == GestureState.Recognized)
+                    {
+                        this._delegate.OnPanChanged(this.Translation(e.Position));
+                    }
+                    else if (e.Position.DistanceTo(this._start) >= Application.GetDragSlop(e.DeviceType))
+                    {
+                        if (this.ShouldBegin?.Invoke(this.Translation(e.Position)) ?? true)
                         {
-                            this.State = GestureState.Began;
+                            this.Recognize();
                             this._start = e.Position;
                             this._delegate.OnPanStarted();
                         }
-                    }
-                    else if ((this.State == GestureState.Began) || (this.State == GestureState.Changed))
-                    {
-                        this.State = GestureState.Changed;
-                        this._delegate.OnPanChanged(this.Translation(e.Position));
+                        else
+                        {
+                            this.Fail();
+                        }
                     }
 
-                    // Claim the moves once panning
-                    result.DidHandleEvent = (this.State == GestureState.Began) || (this.State == GestureState.Changed);
                     break;
 
                 case PointerInputState.Ended:
-                    if ((this.State == GestureState.Began) || (this.State == GestureState.Changed))
+                    if (this.State == GestureState.Recognized)
                     {
-                        this.State = GestureState.Recognized;
+                        this._velocity.Add(e.Position);
+                        this.Velocity = this._velocity.Velocity;
                         this._delegate.OnPanCompleted(this.Translation(e.Position));
-                    }
-                    else
-                    {
-                        this.State = GestureState.Failed;
                     }
 
                     break;
 
                 case PointerInputState.Canceled:
-                    if ((this.State == GestureState.Began) || (this.State == GestureState.Changed))
+                    if (this.State == GestureState.Recognized)
                     {
                         this._delegate.OnPanCanceled();
                     }
 
-                    this.State = GestureState.Canceled;
                     break;
             }
         }

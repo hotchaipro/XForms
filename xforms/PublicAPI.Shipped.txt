@@ -546,13 +546,7 @@ XForms.Input.ITapGestureDelegate
 XForms.Input.ITapGestureDelegate.OnTapBegan() -> void
 XForms.Input.ITapGestureDelegate.OnTapEnded() -> void
 XForms.Input.ITapGestureDelegate.OnTapped() -> void
-XForms.Input.PanDirections
-XForms.Input.PanDirections.Both = XForms.Input.PanDirections.Horizontal | XForms.Input.PanDirections.Vertical -> XForms.Input.PanDirections
-XForms.Input.PanDirections.Horizontal = 1 -> XForms.Input.PanDirections
-XForms.Input.PanDirections.Vertical = 2 -> XForms.Input.PanDirections
 XForms.Input.PanGestureRecognizer
-XForms.Input.PanGestureRecognizer.Directions.get -> XForms.Input.PanDirections
-XForms.Input.PanGestureRecognizer.Directions.set -> void
 XForms.Input.PanGestureRecognizer.PanGestureRecognizer(XForms.Input.IPanGestureDelegate gestureDelegate) -> void
 XForms.Input.PinchGestureRecognizer
 XForms.Input.PinchGestureRecognizer.PinchGestureRecognizer(XForms.Input.IPinchGestureDelegate gestureDelegate) -> void
@@ -763,18 +757,9 @@ override XForms.Controls.ToggleButton.AccessibilityIsChecked.get -> bool?
 override XForms.Controls.Typography.Equals(object obj) -> bool
 override XForms.Controls.Typography.GetHashCode() -> int
 override XForms.Controls.Typography.ToString() -> string
-override XForms.Input.PanGestureRecognizer.OnPointerInput(XForms.PointerEventArgs e, ref XForms.GestureEventResult result) -> void
-override XForms.Input.PinchGestureRecognizer.OnPointerInput(XForms.PointerEventArgs e, ref XForms.GestureEventResult result) -> void
-override XForms.Input.PinchGestureRecognizer.Reset() -> void
 override XForms.Input.PinchGestureRecognizer.TracksMultiplePointers.get -> bool
-override XForms.Input.SwipeGestureRecognizer.OnAttached(XForms.View view) -> void
-override XForms.Input.SwipeGestureRecognizer.OnDetached(XForms.View view) -> void
-override XForms.Input.SwipeGestureRecognizer.OnPointerInput(XForms.PointerEventArgs touch, ref XForms.GestureEventResult result) -> void
-override XForms.Input.SwipeGestureRecognizer.Reset() -> void
 override XForms.Input.TapGestureRecognizer.OnAttached(XForms.View view) -> void
 override XForms.Input.TapGestureRecognizer.OnDetached(XForms.View view) -> void
-override XForms.Input.TapGestureRecognizer.OnPointerInput(XForms.PointerEventArgs touch, ref XForms.GestureEventResult result) -> void
-override XForms.Input.TapGestureRecognizer.Reset() -> void
 override XForms.Layouts.Canvas.ArrangeChildren(XForms.Size finalSize) -> void
 override XForms.Layouts.Canvas.MeasureChildren(XForms.Size availableSize) -> XForms.Size
 override XForms.Layouts.DockPanel.ArrangeChildren(XForms.Size finalSize) -> void

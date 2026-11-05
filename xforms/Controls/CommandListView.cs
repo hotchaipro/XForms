@@ -215,9 +215,7 @@ namespace XForms.Controls
             };
             this._contentLayout.Children.Add(this._commandBar, Dock.Bottom);
 
-            // The swipe recognizer reports taps too, so it replaces the list
-            // item's tap recognizer
-            this.GestureRecognizers.Clear();
+            // Beside the list item's tap: a swipe cancels it
             this._swipeRecognizer = new SwipeGestureRecognizer(this);
             this.GestureRecognizers.Add(this._swipeRecognizer);
         }
@@ -348,6 +346,10 @@ namespace XForms.Controls
 
         private SwipeGestureRecognizer _swipeRecognizer;
 
+        // How far a swipe goes back or on before it changes its mind: whether
+        // lifting runs the command, and which command a long swipe runs
+        private const float SwipeHysteresis = 15.0f;
+
         // A short swipe this fast (points a second, its way) as it lifts runs
         // its command: a flick
         private const float FlickVelocity = 400.0f;
@@ -386,12 +388,12 @@ namespace XForms.Controls
             }
 
             // Update fence position
-            if (dx > this._swipeFencePosition + Application.TouchSlop)
+            if (dx > this._swipeFencePosition + SwipeHysteresis)
             {
                 this._swipeEnabled = true;
                 this._swipeFencePosition = dx;
             }
-            else if (dx < this._swipeFencePosition - Application.TouchSlop)
+            else if (dx < this._swipeFencePosition - SwipeHysteresis)
             {
                 this._swipeEnabled = false;
                 this._swipeFencePosition = dx;
@@ -433,7 +435,7 @@ namespace XForms.Controls
                 this._longSwipe = true;
                 UpdateSwipeCommand(direction);
             }
-            else if ((this._longSwipe) && (dx < (this.Bounds.Size.Width * LongSwipeDistancePercentage) - Application.TouchSlop))
+            else if ((this._longSwipe) && (dx < (this.Bounds.Size.Width * LongSwipeDistancePercentage) - SwipeHysteresis))
             {
                 // Reset back to short swipe
                 this._longSwipe = false;
@@ -584,19 +586,6 @@ namespace XForms.Controls
         #endregion Swipe input
 
         #region Tap input
-
-        void ITapGestureDelegate.OnTapBegan()
-        {
-        }
-
-        void ITapGestureDelegate.OnTapEnded()
-        {
-        }
-
-        void ITapGestureDelegate.OnTapped()
-        {
-            this.OnTapped();
-        }
 
         protected override void OnTapped()
         {

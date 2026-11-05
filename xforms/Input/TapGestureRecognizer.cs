@@ -139,15 +139,8 @@ namespace XForms.Input
         {
             get
             {
-                return this.State == GestureState.Began;
+                return this.State == GestureState.Possible;
             }
-        }
-
-        public override void Reset()
-        {
-            base.Reset();
-
-            this._gestureStart = Point.Zero;
         }
 
         // Activation (Enter, Space, a screen reader) is a tap, which also
@@ -176,86 +169,57 @@ namespace XForms.Input
         }
 
         protected override void OnPointerInput(
-            PointerEventArgs touch,
-            ref GestureEventResult result)
+            PointerEventArgs touch)
         {
-            result.DidHandleEvent = true;
-
             if (touch.State == PointerInputState.Began)
             {
-                if (this.State == GestureState.Possible)
+                this._gestureStart = touch.Position;
+                this._deviceType = touch.DeviceType;
+                this._isHolding = false;
+
+                if (null != this.Holding)
                 {
-                    this.State = GestureState.Began;
-                    this._gestureStart = touch.Position;
-                    this._deviceType = touch.DeviceType;
-                    this._isHolding = false;
-
-                    if (null != this.Holding)
-                    {
-                        this._holdTimer ??= new DispatcherTimer(HoldTime, this.OnHoldTime);
-                        this._holdTimer.Start();
-                    }
-
-                    this._delegate?.OnTapBegan();
+                    this._holdTimer ??= new DispatcherTimer(HoldTime, this.OnHoldTime);
+                    this._holdTimer.Start();
                 }
+
+                this._delegate?.OnTapBegan();
             }
             else if (touch.State == PointerInputState.Moved)
             {
-                if (this.State == GestureState.Began)
+                // NOTE: A tap only recognizes as it lifts, so a drag that starts
+                // on a tappable view can still scroll its parent
+                if (touch.Position.DistanceTo(this._gestureStart) > Application.TapSlop)
                 {
-                    double distance = touch.Position.DistanceTo(this._gestureStart);
-
-                    if (distance > Application.TouchSlop)
-                    {
-                        this.Fail();
-                    }
+                    this.EndPress();
                 }
-
-                // NOTE: A tap never claims the pointer exclusively, so a drag that
-                // starts on a tappable view can still scroll its parent
-                result.DidHandleEvent = false;
             }
             else if (touch.State == PointerInputState.Ended)
             {
-                if (this.State == GestureState.Began)
+                this._holdTimer?.Stop();
+
+                if (this._isHolding)
                 {
-                    this._holdTimer?.Stop();
-                    double distance = touch.Position.DistanceTo(this._gestureStart);
-
-                    if (this._isHolding)
-                    {
-                        this._isHolding = false;
-                        this.State = GestureState.Failed;
-                        this.Holding?.Invoke(this.View, new HoldingEventArgs(touch.Position, HoldingState.Completed));
-                    }
-                    else if (distance <= Application.TouchSlop)
-                    {
-                        this.State = GestureState.Recognized;
-                        this._delegate?.OnTapped();
-                        this.OnTap(touch.Position);
-                    }
-                    else
-                    {
-                        this.State = GestureState.Failed;
-                    }
-
-                    this._delegate?.OnTapEnded();
+                    this._isHolding = false;
+                    this.Fail();
+                    this.Holding?.Invoke(this.View, new HoldingEventArgs(touch.Position, HoldingState.Completed));
+                }
+                else if (touch.Position.DistanceTo(this._gestureStart) <= Application.TapSlop)
+                {
+                    this.Recognize();
+                    this._delegate?.OnTapped();
+                    this.OnTap(touch.Position);
                 }
                 else
-                {
-                    this.State = GestureState.Failed;
-                }
-            }
-            else if (touch.State == PointerInputState.Canceled)
-            {
-                if (this.State == GestureState.Began)
                 {
                     this.Fail();
                 }
-                else
-                {
-                    this.State = GestureState.Failed;
-                }
+
+                this._delegate?.OnTapEnded();
+            }
+            else if (touch.State == PointerInputState.Canceled)
+            {
+                this.EndPress();
             }
         }
 
@@ -265,7 +229,7 @@ namespace XForms.Input
         {
             var now = DateTime.UtcNow;
             bool isDouble = ((now - this._lastTapTime) <= DoubleTapTime)
-                && (position.DistanceTo(this._lastTapPosition) <= 2 * Application.TouchSlop);
+                && (position.DistanceTo(this._lastTapPosition) <= 2 * Application.TapSlop);
 
             var args = new TappedEventArgs(position, this._deviceType);
             this.Tapped?.Invoke(this.View, args);
@@ -286,7 +250,7 @@ namespace XForms.Input
         private void OnHoldTime()
         {
             this._holdTimer.Stop();
-            if (this.State != GestureState.Began)
+            if (this.State != GestureState.Possible)
             {
                 return;
             }
@@ -296,10 +260,10 @@ namespace XForms.Input
         }
 
         // The press moved away or was canceled: no tap (or the end of a hold)
-        private void Fail()
+        private void EndPress()
         {
             this._holdTimer?.Stop();
-            this.State = GestureState.Failed;
+            this.Fail();
 
             if (this._isHolding)
             {

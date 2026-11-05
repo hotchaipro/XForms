@@ -236,23 +236,12 @@ XForms.Frame.Frame() -> void
 XForms.Frame.Push(XForms.Page page) -> void
 XForms.Frame.TransitionDuration.get -> System.TimeSpan
 XForms.Frame.TransitionDuration.set -> void
-XForms.GestureEventResult
-XForms.GestureEventResult.DidHandleEvent -> bool
-XForms.GestureEventResult.GestureEventResult() -> void
 XForms.GestureRecognizer
 XForms.GestureRecognizer.GestureRecognizer() -> void
 XForms.GestureRecognizer.GestureRecognizer(XForms.IGestureRecognizerDelegate gestureRecognizerDelegate) -> void
-XForms.GestureRecognizer.HandlePointerInput(XForms.PointerEventArgs inputEvent, ref XForms.GestureEventResult result) -> void
 XForms.GestureRecognizer.State.get -> XForms.GestureState
-XForms.GestureRecognizer.State.set -> void
 XForms.GestureRecognizer.View.get -> XForms.View
 XForms.GestureState
-XForms.GestureState.Began = 2 -> XForms.GestureState
-XForms.GestureState.Canceled = 5 -> XForms.GestureState
-XForms.GestureState.Changed = 3 -> XForms.GestureState
-XForms.GestureState.Failed = 1 -> XForms.GestureState
-XForms.GestureState.Possible = 0 -> XForms.GestureState
-XForms.GestureState.Recognized = 4 -> XForms.GestureState
 XForms.GradientStop
 XForms.GradientStop.Color.get -> XForms.Color
 XForms.GradientStop.GradientStop() -> void
@@ -842,7 +831,6 @@ abstract XForms.DrawingContext.PushClipCore(XForms.Rect clip) -> void
 abstract XForms.DrawingContext.PushOpacityCore(float opacity) -> void
 abstract XForms.DrawingContext.PushTransformCore(System.Numerics.Matrix3x2 transform) -> void
 abstract XForms.EasingFunction.EaseInCore(float t) -> float
-abstract XForms.GestureRecognizer.OnPointerInput(XForms.PointerEventArgs inputEvent, ref XForms.GestureEventResult result) -> void
 abstract XForms.PageTransition.PlayAsync(XForms.PageTransitionContext context) -> System.Threading.Tasks.Task
 abstract XForms.Primitives.ItemsViewSource.Count.get -> int
 abstract XForms.Primitives.ItemsViewSource.GetItemView(XForms.View reuseView, object item) -> XForms.View
@@ -895,7 +883,6 @@ static XForms.Angle.FromRadians(float radians) -> XForms.Angle
 static XForms.Angle.operator !=(XForms.Angle a, XForms.Angle b) -> bool
 static XForms.Angle.operator ==(XForms.Angle a, XForms.Angle b) -> bool
 static XForms.Application.Current.get -> XForms.Application
-static XForms.Application.TouchSlop -> float
 static XForms.Color.FromArgb(byte a, byte r, byte g, byte b) -> XForms.Color
 static XForms.Color.FromArgb(float a, float r, float g, float b) -> XForms.Color
 static XForms.Color.FromArgb(float r, float g, float b) -> XForms.Color
@@ -1121,7 +1108,6 @@ virtual XForms.Frame.NavigateAsync(XForms.Page page, XForms.PageTransition trans
 virtual XForms.Frame.ReplaceAsync(XForms.Page page, XForms.NavigationMode mode = XForms.NavigationMode.Forward, XForms.PageTransition transition = null) -> System.Threading.Tasks.Task
 virtual XForms.GestureRecognizer.OnAttached(XForms.View view) -> void
 virtual XForms.GestureRecognizer.OnDetached(XForms.View view) -> void
-virtual XForms.GestureRecognizer.Reset() -> void
 virtual XForms.GestureRecognizer.TracksMultiplePointers.get -> bool
 virtual XForms.Page.OnNavigatedFrom(XForms.NavigationEventArgs navigationEventArgs) -> void
 virtual XForms.Page.OnNavigatedTo(XForms.NavigationEventArgs navigationEventArgs) -> void

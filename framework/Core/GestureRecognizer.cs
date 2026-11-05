@@ -1,15 +1,34 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace XForms
 {
+    /// <summary>
+    /// Where a gesture recognizer is in following the pointer on its view.
+    /// </summary>
     public enum GestureState
     {
-        Possible = 0,
-        Failed,
-        Began,
-        Changed,
+        /// <summary>
+        /// No pointer is down: the recognizer waits for a press.
+        /// </summary>
+        Ready = 0,
+
+        /// <summary>
+        /// A pointer is down, and may yet turn out to be the gesture.
+        /// </summary>
+        Possible,
+
+        /// <summary>
+        /// The pointer is the gesture. The recognizer claims its moves, and the
+        /// view's other recognizers have stopped following it.
+        /// </summary>
         Recognized,
-        Canceled,
+
+        /// <summary>
+        /// The pointer isn't the gesture: the recognizer ignores it until it's
+        /// released.
+        /// </summary>
+        Failed,
     }
 
     public interface IGestureRecognizerDelegate
@@ -21,21 +40,30 @@ namespace XForms
         void OnTouchCanceled();
     }
 
-    public struct GestureEventResult
-    {
-        public bool DidHandleEvent;
-    }
-
+    /// <summary>
+    /// Interprets the pointer input of the view it's added to. A press makes it
+    /// <see cref="GestureState.Possible"/>; it then calls
+    /// <see cref="Recognize"/> or <see cref="Fail"/>, and is
+    /// <see cref="GestureState.Ready"/> again once the pointer is released or
+    /// canceled.
+    /// </summary>
+    /// <remarks>
+    /// Recognizers on one view are exclusive: the first to recognize cancels the
+    /// others. A recognizer claims a press unless it fails on it, and claims
+    /// moves once it has recognized; until then a scrolling parent can take the
+    /// pointer, which ends as canceled.
+    /// </remarks>
     public abstract class GestureRecognizer
     {
-        private IGestureRecognizerDelegate _delegate;
+        private readonly IGestureRecognizerDelegate _delegate;
+        private readonly HashSet<int> _pointers = new HashSet<int>();
+        private PointerEventArgs _lastEvent;
 
         /// <summary>
         /// A recognizer that reports through its own events.
         /// </summary>
         protected GestureRecognizer()
         {
-            this.State = GestureState.Possible;
         }
 
         /// <summary>
@@ -45,26 +73,12 @@ namespace XForms
             IGestureRecognizerDelegate gestureRecognizerDelegate)
         {
             this._delegate = gestureRecognizerDelegate ?? throw new ArgumentNullException(nameof(gestureRecognizerDelegate));
-            this.State = GestureState.Possible;
         }
 
         public GestureState State
         {
             get;
-            protected set;
-        }
-
-        //public IGestureRecognizerDelegate Delegate
-        //{
-        //    get
-        //    {
-        //        return this._delegate;
-        //    }
-        //}
-
-        public virtual void Reset()
-        {
-            this.State = GestureState.Possible;
+            private set;
         }
 
         /// <summary>
@@ -88,11 +102,13 @@ namespace XForms
         {
             this.OnDetached(view);
             this.View = null;
+            this._pointers.Clear();
+            this.State = GestureState.Ready;
         }
 
         /// <summary>
         /// Called when the recognizer becomes a view's
-        /// <see cref="View.GestureRecognizer"/>.
+        /// <see cref="View.GestureRecognizers"/>.
         /// </summary>
         protected virtual void OnAttached(
             View view)
@@ -101,23 +117,19 @@ namespace XForms
 
         /// <summary>
         /// Called when the recognizer stops being a view's
-        /// <see cref="View.GestureRecognizer"/>.
+        /// <see cref="View.GestureRecognizers"/>.
         /// </summary>
         protected virtual void OnDetached(
             View view)
         {
         }
 
-        private int? _pointerId;
-
         /// <summary>
-        /// Whether the recognizer gets every pointer pressed on its view (as a
-        /// pinch does). Otherwise it follows only the first one, until released.
-        /// </summary>
-        /// <summary>
-        /// Whether the gesture follows drags (a swipe, a pan): a quick drag
-        /// that starts on a view inside it and lifts before a move hands it
-        /// over (a flick on a row's button) is offered to it as it lifts.
+        /// Whether the gesture follows drags (a swipe, a pan). Only these are
+        /// offered a drag that starts on a view inside theirs (as a sideways
+        /// drag on a row's button swipes the row), and they see each event
+        /// before the view's other recognizers, so a quick flick that lifts
+        /// before a move arrives is theirs, not a tap.
         /// </summary>
         protected virtual bool IsDragGesture
         {
@@ -135,6 +147,10 @@ namespace XForms
             }
         }
 
+        /// <summary>
+        /// Whether the recognizer gets every pointer pressed on its view (as a
+        /// pinch does). Otherwise it follows only the first one, until released.
+        /// </summary>
         protected virtual bool TracksMultiplePointers
         {
             get
@@ -143,60 +159,125 @@ namespace XForms
             }
         }
 
-        public void HandlePointerInput(
-            PointerEventArgs inputEvent,
-            ref GestureEventResult result)
+        /// <summary>
+        /// The pointer is the gesture: the view's other recognizers stop
+        /// following it, and the recognizer claims its moves. Does nothing
+        /// unless the state is <see cref="GestureState.Possible"/>.
+        /// </summary>
+        protected void Recognize()
         {
-            if (!this.TracksMultiplePointers)
+            if (this.State != GestureState.Possible)
             {
-                if (inputEvent.State == PointerInputState.Began)
-                {
-                    if (null != this._pointerId)
-                    {
-                        // Another finger while one is already down: ignore it
-                        return;
-                    }
-
-                    this._pointerId = inputEvent.PointerId;
-                }
-                else if (inputEvent.PointerId != this._pointerId)
-                {
-                    return;
-                }
-
-                if ((inputEvent.State == PointerInputState.Ended) || (inputEvent.State == PointerInputState.Canceled))
-                {
-                    this._pointerId = null;
-                }
+                return;
             }
 
-            if (inputEvent.State == PointerInputState.Began)
+            this.State = GestureState.Recognized;
+
+            var recognizers = this.View?.GestureRecognizers;
+            if ((null == recognizers) || (recognizers.Count < 2))
+            {
+                return;
+            }
+
+            var e = this._lastEvent;
+            foreach (int pointerId in new List<int>(this._pointers))
+            {
+                for (int i = 0; i < recognizers.Count; i += 1)
+                {
+                    if (recognizers[i] != this)
+                    {
+                        recognizers[i].HandlePointerInput(new PointerEventArgs(pointerId, e.DeviceType, e.Position, PointerInputState.Canceled, false, e.KeyModifiers) { OriginalSource = e.OriginalSource });
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// The pointer isn't the gesture: the recognizer gets no more of its
+        /// input, leaving it to others.
+        /// </summary>
+        protected void Fail()
+        {
+            if (this.State != GestureState.Ready)
+            {
+                this.State = GestureState.Failed;
+            }
+        }
+
+        // Returns whether the recognizer claims the event
+        internal bool HandlePointerInput(
+            PointerEventArgs e)
+        {
+            if (e.State == PointerInputState.Began)
+            {
+                if (this._pointers.Contains(e.PointerId))
+                {
+                    // A press for a pointer that never ended (its view was
+                    // taken away from under it, say) starts over
+                    this._pointers.Clear();
+                }
+
+                if (0 == this._pointers.Count)
+                {
+                    this.State = GestureState.Possible;
+                }
+                else if (!this.TracksMultiplePointers)
+                {
+                    // Another finger while one is already down: ignore it
+                    return false;
+                }
+
+                this._pointers.Add(e.PointerId);
+            }
+            else if (!this._pointers.Contains(e.PointerId))
+            {
+                return false;
+            }
+
+            this._lastEvent = e;
+
+            if (e.State == PointerInputState.Began)
             {
                 this._delegate?.OnTouchBegan();
             }
-            else if (inputEvent.State == PointerInputState.Ended)
+            else if (e.State == PointerInputState.Ended)
             {
                 this._delegate?.OnTouchEnded();
             }
-            else if (inputEvent.State == PointerInputState.Canceled)
+            else if (e.State == PointerInputState.Canceled)
             {
                 this._delegate?.OnTouchCanceled();
             }
 
-            this.OnPointerInput(inputEvent, ref result);
-
-            if ((this.State == GestureState.Recognized)
-                || (this.State == GestureState.Failed)
-                || (this.State == GestureState.Canceled))
+            if ((this.State == GestureState.Possible) || (this.State == GestureState.Recognized))
             {
-                // Reset on reaching a terminal node in the state machine
-                this.Reset();
+                this.OnPointerInput(e);
             }
+
+            bool isClaimed = (e.State == PointerInputState.Began)
+                ? (this.State != GestureState.Failed)
+                : ((e.State != PointerInputState.Canceled) && (this.State == GestureState.Recognized));
+
+            if ((e.State == PointerInputState.Ended) || (e.State == PointerInputState.Canceled))
+            {
+                this._pointers.Remove(e.PointerId);
+                if (0 == this._pointers.Count)
+                {
+                    this.State = GestureState.Ready;
+                    this._lastEvent = null;
+                }
+            }
+
+            return isClaimed;
         }
 
+        /// <summary>
+        /// A pointer event for the gesture, while it's
+        /// <see cref="GestureState.Possible"/> or
+        /// <see cref="GestureState.Recognized"/>.
+        /// </summary>
         protected abstract void OnPointerInput(
-            PointerEventArgs inputEvent,
-            ref GestureEventResult result);
+            PointerEventArgs e);
     }
 
     /// <summary>

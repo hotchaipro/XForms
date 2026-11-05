@@ -17,7 +17,32 @@ namespace XForms
         private Color? _accentColor;
         private Theme _theme;
 
-        public static float TouchSlop = 15.0f;
+        /// <summary>
+        /// How far a press can move and still be a tap (or a hold), in points.
+        /// </summary>
+        public const float TapSlop = 15.0f;
+
+        /// <summary>
+        /// How far a touch or pen moves before it's a drag, in points. Less
+        /// than <see cref="TapSlop"/>: past this, a drag gesture takes the
+        /// pointer from a tap that would still accept it.
+        /// </summary>
+        public const float DragSlop = 10.0f;
+
+        /// <summary>
+        /// How far a mouse moves before it's a drag, in points: a mouse holds
+        /// steadier than a finger.
+        /// </summary>
+        public const float MouseDragSlop = 6.0f;
+
+        /// <summary>
+        /// How far a pointer of this kind moves before it's a drag, in points.
+        /// </summary>
+        public static float GetDragSlop(
+            PointerDeviceType deviceType)
+        {
+            return (deviceType == PointerDeviceType.Mouse) ? MouseDragSlop : DragSlop;
+        }
 
         /// <summary>
         /// Raised when the application's theme changes: its mode, accent color

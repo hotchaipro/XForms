@@ -355,12 +355,12 @@ namespace XForms.Controls
             {
                 float dx = Math.Abs(e.Position.X - this._touchStart.X);
                 float dy = Math.Abs(e.Position.Y - this._touchStart.Y);
-                if ((dx > Application.TouchSlop) && (dx >= dy))
+                if ((dx > Application.DragSlop) && (dx >= dy))
                 {
                     this.StartDragging(e);
                     e.Handled = true;
                 }
-                else if (dy > Application.TouchSlop)
+                else if (dy > Application.DragSlop)
                 {
                     // Vertical: the page scrolls
                     this._pendingTouch = null;

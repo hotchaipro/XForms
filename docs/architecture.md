@@ -578,21 +578,36 @@ Views handle input through overrides and events (`OnPointerPressed`,
 `DoubleTapped` and `Holding` events, or gesture recognizers
 (`TapGestureRecognizer`, `SwipeGestureRecognizer`, `PanGestureRecognizer`,
 `PinchGestureRecognizer`). `Application.PreviewPointerInput` sees every event
-first. Two rules keep scrolling native:
+first.
 
-- **A gesture claims Moved events only once it is sure.** A swipe claims them
-  once it is in its Changed state. A tap never claims them.
+A gesture recognizer is `Ready` until a press makes it `Possible`. It then
+calls `Recognize` or `Fail`, and is `Ready` again once the pointer is released
+or canceled; once failed, it gets no more of that pointer's input. Recognizers
+on one view are exclusive: the first to recognize cancels the others, so a
+view pairs a `TapGestureRecognizer` with a `SwipeGestureRecognizer` and gets
+one or the other. A press is a tap within `Application.TapSlop` (15 points) and
+a drag past `Application.GetDragSlop` (10 points, or 6 for a mouse). In between
+it can still be either, so drag gestures see each event first. A
+`PanGestureRecognizer.ShouldBegin` can decline a drag as it passes the slop,
+leaving it to others; its `Velocity`, like a swipe's, is its speed as it lifts.
+
+Three rules keep scrolling native:
+
+- **A gesture claims Moved events only once it is sure.** A swipe or pan claims
+  them once it has recognized. A tap never claims them: it recognizes as it
+  lifts.
 - **Platforms capture the pointer only after a claimed move.** A move is
   claimed when it's handled, or when the view called `CapturePointer`.
   Until then, a drag can still become a scroll of the enclosing list or
   scroll view.
-- **An ancestor's gesture can take over an unclaimed drag.** Once a drag
-  passes the touch slop without the pressed view claiming it, the framework
-  offers it to its ancestors' gesture recognizers, nearest first, as if
-  pressed where it started. The first to claim it gets the rest of the
+- **An ancestor's drag gesture can take over an unclaimed drag.** Once a drag
+  passes the drag slop without the pressed view claiming it, the framework
+  offers it to its ancestors' drag gestures (`IsDragGesture`), nearest first,
+  as if pressed where it started. The first to claim it gets the rest of the
   pointer, and the pressed view's press is canceled. So a sideways drag that
   starts on a command bar button swipes its list row, and a tap still runs
-  the button. Positions follow each view as it is, moved by its animators.
+  the button. A drag that lifts before a move hands it over is offered the same
+  way. Positions follow each view as it is, moved by its animators.
 
 A press finds its view by hit testing, which only looks inside a view's
 frame: a child pushed outside its parent (a negative margin) draws there but

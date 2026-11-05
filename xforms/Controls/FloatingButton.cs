@@ -9,7 +9,7 @@ namespace XForms.Controls
     /// A round button with an icon, floating over the content, which can also
     /// be swiped. Its theme's template draws it.
     /// </summary>
-    public class FloatingButton : TemplatedControl, ISwipeGestureDelegate
+    public class FloatingButton : TemplatedControl, ITapGestureDelegate, ISwipeGestureDelegate
     {
         // Animates the button within a FlyoutButton
         private readonly Animator _flyoutAnimator;
@@ -51,6 +51,7 @@ namespace XForms.Controls
             this._flyoutAnimator = this.CreateOwnAnimator();
             this.SwipeRecognizer = new SwipeGestureRecognizer(this);
             this.GestureRecognizers.Add(this.SwipeRecognizer);
+            this.GestureRecognizers.Add(new TapGestureRecognizer(this));
 
             this.Focusable = true;
         }

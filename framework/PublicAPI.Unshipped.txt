@@ -179,3 +179,14 @@ XForms.Theme.PageTransition.init -> void
 XForms.PageTransitionContext.AnimatorBeneath.get -> XForms.Animator
 XForms.PageTransitionContext.PageBeneath.get -> XForms.Page
 static XForms.PageTransition.SlideOver.get -> XForms.PageTransition
+const XForms.Application.DragSlop = 10 -> float
+const XForms.Application.MouseDragSlop = 6 -> float
+const XForms.Application.TapSlop = 15 -> float
+static XForms.Application.GetDragSlop(XForms.PointerDeviceType deviceType) -> float
+XForms.GestureRecognizer.Fail() -> void
+XForms.GestureRecognizer.Recognize() -> void
+XForms.GestureState.Failed = 3 -> XForms.GestureState
+XForms.GestureState.Possible = 1 -> XForms.GestureState
+XForms.GestureState.Ready = 0 -> XForms.GestureState
+XForms.GestureState.Recognized = 2 -> XForms.GestureState
+abstract XForms.GestureRecognizer.OnPointerInput(XForms.PointerEventArgs e) -> void

@@ -24,6 +24,7 @@ namespace XForms.Input
     {
         private readonly IPinchGestureDelegate _delegate;
         private readonly Dictionary<int, Point> _pointers = new Dictionary<int, Point>();
+        private bool _isPinching;
         private int _first, _second;
         private float _startDistance;
         private float _scale = 1.0f;
@@ -43,29 +44,21 @@ namespace XForms.Input
             }
         }
 
-        private bool IsPinching
+        protected override void OnDetached(
+            View view)
         {
-            get
-            {
-                return (this.State == GestureState.Began) || (this.State == GestureState.Changed);
-            }
-        }
-
-        public override void Reset()
-        {
-            base.Reset();
-            this._scale = 1.0f;
+            this._pointers.Clear();
+            this._isPinching = false;
         }
 
         protected override void OnPointerInput(
-            PointerEventArgs e,
-            ref GestureEventResult result)
+            PointerEventArgs e)
         {
             switch (e.State)
             {
                 case PointerInputState.Began:
                     this._pointers[e.PointerId] = e.Position;
-                    if ((this._pointers.Count == 2) && !this.IsPinching)
+                    if ((this._pointers.Count == 2) && !this._isPinching)
                     {
                         using (var ids = this._pointers.Keys.GetEnumerator())
                         {
@@ -77,12 +70,11 @@ namespace XForms.Input
 
                         this._startDistance = Math.Max(1, this._pointers[this._first].DistanceTo(this._pointers[this._second]));
                         this._scale = 1.0f;
-                        this.State = GestureState.Began;
+                        this._isPinching = true;
+                        this.Recognize();
                         this._delegate.OnPinchStarted();
                     }
 
-                    // Take every finger pressed on the view
-                    result.DidHandleEvent = true;
                     break;
 
                 case PointerInputState.Moved:
@@ -91,30 +83,23 @@ namespace XForms.Input
                         this._pointers[e.PointerId] = e.Position;
                     }
 
-                    if (this.IsPinching && ((e.PointerId == this._first) || (e.PointerId == this._second)))
+                    if (this._isPinching && ((e.PointerId == this._first) || (e.PointerId == this._second)))
                     {
                         var a = this._pointers[this._first];
                         var b = this._pointers[this._second];
                         this._scale = a.DistanceTo(b) / this._startDistance;
-                        this.State = GestureState.Changed;
                         this._delegate.OnPinchChanged(this._scale, new Point((a.X + b.X) / 2, (a.Y + b.Y) / 2));
                     }
 
-                    // Claim the moves only while two fingers pinch
-                    result.DidHandleEvent = this.IsPinching;
                     break;
 
                 case PointerInputState.Ended:
                 case PointerInputState.Canceled:
                     this._pointers.Remove(e.PointerId);
-                    if (this.IsPinching && ((e.PointerId == this._first) || (e.PointerId == this._second)))
+                    if (this._isPinching && ((e.PointerId == this._first) || (e.PointerId == this._second)))
                     {
+                        this._isPinching = false;
                         this._delegate.OnPinchCompleted(this._scale);
-                        this.State = GestureState.Recognized;
-                    }
-                    else if (0 == this._pointers.Count)
-                    {
-                        this.State = GestureState.Failed;
                     }
 
                     break;

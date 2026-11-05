@@ -19,6 +19,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>XForms.Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\framework\XForms.Framework.csproj" />
     <ProjectReference Include="..\toolkit\XForms.Toolkit.csproj" />
   </ItemGroup>
