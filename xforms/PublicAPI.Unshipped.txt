@@ -1,4 +1,4 @@
-virtual XForms.Controls.AppTheme.CreateColors(XForms.ThemeMode mode, XForms.Color accentColor) -> XForms.ColorScheme
+abstract XForms.Controls.AppTheme.CreateColors(XForms.ThemeMode mode, XForms.Color accentColor) -> XForms.ColorScheme
 XForms.Controls.AppTheme.Create(XForms.ThemeMode mode, XForms.Color accentColor) -> XForms.Theme
 XForms.Controls.AutoSuggestBox
 XForms.Controls.AutoSuggestBox.AutoSuggestBox() -> void

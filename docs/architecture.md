@@ -767,8 +767,9 @@ Basic is a neutral starting point, not any one app's look. An app with a look
 of its own has its own `AppTheme`, which applies Basic and then replaces the
 templates and tokens it wants to:
 `theme = new BasicTheme().Apply(theme); return theme.WithTemplate(new MyTabStripTemplate()).WithExtension(theme.MenuBarStyle with { ... });`.
-To replace the colors, it overrides `CreateColors` too, and sets `BasicColors`
-for what has no role:
+Every package gives its colors: one over Basic gives Basic's
+(`CreateColors` is abstract, so it can't lose them by forgetting), or replaces
+them, and sets `BasicColors` for what has no role:
 
 ```csharp
 public sealed class MyTheme : AppTheme

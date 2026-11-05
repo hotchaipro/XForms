@@ -116,17 +116,16 @@ namespace XForms.Themes.Basic
             float r = icon.Width / 2;
             drawContext.FillEllipse(c, r, r, severity);
             var basic = control.ActualTheme.GetBasicColors();
-            var mark = basic.OnSeverity;
             switch (control.Severity)
             {
                 case InfoBarSeverity.Success:
-                    drawContext.DrawLine(new Point(c.X - 4.5f, c.Y), new Point(c.X - 1.5f, c.Y + 3.5f), mark, 2);
-                    drawContext.DrawLine(new Point(c.X - 1.5f, c.Y + 3.5f), new Point(c.X + 4.5f, c.Y - 3.5f), mark, 2);
+                    drawContext.DrawLine(new Point(c.X - 4.5f, c.Y), new Point(c.X - 1.5f, c.Y + 3.5f), basic.OnSuccess, 2);
+                    drawContext.DrawLine(new Point(c.X - 1.5f, c.Y + 3.5f), new Point(c.X + 4.5f, c.Y - 3.5f), basic.OnSuccess, 2);
                     break;
 
                 case InfoBarSeverity.Error:
-                    drawContext.DrawLine(new Point(c.X - 4, c.Y - 4), new Point(c.X + 4, c.Y + 4), mark, 2);
-                    drawContext.DrawLine(new Point(c.X - 4, c.Y + 4), new Point(c.X + 4, c.Y - 4), mark, 2);
+                    drawContext.DrawLine(new Point(c.X - 4, c.Y - 4), new Point(c.X + 4, c.Y + 4), colors.OnError, 2);
+                    drawContext.DrawLine(new Point(c.X - 4, c.Y + 4), new Point(c.X + 4, c.Y - 4), colors.OnError, 2);
                     break;
 
                 case InfoBarSeverity.Warning:
@@ -135,8 +134,8 @@ namespace XForms.Themes.Basic
                     break;
 
                 default:
-                    drawContext.DrawLine(new Point(c.X, c.Y - 1.5f), new Point(c.X, c.Y + 5), mark, 2);
-                    drawContext.FillEllipse(new Point(c.X, c.Y - 4.5f), 1.2f, 1.2f, mark);
+                    drawContext.DrawLine(new Point(c.X, c.Y - 1.5f), new Point(c.X, c.Y + 5), colors.OnAccent, 2);
+                    drawContext.FillEllipse(new Point(c.X, c.Y - 4.5f), 1.2f, 1.2f, colors.OnAccent);
                     break;
             }
 

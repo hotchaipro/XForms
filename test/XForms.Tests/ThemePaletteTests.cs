@@ -42,7 +42,7 @@ namespace XForms.Tests
         {
             Success = Color.FromRgb(0x25, 0x26, 0x27),
             Warning = Color.FromRgb(0x28, 0x29, 0x2a),
-            OnSeverity = Color.FromRgb(0x2b, 0x2c, 0x2d),
+            OnSuccess = Color.FromRgb(0x2b, 0x2c, 0x2d),
             OnWarning = Color.FromRgb(0x2e, 0x2f, 0x30),
             OnPressed = Color.FromRgb(0x31, 0x32, 0x33),
             OnCommand = Color.FromRgb(0x34, 0x35, 0x36),
@@ -312,7 +312,7 @@ namespace XForms.Tests
 
             Assert.Equal(Color.FromRgb(0x2e9e44), colors.Success);
             Assert.Equal(Color.FromRgb(0xe89e00), colors.Warning);
-            Assert.Equal(Colors.White, colors.OnSeverity);
+            Assert.Equal(Colors.White, colors.OnSuccess);
             Assert.Equal(Colors.Black, colors.OnWarning);
             Assert.Equal(Colors.White, colors.OnPressed);
             Assert.Equal(Colors.White, colors.OnCommand);
@@ -410,6 +410,34 @@ namespace XForms.Tests
             button.Shadow = own;
             Show(first);
             Assert.Equal(own, button.Shadow);
+        }
+
+        // On each severity's color, in whatever the palette puts on it, so it
+        // reads in high contrast's yellow accent and dark mode's pale error
+        [Theory]
+        [InlineData(ThemeMode.Dark, InfoBarSeverity.Error)]
+        [InlineData(ThemeMode.HighContrast, InfoBarSeverity.Error)]
+        [InlineData(ThemeMode.HighContrast, InfoBarSeverity.Informational)]
+        public void AnInfoBarsMarkReadsOnItsSeverity(
+            ThemeMode mode,
+            InfoBarSeverity severity)
+        {
+            var theme = new BasicTheme().Create(mode, Accent);
+            var control = new InfoBar() { Theme = theme, Severity = severity };
+            SetBounds(control);
+
+            var recorder = new RecordingContext();
+            theme.GetTemplate(control.GetType()).RenderCore(control, recorder);
+
+            var on = (severity == InfoBarSeverity.Error) ? theme.Colors.OnError : theme.Colors.OnAccent;
+            Assert.Contains(on, recorder.Colors);
+            Assert.DoesNotContain(Colors.White, recorder.Colors.Where(c => c != theme.Colors.Foreground));
+        }
+
+        [Fact]
+        public void APackageMustGiveItsColors()
+        {
+            Assert.True(typeof(AppTheme).GetMethod(nameof(AppTheme.CreateColors)).IsAbstract);
         }
 
         [Fact]
