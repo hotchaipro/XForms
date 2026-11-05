@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 
-namespace XForms
+namespace XForma
 {
     /// <summary>
     /// What fills a shape. Brushes are immutable, so they can be shared and

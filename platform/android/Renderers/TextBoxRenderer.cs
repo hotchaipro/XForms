@@ -1,9 +1,9 @@
 ﻿using System;
-using XForms.Primitives;
-using XForms.Platform;
+using XForma.Primitives;
+using XForma.Platform;
 using AndroidTextEntry = global::Android.Widget.EditText;
 
-namespace XForms.Android.Renderers
+namespace XForma.Android.Renderers
 {
     internal class TextBoxRenderer : ViewRenderer<AndroidTextEntry>, ITextBoxRenderer
     {

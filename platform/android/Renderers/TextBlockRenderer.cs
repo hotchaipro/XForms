@@ -1,10 +1,10 @@
 ﻿using System;
 using Android.Views;
 using AndroidTextView = Android.Widget.TextView;
-using XForms.Primitives;
-using XForms.Platform;
+using XForma.Primitives;
+using XForma.Platform;
 
-namespace XForms.Android.Renderers
+namespace XForma.Android.Renderers
 {
     internal class TextBlockRenderer : ViewRenderer<AndroidTextView>, ITextBlockRenderer
     {

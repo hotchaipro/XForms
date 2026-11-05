@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
 
-namespace XForms.Web
+namespace XForma.Web
 {
     /// <summary>
     /// The app's images, loaded once each by URL, with their natural sizes

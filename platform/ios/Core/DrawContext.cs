@@ -2,11 +2,11 @@
 using CoreGraphics;
 using Foundation;
 using UIKit;
-using XForms.Primitives;
+using XForma.Primitives;
 
-using XForms.iOS.Renderers;
+using XForma.iOS.Renderers;
 
-namespace XForms.iOS
+namespace XForma.iOS
 {
     internal sealed class DrawContext : DrawingContext
     {

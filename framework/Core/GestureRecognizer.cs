@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace XForms
+namespace XForma
 {
     /// <summary>
     /// Where a gesture recognizer is in following the pointer on its view.

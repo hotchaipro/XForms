@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace XForms
+namespace XForma
 {
     /// <summary>
     /// The direction a panel stacks or wraps its children in, or a list lays

@@ -1,7 +1,7 @@
 ﻿using System;
-using XForms.Controls;
+using XForma.Controls;
 
-namespace XForms.Themes.Basic
+namespace XForma.Themes.Basic
 {
     // The Basic look of the bars: in the accent color in light mode, and on
     // the surface color otherwise

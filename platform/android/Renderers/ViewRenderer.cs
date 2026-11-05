@@ -4,10 +4,10 @@ using Android.Views;
 using Android.Views.Animations;
 using Android.Animation;
 using Android.Graphics.Drawables;
-using XForms.Platform;
+using XForma.Platform;
 using AndroidView = global::Android.Views.View;
 
-namespace XForms.Android.Renderers
+namespace XForma.Android.Renderers
 {
     internal abstract class ViewRenderer<TNativeElement> : ElementRenderer<TNativeElement>, IViewRenderer
         where TNativeElement : AndroidView
@@ -408,7 +408,7 @@ namespace XForms.Android.Renderers
 
                 // Text boxes handle their own keys, but offer the ones they have
                 // no use for to their ancestors first
-                if (!(this.Element is XForms.Primitives.TextBox))
+                if (!(this.Element is XForma.Primitives.TextBox))
                 {
                     newElement.KeyPress += Element_KeyPress;
 
@@ -682,7 +682,7 @@ namespace XForms.Android.Renderers
             e.Handled = false;
 
             var key = ToKey(e.KeyCode);
-            if (!(this.Element is XForms.Primitives.TextBox textBox))
+            if (!(this.Element is XForma.Primitives.TextBox textBox))
             {
                 return;
             }

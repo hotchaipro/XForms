@@ -1,8 +1,8 @@
 using System;
 using UIKit;
-using XForms.Platform;
+using XForma.Platform;
 
-namespace XForms.iOS.Renderers
+namespace XForma.iOS.Renderers
 {
     /// <summary>
     /// The renderer of every view that holds children (panels, content and

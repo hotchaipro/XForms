@@ -1,4 +1,4 @@
-namespace XForms.Primitives
+namespace XForma.Primitives
 {
     /// <summary>
     /// Whether scrolling a <see cref="ScrollViewer"/> hides the soft keyboard.

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace XForms.Platform
+namespace XForma.Platform
 {
     /// <summary>
     /// The framework's side of the platform contract for one view the platform

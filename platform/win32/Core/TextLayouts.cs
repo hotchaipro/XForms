@@ -6,9 +6,9 @@ using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Direct2D;
 using Windows.Win32.Graphics.DirectWrite;
 using Windows.Win32.System.Com;
-using XForms.Platform;
+using XForma.Platform;
 
-namespace XForms.Win32
+namespace XForma.Win32
 {
     /// <summary>
     /// Builds DirectWrite text layouts for <see cref="TextLayout"/> and text

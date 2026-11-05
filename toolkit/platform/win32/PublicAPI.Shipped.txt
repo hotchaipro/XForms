@@ -1,2 +1,2 @@
-XForms.Win32.Win32ToolkitServices
-static XForms.Win32.Win32ToolkitServices.Register() -> void
+XForma.Win32.Win32ToolkitServices
+static XForma.Win32.Win32ToolkitServices.Register() -> void

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
-using XForms.Web.Renderers;
-using XForms.Platform;
+using XForma.Web.Renderers;
+using XForma.Platform;
 
-namespace XForms.Web
+namespace XForma.Web
 {
     /// <summary>
     /// The page that hosts the app: it lays the root out to the viewport,
@@ -43,7 +43,7 @@ namespace XForms.Web
         }
 
         /// <summary>
-        /// The viewport's size, in CSS pixels (XForms' device-independent
+        /// The viewport's size, in CSS pixels (XForma's device-independent
         /// pixels).
         /// </summary>
         public Size ViewportSize
@@ -299,7 +299,7 @@ namespace XForms.Web
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"XForms: {ex}");
+                Console.Error.WriteLine($"XForma: {ex}");
             }
         }
 
@@ -313,7 +313,7 @@ namespace XForms.Web
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"XForms: {ex}");
+                Console.Error.WriteLine($"XForma: {ex}");
             }
         }
 

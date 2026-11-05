@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using XForms.Primitives;
-using XForms.Platform;
+using XForma.Primitives;
+using XForma.Platform;
 
-namespace XForms
+namespace XForma
 {
     public abstract class Application
     {
@@ -429,7 +429,7 @@ namespace XForms
         /// <summary>
         /// The path the app starts on when the platform gives none (a link, a
         /// stack restored after the system ended the app, the browser's
-        /// address): <c>/</c> unless set. XForms navigates to it after
+        /// address): <c>/</c> unless set. XForma navigates to it after
         /// <see cref="OnStart"/>; the app doesn't navigate to its first page
         /// itself.
         /// </summary>

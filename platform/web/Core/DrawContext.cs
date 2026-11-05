@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.Versioning;
-using XForms.Web.Renderers;
+using XForma.Web.Renderers;
 
-namespace XForms.Web
+namespace XForma.Web
 {
     /// <summary>
     /// Records drawing as one command list, which the page replays on a
-    /// layer's canvas (see draw in xforms.js): one call into JavaScript per
+    /// layer's canvas (see draw in xforma.js): one call into JavaScript per
     /// layer drawn, rather than one per shape.
     /// </summary>
     [SupportedOSPlatform("browser")]

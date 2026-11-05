@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using UIKit;
-using XForms.Platform;
+using XForma.Platform;
 using NativeView = UIKit.UIView;
 
-namespace XForms.iOS.Renderers
+namespace XForma.iOS.Renderers
 {
     internal class FrameRenderer : ViewRenderer<NativeView>, IFrameRenderer
     {

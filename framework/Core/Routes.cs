@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace XForms
+namespace XForma
 {
     /// <summary>
     /// The app's pages by path, each with a function that makes the page (see

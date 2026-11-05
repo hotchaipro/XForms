@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-android</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>XForma.Test</RootNamespace>
+    <ApplicationId>com.hotchaigames.xforma.test</ApplicationId>
+    <ApplicationVersion>1</ApplicationVersion>
+    <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\XForma.Test\*.cs" LinkBase="Shared" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Android resource names must be lowercase -->
+    <AndroidResource Include="..\Content\AboutLogo.png" Link="Resources\drawable\aboutlogo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\xforma\XForma.csproj" />
+    <ProjectReference Include="..\..\themes\basic\XForma.Themes.Basic.csproj" />
+    <ProjectReference Include="..\..\spikes\XForma.Xaml\XForma.Xaml.csproj" />
+  </ItemGroup>
+
+</Project>

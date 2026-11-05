@@ -4,9 +4,9 @@ using CoreGraphics;
 using CoreText;
 using Foundation;
 using UIKit;
-using XForms.Platform;
+using XForma.Platform;
 
-namespace XForms.iOS
+namespace XForma.iOS
 {
     /// <summary>
     /// Fonts for font families (registered or installed), weights and styles,

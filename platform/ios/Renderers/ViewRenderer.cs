@@ -1,9 +1,9 @@
 ﻿using System;
 using CoreGraphics;
 using UIKit;
-using XForms.Platform;
+using XForma.Platform;
 
-namespace XForms.iOS.Renderers
+namespace XForma.iOS.Renderers
 {
     internal abstract class ViewRenderer<TNativeElement> : ElementRenderer<TNativeElement>, IViewRenderer
         where TNativeElement : UIView

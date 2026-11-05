@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    XForma.Themes.Basic: the first theme for XForma.Controls, a plain, flat
+    look. An app chooses it in Application.CreateTheme.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>XForma.Themes.Basic</RootNamespace>
+    <AssemblyName>XForma.Themes.Basic</AssemblyName>
+    <IsTrimmable>true</IsTrimmable>
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\xforma\XForma.csproj" />
+  </ItemGroup>
+
+</Project>

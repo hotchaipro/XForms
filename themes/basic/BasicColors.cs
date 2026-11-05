@@ -1,6 +1,6 @@
 using System;
 
-namespace XForms.Themes.Basic
+namespace XForma.Themes.Basic
 {
     /// <summary>
     /// The colors the Basic theme draws with that a <see cref="ColorScheme"/>
@@ -39,7 +39,7 @@ namespace XForms.Themes.Basic
 
         /// <summary>
         /// The icon and text behind a swiped row, on its command's color,
-        /// unless the command sets <see cref="XForms.Controls.UICommand.ForegroundColor"/>.
+        /// unless the command sets <see cref="XForma.Controls.UICommand.ForegroundColor"/>.
         /// </summary>
         public Color OnCommand { get; init; } = Colors.White;
 
@@ -65,7 +65,7 @@ namespace XForms.Themes.Basic
         /// What shows around popups where a shadow wouldn't (dark and high
         /// contrast), with its opacity.
         /// </summary>
-        public Color Glow { get; init; } = XForms.Shadow.GlowColor;
+        public Color Glow { get; init; } = XForma.Shadow.GlowColor;
     }
 
     internal static class BasicColorsExtensions

@@ -3,10 +3,10 @@ using CoreText;
 using Foundation;
 using UIKit;
 
-using XForms.Primitives;
-using XForms.Platform;
+using XForma.Primitives;
+using XForma.Platform;
 
-namespace XForms.iOS.Renderers
+namespace XForma.iOS.Renderers
 {
     internal class TextBlockRenderer : ViewRenderer<UILabel>, ITextBlockRenderer
     {

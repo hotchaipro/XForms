@@ -4,12 +4,12 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace XForms.Analyzers;
+namespace XForma.Analyzers;
 
 /// <summary>
 /// Keeps platform code to the platform contract (XF0001): in an assembly the framework gives
-/// its internals to (a platform: XForms.Framework.Win32, .Android, .iOS, .Web), an internal
-/// framework type or member may be used only if it's in the contract namespace, XForms.Platform
+/// its internals to (a platform: XForma.Framework.Win32, .Android, .iOS, .Web), an internal
+/// framework type or member may be used only if it's in the contract namespace, XForma.Platform
 /// (the renderer interfaces and the hosts), or is marked [PlatformContract].
 /// </summary>
 /// <remarks>
@@ -21,15 +21,15 @@ namespace XForms.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class PlatformContractAnalyzer : DiagnosticAnalyzer
 {
-    private const string FrameworkAssemblyName = "XForms.Framework";
-    private const string ContractNamespace = "XForms.Platform";
-    private const string ContractAttributeName = "XForms.Platform.PlatformContractAttribute";
+    private const string FrameworkAssemblyName = "XForma.Framework";
+    private const string ContractNamespace = "XForma.Platform";
+    private const string ContractAttributeName = "XForma.Platform.PlatformContractAttribute";
 
     private static readonly DiagnosticDescriptor OutsideContract = new DiagnosticDescriptor(
         id: "XF0001",
         title: "Platform code uses a framework internal outside the platform contract",
-        messageFormat: "'{0}' is internal to the framework and not part of the platform contract: drive the framework through the hosts (XForms.Platform), or mark the member [PlatformContract] if platforms need it",
-        category: "XForms.Platform",
+        messageFormat: "'{0}' is internal to the framework and not part of the platform contract: drive the framework through the hosts (XForma.Platform), or mark the member [PlatformContract] if platforms need it",
+        category: "XForma.Platform",
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true,
         description: "Platform assemblies see every framework internal through InternalsVisibleTo; they may use only the platform contract.");

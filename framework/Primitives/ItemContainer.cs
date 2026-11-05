@@ -1,6 +1,6 @@
 using System;
 
-namespace XForms.Primitives
+namespace XForma.Primitives
 {
     /// <summary>
     /// An items view's container for one item: it holds the item's view (any

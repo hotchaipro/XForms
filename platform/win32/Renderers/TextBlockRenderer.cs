@@ -2,10 +2,10 @@ using System;
 using Windows.Win32.Graphics.Direct2D;
 using Windows.Win32.Graphics.Direct2D.Common;
 using Windows.Win32.Graphics.DirectWrite;
-using XForms.Primitives;
-using XForms.Platform;
+using XForma.Primitives;
+using XForma.Platform;
 
-namespace XForms.Win32.Renderers
+namespace XForma.Win32.Renderers
 {
     /// <summary>
     /// A text label measured and drawn with DirectWrite.
@@ -144,7 +144,7 @@ namespace XForms.Win32.Renderers
                     : (this._horizontalTextAlignment == TextAlignment.End) ? HorizontalAlignment.Right
                     : HorizontalAlignment.Left,
                 TextWrapping = this._wordWrap ? TextWrapping.Wrap : TextWrapping.NoWrap,
-                TextTrimming = this._textTrimming ? XForms.TextTrimming.CharacterEllipsis : XForms.TextTrimming.None,
+                TextTrimming = this._textTrimming ? XForma.TextTrimming.CharacterEllipsis : XForma.TextTrimming.None,
                 MaxLines = this._maxLines,
             };
 

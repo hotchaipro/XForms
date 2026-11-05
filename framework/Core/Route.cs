@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 
-namespace XForms
+namespace XForma
 {
     /// <summary>
     /// A path matched to one of the app's routes (see

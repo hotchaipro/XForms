@@ -5,7 +5,7 @@ using Android.Views;
 using AndroidRect = Android.Graphics.Rect;
 using AndroidView = Android.Views.View;
 
-namespace XForms.Android
+namespace XForma.Android
 {
     /// <summary>
     /// A view's animation layers, composed onto the view's own render

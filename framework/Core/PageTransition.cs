@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace XForms
+namespace XForma
 {
     /// <summary>
     /// How a page arrives or leaves a <see cref="Frame"/>: the built-in

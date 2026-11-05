@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 using AndroidView = Android.Views.View;
 
-namespace XForms.Android
+namespace XForma.Android
 {
     /// <summary>
     /// How far past their bounds native views take touches (see

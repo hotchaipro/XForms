@@ -1,0 +1,31 @@
+<Solution>
+  <Folder Name="/framework/">
+    <Project Path="framework/XForma.Framework.csproj" />
+  </Folder>
+  <Folder Name="/platform/">
+    <Project Path="platform/android/XForma.Framework.Android.csproj" />
+    <Project Path="platform/ios/XForma.Framework.iOS.csproj" />
+    <Project Path="platform/web/XForma.Framework.Web.csproj" />
+    <Project Path="platform/win32/XForma.Framework.Win32.csproj" />
+  </Folder>
+  <Folder Name="/toolkit/">
+    <Project Path="toolkit/XForma.Toolkit.csproj" />
+    <Project Path="toolkit/platform/android/XForma.Toolkit.Android.csproj" />
+    <Project Path="toolkit/platform/ios/XForma.Toolkit.iOS.csproj" />
+    <Project Path="toolkit/platform/web/XForma.Toolkit.Web.csproj" />
+    <Project Path="toolkit/platform/win32/XForma.Toolkit.Win32.csproj" />
+  </Folder>
+  <Folder Name="/themes/">
+    <Project Path="themes/basic/XForma.Themes.Basic.csproj" />
+  </Folder>
+  <Folder Name="/xforma/">
+    <Project Path="xforma/XForma.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/XForma.Test.Android/XForma.Test.Android.csproj" />
+    <Project Path="test/XForma.Test.iOS/XForma.Test.iOS.csproj" />
+    <Project Path="test/XForma.Test.Web/XForma.Test.Web.csproj" />
+    <Project Path="test/XForma.Test.Win32/XForma.Test.Win32.csproj" />
+    <Project Path="test/XForma.Tests/XForma.Tests.csproj" />
+  </Folder>
+</Solution>

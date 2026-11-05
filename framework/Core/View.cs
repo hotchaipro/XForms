@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using XForms.Platform;
+using XForma.Platform;
 
-namespace XForms
+namespace XForma
 {
     public abstract class View : Element, INotifyPropertyChanged
     {
@@ -1025,7 +1025,7 @@ namespace XForms
         {
             get
             {
-                if (AppContext.TryGetSwitch("XForms.DisableLightweightViews", out bool isDisabled) && isDisabled)
+                if (AppContext.TryGetSwitch("XForma.DisableLightweightViews", out bool isDisabled) && isDisabled)
                 {
                     return false;
                 }

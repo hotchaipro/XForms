@@ -1,7 +1,7 @@
 ﻿using System;
-using XForms.Platform;
+using XForma.Platform;
 
-namespace XForms.iOS.Renderers
+namespace XForma.iOS.Renderers
 {
     internal abstract class ElementRenderer<TNativeElement> : IElementRenderer
         where TNativeElement : class

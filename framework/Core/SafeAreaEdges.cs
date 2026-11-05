@@ -1,6 +1,6 @@
 using System;
 
-namespace XForms
+namespace XForma
 {
     /// <summary>
     /// Edges of the safe area: the parts of the screen next to the system's

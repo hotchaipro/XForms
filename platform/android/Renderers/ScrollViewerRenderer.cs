@@ -1,9 +1,9 @@
 ﻿using System;
-using XForms.Primitives;
-using XForms.Platform;
+using XForma.Primitives;
+using XForma.Platform;
 using AndroidScrollView = global::Android.Widget.ScrollView;
 
-namespace XForms.Android.Renderers
+namespace XForma.Android.Renderers
 {
     internal class ScrollViewerRenderer : ViewRenderer<AndroidScrollView>, IScrollViewerRenderer
     {

@@ -2,9 +2,9 @@
 using System.IO;
 using System.Threading.Tasks;
 using UIKit;
-using XForms.Platform;
+using XForma.Platform;
 
-namespace XForms.iOS.Renderers
+namespace XForma.iOS.Renderers
 {
     internal class BitmapRenderer : ElementRenderer<UIImage>, IBitmapRenderer
     {

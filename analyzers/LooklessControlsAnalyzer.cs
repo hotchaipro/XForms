@@ -6,11 +6,11 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace XForms.Analyzers;
+namespace XForma.Analyzers;
 
 /// <summary>
-/// Keeps looks out of the XForms assembly (XF0003): a control says what it does and what state
-/// it's in, and its theme says how it looks. In XForms itself this flags a literal color, drawing
+/// Keeps looks out of the XForma assembly (XF0003): a control says what it does and what state
+/// it's in, and its theme says how it looks. In XForma itself this flags a literal color, drawing
 /// outside the template machinery, a numeric constant on a view, and a literal size, spacing,
 /// font, easing or decorative transform. A theme package, or an app, is where these belong, and
 /// the rule doesn't apply there.
@@ -24,8 +24,8 @@ namespace XForms.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class LooklessControlsAnalyzer : DiagnosticAnalyzer
 {
-    private const string XFormsAssemblyName = "XForms";
-    private const string ExemptionAttributeName = "XForms.Controls.BehaviorConstantAttribute";
+    private const string XFormaAssemblyName = "XForma";
+    private const string ExemptionAttributeName = "XForma.Controls.BehaviorConstantAttribute";
 
     // The types that draw: the template machinery, and Border, which has no template
     private static readonly ImmutableHashSet<string> DrawingTypes = ImmutableHashSet.Create(
@@ -53,12 +53,12 @@ public sealed class LooklessControlsAnalyzer : DiagnosticAnalyzer
 
     private static readonly DiagnosticDescriptor LookInControls = new DiagnosticDescriptor(
         id: "XF0003",
-        title: "A look in the XForms controls",
-        messageFormat: "{0}: this is a look, which belongs in the theme (a style in xforms/Theming/ControlStyles.cs, with its value in the theme package)",
-        category: "XForms.Look",
+        title: "A look in the XForma controls",
+        messageFormat: "{0}: this is a look, which belongs in the theme (a style in xforma/Theming/ControlStyles.cs, with its value in the theme package)",
+        category: "XForma.Look",
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        description: "XForms' controls are lookless: their colors, drawing, sizes, fonts and decorative motion come from their theme. A constant that's behavior says why with [BehaviorConstant(\"...\")].");
+        description: "XForma's controls are lookless: their colors, drawing, sizes, fonts and decorative motion come from their theme. A constant that's behavior says why with [BehaviorConstant(\"...\")].");
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(LookInControls);
 
@@ -74,7 +74,7 @@ public sealed class LooklessControlsAnalyzer : DiagnosticAnalyzer
         CompilationStartAnalysisContext context)
     {
         var compilation = context.Compilation;
-        if (compilation.AssemblyName != XFormsAssemblyName)
+        if (compilation.AssemblyName != XFormaAssemblyName)
         {
             return;
         }
@@ -334,15 +334,15 @@ public sealed class LooklessControlsAnalyzer : DiagnosticAnalyzer
         public FrameworkTypes(
             Compilation compilation)
         {
-            this.Angle = compilation.GetTypeByMetadataName("XForms.Angle");
-            this.Color = compilation.GetTypeByMetadataName("XForms.Color");
-            this.Colors = compilation.GetTypeByMetadataName("XForms.Colors");
-            this.DrawingContext = compilation.GetTypeByMetadataName("XForms.DrawingContext");
-            this.EasingFunction = compilation.GetTypeByMetadataName("XForms.EasingFunction");
-            this.FontWeight = compilation.GetTypeByMetadataName("XForms.FontWeight");
-            this.Size = compilation.GetTypeByMetadataName("XForms.Size");
-            this.Thickness = compilation.GetTypeByMetadataName("XForms.Thickness");
-            this.View = compilation.GetTypeByMetadataName("XForms.View");
+            this.Angle = compilation.GetTypeByMetadataName("XForma.Angle");
+            this.Color = compilation.GetTypeByMetadataName("XForma.Color");
+            this.Colors = compilation.GetTypeByMetadataName("XForma.Colors");
+            this.DrawingContext = compilation.GetTypeByMetadataName("XForma.DrawingContext");
+            this.EasingFunction = compilation.GetTypeByMetadataName("XForma.EasingFunction");
+            this.FontWeight = compilation.GetTypeByMetadataName("XForma.FontWeight");
+            this.Size = compilation.GetTypeByMetadataName("XForma.Size");
+            this.Thickness = compilation.GetTypeByMetadataName("XForma.Thickness");
+            this.View = compilation.GetTypeByMetadataName("XForma.View");
         }
 
         public INamedTypeSymbol? Angle { get; }

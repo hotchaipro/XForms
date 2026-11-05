@@ -2,7 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 
-namespace XForms.Win32.Automation
+namespace XForma.Win32.Automation
 {
     // UI Automation provider interfaces (from UIAutomationCore.h), declared for
     // .NET's source-generated COM so they work with trimming and Native AOT.

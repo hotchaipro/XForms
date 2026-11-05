@@ -4,10 +4,10 @@ using Windows.Win32.Foundation;
 using Windows.Win32.UI.Controls;
 using Windows.Win32.UI.Controls.RichEdit;
 using Windows.Win32.UI.WindowsAndMessaging;
-using XForms.Primitives;
-using XForms.Platform;
+using XForma.Primitives;
+using XForma.Platform;
 
-namespace XForms.Win32.Renderers
+namespace XForma.Win32.Renderers
 {
     /// <summary>
     /// Native text entry: a RichEdit control (the text engine underneath the
@@ -110,7 +110,7 @@ namespace XForms.Win32.Renderers
             // the process now and then (an access violation inside RichEdit,
             // about one start in nine with a few text boxes), with or without
             // spell checking; this one draws the same and didn't, in 35 starts
-            this._hwnd = Create(Environment.GetEnvironmentVariable("XFORMS_EDIT_CLASS") ?? "RICHEDIT50W", (WINDOW_STYLE)style); // TEMP
+            this._hwnd = Create(Environment.GetEnvironmentVariable("XFORMA_EDIT_CLASS") ?? "RICHEDIT50W", (WINDOW_STYLE)style); // TEMP
 
             PInvoke.SendMessage(this._hwnd, EM_SETEVENTMASK, 0, ENM_CHANGE | ENM_REQUESTRESIZE | ENM_SELCHANGE);
 
@@ -255,7 +255,7 @@ namespace XForms.Win32.Renderers
         private void ApplyKeyboardOptions()
         {
             nint options = PInvoke.SendMessage(this._hwnd, EM_GETLANGOPTIONS, 0, 0).Value;
-            if (this._keyboardOptions.HasFlag(KeyboardOptions.SpellCheck) && !this._isPassword && Environment.GetEnvironmentVariable("XFORMS_NOSPELL") != "1") // TEMP
+            if (this._keyboardOptions.HasFlag(KeyboardOptions.SpellCheck) && !this._isPassword && Environment.GetEnvironmentVariable("XFORMA_NOSPELL") != "1") // TEMP
             {
                 options |= IMF_SPELLCHECKING;
             }
@@ -270,7 +270,7 @@ namespace XForms.Win32.Renderers
         private void ApplyPlaceholder()
         {
             // Screen readers name the edit window by the view's label (by default its placeholder)
-            if (Environment.GetEnvironmentVariable("XFORMS_NOACCNAME") != "1") // TEMP
+            if (Environment.GetEnvironmentVariable("XFORMA_NOACCNAME") != "1") // TEMP
             Automation.AccessibleNames.Set(this._hwnd, ((View)this.Element).AccessibilityLabel);
             this.RefreshPlaceholder();
         }
@@ -528,7 +528,7 @@ namespace XForms.Win32.Renderers
             bounds.right = bounds.left + (int)Math.Round(Math.Max(0, frame.Width - this._padding.Left - this._padding.Right) * scale);
             bounds.bottom = bounds.top + (int)Math.Round(Math.Max(0, frame.Height - this._padding.Top - this._padding.Bottom) * scale);
 
-            bool isShown = this.IsShownOnScreen && ((Environment.GetEnvironmentVariable("XFORMS_NOHIDE") == "1") || !this.IsShowingPlaceholder); // TEMP
+            bool isShown = this.IsShownOnScreen && ((Environment.GetEnvironmentVariable("XFORMA_NOHIDE") == "1") || !this.IsShowingPlaceholder); // TEMP
 
             // Moving a window is relatively costly, so only do it when something changed
             if ((bounds.left == this._windowBounds.left) && (bounds.top == this._windowBounds.top)

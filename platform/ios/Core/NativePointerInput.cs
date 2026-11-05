@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using Foundation;
 using UIKit;
-using XForms.Platform;
+using XForma.Platform;
 
-namespace XForms.iOS
+namespace XForma.iOS
 {
     /// <summary>
-    /// Translates UIKit touches into XForms pointer events for a single native view.
+    /// Translates UIKit touches into XForma pointer events for a single native view.
     /// </summary>
     /// <remarks>
     /// Mirrors the Android model: a view that handles a touch receives the rest

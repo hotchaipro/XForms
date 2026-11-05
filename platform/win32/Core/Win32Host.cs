@@ -18,13 +18,13 @@ using Windows.Win32.UI.Controls;
 using Windows.Win32.UI.HiDpi;
 using Windows.Win32.UI.Input.Pointer;
 using Windows.Win32.UI.WindowsAndMessaging;
-using XForms.Platform;
-using XForms.Win32.Renderers;
+using XForma.Platform;
+using XForma.Win32.Renderers;
 
-namespace XForms.Win32
+namespace XForma.Win32
 {
     /// <summary>
-    /// PROTOTYPE: hosts an XForms app in a plain Win32 window. Views are
+    /// PROTOTYPE: hosts an XForma app in a plain Win32 window. Views are
     /// DirectComposition visuals, drawing goes through Direct2D and DirectWrite,
     /// and text entry uses native RichEdit controls. Layout, drawing and the
     /// composition commit are batched into one pass per message loop turn.
@@ -352,7 +352,7 @@ namespace XForms.Win32
         {
             var instance = PInvoke.GetModuleHandle((PCWSTR)null);
 
-            fixed (char* className = "XFormsWin32Window")
+            fixed (char* className = "XFormaWin32Window")
             {
                 var windowClass = new WNDCLASSEXW()
                 {
@@ -379,7 +379,7 @@ namespace XForms.Win32
             this._focus = new FocusManager(this);
 
             var instance = PInvoke.GetModuleHandle((PCWSTR)null);
-            fixed (char* className = "XFormsWin32Window")
+            fixed (char* className = "XFormaWin32Window")
             {
                 fixed (char* windowTitle = title)
                 {

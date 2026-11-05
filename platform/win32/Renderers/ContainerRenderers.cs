@@ -5,10 +5,10 @@ using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Direct2D;
 using Windows.Win32.Graphics.Imaging;
-using XForms.Primitives;
-using XForms.Platform;
+using XForma.Primitives;
+using XForma.Platform;
 
-namespace XForms.Win32.Renderers
+namespace XForma.Win32.Renderers
 {
     /// <summary>
     /// The renderer of every view that holds children (panels, content and

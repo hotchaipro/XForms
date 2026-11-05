@@ -2,12 +2,12 @@
 using System.Collections.Specialized;
 using AndroidX.RecyclerView.Widget;
 using AndroidX.SwipeRefreshLayout.Widget;
-using XForms.Primitives;
-using XForms.Platform;
+using XForma.Primitives;
+using XForma.Platform;
 using AndroidListView = global::Android.Widget.ListView;
 using AndroidView = global::Android.Views.View;
 
-namespace XForms.Android.Renderers
+namespace XForma.Android.Renderers
 {
     /// <summary>
     /// A list in a pull-to-refresh layout: Android's <c>ListView</c> for a
@@ -158,7 +158,7 @@ namespace XForms.Android.Renderers
 
             list.SetClipToPadding(false);
 
-            // Keyboard focus goes to the items (XForms moves it between them),
+            // Keyboard focus goes to the items (XForma moves it between them),
             // not the list
             list.Focusable = false;
             list.FocusableInTouchMode = false;

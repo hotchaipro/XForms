@@ -1,3 +1,3 @@
-XForms.Android.AndroidApplication
-XForms.Android.AndroidApplication.Activity.get -> Android.App.Activity
-static XForms.Android.AndroidApplication.Current.get -> XForms.Android.AndroidApplication
+XForma.Android.AndroidApplication
+XForma.Android.AndroidApplication.Activity.get -> Android.App.Activity
+static XForma.Android.AndroidApplication.Current.get -> XForma.Android.AndroidApplication

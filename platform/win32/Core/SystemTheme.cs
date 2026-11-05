@@ -7,7 +7,7 @@ using Windows.Win32.Graphics.Gdi;
 using Windows.Win32.UI.Accessibility;
 using Windows.Win32.UI.WindowsAndMessaging;
 
-namespace XForms.Win32
+namespace XForma.Win32
 {
     /// <summary>
     /// Windows' theme settings: dark mode, the accent color and high contrast.

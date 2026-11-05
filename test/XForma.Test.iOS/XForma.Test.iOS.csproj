@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-ios</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>XForma.Test.iOS</RootNamespace>
+    <ApplicationId>com.hotchaigames.xforma.test</ApplicationId>
+    <ApplicationTitle>XForma Test</ApplicationTitle>
+    <ApplicationVersion>1</ApplicationVersion>
+    <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\XForma.Test\*.cs" LinkBase="Shared" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- BitmapRenderer looks images up by lowercase file name -->
+    <BundleResource Include="..\Content\AboutLogo.png" LogicalName="aboutlogo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\xforma\XForma.csproj" />
+    <ProjectReference Include="..\..\themes\basic\XForma.Themes.Basic.csproj" />
+    <ProjectReference Include="..\..\spikes\XForma.Xaml\XForma.Xaml.csproj" />
+  </ItemGroup>
+
+</Project>

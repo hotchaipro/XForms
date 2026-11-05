@@ -1,7 +1,7 @@
 ﻿using System;
-using XForms.Controls;
+using XForma.Controls;
 
-namespace XForms.Themes.Basic
+namespace XForma.Themes.Basic
 {
     /// <summary>
     /// A control's drawn scale and opacity, set at once when its template is

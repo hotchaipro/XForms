@@ -5,13 +5,13 @@ using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 using System.Text;
 using System.Threading;
-using XForms.Win32.Renderers;
-using XForms.Platform;
+using XForma.Win32.Renderers;
+using XForma.Platform;
 
-namespace XForms.Win32.Automation
+namespace XForma.Win32.Automation
 {
     /// <summary>
-    /// Exposes the XForms view tree to UI Automation (screen readers such as
+    /// Exposes the XForma view tree to UI Automation (screen readers such as
     /// Narrator). Views with an accessibility role become automation elements;
     /// views without one are skipped and their accessible descendants are
     /// promoted. Native RichEdit text entries expose themselves.
@@ -551,7 +551,7 @@ namespace XForms.Win32.Automation
                         break;
 
                     case UiaConstants.FrameworkIdPropertyId:
-                        result = Variant.FromString("XForms");
+                        result = Variant.FromString("XForma");
                         break;
 
                     case UiaConstants.ToggleToggleStatePropertyId:
@@ -975,7 +975,7 @@ namespace XForms.Win32.Automation
         public int GetPropertyValue(int propertyId, Variant* value)
         {
             // The window's own (hosting) provider supplies its name and type
-            *value = (propertyId == UiaConstants.FrameworkIdPropertyId) ? Variant.FromString("XForms") : new Variant();
+            *value = (propertyId == UiaConstants.FrameworkIdPropertyId) ? Variant.FromString("XForma") : new Variant();
             return 0;
         }
 

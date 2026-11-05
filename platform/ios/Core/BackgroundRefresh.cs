@@ -2,9 +2,9 @@
 using System.Linq;
 using BackgroundTasks;
 using Foundation;
-using XForms.Platform;
+using XForma.Platform;
 
-namespace XForms.iOS
+namespace XForma.iOS
 {
     /// <summary>
     /// Wakes the app in the background to refresh (see

@@ -1,7 +1,7 @@
 ﻿using System;
-using XForms.Controls;
+using XForma.Controls;
 
-namespace XForms.Themes.Basic
+namespace XForma.Themes.Basic
 {
     // The Basic look of the buttons: filled, flat, with a quick shrink as
     // they're pressed

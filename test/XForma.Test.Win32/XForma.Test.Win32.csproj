@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- PROTOTYPE: the XForma test app on the XAML-free Win32 backend -->
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <RootNamespace>XForma.Test.Win32</RootNamespace>
+    <AssemblyName>XForma.Test.Win32</AssemblyName>
+    <PlatformTarget>x64</PlatformTarget>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\XForma.Test\*.cs" LinkBase="Shared" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\Content\**\*" LinkBase="Content" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\xforma\XForma.csproj" />
+    <ProjectReference Include="..\..\themes\basic\XForma.Themes.Basic.csproj" />
+    <ProjectReference Include="..\..\spikes\XForma.Xaml\XForma.Xaml.csproj" />
+  </ItemGroup>
+
+</Project>

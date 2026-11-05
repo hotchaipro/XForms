@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace XForms
+namespace XForma
 {
     /// <summary>
     /// A page replacing a frame's current one as a gesture moves (see

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using XForms.Platform;
+using XForma.Platform;
 
-namespace XForms
+namespace XForma
 {
     /// <summary>
     /// Generic font families, as in CSS: each platform uses a matching system

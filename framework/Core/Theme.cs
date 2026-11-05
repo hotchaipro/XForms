@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 
-namespace XForms
+namespace XForma
 {
     /// <summary>
     /// Whether the UI is light, dark or high contrast. The system reports its
@@ -137,9 +137,9 @@ namespace XForms
 
         /// <summary>
         /// How a frame's pages come and go when navigating doesn't name a
-        /// transition; null (the default) for <see cref="XForms.PageTransition.Slide"/>.
+        /// transition; null (the default) for <see cref="XForma.PageTransition.Slide"/>.
         /// A switch following a gesture always slides: over the current page
-        /// for <see cref="XForms.PageTransition.SlideOver"/>, otherwise
+        /// for <see cref="XForma.PageTransition.SlideOver"/>, otherwise
         /// together with it.
         /// </summary>
         public PageTransition PageTransition { get; init; }
@@ -156,7 +156,7 @@ namespace XForms
         public ImmutableDictionary<Type, object> Extensions { get; init; } = ImmutableDictionary<Type, object>.Empty;
 
         /// <summary>
-        /// The theme's extension of a type (such as XForms.Controls'
+        /// The theme's extension of a type (such as XForma.Controls'
         /// <c>Typography</c> or <c>ButtonStyle</c>), or null.
         /// </summary>
         public TExtension GetExtension<TExtension>()
@@ -182,7 +182,7 @@ namespace XForms
         public static Color ContrastingColor(
             Color color)
         {
-            return (Luminance(color) > 0.4) ? XForms.Colors.Black : XForms.Colors.White;
+            return (Luminance(color) > 0.4) ? XForma.Colors.Black : XForma.Colors.White;
         }
 
         // Relative luminance (sRGB, linearized)

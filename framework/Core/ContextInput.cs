@@ -1,6 +1,6 @@
 using System;
 
-namespace XForms
+namespace XForma
 {
     /// <summary>
     /// The user asked for a view's context menu: with a right-click, a long

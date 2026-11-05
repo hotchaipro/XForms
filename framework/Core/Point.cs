@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
-namespace XForms
+namespace XForma
 {
     public struct Point
     {

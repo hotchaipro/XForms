@@ -1,9 +1,9 @@
 using System;
 using System.Globalization;
 using System.Runtime.Versioning;
-using XForms.Web.Renderers;
+using XForma.Web.Renderers;
 
-namespace XForms.Web
+namespace XForma.Web
 {
     /// <summary>
     /// A view's animation layers, composed onto its element: one CSS transform

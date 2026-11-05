@@ -6,7 +6,7 @@ This benchmark measures what a native object per view costs, to size the
 gain from lightweight views (see
 [alignment.md](alignment.md#6-lightweight-controls-and-layers)).
 
-The test page (`test/XForms.Test/BenchmarkPage.cs`) shows 1,000 owner-drawn
+The test page (`test/XForma.Test/BenchmarkPage.cs`) shows 1,000 owner-drawn
 tiles (100 rows of 10, each tile a filled and outlined square with a number),
 in a scroll view, in two variants:
 - **One view per tile.** Each tile is a `UserControl`, so it has its own native
@@ -20,7 +20,7 @@ finished drawing ("first frame drawn"), both measured from the start of the
 page's constructor. Memory is measured from outside the process after five
 seconds. The text-and-list test page is the baseline.
 
-Choose the page with `XFORMS_TEST_PAGE` on Win32, or an intent extra on
+Choose the page with `XFORMA_TEST_PAGE` on Win32, or an intent extra on
 Android (`--es page benchmark-views` or `benchmark-drawn`).
 
 ### Results
@@ -56,7 +56,7 @@ difference between the variants was consistent across runs.
 
 Measured again on 2026-10-20 after phase 8, which made the tiles (and their
 row layouts) lightweight. "Native" is the same build with lightweight views
-turned off (`XFORMS_LIGHTWEIGHT=0` on Win32, `--es lightweight off` on
+turned off (`XFORMA_LIGHTWEIGHT=0` on Win32, `--es lightweight off` on
 Android). The managed heap is measured after a full collection.
 
 **Win32**, three runs each:

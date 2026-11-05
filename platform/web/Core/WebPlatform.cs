@@ -3,11 +3,11 @@ using System.Reflection;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
-using XForms.Primitives;
-using XForms.Platform;
-using XForms.Web.Renderers;
+using XForma.Primitives;
+using XForma.Platform;
+using XForma.Web.Renderers;
 
-namespace XForms.Web
+namespace XForma.Web
 {
     [SupportedOSPlatform("browser")]
     internal sealed class WebPlatform : IPlatform
@@ -205,7 +205,7 @@ namespace XForms.Web
     }
 
     /// <summary>
-    /// Runs an XForms app in the page.
+    /// Runs an XForma app in the page.
     /// </summary>
     [SupportedOSPlatform("browser")]
     public sealed class WebApplication
@@ -267,7 +267,7 @@ namespace XForms.Web
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"XForms: the app didn't start: {ex}");
+                Console.Error.WriteLine($"XForma: the app didn't start: {ex}");
                 throw;
             }
         }

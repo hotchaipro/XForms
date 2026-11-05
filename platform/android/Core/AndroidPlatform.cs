@@ -1,9 +1,9 @@
 ﻿using System;
-using XForms.Android.Renderers;
-using XForms.Primitives;
-using XForms.Platform;
+using XForma.Android.Renderers;
+using XForma.Primitives;
+using XForma.Platform;
 
-namespace XForms.Android
+namespace XForma.Android
 {
     internal sealed class AndroidPlatform : IPlatform
     {

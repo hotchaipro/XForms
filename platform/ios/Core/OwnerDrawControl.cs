@@ -1,10 +1,10 @@
 ﻿using System;
 using CoreGraphics;
 using UIKit;
-using XForms.Primitives;
-using XForms.Platform;
+using XForma.Primitives;
+using XForma.Platform;
 
-namespace XForms.iOS
+namespace XForma.iOS
 {
     /// <summary>
     /// Native host for a custom-drawn control: draws through the control's

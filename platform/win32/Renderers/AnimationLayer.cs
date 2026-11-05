@@ -4,7 +4,7 @@ using Windows.Win32.Graphics.Direct2D.Common;
 using Windows.Win32.Graphics.DirectComposition;
 using Windows.Win32.System.Com;
 
-namespace XForms.Win32.Renderers
+namespace XForma.Win32.Renderers
 {
     /// <summary>
     /// An animator's layer: a composition visual wrapping the view's own

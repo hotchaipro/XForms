@@ -7,10 +7,10 @@ using Windows.Win32.Graphics.DirectComposition;
 using Windows.Win32.Graphics.Dxgi.Common;
 using Windows.Win32.System.Com;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
-using XForms.Win32.Renderers;
-using XForms.Platform;
+using XForma.Win32.Renderers;
+using XForma.Platform;
 
-namespace XForms.Win32
+namespace XForma.Win32
 {
     /// <summary>
     /// Keyboard focus across owner-drawn controls (anything with a tap gesture)

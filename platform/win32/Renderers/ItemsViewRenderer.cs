@@ -6,10 +6,10 @@ using Windows.Win32.Graphics.Direct2D;
 using Windows.Win32.Graphics.Direct2D.Common;
 using Windows.Win32.Graphics.DirectComposition;
 using Windows.Win32.Graphics.Dxgi.Common;
-using XForms.Primitives;
-using XForms.Platform;
+using XForma.Primitives;
+using XForma.Platform;
 
-namespace XForms.Win32.Renderers
+namespace XForma.Win32.Renderers
 {
     /// <summary>
     /// A virtualized list: only lines in or near the viewport exist, item

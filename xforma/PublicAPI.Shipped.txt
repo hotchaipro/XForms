@@ -1,0 +1,865 @@
+XForma.Binding
+XForma.Controls.AppTheme
+XForma.Controls.AppTheme.AppTheme() -> void
+XForma.Controls.Border
+XForma.Controls.Border.Background.get -> XForma.Color
+XForma.Controls.Border.Background.set -> void
+XForma.Controls.Border.Border() -> void
+XForma.Controls.Border.BorderBrush.get -> XForma.Color
+XForma.Controls.Border.BorderBrush.set -> void
+XForma.Controls.Border.BorderThickness.get -> XForma.Thickness
+XForma.Controls.Border.BorderThickness.set -> void
+XForma.Controls.Border.Child.get -> XForma.View
+XForma.Controls.Border.Child.set -> void
+XForma.Controls.Border.CornerRadius.get -> float
+XForma.Controls.Border.CornerRadius.set -> void
+XForma.Controls.Button
+XForma.Controls.Button.Button() -> void
+XForma.Controls.Button.Clicked -> System.EventHandler
+XForma.Controls.Button.Command.get -> System.Windows.Input.ICommand
+XForma.Controls.Button.Command.set -> void
+XForma.Controls.Button.CommandParameter.get -> object
+XForma.Controls.Button.CommandParameter.set -> void
+XForma.Controls.Button.IsAlertStyle.get -> bool
+XForma.Controls.Button.IsAlertStyle.set -> void
+XForma.Controls.Button.Text.get -> string
+XForma.Controls.Button.Text.set -> void
+XForma.Controls.CalendarDatePicker
+XForma.Controls.CalendarDatePicker.CalendarDatePicker() -> void
+XForma.Controls.CalendarDatePicker.MinimumDate.get -> System.DateTime
+XForma.Controls.CalendarDatePicker.MinimumDate.set -> void
+XForma.Controls.CalendarDatePicker.PlaceholderText.get -> string
+XForma.Controls.CalendarDatePicker.PlaceholderText.set -> void
+XForma.Controls.CalendarDatePicker.SelectedDate.get -> System.DateTime?
+XForma.Controls.CalendarDatePicker.SelectedDate.set -> void
+XForma.Controls.CalendarDatePicker.SelectedDateChanged -> System.EventHandler<System.DateTime?>
+XForma.Controls.CalendarView
+XForma.Controls.CalendarView.CalendarView() -> void
+XForma.Controls.CalendarView.CanShowPreviousMonth.get -> bool
+XForma.Controls.CalendarView.DisplayedMonth.get -> System.DateTime
+XForma.Controls.CalendarView.FirstShownDay.get -> System.DateTime
+XForma.Controls.CalendarView.FocusedDate.get -> System.DateTime
+XForma.Controls.CalendarView.GetDayBounds(int row, int column) -> XForma.Rect
+XForma.Controls.CalendarView.GetWeekdayBounds(int column) -> XForma.Rect
+XForma.Controls.CalendarView.HeaderBounds.get -> XForma.Rect
+XForma.Controls.CalendarView.IsDateEnabled(System.DateTime date) -> bool
+XForma.Controls.CalendarView.MinimumDate.get -> System.DateTime
+XForma.Controls.CalendarView.MinimumDate.set -> void
+XForma.Controls.CalendarView.NextButtonBounds.get -> XForma.Rect
+XForma.Controls.CalendarView.PressedDate.get -> System.DateTime
+XForma.Controls.CalendarView.PressedPart.get -> XForma.Controls.CalendarViewPart
+XForma.Controls.CalendarView.PreviousButtonBounds.get -> XForma.Rect
+XForma.Controls.CalendarView.SelectedDate.get -> System.DateTime?
+XForma.Controls.CalendarView.SelectedDate.set -> void
+XForma.Controls.CalendarView.SelectedDateChanged -> System.EventHandler<System.DateTime?>
+XForma.Controls.CalendarViewPart
+XForma.Controls.CalendarViewPart.Day = 3 -> XForma.Controls.CalendarViewPart
+XForma.Controls.CalendarViewPart.NextMonth = 2 -> XForma.Controls.CalendarViewPart
+XForma.Controls.CalendarViewPart.None = 0 -> XForma.Controls.CalendarViewPart
+XForma.Controls.CalendarViewPart.PreviousMonth = 1 -> XForma.Controls.CalendarViewPart
+XForma.Controls.ComboBox
+XForma.Controls.ComboBox.ComboBox() -> void
+XForma.Controls.ComboBox.Items.get -> XForma.Controls.ComboBoxItemCollection
+XForma.Controls.ComboBox.Select(int index) -> void
+XForma.Controls.ComboBox.SelectedIndex.get -> int
+XForma.Controls.ComboBox.SelectedIndex.set -> void
+XForma.Controls.ComboBox.SelectedItem.get -> XForma.Controls.ComboBoxItem
+XForma.Controls.ComboBox.SelectedItem.set -> void
+XForma.Controls.ComboBox.SelectionChanged -> System.EventHandler<XForma.Controls.ComboBoxItem>
+XForma.Controls.ComboBoxItem
+XForma.Controls.ComboBoxItem.ComboBoxItem() -> void
+XForma.Controls.ComboBoxItem.ComboBoxItem(string text) -> void
+XForma.Controls.ComboBoxItem.PropertyChanged -> System.ComponentModel.PropertyChangedEventHandler
+XForma.Controls.ComboBoxItem.Text.get -> string
+XForma.Controls.ComboBoxItem.Text.set -> void
+XForma.Controls.ComboBoxItem.Value.get -> object
+XForma.Controls.ComboBoxItem.Value.set -> void
+XForma.Controls.ComboBoxItemCollection
+XForma.Controls.ComboBoxItemCollection.Add(XForma.Controls.ComboBoxItem listPickerItem) -> void
+XForma.Controls.ComboBoxItemCollection.Clear() -> void
+XForma.Controls.ComboBoxItemCollection.Count.get -> int
+XForma.Controls.ComboBoxItemCollection.GetEnumerator() -> System.Collections.Generic.IEnumerator<XForma.Controls.ComboBoxItem>
+XForma.Controls.ComboBoxItemCollection.IndexOf(XForma.Controls.ComboBoxItem item) -> int
+XForma.Controls.ComboBoxItemCollection.this[int index].get -> XForma.Controls.ComboBoxItem
+XForma.Controls.ComboBoxItemsView
+XForma.Controls.ComboBoxItemsView.ComboBox.get -> XForma.Controls.ComboBox
+XForma.Controls.ComboBoxItemsView.HighlightedIndex.get -> int
+XForma.Controls.ComboBoxItemsView.PressedIndex.get -> int
+XForma.Controls.CommandBar
+XForma.Controls.CommandBar.CommandBar() -> void
+XForma.Controls.CommandBar.CommandParameter.get -> object
+XForma.Controls.CommandBar.CommandParameter.set -> void
+XForma.Controls.CommandBarButton
+XForma.Controls.CommandBarButton.Command.get -> System.Windows.Input.ICommand
+XForma.Controls.CommandBarButton.Command.set -> void
+XForma.Controls.CommandBarButton.CommandBarButton() -> void
+XForma.Controls.CommandBarButton.CommandParameter.get -> object
+XForma.Controls.CommandBarButton.CommandParameter.set -> void
+XForma.Controls.CommandBarButton.Icon.get -> XForma.Bitmap
+XForma.Controls.CommandBarButton.Icon.set -> void
+XForma.Controls.CommandBarButton.Text.get -> string
+XForma.Controls.CommandBarButton.Text.set -> void
+XForma.Controls.CommandBarCommandCollection
+XForma.Controls.CommandBarCommandCollection.CommandBarCommandCollection() -> void
+XForma.Controls.CommandBarCommandCollection.PrimaryCommands.get -> System.Collections.Generic.List<XForma.Controls.UICommand>
+XForma.Controls.CommandBarCommandCollection.SecondaryCommands.get -> System.Collections.Generic.List<XForma.Controls.UICommand>
+XForma.Controls.CommandListView
+XForma.Controls.CommandListView.CommandBarCommands.get -> XForma.Controls.CommandBarCommandCollection
+XForma.Controls.CommandListView.CommandListView() -> void
+XForma.Controls.CommandListView.SwipeCommands.get -> XForma.Controls.SwipeCommandCollection
+XForma.Controls.CommandListViewItem
+XForma.Controls.CommandListViewItem.CommandBarMargin.get -> XForma.Thickness
+XForma.Controls.CommandListViewItem.CommandBarMargin.set -> void
+XForma.Controls.CommandListViewItem.CommandListViewItem() -> void
+XForma.Controls.CommandListViewItem.IsCommandBarVisible.get -> bool
+XForma.Controls.CommandListViewItem.IsCommandBarVisible.set -> void
+XForma.Controls.CommandListViewItem.Item.get -> object
+XForma.Controls.CommandListViewItem.Item.set -> void
+XForma.Controls.CommandListViewItemContainer
+XForma.Controls.CommandListViewItemContainer.CommandBarMargin.get -> XForma.Thickness
+XForma.Controls.CommandListViewItemContainer.CommandBarMargin.set -> void
+XForma.Controls.CommandListViewItemContainer.CommandListViewItemContainer() -> void
+XForma.Controls.CommandListViewItemContainer.IsCommandBarVisible.get -> bool
+XForma.Controls.CommandListViewItemContainer.IsCommandBarVisible.set -> void
+XForma.Controls.ContentControl
+XForma.Controls.ContentControl.Content.get -> XForma.View
+XForma.Controls.ContentControl.Content.set -> void
+XForma.Controls.ContentControl.ContentControl() -> void
+XForma.Controls.ContentControl.Padding.get -> XForma.Thickness
+XForma.Controls.ContentControl.Padding.set -> void
+XForma.Controls.Control
+XForma.Controls.Control.Control() -> void
+XForma.Controls.ControlTemplate
+XForma.Controls.ControlTemplate<TControl>
+XForma.Controls.ControlTemplate<TControl>.ControlTemplate() -> void
+XForma.Controls.ControlTemplates
+XForma.Controls.ControlTemplates.<Clone>$() -> XForma.Controls.ControlTemplates
+XForma.Controls.ControlTemplates.ControlTemplates() -> void
+XForma.Controls.ControlTemplates.Equals(XForma.Controls.ControlTemplates other) -> bool
+XForma.Controls.ControlTemplates.Get(System.Type controlType) -> XForma.Controls.ControlTemplate
+XForma.Controls.ControlTemplates.With(XForma.Controls.ControlTemplate template) -> XForma.Controls.ControlTemplates
+XForma.Controls.DayOfWeekToggleButton
+XForma.Controls.DayOfWeekToggleButton.DaysOfWeekPicker.get -> XForma.Controls.DaysOfWeekPicker
+XForma.Controls.DayOfWeekToggleButton.IsChecked.get -> bool
+XForma.Controls.DayOfWeekToggleButton.IsChecked.set -> void
+XForma.Controls.DayOfWeekToggleButton.IsCheckedChanged -> System.EventHandler<XForma.Controls.ToggledEventArgs>
+XForma.Controls.DayOfWeekToggleButton.Text.get -> string
+XForma.Controls.DayOfWeekToggleButton.Text.set -> void
+XForma.Controls.DaysOfWeekPicker
+XForma.Controls.DaysOfWeekPicker.DaysOfWeekPicker() -> void
+XForma.Controls.DaysOfWeekPicker.SelectedDaysOfWeek.get -> System.DayOfWeek[]
+XForma.Controls.DaysOfWeekPicker.SelectedDaysOfWeek.set -> void
+XForma.Controls.FloatingButton
+XForma.Controls.FloatingButton.Clicked -> System.EventHandler
+XForma.Controls.FloatingButton.FloatingButton() -> void
+XForma.Controls.FloatingButton.Icon.get -> XForma.Bitmap
+XForma.Controls.FloatingButton.Icon.set -> void
+XForma.Controls.FloatingButton.IsSubtleStyle.get -> bool
+XForma.Controls.FloatingButton.IsSubtleStyle.set -> void
+XForma.Controls.FloatingButton.Swiped -> System.EventHandler<int>
+XForma.Controls.Flyout
+XForma.Controls.Flyout.Content.get -> XForma.View
+XForma.Controls.Flyout.Content.set -> void
+XForma.Controls.Flyout.Flyout() -> void
+XForma.Controls.Flyout.ShowAsync() -> void
+XForma.Controls.FlyoutButton
+XForma.Controls.FlyoutButton.AddButton(XForma.Controls.FloatingButton button) -> void
+XForma.Controls.FlyoutButton.Collapsing -> System.EventHandler
+XForma.Controls.FlyoutButton.Expanding -> System.EventHandler
+XForma.Controls.FlyoutButton.FlyoutButton() -> void
+XForma.Controls.FlyoutButton.Icon.get -> XForma.Bitmap
+XForma.Controls.FlyoutButton.Icon.set -> void
+XForma.Controls.HyperlinkButton
+XForma.Controls.HyperlinkButton.Content.get -> XForma.View
+XForma.Controls.HyperlinkButton.Content.set -> void
+XForma.Controls.HyperlinkButton.HyperlinkButton() -> void
+XForma.Controls.HyperlinkButton.NavigationUri.get -> System.Uri
+XForma.Controls.HyperlinkButton.NavigationUri.set -> void
+XForma.Controls.IMenuItemContainer
+XForma.Controls.IMenuItemContainer.Add(XForma.Controls.MenuItem menuItem) -> void
+XForma.Controls.ImageToggleButton
+XForma.Controls.ImageToggleButton.CheckedIcon.get -> XForma.Bitmap
+XForma.Controls.ImageToggleButton.CheckedIcon.set -> void
+XForma.Controls.ImageToggleButton.CommandParameter.get -> object
+XForma.Controls.ImageToggleButton.CommandParameter.set -> void
+XForma.Controls.ImageToggleButton.IconSize.get -> XForma.Size?
+XForma.Controls.ImageToggleButton.IconSize.set -> void
+XForma.Controls.ImageToggleButton.ImageToggleButton() -> void
+XForma.Controls.ImageToggleButton.IsChecked.get -> bool
+XForma.Controls.ImageToggleButton.IsChecked.set -> void
+XForma.Controls.ImageToggleButton.IsCheckedChanged -> System.EventHandler<XForma.Controls.ToggledEventArgs>
+XForma.Controls.ImageToggleButton.Tint.get -> XForma.Color
+XForma.Controls.ImageToggleButton.Tint.set -> void
+XForma.Controls.ImageToggleButton.ToggleCommand.get -> System.Windows.Input.ICommand
+XForma.Controls.ImageToggleButton.ToggleCommand.set -> void
+XForma.Controls.ImageToggleButton.UncheckedIcon.get -> XForma.Bitmap
+XForma.Controls.ImageToggleButton.UncheckedIcon.set -> void
+XForma.Controls.ItemClickEventArgs
+XForma.Controls.ItemClickEventArgs.ClickedItem.get -> object
+XForma.Controls.ItemClickEventArgs.ItemClickEventArgs(object clickedItem, XForma.View itemView) -> void
+XForma.Controls.ItemClickEventArgs.ItemView.get -> XForma.View
+XForma.Controls.ItemViewFactory<T>
+XForma.Controls.LayoutTransition
+XForma.Controls.LayoutTransition.AnimatesEntrances.get -> bool
+XForma.Controls.LayoutTransition.AnimatesEntrances.init -> void
+XForma.Controls.LayoutTransition.AnimatesMoves.get -> bool
+XForma.Controls.LayoutTransition.AnimatesMoves.init -> void
+XForma.Controls.LayoutTransition.Duration.init -> void
+XForma.Controls.LayoutTransition.Easing.get -> XForma.EasingFunction
+XForma.Controls.LayoutTransition.Easing.init -> void
+XForma.Controls.LayoutTransition.LayoutTransition() -> void
+XForma.Controls.LightDismissControl
+XForma.Controls.LightDismissControl.IsLightDismissEnabled.get -> bool
+XForma.Controls.LightDismissControl.IsLightDismissEnabled.set -> void
+XForma.Controls.LightDismissControl.LightDismissControl() -> void
+XForma.Controls.ListView
+XForma.Controls.ListView.ClearSelection() -> void
+XForma.Controls.ListView.ContainerFromItem(object item) -> XForma.Controls.ListViewItem
+XForma.Controls.ListView.ItemClick -> System.EventHandler<XForma.Controls.ItemClickEventArgs>
+XForma.Controls.ListView.ListView() -> void
+XForma.Controls.ListView.SelectedItem.get -> object
+XForma.Controls.ListView.SelectedItem.set -> void
+XForma.Controls.ListView.SelectedItems.get -> System.Collections.Generic.IReadOnlyList<object>
+XForma.Controls.ListView.SelectionChanged -> System.EventHandler<XForma.Controls.SelectionChangedEventArgs>
+XForma.Controls.ListView.SelectionMode.get -> XForma.Controls.SelectionMode
+XForma.Controls.ListView.SelectionMode.set -> void
+XForma.Controls.ListView<T>
+XForma.Controls.ListView<T>.GroupHeaderFactory.get -> XForma.Controls.ItemViewFactory<object>
+XForma.Controls.ListView<T>.GroupHeaderFactory.set -> void
+XForma.Controls.ListView<T>.GroupKeySelector.get -> System.Func<T, object>
+XForma.Controls.ListView<T>.GroupKeySelector.set -> void
+XForma.Controls.ListView<T>.ItemViewFactory.get -> XForma.Controls.ItemViewFactory<T>
+XForma.Controls.ListView<T>.ItemViewFactory.set -> void
+XForma.Controls.ListView<T>.ItemsSource.get -> System.Collections.Generic.IReadOnlyList<T>
+XForma.Controls.ListView<T>.ItemsSource.set -> void
+XForma.Controls.ListView<T>.ListView() -> void
+XForma.Controls.ListView<T>.ScrollIntoView(T item) -> void
+XForma.Controls.ListView<T>.SelectedItem.get -> T
+XForma.Controls.ListView<T>.SelectedItem.set -> void
+XForma.Controls.ListView<T>.SelectedItems.get -> System.Collections.Generic.IReadOnlyList<T>
+XForma.Controls.ListViewItem
+XForma.Controls.ListViewItem.IsSelected.get -> bool
+XForma.Controls.ListViewItem.ListView.get -> XForma.Controls.ListView
+XForma.Controls.ListViewItem.ListViewItem() -> void
+XForma.Controls.ListViewSwipeDirection
+XForma.Controls.ListViewSwipeDirection.Primary = 0 -> XForma.Controls.ListViewSwipeDirection
+XForma.Controls.ListViewSwipeDirection.Secondary = 1 -> XForma.Controls.ListViewSwipeDirection
+XForma.Controls.ListViewSwipeItem
+XForma.Controls.ListViewSwipeItem.Command.get -> XForma.Controls.UICommand
+XForma.Controls.ListViewSwipeItem.Command.set -> void
+XForma.Controls.ListViewSwipeItem.Direction.get -> XForma.Controls.ListViewSwipeDirection
+XForma.Controls.ListViewSwipeItem.Direction.set -> void
+XForma.Controls.ListViewSwipeItem.Icon.get -> XForma.Bitmap
+XForma.Controls.ListViewSwipeItem.IconSize.get -> XForma.Size
+XForma.Controls.ListViewSwipeItem.IconSize.set -> void
+XForma.Controls.ListViewSwipeItem.ListViewSwipeItem() -> void
+XForma.Controls.ListViewSwipeItem.Reset() -> void
+XForma.Controls.ListViewSwipeItem.Text.get -> string
+XForma.Controls.MenuBar
+XForma.Controls.MenuBar.MenuBar() -> void
+XForma.Controls.MenuBar.MenuItems.get -> XForma.Controls.MenuItemCollection
+XForma.Controls.MenuButton
+XForma.Controls.MenuButton.CommandParameter.get -> object
+XForma.Controls.MenuButton.CommandParameter.set -> void
+XForma.Controls.MenuButton.MenuBar.get -> XForma.Controls.MenuBar
+XForma.Controls.MenuButton.MenuItem.get -> XForma.Controls.MenuItem
+XForma.Controls.MenuItem
+XForma.Controls.MenuItem.Command.get -> System.Windows.Input.ICommand
+XForma.Controls.MenuItem.Command.set -> void
+XForma.Controls.MenuItem.Icon.get -> XForma.Bitmap
+XForma.Controls.MenuItem.Icon.set -> void
+XForma.Controls.MenuItem.IsVisible.get -> bool
+XForma.Controls.MenuItem.IsVisible.set -> void
+XForma.Controls.MenuItem.MenuItem() -> void
+XForma.Controls.MenuItem.PropertyChanged -> System.ComponentModel.PropertyChangedEventHandler
+XForma.Controls.MenuItem.Text.get -> string
+XForma.Controls.MenuItem.Text.set -> void
+XForma.Controls.MenuItemCollection
+XForma.Controls.MenuItemCollection.Add(XForma.Controls.MenuItem menuItem) -> void
+XForma.Controls.MenuItemCollection.GetEnumerator() -> System.Collections.Generic.IEnumerator<XForma.Controls.MenuItem>
+XForma.Controls.MessageBox
+XForma.Controls.MessageBoxResult
+XForma.Controls.MessageBoxResult.Cancel = 0 -> XForma.Controls.MessageBoxResult
+XForma.Controls.MessageBoxResult.OK = 1 -> XForma.Controls.MessageBoxResult
+XForma.Controls.MessageBoxView
+XForma.Controls.MessageBoxView.Choose(XForma.Controls.MessageBoxResult result) -> void
+XForma.Controls.MessageBoxView.Message.get -> string
+XForma.Controls.MessageBoxView.Title.get -> string
+XForma.Controls.Motion
+XForma.Controls.Motion.<Clone>$() -> XForma.Controls.Motion
+XForma.Controls.Motion.Accelerate.get -> XForma.EasingFunction
+XForma.Controls.Motion.Accelerate.init -> void
+XForma.Controls.Motion.Decelerate.get -> XForma.EasingFunction
+XForma.Controls.Motion.Decelerate.init -> void
+XForma.Controls.Motion.Equals(XForma.Controls.Motion other) -> bool
+XForma.Controls.Motion.Long.get -> System.TimeSpan
+XForma.Controls.Motion.Long.init -> void
+XForma.Controls.Motion.Medium.get -> System.TimeSpan
+XForma.Controls.Motion.Medium.init -> void
+XForma.Controls.Motion.Motion() -> void
+XForma.Controls.Motion.Short.get -> System.TimeSpan
+XForma.Controls.Motion.Short.init -> void
+XForma.Controls.Motion.Spring.get -> XForma.EasingFunction
+XForma.Controls.Motion.Spring.init -> void
+XForma.Controls.Motion.Standard.get -> XForma.EasingFunction
+XForma.Controls.Motion.Standard.init -> void
+XForma.Controls.Panel
+XForma.Controls.Panel.ChildTransitions.get -> XForma.Controls.LayoutTransition
+XForma.Controls.Panel.ChildTransitions.set -> void
+XForma.Controls.Panel.LayoutChildren.get -> System.Collections.Generic.IReadOnlyList<XForma.View>
+XForma.Controls.Panel.Padding.get -> XForma.Thickness
+XForma.Controls.Panel.Padding.set -> void
+XForma.Controls.Panel.Panel() -> void
+XForma.Controls.PickerField
+XForma.Controls.PickerField.CreateTextFormat() -> XForma.TextFormat
+XForma.Controls.PickerField.PickerField() -> void
+XForma.Controls.PopupFrame
+XForma.Controls.PopupFrame.PopupFrame() -> void
+XForma.Controls.ProgressRing
+XForma.Controls.ProgressRing.IsActive.get -> bool
+XForma.Controls.ProgressRing.IsActive.set -> void
+XForma.Controls.ProgressRing.ProgressRing() -> void
+XForma.Controls.RadioButton
+XForma.Controls.RadioButton.Command.get -> System.Windows.Input.ICommand
+XForma.Controls.RadioButton.Command.set -> void
+XForma.Controls.RadioButton.IsChecked.get -> bool
+XForma.Controls.RadioButton.IsChecked.set -> void
+XForma.Controls.RadioButton.IsCheckedChanged -> System.EventHandler<XForma.Controls.ToggledEventArgs>
+XForma.Controls.RadioButton.RadioButtonItem.get -> XForma.Controls.RadioButtonItem
+XForma.Controls.RadioButton.RadioButtons.get -> XForma.Controls.RadioButtons
+XForma.Controls.RadioButtonItem
+XForma.Controls.RadioButtonItem.Icon.get -> XForma.Bitmap
+XForma.Controls.RadioButtonItem.Icon.set -> void
+XForma.Controls.RadioButtonItem.PropertyChanged -> System.ComponentModel.PropertyChangedEventHandler
+XForma.Controls.RadioButtonItem.RadioButtonItem() -> void
+XForma.Controls.RadioButtonItem.Text.get -> string
+XForma.Controls.RadioButtonItem.Text.set -> void
+XForma.Controls.RadioButtonItem.Value.get -> object
+XForma.Controls.RadioButtonItem.Value.set -> void
+XForma.Controls.RadioButtonItemCollection
+XForma.Controls.RadioButtonItemCollection.Add(XForma.Controls.RadioButtonItem radioButtonItem) -> void
+XForma.Controls.RadioButtonItemCollection.GetEnumerator() -> System.Collections.Generic.IEnumerator<XForma.Controls.RadioButtonItem>
+XForma.Controls.RadioButtons
+XForma.Controls.RadioButtons.Items.get -> XForma.Controls.RadioButtonItemCollection
+XForma.Controls.RadioButtons.RadioButtons() -> void
+XForma.Controls.RadioButtons.SelectedItem.get -> object
+XForma.Controls.RadioButtons.SelectedItem.set -> void
+XForma.Controls.RadioButtons.SelectionChanged -> System.EventHandler<XForma.Controls.SelectionChangedEventArgs>
+XForma.Controls.RelayCommand
+XForma.Controls.RelayCommand.CanExecute(object parameter) -> bool
+XForma.Controls.RelayCommand.CanExecuteChanged -> System.EventHandler
+XForma.Controls.RelayCommand.Execute(object parameter) -> void
+XForma.Controls.RelayCommand.NotifyCanExecuteChanged() -> void
+XForma.Controls.RelayCommand.RelayCommand(System.Action execute, System.Func<bool> canExecute = null) -> void
+XForma.Controls.RelayCommand.RelayCommand(System.Action<object> execute, System.Func<object, bool> canExecute = null) -> void
+XForma.Controls.SelectionChangedEventArgs
+XForma.Controls.SelectionChangedEventArgs.AddedItems.get -> System.Collections.Generic.IReadOnlyList<object>
+XForma.Controls.SelectionChangedEventArgs.NewItem.get -> object
+XForma.Controls.SelectionChangedEventArgs.OldItem.get -> object
+XForma.Controls.SelectionChangedEventArgs.RemovedItems.get -> System.Collections.Generic.IReadOnlyList<object>
+XForma.Controls.SelectionChangedEventArgs.SelectionChangedEventArgs(System.Collections.Generic.IReadOnlyList<object> removedItems, System.Collections.Generic.IReadOnlyList<object> addedItems, object oldItem, object newItem) -> void
+XForma.Controls.SelectionChangedEventArgs.SelectionChangedEventArgs(object oldItem, object newItem) -> void
+XForma.Controls.SelectionMode
+XForma.Controls.SelectionMode.Multiple = 2 -> XForma.Controls.SelectionMode
+XForma.Controls.SelectionMode.None = 0 -> XForma.Controls.SelectionMode
+XForma.Controls.SelectionMode.Single = 1 -> XForma.Controls.SelectionMode
+XForma.Controls.Shapes
+XForma.Controls.Shapes.<Clone>$() -> XForma.Controls.Shapes
+XForma.Controls.Shapes.Equals(XForma.Controls.Shapes other) -> bool
+XForma.Controls.Shapes.LargeCornerRadius.get -> float
+XForma.Controls.Shapes.LargeCornerRadius.init -> void
+XForma.Controls.Shapes.MediumCornerRadius.get -> float
+XForma.Controls.Shapes.MediumCornerRadius.init -> void
+XForma.Controls.Shapes.Shapes() -> void
+XForma.Controls.Shapes.SmallCornerRadius.get -> float
+XForma.Controls.Shapes.SmallCornerRadius.init -> void
+XForma.Controls.SwipeCommandCollection
+XForma.Controls.SwipeCommandCollection.IsLongSwipeRequiredForPrimaryCommands.get -> bool
+XForma.Controls.SwipeCommandCollection.IsLongSwipeRequiredForPrimaryCommands.set -> void
+XForma.Controls.SwipeCommandCollection.IsLongSwipeRequiredForSecondaryCommands.get -> bool
+XForma.Controls.SwipeCommandCollection.IsLongSwipeRequiredForSecondaryCommands.set -> void
+XForma.Controls.SwipeCommandCollection.PrimaryCommands.get -> System.Collections.Generic.List<XForma.Controls.UICommand>
+XForma.Controls.SwipeCommandCollection.SecondaryCommands.get -> System.Collections.Generic.List<XForma.Controls.UICommand>
+XForma.Controls.SwipeCommandCollection.SwipeCommandCollection() -> void
+XForma.Controls.TabSelectionChangedEventArgs
+XForma.Controls.TabSelectionChangedEventArgs.NavigationMode.get -> XForma.NavigationMode
+XForma.Controls.TabSelectionChangedEventArgs.PreviousSelection.get -> XForma.Page
+XForma.Controls.TabSelectionChangedEventArgs.Selection.get -> XForma.Page
+XForma.Controls.TabSelectionChangedEventArgs.TabSelectionChangedEventArgs(XForma.Page selection, XForma.Page previousSelection, XForma.NavigationMode navigationMode) -> void
+XForma.Controls.TabStrip
+XForma.Controls.TabStrip.AddButton(XForma.Controls.TabStripItem tabButton, XForma.Page tabPage) -> void
+XForma.Controls.TabStrip.SelectRelative(int direction) -> void
+XForma.Controls.TabStrip.SelectedPage.get -> XForma.Page
+XForma.Controls.TabStrip.SelectionChanged -> System.EventHandler<XForma.Controls.TabSelectionChangedEventArgs>
+XForma.Controls.TabStrip.TabStrip() -> void
+XForma.Controls.TabStripItem
+XForma.Controls.TabStripItem.Icon.get -> XForma.Bitmap
+XForma.Controls.TabStripItem.Icon.set -> void
+XForma.Controls.TabStripItem.IsChecked.get -> bool
+XForma.Controls.TabStripItem.IsChecked.set -> void
+XForma.Controls.TabStripItem.IsCheckedChanged -> System.EventHandler<XForma.Controls.ToggledEventArgs>
+XForma.Controls.TabStripItem.TabPage.get -> XForma.Page
+XForma.Controls.TabStripItem.TabStripItem() -> void
+XForma.Controls.TabStripItem.Text.get -> string
+XForma.Controls.TabStripItem.Text.set -> void
+XForma.Controls.TemplateContext
+XForma.Controls.TemplateContext.AddPart(XForma.View part) -> void
+XForma.Controls.TemplateContext.CreateDrawnAnimator() -> XForma.DrawnAnimator
+XForma.Controls.TemplateContext.CreateOwnAnimator() -> XForma.Animator
+XForma.Controls.TemplateContext.InvalidateMeasure() -> void
+XForma.Controls.TemplateContext.InvalidateVisual() -> void
+XForma.Controls.TemplateContext.RemovePart(XForma.View part) -> void
+XForma.Controls.TemplateContext.State.get -> object
+XForma.Controls.TemplateContext.State.set -> void
+XForma.Controls.TemplatedContentControl
+XForma.Controls.TemplatedContentControl.IsPressed.get -> bool
+XForma.Controls.TemplatedContentControl.IsPressed.set -> void
+XForma.Controls.TemplatedContentControl.OnStateChanged() -> void
+XForma.Controls.TemplatedContentControl.StateChanged -> System.EventHandler
+XForma.Controls.TemplatedContentControl.Template.get -> XForma.Controls.ControlTemplate
+XForma.Controls.TemplatedContentControl.TemplatedContentControl() -> void
+XForma.Controls.TemplatedControl
+XForma.Controls.TemplatedControl.IsPressed.get -> bool
+XForma.Controls.TemplatedControl.IsPressed.set -> void
+XForma.Controls.TemplatedControl.OnStateChanged() -> void
+XForma.Controls.TemplatedControl.StateChanged -> System.EventHandler
+XForma.Controls.TemplatedControl.Template.get -> XForma.Controls.ControlTemplate
+XForma.Controls.TemplatedControl.TemplatedControl() -> void
+XForma.Controls.TextStyle
+XForma.Controls.TextStyle.<Clone>$() -> XForma.Controls.TextStyle
+XForma.Controls.TextStyle.Equals(XForma.Controls.TextStyle other) -> bool
+XForma.Controls.TextStyle.FontFamily.get -> string
+XForma.Controls.TextStyle.FontFamily.init -> void
+XForma.Controls.TextStyle.FontSize.get -> float
+XForma.Controls.TextStyle.FontSize.init -> void
+XForma.Controls.TextStyle.FontWeight.get -> XForma.FontWeight
+XForma.Controls.TextStyle.FontWeight.init -> void
+XForma.Controls.TextStyle.TextStyle() -> void
+XForma.Controls.TextStyle.ToTextFormat() -> XForma.TextFormat
+XForma.Controls.ThemeTemplates
+XForma.Controls.ThemeTemplates.extension(XForma.Theme)
+XForma.Controls.ThemeTemplates.extension(XForma.Theme).GetTemplate(System.Type controlType) -> XForma.Controls.ControlTemplate
+XForma.Controls.ThemeTemplates.extension(XForma.Theme).WithTemplate(XForma.Controls.ControlTemplate template) -> XForma.Theme
+XForma.Controls.ThemeTokens
+XForma.Controls.ThemeTokens.extension(XForma.Theme)
+XForma.Controls.ThemeTokens.extension(XForma.Theme).Motion.get -> XForma.Controls.Motion
+XForma.Controls.ThemeTokens.extension(XForma.Theme).Shapes.get -> XForma.Controls.Shapes
+XForma.Controls.ThemeTokens.extension(XForma.Theme).Typography.get -> XForma.Controls.Typography
+XForma.Controls.ToggleButton
+XForma.Controls.ToggleButton.Icon.get -> XForma.Bitmap
+XForma.Controls.ToggleButton.Icon.set -> void
+XForma.Controls.ToggleButton.IsChecked.get -> bool
+XForma.Controls.ToggleButton.IsChecked.set -> void
+XForma.Controls.ToggleButton.IsCheckedChanged -> System.EventHandler<XForma.Controls.ToggledEventArgs>
+XForma.Controls.ToggleButton.Text.get -> string
+XForma.Controls.ToggleButton.Text.set -> void
+XForma.Controls.ToggleButton.ToggleButton() -> void
+XForma.Controls.ToggledEventArgs
+XForma.Controls.ToggledEventArgs.ToggledEventArgs(bool value) -> void
+XForma.Controls.ToggledEventArgs.Value.get -> bool
+XForma.Controls.Typography
+XForma.Controls.Typography.<Clone>$() -> XForma.Controls.Typography
+XForma.Controls.Typography.Body.get -> XForma.Controls.TextStyle
+XForma.Controls.Typography.Body.init -> void
+XForma.Controls.Typography.Caption.get -> XForma.Controls.TextStyle
+XForma.Controls.Typography.Caption.init -> void
+XForma.Controls.Typography.Display.get -> XForma.Controls.TextStyle
+XForma.Controls.Typography.Display.init -> void
+XForma.Controls.Typography.Equals(XForma.Controls.Typography other) -> bool
+XForma.Controls.Typography.Label.get -> XForma.Controls.TextStyle
+XForma.Controls.Typography.Label.init -> void
+XForma.Controls.Typography.Title.get -> XForma.Controls.TextStyle
+XForma.Controls.Typography.Title.init -> void
+XForma.Controls.Typography.Typography() -> void
+XForma.Controls.UICommand
+XForma.Controls.UICommand.AccentColor.get -> XForma.Color
+XForma.Controls.UICommand.AccentColor.set -> void
+XForma.Controls.UICommand.CanExecute(object parameter) -> bool
+XForma.Controls.UICommand.CanExecuteChanged -> System.EventHandler
+XForma.Controls.UICommand.Command.get -> System.Windows.Input.ICommand
+XForma.Controls.UICommand.Command.set -> void
+XForma.Controls.UICommand.Execute(object parameter) -> void
+XForma.Controls.UICommand.ForegroundColor.set -> void
+XForma.Controls.UICommand.Icon.get -> XForma.Bitmap
+XForma.Controls.UICommand.Icon.set -> void
+XForma.Controls.UICommand.Text.get -> string
+XForma.Controls.UICommand.Text.set -> void
+XForma.Controls.UICommand.UICommand() -> void
+XForma.Controls.UriNavigationCommand
+XForma.Controls.UriNavigationCommand.CanExecute(object parameter) -> bool
+XForma.Controls.UriNavigationCommand.CanExecuteChanged -> System.EventHandler
+XForma.Controls.UriNavigationCommand.Execute(object parameter) -> void
+XForma.Controls.UriNavigationCommand.NavigationUri.get -> System.Uri
+XForma.Controls.UriNavigationCommand.NavigationUri.set -> void
+XForma.Controls.UriNavigationCommand.UriNavigationCommand() -> void
+XForma.Controls.UserControl
+XForma.Controls.UserControl.Content.get -> XForma.View
+XForma.Controls.UserControl.Content.set -> void
+XForma.Controls.UserControl.UserControl() -> void
+XForma.Controls.ViewCollection
+XForma.Controls.ViewCollection.Add(XForma.View child) -> void
+XForma.Controls.ViewCollection.Clear() -> void
+XForma.Controls.ViewCollection.Contains(XForma.View child) -> bool
+XForma.Controls.ViewCollection.Count.get -> int
+XForma.Controls.ViewCollection.GetEnumerator() -> System.Collections.Generic.IEnumerator<XForma.View>
+XForma.Controls.ViewCollection.IndexOf(XForma.View child) -> int
+XForma.Controls.ViewCollection.Insert(int index, XForma.View child) -> void
+XForma.Controls.ViewCollection.Remove(XForma.View child) -> bool
+XForma.Controls.ViewCollection.RemoveAt(int index) -> void
+XForma.Controls.ViewCollection.Replace(int index, XForma.View child) -> void
+XForma.Controls.ViewCollection.ViewCollection(XForma.Controls.Panel owner) -> void
+XForma.Controls.ViewCollection.this[int index].get -> XForma.View
+XForma.Controls.ViewCollection<TLayout>
+XForma.Controls.ViewCollection<TLayout>.Add(XForma.View child, TLayout layout) -> void
+XForma.Controls.ViewCollection<TLayout>.GetLayout(XForma.View child) -> TLayout
+XForma.Controls.ViewCollection<TLayout>.Insert(int index, XForma.View child, TLayout layout) -> void
+XForma.Controls.ViewCollection<TLayout>.Replace(int index, XForma.View child, TLayout layout) -> void
+XForma.Controls.ViewCollection<TLayout>.SetLayout(XForma.View child, TLayout layout) -> void
+XForma.Controls.ViewCollection<TLayout>.ViewCollection(XForma.Controls.Panel owner, TLayout defaultLayout = default(TLayout)) -> void
+XForma.ImageProperties
+XForma.ImageProperties.extension(XForma.Primitives.Image)
+XForma.Input.HoldingEventArgs
+XForma.Input.HoldingEventArgs.HoldingEventArgs(XForma.Point position, XForma.Input.HoldingState state) -> void
+XForma.Input.HoldingEventArgs.HoldingState.get -> XForma.Input.HoldingState
+XForma.Input.HoldingEventArgs.Position.get -> XForma.Point
+XForma.Input.HoldingState
+XForma.Input.HoldingState.Canceled = 2 -> XForma.Input.HoldingState
+XForma.Input.HoldingState.Completed = 1 -> XForma.Input.HoldingState
+XForma.Input.HoldingState.Started = 0 -> XForma.Input.HoldingState
+XForma.Input.IPanGestureDelegate
+XForma.Input.IPanGestureDelegate.OnPanCanceled() -> void
+XForma.Input.IPanGestureDelegate.OnPanChanged(XForma.Point translation) -> void
+XForma.Input.IPanGestureDelegate.OnPanCompleted(XForma.Point translation) -> void
+XForma.Input.IPanGestureDelegate.OnPanStarted() -> void
+XForma.Input.IPinchGestureDelegate
+XForma.Input.IPinchGestureDelegate.OnPinchChanged(float scale, XForma.Point center) -> void
+XForma.Input.IPinchGestureDelegate.OnPinchCompleted(float scale) -> void
+XForma.Input.IPinchGestureDelegate.OnPinchStarted() -> void
+XForma.Input.ISwipeGestureDelegate
+XForma.Input.ISwipeGestureDelegate.OnSwipeBegan(int direction) -> bool
+XForma.Input.ISwipeGestureDelegate.OnSwipeCanceled(int direction) -> bool
+XForma.Input.ISwipeGestureDelegate.OnSwipeEnded(int direction, float dx) -> bool
+XForma.Input.ISwipeGestureDelegate.OnSwipeMoved(int direction, float dx) -> bool
+XForma.Input.ITapGestureDelegate
+XForma.Input.ITapGestureDelegate.OnTapBegan() -> void
+XForma.Input.ITapGestureDelegate.OnTapEnded() -> void
+XForma.Input.ITapGestureDelegate.OnTapped() -> void
+XForma.Input.PanGestureRecognizer
+XForma.Input.PanGestureRecognizer.PanGestureRecognizer(XForma.Input.IPanGestureDelegate gestureDelegate) -> void
+XForma.Input.PinchGestureRecognizer
+XForma.Input.PinchGestureRecognizer.PinchGestureRecognizer(XForma.Input.IPinchGestureDelegate gestureDelegate) -> void
+XForma.Input.SwipeGestureRecognizer
+XForma.Input.SwipeGestureRecognizer.SwipeGestureRecognizer(XForma.Input.ISwipeGestureDelegate swipeDelegate) -> void
+XForma.Input.TapGestureRecognizer
+XForma.Input.TapGestureRecognizer.DoubleTapped -> System.EventHandler<XForma.Input.TappedEventArgs>
+XForma.Input.TapGestureRecognizer.Holding -> System.EventHandler<XForma.Input.HoldingEventArgs>
+XForma.Input.TapGestureRecognizer.IsPressed.get -> bool
+XForma.Input.TapGestureRecognizer.TapGestureRecognizer() -> void
+XForma.Input.TapGestureRecognizer.TapGestureRecognizer(XForma.Input.ITapGestureDelegate gestureDelegate) -> void
+XForma.Input.TapGestureRecognizer.Tapped -> System.EventHandler<XForma.Input.TappedEventArgs>
+XForma.Input.TappedEventArgs
+XForma.Input.TappedEventArgs.DeviceType.get -> XForma.PointerDeviceType
+XForma.Input.TappedEventArgs.Position.get -> XForma.Point
+XForma.Input.TappedEventArgs.TappedEventArgs(XForma.Point position, XForma.PointerDeviceType deviceType) -> void
+XForma.Layouts.Canvas
+XForma.Layouts.Canvas.Canvas() -> void
+XForma.Layouts.Canvas.CanvasChildren
+XForma.Layouts.Canvas.CanvasChildren.Add(XForma.View child, float left, float top) -> void
+XForma.Layouts.Canvas.Children.get -> XForma.Layouts.Canvas.CanvasChildren
+XForma.Layouts.Dock
+XForma.Layouts.Dock.Bottom = 4 -> XForma.Layouts.Dock
+XForma.Layouts.Dock.BottomOverlay = 8 -> XForma.Layouts.Dock
+XForma.Layouts.Dock.CenterOverlay = 0 -> XForma.Layouts.Dock
+XForma.Layouts.Dock.Left = 1 -> XForma.Layouts.Dock
+XForma.Layouts.Dock.LeftOverlay = 5 -> XForma.Layouts.Dock
+XForma.Layouts.Dock.Right = 3 -> XForma.Layouts.Dock
+XForma.Layouts.Dock.RightOverlay = 7 -> XForma.Layouts.Dock
+XForma.Layouts.Dock.Top = 2 -> XForma.Layouts.Dock
+XForma.Layouts.Dock.TopOverlay = 6 -> XForma.Layouts.Dock
+XForma.Layouts.DockPanel
+XForma.Layouts.DockPanel.Children.get -> XForma.Controls.ViewCollection<XForma.Layouts.Dock>
+XForma.Layouts.DockPanel.DockPanel() -> void
+XForma.Layouts.Grid
+XForma.Layouts.Grid.Children.get -> XForma.Layouts.Grid.GridChildren
+XForma.Layouts.Grid.ColumnDefinitions.get -> XForma.Layouts.Grid.DefinitionCollection
+XForma.Layouts.Grid.ColumnSpacing.get -> float
+XForma.Layouts.Grid.ColumnSpacing.set -> void
+XForma.Layouts.Grid.DefinitionCollection
+XForma.Layouts.Grid.DefinitionCollection.AddRange(string definitions) -> void
+XForma.Layouts.Grid.Grid() -> void
+XForma.Layouts.Grid.GridChildren
+XForma.Layouts.Grid.GridChildren.Add(XForma.View child, int row, int column, int rowSpan = 1, int columnSpan = 1) -> void
+XForma.Layouts.Grid.RowDefinitions.get -> XForma.Layouts.Grid.DefinitionCollection
+XForma.Layouts.Grid.RowSpacing.get -> float
+XForma.Layouts.Grid.RowSpacing.set -> void
+XForma.Layouts.GridCell
+XForma.Layouts.GridCell.Column.get -> int
+XForma.Layouts.GridCell.ColumnSpan.get -> int
+XForma.Layouts.GridCell.GridCell() -> void
+XForma.Layouts.GridCell.GridCell(int row, int column, int rowSpan = 1, int columnSpan = 1) -> void
+XForma.Layouts.GridCell.Row.get -> int
+XForma.Layouts.GridCell.RowSpan.get -> int
+XForma.Layouts.GridLength
+XForma.Layouts.GridLength.Equals(XForma.Layouts.GridLength other) -> bool
+XForma.Layouts.GridLength.GridLength() -> void
+XForma.Layouts.GridLength.GridLength(float value, XForma.Layouts.GridUnitType unitType = XForma.Layouts.GridUnitType.Pixel) -> void
+XForma.Layouts.GridLength.GridUnitType.get -> XForma.Layouts.GridUnitType
+XForma.Layouts.GridLength.IsAbsolute.get -> bool
+XForma.Layouts.GridLength.IsAuto.get -> bool
+XForma.Layouts.GridLength.IsStar.get -> bool
+XForma.Layouts.GridLength.Value.get -> float
+XForma.Layouts.GridUnitType
+XForma.Layouts.GridUnitType.Auto = 0 -> XForma.Layouts.GridUnitType
+XForma.Layouts.GridUnitType.Pixel = 1 -> XForma.Layouts.GridUnitType
+XForma.Layouts.GridUnitType.Star = 2 -> XForma.Layouts.GridUnitType
+XForma.Layouts.StackPanel
+XForma.Layouts.StackPanel.Children.get -> XForma.Controls.ViewCollection
+XForma.Layouts.StackPanel.Orientation.get -> XForma.Orientation
+XForma.Layouts.StackPanel.Orientation.set -> void
+XForma.Layouts.StackPanel.Spacing.get -> float
+XForma.Layouts.StackPanel.Spacing.set -> void
+XForma.Layouts.StackPanel.StackPanel() -> void
+XForma.Layouts.UniformGrid
+XForma.Layouts.UniformGrid.Children.get -> XForma.Controls.ViewCollection
+XForma.Layouts.UniformGrid.UniformGrid() -> void
+XForma.Layouts.WrapPanel
+XForma.Layouts.WrapPanel.Children.get -> XForma.Controls.ViewCollection
+XForma.Layouts.WrapPanel.ItemSpacing.get -> float
+XForma.Layouts.WrapPanel.ItemSpacing.set -> void
+XForma.Layouts.WrapPanel.LineSpacing.get -> float
+XForma.Layouts.WrapPanel.LineSpacing.set -> void
+XForma.Layouts.WrapPanel.Orientation.get -> XForma.Orientation
+XForma.Layouts.WrapPanel.Orientation.set -> void
+XForma.Layouts.WrapPanel.WrapPanel() -> void
+XForma.TextBlockProperties
+XForma.TextBlockProperties.extension(XForma.Primitives.TextBlock)
+XForma.TextBoxProperties
+XForma.TextBoxProperties.extension(XForma.Primitives.TextBox)
+XForma.ViewBindingExtensions
+XForma.ViewProperties
+XForma.ViewProperties.extension(XForma.View)
+XForma.ViewProperty<TView, TValue>
+XForma.ViewProperty<TView, TValue>.GetValue(TView view) -> TValue
+XForma.ViewProperty<TView, TValue>.Name.get -> string
+XForma.ViewProperty<TView, TValue>.SetValue(TView view, TValue value) -> void
+XForma.ViewProperty<TView, TValue>.ViewProperty(string name, System.Func<TView, TValue> getValue, System.Action<TView, TValue> setValue) -> void
+XForma.XFormaApp
+abstract XForma.Binding.Dispose() -> void
+abstract XForma.Binding.Refresh() -> void
+abstract XForma.Controls.AppTheme.Apply(XForma.Theme theme) -> XForma.Theme
+abstract XForma.Controls.ControlTemplate.ControlType.get -> System.Type
+abstract XForma.Controls.Panel.ArrangeChildren(XForma.Size finalSize) -> void
+abstract XForma.Controls.Panel.MeasureChildren(XForma.Size availableSize) -> XForma.Size
+abstract XForma.Controls.PickerField.DisplayText.get -> string
+abstract XForma.Controls.PickerField.MaximumTextWidth.get -> float
+abstract XForma.Controls.PickerField.OpenPicker() -> void
+override XForma.Controls.Border.BackgroundColor.get -> XForma.Color
+override XForma.Controls.Border.Padding.get -> XForma.Thickness
+override XForma.Controls.Border.Padding.set -> void
+override XForma.Controls.Border.Render(XForma.DrawingContext drawContext) -> void
+override XForma.Controls.Button.DefaultAccessibilityLabel.get -> string
+override XForma.Controls.Button.DefaultAccessibilityRole.get -> XForma.AccessibilityRole
+override XForma.Controls.CalendarDatePicker.ClosePicker() -> void
+override XForma.Controls.CalendarDatePicker.DefaultAccessibilityLabel.get -> string
+override XForma.Controls.CalendarDatePicker.DisplayText.get -> string
+override XForma.Controls.CalendarDatePicker.IsPickerOpen.get -> bool
+override XForma.Controls.CalendarDatePicker.IsPlaceholder.get -> bool
+override XForma.Controls.CalendarDatePicker.MaximumTextWidth.get -> float
+override XForma.Controls.CalendarDatePicker.OpenPicker() -> void
+override XForma.Controls.CalendarView.DefaultAccessibilityLabel.get -> string
+override XForma.Controls.CalendarView.DefaultAccessibilityRole.get -> XForma.AccessibilityRole
+override XForma.Controls.CalendarView.MeasureOverride(XForma.Size availableSize) -> XForma.Size
+override XForma.Controls.CalendarView.OnActivate() -> void
+override XForma.Controls.CalendarView.OnGotFocus() -> void
+override XForma.Controls.CalendarView.OnKeyDown(XForma.KeyEventArgs keyInputEvent) -> void
+override XForma.Controls.CalendarView.OnLostFocus() -> void
+override XForma.Controls.CalendarView.OnPointerCanceled(XForma.PointerEventArgs e) -> void
+override XForma.Controls.CalendarView.OnPointerPressed(XForma.PointerEventArgs e) -> void
+override XForma.Controls.CalendarView.OnPointerReleased(XForma.PointerEventArgs e) -> void
+override XForma.Controls.CalendarView.OnThemeChanged(XForma.Theme theme) -> void
+override XForma.Controls.ComboBox.ClosePicker() -> void
+override XForma.Controls.ComboBox.DefaultAccessibilityLabel.get -> string
+override XForma.Controls.ComboBox.DisplayText.get -> string
+override XForma.Controls.ComboBox.IsPickerOpen.get -> bool
+override XForma.Controls.ComboBox.MaximumTextWidth.get -> float
+override XForma.Controls.ComboBox.OnKeyDown(XForma.KeyEventArgs keyInputEvent) -> void
+override XForma.Controls.ComboBox.OpenPicker() -> void
+override XForma.Controls.ComboBoxItem.ToString() -> string
+override XForma.Controls.CommandListView.CreateItemContainer() -> XForma.Controls.ListViewItem
+override XForma.Controls.CommandListViewItemContainer.AddContent(XForma.View content) -> void
+override XForma.Controls.CommandListViewItemContainer.OnBind() -> void
+override XForma.Controls.CommandListViewItemContainer.OnRecycle() -> void
+override XForma.Controls.CommandListViewItemContainer.OnTapped() -> void
+override XForma.Controls.CommandListViewItemContainer.RemoveContent(XForma.View content) -> void
+override XForma.Controls.Control.GetBackgroundColor() -> XForma.Color
+override XForma.Controls.ControlTemplates.Equals(object obj) -> bool
+override XForma.Controls.ControlTemplates.GetHashCode() -> int
+override XForma.Controls.ControlTemplates.ToString() -> string
+override XForma.Controls.FloatingButton.DefaultAccessibilityRole.get -> XForma.AccessibilityRole
+override XForma.Controls.FlyoutButton.BackgroundColor.get -> XForma.Color
+override XForma.Controls.FlyoutButton.OnLightDismiss() -> void
+override XForma.Controls.ListView.CreateItemContainer() -> XForma.Controls.ListViewItem
+override XForma.Controls.ListView.OnContainerBound(XForma.Primitives.ItemContainer container) -> void
+override XForma.Controls.ListViewItem.AccessibilityIsSelected.get -> bool
+override XForma.Controls.ListViewItem.DefaultAccessibilityRole.get -> XForma.AccessibilityRole
+override XForma.Controls.ListViewItem.OnAttaching(XForma.Theme theme) -> void
+override XForma.Controls.ListViewItem.OnThemeChanged(XForma.Theme theme) -> void
+override XForma.Controls.ListViewItem.Render(XForma.DrawingContext drawingContext) -> void
+override XForma.Controls.ListViewSwipeItem.BackgroundColor.get -> XForma.Color
+override XForma.Controls.Motion.Equals(object obj) -> bool
+override XForma.Controls.Motion.GetHashCode() -> int
+override XForma.Controls.Motion.ToString() -> string
+override XForma.Controls.Panel.AnimatesChildren.get -> bool
+override XForma.Controls.PickerField.AccessibilityIsExpanded.get -> bool?
+override XForma.Controls.PickerField.AccessibilityValue.get -> string
+override XForma.Controls.PickerField.DefaultAccessibilityRole.get -> XForma.AccessibilityRole
+override XForma.Controls.PickerField.MeasureOverride(XForma.Size availableSize) -> XForma.Size
+override XForma.Controls.PickerField.OnActivate() -> void
+override XForma.Controls.PickerField.OnKeyDown(XForma.KeyEventArgs keyInputEvent) -> void
+override XForma.Controls.PickerField.OnPointerCanceled(XForma.PointerEventArgs e) -> void
+override XForma.Controls.PickerField.OnPointerPressed(XForma.PointerEventArgs e) -> void
+override XForma.Controls.PickerField.OnPointerReleased(XForma.PointerEventArgs e) -> void
+override XForma.Controls.PickerField.PerformAccessibilityAction(XForma.AccessibilityAction action) -> bool
+override XForma.Controls.RadioButton.AccessibilityIsSelected.get -> bool
+override XForma.Controls.Shapes.Equals(object obj) -> bool
+override XForma.Controls.Shapes.GetHashCode() -> int
+override XForma.Controls.Shapes.ToString() -> string
+override XForma.Controls.TabStripItem.AccessibilityIsSelected.get -> bool
+override XForma.Controls.TabStripItem.BackgroundColor.get -> XForma.Color
+override XForma.Controls.TabStripItem.DefaultAccessibilityLabel.get -> string
+override XForma.Controls.TabStripItem.DefaultAccessibilityRole.get -> XForma.AccessibilityRole
+override XForma.Controls.TemplatedContentControl.ArrangeOverride(XForma.Size finalSize) -> void
+override XForma.Controls.TemplatedContentControl.BackgroundColor.get -> XForma.Color
+override XForma.Controls.TemplatedContentControl.MeasureOverride(XForma.Size availableSize) -> XForma.Size
+override XForma.Controls.TemplatedContentControl.OnAttaching(XForma.Theme theme) -> void
+override XForma.Controls.TemplatedContentControl.OnGotFocus() -> void
+override XForma.Controls.TemplatedContentControl.OnLostFocus() -> void
+override XForma.Controls.TemplatedContentControl.OnPointerEntered(XForma.PointerEventArgs e) -> void
+override XForma.Controls.TemplatedContentControl.OnPointerExited(XForma.PointerEventArgs e) -> void
+override XForma.Controls.TemplatedContentControl.OnThemeChanged(XForma.Theme theme) -> void
+override XForma.Controls.TemplatedControl.ArrangeOverride(XForma.Size finalSize) -> void
+override XForma.Controls.TemplatedControl.MeasureOverride(XForma.Size availableSize) -> XForma.Size
+override XForma.Controls.TemplatedControl.OnAttaching(XForma.Theme theme) -> void
+override XForma.Controls.TemplatedControl.OnGotFocus() -> void
+override XForma.Controls.TemplatedControl.OnLostFocus() -> void
+override XForma.Controls.TemplatedControl.OnPointerEntered(XForma.PointerEventArgs e) -> void
+override XForma.Controls.TemplatedControl.OnPointerExited(XForma.PointerEventArgs e) -> void
+override XForma.Controls.TemplatedControl.OnThemeChanged(XForma.Theme theme) -> void
+override XForma.Controls.TemplatedControl.Render(XForma.DrawingContext drawingContext) -> void
+override XForma.Controls.TextStyle.Equals(object obj) -> bool
+override XForma.Controls.TextStyle.GetHashCode() -> int
+override XForma.Controls.TextStyle.ToString() -> string
+override XForma.Controls.ToggleButton.AccessibilityIsChecked.get -> bool?
+override XForma.Controls.Typography.Equals(object obj) -> bool
+override XForma.Controls.Typography.GetHashCode() -> int
+override XForma.Controls.Typography.ToString() -> string
+override XForma.Input.PinchGestureRecognizer.TracksMultiplePointers.get -> bool
+override XForma.Input.TapGestureRecognizer.OnAttached(XForma.View view) -> void
+override XForma.Input.TapGestureRecognizer.OnDetached(XForma.View view) -> void
+override XForma.Layouts.Canvas.ArrangeChildren(XForma.Size finalSize) -> void
+override XForma.Layouts.Canvas.MeasureChildren(XForma.Size availableSize) -> XForma.Size
+override XForma.Layouts.DockPanel.ArrangeChildren(XForma.Size finalSize) -> void
+override XForma.Layouts.DockPanel.MeasureChildren(XForma.Size availableSize) -> XForma.Size
+override XForma.Layouts.Grid.ArrangeChildren(XForma.Size finalSize) -> void
+override XForma.Layouts.Grid.MeasureChildren(XForma.Size availableSize) -> XForma.Size
+override XForma.Layouts.GridLength.Equals(object obj) -> bool
+override XForma.Layouts.GridLength.GetHashCode() -> int
+override XForma.Layouts.GridLength.ToString() -> string
+override XForma.Layouts.StackPanel.ArrangeChildren(XForma.Size finalSize) -> void
+override XForma.Layouts.StackPanel.MeasureChildren(XForma.Size availableSize) -> XForma.Size
+override XForma.Layouts.UniformGrid.ArrangeChildren(XForma.Size finalSize) -> void
+override XForma.Layouts.UniformGrid.MeasureChildren(XForma.Size availableSize) -> XForma.Size
+override XForma.Layouts.WrapPanel.ArrangeChildren(XForma.Size finalSize) -> void
+override XForma.Layouts.WrapPanel.MeasureChildren(XForma.Size availableSize) -> XForma.Size
+override XForma.ViewProperty<TView, TValue>.ToString() -> string
+override sealed XForma.Controls.ControlTemplate<TControl>.ControlType.get -> System.Type
+override sealed XForma.Controls.Panel.ArrangeOverride(XForma.Size finalSize) -> void
+override sealed XForma.Controls.Panel.MeasureOverride(XForma.Size availableSize) -> XForma.Size
+static XForma.Controls.ControlTemplates.Empty.get -> XForma.Controls.ControlTemplates
+static XForma.Controls.ControlTemplates.operator !=(XForma.Controls.ControlTemplates left, XForma.Controls.ControlTemplates right) -> bool
+static XForma.Controls.ControlTemplates.operator ==(XForma.Controls.ControlTemplates left, XForma.Controls.ControlTemplates right) -> bool
+static XForma.Controls.ItemViewFactory<T>.Create<TView>(System.Func<TView> create, System.Action<TView, T> bind) -> XForma.Controls.ItemViewFactory<T>
+static XForma.Controls.ListViewItem.ContainerFromContent(XForma.View view) -> XForma.Controls.ListViewItem
+static XForma.Controls.MessageBox.ShowAsync(string message, string title) -> System.Threading.Tasks.Task<XForma.Controls.MessageBoxResult>
+static XForma.Controls.Motion.operator !=(XForma.Controls.Motion left, XForma.Controls.Motion right) -> bool
+static XForma.Controls.Motion.operator ==(XForma.Controls.Motion left, XForma.Controls.Motion right) -> bool
+static XForma.Controls.Shapes.operator !=(XForma.Controls.Shapes left, XForma.Controls.Shapes right) -> bool
+static XForma.Controls.Shapes.operator ==(XForma.Controls.Shapes left, XForma.Controls.Shapes right) -> bool
+static XForma.Controls.TextStyle.operator !=(XForma.Controls.TextStyle left, XForma.Controls.TextStyle right) -> bool
+static XForma.Controls.TextStyle.operator ==(XForma.Controls.TextStyle left, XForma.Controls.TextStyle right) -> bool
+static XForma.Controls.ThemeTemplates.GetTemplate(this XForma.Theme theme, System.Type controlType) -> XForma.Controls.ControlTemplate
+static XForma.Controls.ThemeTemplates.WithTemplate(this XForma.Theme theme, XForma.Controls.ControlTemplate template) -> XForma.Theme
+static XForma.Controls.ThemeTokens.get_Motion(XForma.Theme theme) -> XForma.Controls.Motion
+static XForma.Controls.ThemeTokens.get_Shapes(XForma.Theme theme) -> XForma.Controls.Shapes
+static XForma.Controls.ThemeTokens.get_Typography(XForma.Theme theme) -> XForma.Controls.Typography
+static XForma.Controls.Typography.operator !=(XForma.Controls.Typography left, XForma.Controls.Typography right) -> bool
+static XForma.Controls.Typography.operator ==(XForma.Controls.Typography left, XForma.Controls.Typography right) -> bool
+static XForma.ImageProperties.extension(XForma.Primitives.Image).SourceProperty.get -> XForma.ViewProperty<XForma.Primitives.Image, XForma.ImageSource>
+static XForma.ImageProperties.extension(XForma.Primitives.Image).TintProperty.get -> XForma.ViewProperty<XForma.Primitives.Image, XForma.Color>
+static XForma.ImageProperties.get_SourceProperty() -> XForma.ViewProperty<XForma.Primitives.Image, XForma.ImageSource>
+static XForma.ImageProperties.get_TintProperty() -> XForma.ViewProperty<XForma.Primitives.Image, XForma.Color>
+static XForma.Layouts.GridLength.Auto.get -> XForma.Layouts.GridLength
+static XForma.Layouts.GridLength.Parse(string text) -> XForma.Layouts.GridLength
+static XForma.Layouts.GridLength.Star.get -> XForma.Layouts.GridLength
+static XForma.Layouts.GridLength.operator !=(XForma.Layouts.GridLength a, XForma.Layouts.GridLength b) -> bool
+static XForma.Layouts.GridLength.operator ==(XForma.Layouts.GridLength a, XForma.Layouts.GridLength b) -> bool
+static XForma.TextBlockProperties.extension(XForma.Primitives.TextBlock).FontSizeProperty.get -> XForma.ViewProperty<XForma.Primitives.TextBlock, float>
+static XForma.TextBlockProperties.extension(XForma.Primitives.TextBlock).FontWeightProperty.get -> XForma.ViewProperty<XForma.Primitives.TextBlock, XForma.FontWeight>
+static XForma.TextBlockProperties.extension(XForma.Primitives.TextBlock).ForegroundProperty.get -> XForma.ViewProperty<XForma.Primitives.TextBlock, XForma.Color>
+static XForma.TextBlockProperties.extension(XForma.Primitives.TextBlock).StrikethroughProperty.get -> XForma.ViewProperty<XForma.Primitives.TextBlock, bool>
+static XForma.TextBlockProperties.extension(XForma.Primitives.TextBlock).TextProperty.get -> XForma.ViewProperty<XForma.Primitives.TextBlock, string>
+static XForma.TextBlockProperties.get_FontSizeProperty() -> XForma.ViewProperty<XForma.Primitives.TextBlock, float>
+static XForma.TextBlockProperties.get_FontWeightProperty() -> XForma.ViewProperty<XForma.Primitives.TextBlock, XForma.FontWeight>
+static XForma.TextBlockProperties.get_ForegroundProperty() -> XForma.ViewProperty<XForma.Primitives.TextBlock, XForma.Color>
+static XForma.TextBlockProperties.get_StrikethroughProperty() -> XForma.ViewProperty<XForma.Primitives.TextBlock, bool>
+static XForma.TextBlockProperties.get_TextProperty() -> XForma.ViewProperty<XForma.Primitives.TextBlock, string>
+static XForma.TextBoxProperties.extension(XForma.Primitives.TextBox).PlaceholderTextProperty.get -> XForma.ViewProperty<XForma.Primitives.TextBox, string>
+static XForma.TextBoxProperties.extension(XForma.Primitives.TextBox).TextProperty.get -> XForma.ViewProperty<XForma.Primitives.TextBox, string>
+static XForma.TextBoxProperties.get_PlaceholderTextProperty() -> XForma.ViewProperty<XForma.Primitives.TextBox, string>
+static XForma.TextBoxProperties.get_TextProperty() -> XForma.ViewProperty<XForma.Primitives.TextBox, string>
+static XForma.ViewBindingExtensions.Bind<TView, TValue, TSource>(this TView view, XForma.ViewProperty<TView, TValue> property, TSource source, System.Func<TSource, TValue> getValue) -> XForma.Binding
+static XForma.ViewBindingExtensions.Bind<TView, TValue, TSource>(this TView view, XForma.ViewProperty<TView, TValue> property, TSource source, System.Func<TSource, TValue> getValue, System.Action<TSource, TValue> setValue) -> XForma.Binding
+static XForma.ViewProperties.extension(XForma.View).AccessibilityLabelProperty.get -> XForma.ViewProperty<XForma.View, string>
+static XForma.ViewProperties.extension(XForma.View).HeightProperty.get -> XForma.ViewProperty<XForma.View, float>
+static XForma.ViewProperties.extension(XForma.View).IsHitTestVisibleProperty.get -> XForma.ViewProperty<XForma.View, bool>
+static XForma.ViewProperties.extension(XForma.View).IsVisibleProperty.get -> XForma.ViewProperty<XForma.View, bool>
+static XForma.ViewProperties.extension(XForma.View).MarginProperty.get -> XForma.ViewProperty<XForma.View, XForma.Thickness>
+static XForma.ViewProperties.extension(XForma.View).WidthProperty.get -> XForma.ViewProperty<XForma.View, float>
+static XForma.ViewProperties.get_AccessibilityLabelProperty() -> XForma.ViewProperty<XForma.View, string>
+static XForma.ViewProperties.get_HeightProperty() -> XForma.ViewProperty<XForma.View, float>
+static XForma.ViewProperties.get_IsHitTestVisibleProperty() -> XForma.ViewProperty<XForma.View, bool>
+static XForma.ViewProperties.get_IsVisibleProperty() -> XForma.ViewProperty<XForma.View, bool>
+static XForma.ViewProperties.get_MarginProperty() -> XForma.ViewProperty<XForma.View, XForma.Thickness>
+static XForma.ViewProperties.get_WidthProperty() -> XForma.ViewProperty<XForma.View, float>
+static readonly XForma.Controls.Border.BackgroundProperty -> XForma.ViewProperty<XForma.Controls.Border, XForma.Color>
+static readonly XForma.Controls.Border.BorderBrushProperty -> XForma.ViewProperty<XForma.Controls.Border, XForma.Color>
+static readonly XForma.Controls.Button.CommandProperty -> XForma.ViewProperty<XForma.Controls.Button, System.Windows.Input.ICommand>
+static readonly XForma.Controls.Button.IsEnabledProperty -> XForma.ViewProperty<XForma.Controls.Button, bool>
+static readonly XForma.Controls.Button.TextProperty -> XForma.ViewProperty<XForma.Controls.Button, string>
+static readonly XForma.Controls.CalendarDatePicker.SelectedDateProperty -> XForma.ViewProperty<XForma.Controls.CalendarDatePicker, System.DateTime?>
+static readonly XForma.Controls.ComboBox.SelectedIndexProperty -> XForma.ViewProperty<XForma.Controls.ComboBox, int>
+static readonly XForma.Controls.ComboBox.SelectedItemProperty -> XForma.ViewProperty<XForma.Controls.ComboBox, XForma.Controls.ComboBoxItem>
+static readonly XForma.Controls.RadioButtons.SelectedItemProperty -> XForma.ViewProperty<XForma.Controls.RadioButtons, object>
+static readonly XForma.Controls.ToggleButton.IsCheckedProperty -> XForma.ViewProperty<XForma.Controls.ToggleButton, bool>
+virtual XForma.Controls.CommandListViewItem.OnItemChanged() -> void
+virtual XForma.Controls.Control.BackgroundColor.get -> XForma.Color
+virtual XForma.Controls.ControlTemplate<TControl>.Apply(TControl control, XForma.Controls.TemplateContext context) -> void
+virtual XForma.Controls.ControlTemplate<TControl>.Arrange(TControl control, XForma.Size finalSize) -> bool
+virtual XForma.Controls.ControlTemplate<TControl>.Background(TControl control) -> XForma.Color?
+virtual XForma.Controls.ControlTemplate<TControl>.Measure(TControl control, XForma.Size availableSize) -> XForma.Size?
+virtual XForma.Controls.ControlTemplate<TControl>.OnStateChanged(TControl control, XForma.Controls.TemplateContext context) -> void
+virtual XForma.Controls.ControlTemplate<TControl>.OnThemeChanged(TControl control, XForma.Controls.TemplateContext context) -> void
+virtual XForma.Controls.ControlTemplate<TControl>.Render(TControl control, XForma.DrawingContext drawingContext) -> void
+virtual XForma.Controls.ControlTemplate<TControl>.Unapply(TControl control, XForma.Controls.TemplateContext context) -> void
+virtual XForma.Controls.FloatingButton.OnTapBegan() -> void
+virtual XForma.Controls.FloatingButton.OnTapEnded() -> void
+virtual XForma.Controls.LightDismissControl.OnLightDismiss() -> void
+virtual XForma.Controls.ListViewItem.OnIsSelectedChanged() -> void
+virtual XForma.Controls.ListViewItem.OnTapped() -> void
+virtual XForma.Controls.PickerField.ClosePicker() -> void
+virtual XForma.Controls.PickerField.IsPickerOpen.get -> bool
+virtual XForma.Controls.PickerField.IsPlaceholder.get -> bool
+virtual XForma.Controls.TemplatedControl.IsEnabled.get -> bool
+virtual XForma.Controls.TemplatedControl.IsEnabled.set -> void
+virtual XForma.Controls.UserControl.Padding.get -> XForma.Thickness
+virtual XForma.Controls.UserControl.Padding.set -> void

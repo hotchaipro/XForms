@@ -9,7 +9,7 @@ using Network;
 using UIKit;
 using UniformTypeIdentifiers;
 
-namespace XForms.Toolkit
+namespace XForma.Toolkit
 {
     /// <summary>
     /// Whether the device is online, from the Network framework's path

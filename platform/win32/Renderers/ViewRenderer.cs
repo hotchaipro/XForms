@@ -6,10 +6,10 @@ using Windows.Win32.Graphics.Direct2D.Common;
 using Windows.Win32.Graphics.DirectComposition;
 using Windows.Win32.Graphics.Dxgi.Common;
 using Windows.Win32.System.Com;
-using XForms.Primitives;
-using XForms.Platform;
+using XForma.Primitives;
+using XForma.Platform;
 
-namespace XForms.Win32.Renderers
+namespace XForma.Win32.Renderers
 {
     internal abstract class ElementRenderer : IElementRenderer
     {
@@ -20,7 +20,7 @@ namespace XForms.Win32.Renderers
         }
 
         /// <summary>
-        /// For platform-only views (such as a picker's drop-down) with no XForms element.
+        /// For platform-only views (such as a picker's drop-down) with no XForma element.
         /// </summary>
         protected ElementRenderer()
         {
@@ -165,7 +165,7 @@ namespace XForms.Win32.Renderers
         }
 
         /// <summary>
-        /// For platform-only views with no XForms element; they lay out and draw
+        /// For platform-only views with no XForma element; they lay out and draw
         /// themselves.
         /// </summary>
         protected ViewRenderer()

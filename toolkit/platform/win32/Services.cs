@@ -8,7 +8,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace XForms.Toolkit
+namespace XForma.Toolkit
 {
     /// <summary>
     /// Windows' services for the application.
@@ -57,6 +57,7 @@ namespace XForms.Toolkit
         {
             get
             {
+                // Keeps the name from before XForma: data users already have is stored under it
                 string name = Assembly.GetEntryAssembly()?.GetName().Name ?? "XForms";
                 return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), name);
             }

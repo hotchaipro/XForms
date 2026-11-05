@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using Foundation;
 using UIKit;
-using XForms.Primitives;
-using XForms.Platform;
+using XForma.Primitives;
+using XForma.Platform;
 
-namespace XForms.iOS.Renderers
+namespace XForma.iOS.Renderers
 {
     /// <summary>
     /// Hosts a native UIKit editor so text entry keeps the platform's full editing
@@ -268,7 +268,7 @@ namespace XForms.iOS.Renderers
                 Text = text,
 
                 // Grow with the content instead of scrolling internally; the
-                // surrounding XForms layout decides how much room the entry gets
+                // surrounding XForma layout decides how much room the entry gets
                 ScrollEnabled = false,
                 TextContainerInset = UIEdgeInsets.Zero,
             };

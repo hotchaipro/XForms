@@ -1,9 +1,9 @@
 ﻿using System;
 using Android.Views;
-using XForms.Platform;
+using XForma.Platform;
 using AndroidFrameLayout = global::Android.Widget.FrameLayout;
 
-namespace XForms.Android.Renderers
+namespace XForma.Android.Renderers
 {
     internal class FrameRenderer : ViewRenderer<AndroidFrameLayout>, IFrameRenderer
     {

@@ -1,8 +1,8 @@
 ﻿using System;
-using XForms.Platform;
+using XForma.Platform;
 using AndroidContext = Android.Content.Context;
 
-namespace XForms.Android.Renderers
+namespace XForma.Android.Renderers
 {
     internal abstract class ElementRenderer<TNativeElement> : IElementRenderer
         where TNativeElement : class

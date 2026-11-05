@@ -1,6 +1,6 @@
 using System;
 
-namespace XForms
+namespace XForma
 {
     /// <summary>
     /// Keys that views can handle. Text typed into text boxes goes to the native

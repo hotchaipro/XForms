@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using XForms.Platform;
+using XForma.Platform;
 
-namespace XForms.Primitives
+namespace XForma.Primitives
 {
     /// <summary>
     /// A piece of a <see cref="TextBlock"/>'s text with its own style. Unset

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace XForms
+namespace XForma
 {
     public enum FontStyle
     {

@@ -1,9 +1,9 @@
 ﻿using System;
-using XForms.Controls;
-using XForms.Layouts;
-using XForms.Primitives;
+using XForma.Controls;
+using XForma.Layouts;
+using XForma.Primitives;
 
-namespace XForms.Themes.Basic
+namespace XForma.Themes.Basic
 {
     // The message, and Cancel and OK beneath it, side by side
     internal sealed class MessageBoxTemplate : ControlTemplate<MessageBoxView>

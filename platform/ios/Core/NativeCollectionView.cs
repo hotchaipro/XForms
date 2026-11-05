@@ -3,9 +3,9 @@ using System.Collections.Specialized;
 using CoreGraphics;
 using Foundation;
 using UIKit;
-using XForms.Primitives;
+using XForma.Primitives;
 
-namespace XForms.iOS
+namespace XForma.iOS
 {
     /// <summary>
     /// Holds a list's native scroll view (a table or a collection view),
@@ -51,7 +51,7 @@ namespace XForms.iOS
 
     /// <summary>
     /// A horizontal list or a grid: a collection view with a flow layout,
-    /// whose cells hold XForms item containers sized by measuring them.
+    /// whose cells hold XForma item containers sized by measuring them.
     /// </summary>
     internal sealed class NativeCollectionView : UICollectionView
     {
@@ -191,7 +191,7 @@ namespace XForms.iOS
 
     internal sealed class NativeCollectionViewCell : UICollectionViewCell
     {
-        public static readonly NSString CellReuseIdentifier = new NSString("XForms.ItemContainer.Collection");
+        public static readonly NSString CellReuseIdentifier = new NSString("XForma.ItemContainer.Collection");
 
         private ItemContainer _itemContainer;
 

@@ -1,6 +1,6 @@
 using System;
 
-namespace XForms
+namespace XForma
 {
     /// <summary>
     /// What a view is to assistive technology such as a screen reader. Each

@@ -1,8 +1,13 @@
-# XForms
+# XForma
 
 A lightweight .NET UI framework: native text, text entry and scrolling, owner-drawn everything
 else, so apps look the same on every platform. See `README.md`. SoonerOrLater
 (`../SoonerOrLater/XForms`) is the app built on it, ported phase by phase alongside it.
+
+Renamed from XForms on 2026-11-05. The repo, its folder and the Mac's clone are still called
+`XForms`, until that's coordinated, and Sooner Or Later's own folder and projects keep the name.
+Names apps' stored data lives under (secure storage, saved files, navigation) also keep it: each
+has a comment saying so, and renaming one would lose users' data.
 
 ## Where things stand
 
@@ -13,7 +18,7 @@ else, so apps look the same on every platform. See `README.md`. SoonerOrLater
 
 ## Open work
 
-- Phases 1-28 are done. Next is phase 29, `XForms.Xaml`, waiting on planning with the user
+- Phases 1-28 are done. Next is phase 29, `XForma.Xaml`, waiting on planning with the user
   (build-time generator recommended over the spike's run-time parser).
 - Unverified: Win32 from the keyboard (scripted input is blocked when another window holds the
   foreground), what VoiceOver and TalkBack say, a real iPhone or iPad.
@@ -27,10 +32,10 @@ else, so apps look the same on every platform. See `README.md`. SoonerOrLater
 
 - `framework/`: the small per-platform framework (all platform-specific code)
 - `platform/`: the platform hosts (Win32, Android, iOS, web)
-- `xforms/`: the multi-targeted `XForms` package apps reference; `toolkit/`, `themes/` (looks, such
+- `xforma/`: the multi-targeted `XForma` package apps reference; `toolkit/`, `themes/` (looks, such
   as the Basic theme), `analyzers/` (the platform contract, XF0001)
 - `test/`: unit tests; `spikes/`: experiments, not shipped
-- `XForms.slnx`: everything
+- `XForma.slnx`: everything
 
 ## Working here
 

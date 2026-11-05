@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Globalization;
-using XForms.Controls;
+using XForma.Controls;
 
-namespace XForms.Themes.Basic
+namespace XForma.Themes.Basic
 {
     // The Basic look of the pickers: flat fields on the surface color, and
     // popups in a thin frame

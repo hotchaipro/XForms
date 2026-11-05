@@ -1,7 +1,7 @@
 using System;
-using XForms.Platform;
+using XForma.Platform;
 
-namespace XForms.Android.Renderers
+namespace XForma.Android.Renderers
 {
     /// <summary>
     /// The renderer of every view that holds children (panels, content and

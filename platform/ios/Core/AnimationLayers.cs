@@ -4,7 +4,7 @@ using CoreGraphics;
 using Foundation;
 using UIKit;
 
-namespace XForms.iOS
+namespace XForma.iOS
 {
     /// <summary>
     /// An animator's layer: a view's Core Animation layer, with its transform

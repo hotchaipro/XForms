@@ -3,10 +3,10 @@ using System.IO;
 using System.Threading.Tasks;
 using Android.Graphics;
 using AndroidImageView = global::Android.Widget.ImageView;
-using XForms.Primitives;
-using XForms.Platform;
+using XForma.Primitives;
+using XForma.Platform;
 
-namespace XForms.Android.Renderers
+namespace XForma.Android.Renderers
 {
     internal class ImageRenderer : ViewRenderer<AndroidImageView>, IImageRenderer
     {
@@ -15,7 +15,7 @@ namespace XForms.Android.Renderers
 
         public ImageRenderer(
             global::Android.Content.Context context,
-            XForms.Primitives.Image imageControl)
+            XForma.Primitives.Image imageControl)
             : base(context, imageControl)
         {
             this._nativeImageView = new AndroidImageView(context);

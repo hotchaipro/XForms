@@ -2,12 +2,12 @@ using System;
 using Windows.Win32.Graphics.Direct2D;
 using Windows.Win32.Graphics.Direct2D.Common;
 using Windows.Win32.Graphics.DirectWrite;
-using XForms.Win32.Renderers;
+using XForma.Win32.Renderers;
 
-namespace XForms.Win32
+namespace XForma.Win32
 {
     /// <summary>
-    /// Draws XForms owner-drawn content with Direct2D, and text with DirectWrite
+    /// Draws XForma owner-drawn content with Direct2D, and text with DirectWrite
     /// (the system's own text renderer).
     /// </summary>
     internal sealed unsafe class DrawContext : DrawingContext

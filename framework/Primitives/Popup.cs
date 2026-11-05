@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using XForms.Platform;
+using XForma.Platform;
 
-namespace XForms.Primitives
+namespace XForma.Primitives
 {
     /// <summary>
     /// Shows a view above the page until it is closed: centered in the window,

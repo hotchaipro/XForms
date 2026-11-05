@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace XForms
+namespace XForma
 {
     /// <summary>
     /// Where a view sits horizontally in the space its parent gives it.

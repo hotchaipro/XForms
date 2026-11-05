@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using XForms.Primitives;
+using XForma.Primitives;
 
-namespace XForms.Platform
+namespace XForma.Platform
 {
     internal interface IElementRenderer
     {

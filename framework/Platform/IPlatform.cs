@@ -1,7 +1,7 @@
 ﻿using System;
-using XForms.Primitives;
+using XForma.Primitives;
 
-namespace XForms.Platform
+namespace XForma.Platform
 {
     internal interface IPlatform
     {

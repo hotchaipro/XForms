@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Specialized;
-using XForms.Primitives;
+using XForma.Primitives;
 using Android.Views;
 
-namespace XForms.Android
+namespace XForma.Android
 {
     internal class NativeListViewAdapter : global::Android.Widget.BaseAdapter<object>, IDisposable
     {

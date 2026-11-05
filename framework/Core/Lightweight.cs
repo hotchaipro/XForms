@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using XForms.Primitives;
-using XForms.Platform;
+using XForma.Primitives;
+using XForma.Platform;
 
-namespace XForms
+namespace XForma
 {
     /// <summary>
     /// The renderer of a lightweight view: a view with no native object of its
@@ -392,7 +392,7 @@ namespace XForms
                     : (this._horizontalTextAlignment == TextAlignment.End) ? HorizontalAlignment.Right
                     : HorizontalAlignment.Left,
                 TextWrapping = this._wordWrap ? TextWrapping.Wrap : TextWrapping.NoWrap,
-                TextTrimming = this._textTrimming ? XForms.TextTrimming.CharacterEllipsis : XForms.TextTrimming.None,
+                TextTrimming = this._textTrimming ? XForma.TextTrimming.CharacterEllipsis : XForma.TextTrimming.None,
                 MaxLines = this._maxLines,
             };
 

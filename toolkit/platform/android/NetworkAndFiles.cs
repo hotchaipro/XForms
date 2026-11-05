@@ -12,7 +12,7 @@ using Android.Webkit;
 // Connectivity reads the network's state
 [assembly: UsesPermission(global::Android.Manifest.Permission.AccessNetworkState)]
 
-namespace XForms.Toolkit
+namespace XForma.Toolkit
 {
     /// <summary>
     /// Whether the device is online, from <see cref="ConnectivityManager"/>: a

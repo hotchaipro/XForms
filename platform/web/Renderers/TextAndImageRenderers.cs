@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Runtime.Versioning;
 using System.Text;
 using System.Threading.Tasks;
-using XForms.Primitives;
-using XForms.Platform;
+using XForma.Primitives;
+using XForma.Platform;
 
-namespace XForms.Web.Renderers
+namespace XForma.Web.Renderers
 {
     /// <summary>
     /// Text in an element: the lines are broken here (as for drawn text), so
@@ -136,7 +136,7 @@ namespace XForms.Web.Renderers
                 FontWeight = this._fontWeight,
                 FontStyle = this._fontStyle,
                 TextWrapping = this._wordWrap ? TextWrapping.Wrap : TextWrapping.NoWrap,
-                TextTrimming = this._textTrimming ? XForms.TextTrimming.CharacterEllipsis : XForms.TextTrimming.None,
+                TextTrimming = this._textTrimming ? XForma.TextTrimming.CharacterEllipsis : XForma.TextTrimming.None,
                 MaxLines = this._maxLines,
                 HorizontalAlignment = (this._horizontalAlignment == TextAlignment.Center) ? HorizontalAlignment.Center
                     : (this._horizontalAlignment == TextAlignment.End) ? HorizontalAlignment.Right
@@ -228,7 +228,7 @@ namespace XForms.Web.Renderers
                         texts.Add(isLineEnd ? run.Text + "\n" : run.Text);
 
                         string decoration = (run.Underline ? "underline " : string.Empty) + (run.Strikethrough ? "line-through" : string.Empty);
-                        styles.Add($"font-weight:{(int)run.Weight};font-style:{((run.Style == XForms.FontStyle.Italic) ? "italic" : "normal")};"
+                        styles.Add($"font-weight:{(int)run.Weight};font-style:{((run.Style == XForma.FontStyle.Italic) ? "italic" : "normal")};"
                             + (run.Foreground.HasValue ? $"color:{Css(run.Foreground.Value)};" : string.Empty)
                             + ((decoration.Length > 0) ? $"text-decoration:{decoration.Trim()};" : string.Empty));
                     }

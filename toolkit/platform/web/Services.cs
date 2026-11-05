@@ -5,7 +5,7 @@ using System.Linq;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
 
-namespace XForms.Toolkit
+namespace XForma.Toolkit
 {
     /// <summary>
     /// The page's services. A page has no secret store, so secure storage is
@@ -32,7 +32,9 @@ namespace XForms.Toolkit
             _isRegistered = true;
             Clipboard.Default = new WebClipboard();
             Launcher.Default = new WebLauncher();
+            // Keeps the name from before XForma: data users already have is stored under it
             Preferences.Default = new LocalStoragePreferences("xforms.preferences.");
+            // Keeps the name from before XForma: data users already have is stored under it
             SecureStorage.Default = new LocalStorageSecrets("xforms.secure.");
             Share.Default = new WebShare();
             HapticFeedback.Default = new VibrationHapticFeedback();

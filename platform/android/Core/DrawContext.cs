@@ -1,9 +1,9 @@
 ﻿using System;
 using Android.Content;
 using Android.Graphics;
-using XForms.Android.Renderers;
+using XForma.Android.Renderers;
 
-namespace XForms.Android
+namespace XForma.Android
 {
     internal sealed class DrawContext : DrawingContext
     {
@@ -533,7 +533,7 @@ namespace XForms.Android
         {
             var oval = this.ToNativeRectFPixels(new Rect(center.X - radius, center.Y - radius, 2 * radius, 2 * radius));
 
-            // NOTE: Android measures angles from 3 o'clock; XForms from 12 o'clock
+            // NOTE: Android measures angles from 3 o'clock; XForma from 12 o'clock
             var paint = this.CreateStrokePaint(color, strokeWidth);
             this._canvas.DrawArc(oval, startDegrees - 90, sweepDegrees, false, paint);
             paint.Dispose();

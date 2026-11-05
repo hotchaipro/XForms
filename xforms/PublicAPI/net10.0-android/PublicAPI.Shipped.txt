@@ -1,1 +1,0 @@
-static XForms.XFormsApp.Run(Android.App.Activity activity, Android.OS.Bundle savedInstanceState, XForms.Application application, XForms.Controls.AppTheme theme) -> void

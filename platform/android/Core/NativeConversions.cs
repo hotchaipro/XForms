@@ -1,7 +1,7 @@
 ﻿using System;
 using Android.Content;
 
-namespace XForms.Android
+namespace XForma.Android
 {
     internal static class NativeConversions
     {

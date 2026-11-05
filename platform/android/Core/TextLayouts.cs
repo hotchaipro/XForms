@@ -4,9 +4,9 @@ using Android.Content;
 using Android.Graphics;
 using Android.Text;
 using Android.Text.Style;
-using XForms.Platform;
+using XForma.Platform;
 
-namespace XForms.Android
+namespace XForma.Android
 {
     /// <summary>
     /// Typefaces for font families (registered or installed), weights and

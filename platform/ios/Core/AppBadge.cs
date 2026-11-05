@@ -2,9 +2,9 @@
 using System.Runtime.CompilerServices;
 using UIKit;
 using UserNotifications;
-using XForms.Platform;
+using XForma.Platform;
 
-namespace XForms.iOS
+namespace XForma.iOS
 {
     /// <summary>
     /// Shows an app's <see cref="Application.BadgeCount"/> on its icon. The

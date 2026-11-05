@@ -2,10 +2,10 @@
 using Android.Graphics.Drawables;
 using Android.Views;
 using AndroidPopupWindow = global::Android.Widget.PopupWindow;
-using XForms.Primitives;
-using XForms.Platform;
+using XForma.Primitives;
+using XForma.Platform;
 
-namespace XForms.Android.Renderers
+namespace XForma.Android.Renderers
 {
     /// <summary>
     /// Shows a popup in a PopupWindow: centered in the window, or below (or,

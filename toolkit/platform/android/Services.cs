@@ -7,7 +7,7 @@ using Java.Security;
 using Javax.Crypto;
 using Javax.Crypto.Spec;
 
-namespace XForms.Toolkit
+namespace XForma.Toolkit
 {
     /// <summary>
     /// Android's services for the application.
@@ -185,6 +185,7 @@ namespace XForms.Toolkit
         public KeystoreStorage(
             Context context)
         {
+            // Keeps the name from before XForma: data users already have is stored under it
             this._alias = context.PackageName + ".xforms.secure";
             this._store = new SharedPreferencesStore(context, ".secure");
         }

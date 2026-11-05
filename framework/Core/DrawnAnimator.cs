@@ -2,7 +2,7 @@ using System;
 using System.Numerics;
 using System.Threading.Tasks;
 
-namespace XForms
+namespace XForma
 {
     /// <summary>
     /// A scale and opacity that an owner-drawn control applies to its own

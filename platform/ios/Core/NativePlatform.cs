@@ -1,10 +1,10 @@
 ﻿using System;
-using XForms.Primitives;
+using XForma.Primitives;
 
-using XForms.Platform;
-using XForms.iOS.Renderers;
+using XForma.Platform;
+using XForma.iOS.Renderers;
 
-namespace XForms.iOS
+namespace XForma.iOS
 {
     internal sealed class NativePlatform : IPlatform
     {

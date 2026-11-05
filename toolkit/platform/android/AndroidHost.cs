@@ -6,7 +6,7 @@ using Android.Content;
 using Android.OS;
 using Android.Runtime;
 
-namespace XForms.Toolkit
+namespace XForma.Toolkit
 {
     /// <summary>
     /// What the services need of the running app: its context, its activity
@@ -106,8 +106,8 @@ namespace XForms.Toolkit
         Theme = "@android:style/Theme.Translucent.NoTitleBar")]
     internal sealed class ResultActivity : Activity
     {
-        public const string IntentExtra = "xforms.intent";
-        public const string RequestCodeExtra = "xforms.requestCode";
+        public const string IntentExtra = "xforma.intent";
+        public const string RequestCodeExtra = "xforma.requestCode";
 
         private bool _isStarted;
 

@@ -1,34 +1,34 @@
-# Aligning XForms with familiar UI frameworks
+# Aligning XForma with familiar UI frameworks
 
 This document covers five things:
-- the main gaps in the XForms framework layer, compared with other UI
+- the main gaps in the XForma framework layer, compared with other UI
   frameworks;
-- options for aligning XForms' API with a framework developers already know;
-- a recommendation, including how XForms should draw and animate;
-- the legacy mechanisms XForms should deliberately leave behind, and a
+- options for aligning XForma's API with a framework developers already know;
+- a recommendation, including how XForma should draw and animate;
+- the legacy mechanisms XForma should deliberately leave behind, and a
   proposed mapping from current names to new ones;
 - whether another UI framework, such as one with XAML, could be built on
-  XForms' public API, and a proof of concept to find out.
+  XForma's public API, and a proof of concept to find out.
 
-The goal is for XForms to feel familiar, so that developers recognize its
+The goal is for XForma to feel familiar, so that developers recognize its
 concepts and names, and for controls, view models and app logic to port with
 modest rework. But familiar names shouldn't bring legacy mechanics with them:
-XForms is free to break with designs that other frameworks keep only for
+XForma is free to break with designs that other frameworks keep only for
 backward compatibility.
 
 It's a proposal. Nothing here is implemented yet. See
-[architecture.md](architecture.md) for how XForms works today and
+[architecture.md](architecture.md) for how XForma works today and
 [comparisons.md](comparisons.md) for how it differs from other frameworks.
 
 ## Summary
 
 - **Framework layer.** Use the vocabulary shared by WPF, WinUI and Avalonia
-  for layout, view properties, input, focus and drawing. XForms' layout
+  for layout, view properties, input, focus and drawing. XForma's layout
   already follows WPF's model (Measure and Arrange, `MeasureOverride` and
   `ArrangeOverride`, Margin, alignment, desired size), and it's the model the
   most .NET UI developers know.
 - **App layer.** Follow .NET MAUI for lifecycle, navigation and platform
-  services, where MAUI is strongest and where XForms' Xamarin.Forms heritage
+  services, where MAUI is strongest and where XForma's Xamarin.Forms heritage
   already points.
 - **Familiar names, not legacy mechanics.** Adopt the names developers know,
   but not the mechanisms those frameworks keep only for compatibility. That
@@ -38,7 +38,7 @@ It's a proposal. Nothing here is implemented yet. See
 - **Data binding.** Use plain observable properties and typed bindings with
   an explicit source, so MVVM view models port without a DependencyProperty
   system, XAML or reflection.
-- **Drawing.** Keep XForms' own drawing API, implemented on each platform's
+- **Drawing.** Keep XForma's own drawing API, implemented on each platform's
   native 2D library. Don't build on Skia.
 - **Animation.** A view that animates is given an animator at construction,
   which holds its translation, scale, rotation, opacity and clip. The public
@@ -56,7 +56,7 @@ It's a proposal. Nothing here is implemented yet. See
   time, and the public API never mentions layers, so this can be built later
   without breaking changes.
 - **Code first.** XAML stays optional; a markup layer could come later.
-- **Rename now.** SoonerOrLater is the only app built on XForms, so breaking
+- **Rename now.** SoonerOrLater is the only app built on XForma, so breaking
   changes are cheap today and expensive later.
 
 ## Gap analysis
@@ -65,7 +65,7 @@ The comparison is against WPF, WinUI and Avalonia, MAUI, Flutter and React
 Native. Priority reflects how soon apps, and controls ported from elsewhere,
 run into the gap.
 
-| Priority | Area | XForms today | What developers expect |
+| Priority | Area | XForma today | What developers expect |
 |---|---|---|---|
 | 1 | **Properties and binding** | `BindingContext` (a plain object) and attached properties. No change notification, no bindings | Observable properties, bindings to view models, `INotifyPropertyChanged`, commands (MVVM) |
 | 1 | **Layout panels** | `DockLayout`, `DistributedStackLayout` | Grid, a stack panel with spacing, wrap, canvas, Border |
@@ -94,7 +94,7 @@ Adopt the names and shapes these three frameworks share: `Grid`,
 key events on views, focus events, `Padding`, and `Render(DrawingContext)`.
 
 - **For:**
-  - XForms already follows this layout model, so the change is mostly names
+  - XForma already follows this layout model, so the change is mostly names
     plus filling gaps.
   - It's the largest pool of .NET UI developers: WPF, UWP, WinUI, Avalonia
     and Uno.
@@ -111,12 +111,12 @@ Adopt MAUI's names: `Label`, `Entry`, `Editor`, `VerticalStackLayout`,
 `CollectionView`, `BindableProperty`, `ContentPage`, Shell.
 
 - **For:**
-  - XForms descends from Xamarin.Forms (`Page`, `BindingContext`, one
+  - XForma descends from Xamarin.Forms (`Page`, `BindingContext`, one
     renderer per element), so the app model is already close.
   - Many teams have Xamarin.Forms or MAUI apps and want a custom look.
 - **Against:**
   - MAUI's controls are native controls with a native look, the opposite of
-    XForms' toolkit. Only view models, the app model and services port well.
+    XForma's toolkit. Only view models, the app model and services port well.
   - MAUI's layout and drawing vocabulary (`GraphicsView`, `ICanvas`) is less
     widely known than WPF's.
 
@@ -131,7 +131,7 @@ MauiReactor and Comet sit on top of MAUI.
 
 ### D. Compatibility shims
 
-Libraries that imitate a subset of the WPF or MAUI API on top of XForms.
+Libraries that imitate a subset of the WPF or MAUI API on top of XForma.
 
 - **Against:** a shim is always partial, and porting fails at whatever falls
   outside the subset. Not recommended.
@@ -141,10 +141,10 @@ Libraries that imitate a subset of the WPF or MAUI API on top of XForms.
 ### 1. Framework layer: WPF, WinUI and Avalonia vocabulary
 
 Where the three frameworks agree, use their shared name. Where they differ,
-prefer Avalonia's, since it's the cross-platform one and closest to XForms in
+prefer Avalonia's, since it's the cross-platform one and closest to XForma in
 spirit (for example, `IsVisible` and `Render`). Keep names that are specific
-to XForms where none of them has an equivalent, such as the swipe gesture.
-Also keep them where XForms deliberately differs (see
+to XForma where none of them has an equivalent, such as the swipe gesture.
+Also keep them where XForma deliberately differs (see
 [What to leave behind](#what-to-leave-behind)), and take the animation API
 from Hot Chai's game engine (see [Animation](#5-animation-an-animator-given-to-a-view-at-construction)).
 
@@ -202,9 +202,9 @@ metadata, coercion). Instead:
 This lets MVVM view models from WPF, Avalonia or MAUI apps move over
 unchanged. Only the binding code in the views is rewritten.
 
-### 4. Drawing: XForms' own API on native 2D libraries
+### 4. Drawing: XForma's own API on native 2D libraries
 
-Keep `DrawingContext` as XForms' own thin API, shaped like WPF and Avalonia's
+Keep `DrawingContext` as XForma's own thin API, shaped like WPF and Avalonia's
 `DrawingContext` so drawing code ports. Implement it on each platform's
 native 2D library:
 - Win32: Direct2D, drawing into DirectComposition surfaces.
@@ -219,7 +219,7 @@ filling the drawing gaps means thin wrappers rather than new engines.
 Don't build on Skia (SkiaSharp), as a foundation or as an optional view:
 - **Text.** Text drawn by owner-drawn controls would be shaped and rasterized
   by Skia, while `TextBlock` and `TextBox` next to it use DirectWrite, Core
-  Text or Android's text stack. Native text is a core XForms principle.
+  Text or Android's text stack. Native text is a core XForma principle.
 - **Composition.** On Win32, Skia has no path into Direct2D and
   DirectComposition surfaces without extra copies. On Android, a separate
   Skia surface loses the integration with the system's own rendering.
@@ -374,7 +374,7 @@ an animation start from wherever a view currently appears.
   work this way. This keeps simple controls, such as buttons, free of any
   animator.
 
-**Layout properties are never animated.** XForms won't offer per-frame
+**Layout properties are never animated.** XForma won't offer per-frame
 animation of width, height, margin or any other property that affects
 layout, not even as an opt-in. That's the expensive pattern: a measure and
 arrange pass (and often a redraw) on the UI thread every frame, which is
@@ -386,7 +386,7 @@ back to zero (`Animator.TranslateFrom(oldOffset, zero)`). A move that
 interrupts another continues from wherever the view appears. This is the
 FLIP technique ("first, last, invert, play"). Size changes use the clip
 channel to reveal or hide, because scaling distorts text. Native lists
-animate row changes this way, and so does XForms' list-item reveal on all
+animate row changes this way, and so does XForma's list-item reveal on all
 three platforms.
 
 A panel that animates its children's layout changes needs an `Animator` for
@@ -408,7 +408,7 @@ UI needs with less API (see [What to leave behind](#what-to-leave-behind)).
 **Differences from HotChai.Game.** The engine gives every control its own
 transform values as well as an `Animator`, and adds the two together when it
 draws. That's nearly free in a game engine, which combines transforms on the
-CPU every frame anyway. XForms reaches the same result, a control's own
+CPU every frame anyway. XForma reaches the same result, a control's own
 effects and an app's animations that never interrupt each other, by nesting
 compositor layers instead of adding values. And only views given an animator
 have render properties at all, because every animated view needs a layer.
@@ -433,7 +433,7 @@ have render properties at all, because every animated view needs a layer.
 
 ### 6. Lightweight controls and layers
 
-**The problem.** Today every view in XForms has its own native object: an
+**The problem.** Today every view in XForma has its own native object: an
 Android `View`, a UIKit view, or a DirectComposition visual with its own
 surface. A command bar with five buttons is six native objects, and every row
 of a command list adds more. Native objects cost time to create and memory to
@@ -472,7 +472,7 @@ created. Nothing is promoted at run time.
 
 There is no automatic promotion. Browsers create compositing layers
 implicitly whenever content animates, which leads to unpredictable memory use
-and to hints like `will-change` added to steer the heuristics. In XForms, a
+and to hints like `will-change` added to steer the heuristics. In XForma, a
 layer's cost is visible in the code that creates the view.
 
 A layer is the lightest native container that can also host native
@@ -491,7 +491,7 @@ primitives (a layer may contain a `TextBox`):
   close animation already uses.
 - **Accessibility.** Lightweight views are exposed through virtual
   accessibility nodes: Android's `AccessibilityNodeProvider`, iOS's
-  `UIAccessibilityElement`, and the UI Automation providers XForms already
+  `UIAccessibilityElement`, and the UI Automation providers XForma already
   has on Win32, which are virtual already.
 - **Hit-testing and input** are done by the framework for lightweight views,
   the way the Win32 backend already dispatches input itself.
@@ -538,7 +538,7 @@ So lightweight views are worth doing, and Android is the strongest reason.
 
 ### 7. Theming: a mode, design tokens and styles
 
-"Theme" means three different things in other frameworks, and XForms keeps
+"Theme" means three different things in other frameworks, and XForma keeps
 them apart:
 
 | Concept | What it is | Precedent |
@@ -547,7 +547,7 @@ them apart:
 | **Design tokens** | Semantic colors, a type scale, shapes and motion, resolved for a mode | Flutter's `ThemeData`, Compose's `MaterialTheme`, WinUI's theme resources |
 | **Skin** | How each control looks | Templates in WPF, WinUI and Avalonia; the control's own drawing, with component themes, in Flutter and Compose |
 
-XForms' controls draw themselves and its properties are typed, so it follows
+XForma's controls draw themselves and its properties are typed, so it follows
 Flutter and Compose:
 - **`ThemeMode`.** An enum: `Light`, `Dark` and `HighContrast`. The platform
   reports the system's mode and raises a change event. An app can follow it
@@ -561,7 +561,7 @@ Flutter and Compose:
     text formats, using the generic font families.
   - `Shapes`: corner radii (small, medium, large).
   - `Motion`: durations and easings (short, medium, emphasized).
-  - XForms provides a theme for each mode, built from the system's accent
+  - XForma provides a theme for each mode, built from the system's accent
     color. An app can build its own (a brand's colors, its type scale).
 - **Scoped.** Any view can set a `Theme` for itself and its descendants (a
   dark section in a light app, or a brand-colored banner). A view's
@@ -580,10 +580,10 @@ Flutter and Compose:
   enum, so keeping the name with another meaning would mislead MAUI
   developers, and five colors leave controls to hard-code the rest.
 - **String-keyed resource dictionaries** (WPF, WinUI, MAUI). They lose type
-  checking and refactoring, and need the dependency property engine XForms
+  checking and refactoring, and need the dependency property engine XForma
   doesn't adopt (see [Properties and binding](#3-properties-and-binding)).
-- **Control templates.** XForms' controls draw themselves (see
-  [Drawing](#4-drawing-xforms-own-api-on-native-2d-libraries)), so there's
+- **Control templates.** XForma's controls draw themselves (see
+  [Drawing](#4-drawing-xforma-own-api-on-native-2d-libraries)), so there's
   no visual tree to template.
 
 ### 8. Be clear about what ports
@@ -597,9 +597,9 @@ Flutter and Compose:
 ## What to leave behind
 
 These are mechanisms other frameworks keep mainly for backward
-compatibility. XForms should use familiar names without inheriting them.
+compatibility. XForma should use familiar names without inheriting them.
 
-| Legacy mechanism | Where it comes from | Why leave it | XForms instead |
+| Legacy mechanism | Where it comes from | Why leave it | XForma instead |
 |---|---|---|---|
 | Animating layout properties (dependent animations, `LayoutTransform`) | WPF, WinUI | Runs layout every frame on the UI thread | Render-property animations and layout transitions |
 | A dependency property engine with value precedence, inheritance and coercion | WPF, WinUI, Avalonia | Complex, slow to reason about, needed mostly by XAML styling | Plain observable properties |
@@ -625,7 +625,7 @@ keeping it is what lets them port unchanged.
 ## Proposed name mapping
 
 "Familiar from" names the frameworks a developer would recognize the new name
-from. Where XForms keeps its own name, the reason is in
+from. Where XForma keeps its own name, the reason is in
 [What to leave behind](#what-to-leave-behind).
 
 ### Framework: types
@@ -634,7 +634,7 @@ from. Where XForms keeps its own name, the reason is in
 |---|---|---|---|
 | `View` | `View` | MAUI | Keep. Avalonia and WinUI developers know it as `Control` or `UIElement`; `View` is clearer for a base that includes primitives |
 | `Layout` | `Panel` | WPF, WinUI, Avalonia | Base for layout containers; children are added with typed layout parameters |
-| `DockLayout` | `DockPanel` | WPF, Avalonia | `DockRegion` becomes `Dock` (Left, Top, Right, Bottom). The overlay regions remain an XForms extension |
+| `DockLayout` | `DockPanel` | WPF, Avalonia | `DockRegion` becomes `Dock` (Left, Top, Right, Bottom). The overlay regions remain an XForma extension |
 | `DistributedStackLayout` | `UniformGrid` | WPF, Avalonia | With one row (or column), it spaces children evenly |
 | (new) | `StackPanel` | WPF, WinUI, Avalonia | With `Spacing` |
 | (new) | `Grid` | WPF, WinUI, Avalonia | Rows and columns: Auto, star, fixed |
@@ -654,7 +654,7 @@ from. Where XForms keeps its own name, the reason is in
 | `Page`, `Frame` | `Page`, `Frame` | WinUI, MAUI | Keep |
 | `Popup` | `Popup` | WinUI, Avalonia | Keep; `PlacementTarget` already matches Avalonia and WPF |
 | `ILightDismissTarget` | `Popup.IsLightDismissEnabled`, and a light-dismiss layer for flyouts | WinUI | |
-| `IDrawContext` | `DrawingContext` | WPF, Avalonia | XForms' own API on native 2D libraries |
+| `IDrawContext` | `DrawingContext` | WPF, Avalonia | XForma's own API on native 2D libraries |
 | `TextFormat` | `TextLayout` | Avalonia, DirectWrite | Immutable; for measuring and drawing, single- or multi-line |
 | `Rectangle` | `Rect` | WPF, WinUI, Avalonia | |
 | `Point`, `Size`, `Thickness`, `Color`, `Colors` | Keep | All | `float` coordinates |
@@ -722,7 +722,7 @@ from. Where XForms keeps its own name, the reason is in
 
 ### Toolkit
 
-The toolkit became `XForms.Controls` in phase 21, after taking the panels,
+The toolkit became `XForma.Controls` in phase 21, after taking the panels,
 gestures and controls' base classes from the framework in phase 20 (see
 [Layering](#layering)).
 
@@ -743,7 +743,7 @@ gestures and controls' base classes from the framework in phase 20 (see
 | `TabBar`, `TabButton` | `TabStrip`, `TabStripItem` | Avalonia | Or `TabView` (WinUI) for closable tabs |
 | `CommandListView` | Keep, as a toolkit composite | | WinUI's equivalent is `ListView` with `SwipeControl` items |
 | `UICommand`, `Command` | `UICommand`, and `RelayCommand` | CommunityToolkit.Mvvm | Not `XamlUICommand` |
-| `FloatingButton`, `ImageToggleButton`, `DaysOfWeekPicker` | Keep | | XForms-specific; no shared equivalent |
+| `FloatingButton`, `ImageToggleButton`, `DaysOfWeekPicker` | Keep | | XForma-specific; no shared equivalent |
 
 ## Open decisions
 
@@ -761,12 +761,12 @@ gestures and controls' base classes from the framework in phase 20 (see
    are the most recognizable. Some, like `CommandListView`, describe the
    toolkit's own design better than any shared name. **Recommended: use the
    WinUI names where the behavior matches, except Windows 8-era names, and
-   keep XForms names where the behavior differs.**
+   keep XForma names where the behavior differs.**
 4. **A general transform matrix.** Translation, scale and rotation cover
    almost every UI need, as the Animator's channels. **Recommended: leave out
    skew and arbitrary matrices** until a real control needs them.
 
-## Could other UI frameworks be built on XForms?
+## Could other UI frameworks be built on XForma?
 
 A good test of the framework is whether another UI framework, such as one
 with XAML, could be built on it using only the public framework API: no
@@ -780,14 +780,14 @@ markup, the property system, styles, templates, resources, bindings, visual
 states and routed events. It needs relatively little from the platform.
 Avalonia shows this: its platform layer is small (windowing, input, a drawing
 backend, clipboard and similar services), and everything above it is portable
-C#. The XForms framework sits at about that level. A XAML layer on XForms
+C#. The XForma framework sits at about that level. A XAML layer on XForma
 would also keep native text, because `TextBlock` and `TextBox` would map to
-XForms' native text primitives.
+XForma's native text primitives.
 
-A XAML layer could also bring back the mechanisms XForms leaves out, such as
+A XAML layer could also bring back the mechanisms XForma leaves out, such as
 dependency properties, inherited data contexts, string-path bindings and
 tunneling events, implemented in the layer itself for apps that want them.
-XForms just doesn't build them into the framework.
+XForma just doesn't build them into the framework.
 
 What a XAML layer needs, and whether the public framework API provides it
 today:
@@ -818,7 +818,7 @@ because control libraries need them too. So the answer is:
 
 The bigger risk is performance, not capability. XAML templates create many
 elements; even a simple templated `Button` is a `Border`, a
-`ContentPresenter` and a `TextBlock`. In XForms today, every view has a
+`ContentPresenter` and a `TextBlock`. In XForma today, every view has a
 native object: an Android `View`, a UIKit view or a DirectComposition
 visual. Thousands of them would be expensive, especially on Android.
 
@@ -841,9 +841,9 @@ lightweight controls once they're available.
 
 ### Proof of concept
 
-Build a small XAML layer, **XForms.Xaml**, as a throwaway spike.
+Build a small XAML layer, **XForma.Xaml**, as a throwaway spike.
 
-- **Project:** a separate project that references only `XForms.Framework`. The
+- **Project:** a separate project that references only `XForma.Framework`. The
   compiler then blocks framework internals and platform code, so whatever
   the spike needs is visible as missing public API.
 - **XAML subset:**
@@ -861,7 +861,7 @@ Build a small XAML layer, **XForms.Xaml**, as a throwaway spike.
   Android.
 
 **Success criteria:**
-- No platform-specific code in XForms.Xaml.
+- No platform-specific code in XForma.Xaml.
 - No access to framework internals.
 - Every framework API the spike needed either already exists or is an item
   in this document's plan. Record each one, with how the spike worked around
@@ -873,9 +873,9 @@ throwaway, the renames won't make it obsolete in any way that matters.
 
 ### Proof of concept results
 
-**Verdict: yes.** The spike is in `spikes/XForms.Xaml`: a run-time parser of
+**Verdict: yes.** The spike is in `spikes/XForma.Xaml`: a run-time parser of
 about 1,000 lines with a handful of elements. It references only
-`XForms.Framework`. The test app's XAML page (`XFORMS_TEST_PAGE=xaml` on
+`XForma.Framework`. The test app's XAML page (`XFORMA_TEST_PAGE=xaml` on
 Win32, `--es page xaml` on Android) runs unchanged on Win32 and Android. It
 covers:
 - implicit and keyed styles, `{StaticResource}` and color resources;
@@ -887,7 +887,7 @@ covers:
 - a storyboard that fades and slides the card in.
 
 All three success criteria hold:
-- XForms.Xaml contains no platform code.
+- XForma.Xaml contains no platform code.
 - It uses no framework internals.
 - Every missing API it hit is already in the plan below, apart from the
   four marked **new**, which are now added to it.
@@ -901,7 +901,7 @@ All three success criteria hold:
 | `TextEntry` raises no event when its text changes | None: two-way bindings behave as one-way | 3, **done**: `TextBox.TextChanged`, and views raise `PropertyChanged`; the spike's `TwoWay` bindings work |
 | No opacity animation, and no frame callback | Opacity is stepped on the UI thread by a timer; translation uses `TranslateTo` | 6, **done**: `FadeTo` and `Application.RequestAnimationFrame` |
 | No loaded or attached event | The storyboard starts in a UI-thread callback queued from the page's constructor | 1, **new**: `Attached` and `Detached` events, which come with creating renderers at attach |
-| `XForms.Timer` hides `System.Threading.Timer` in any file that uses `XForms` | Fully qualified name | 1, **new**: rename it to `DispatcherTimer` |
+| `XForma.Timer` hides `System.Threading.Timer` in any file that uses `XForma` | Fully qualified name | 1, **new**: rename it to `DispatcherTimer` |
 | The primitives look different on each platform: `Control.BackgroundColor` is painted behind owner-drawn controls on Android but not on Win32, the default text color is black on Win32 and Android's gray, and `TextEntry`'s background is white on Win32 and gray on Android | Owner-drawn spike elements report a transparent background | 2, **done**: the spike's workarounds are gone |
 
 **What worked as is:**
@@ -935,7 +935,7 @@ Each phase leaves the framework and toolkit building and SoonerOrLater
 working. Do the renames first, while SoonerOrLater is the only app to update.
 
 Before phase 1 (both done):
-- Run the XForms.Xaml proof of concept described above. See
+- Run the XForma.Xaml proof of concept described above. See
   [Proof of concept results](#proof-of-concept-results).
 - Run the native-object benchmark described in
   [Lightweight controls and layers](#6-lightweight-controls-and-layers). See
@@ -956,7 +956,7 @@ Neither changed the order of the phases. Both added items, which are below.
      their nested layers.
    - Create renderers when a view is first attached, instead of in
      `Element`'s constructor, and raise `Attached` and `Detached` events.
-   - Rename `XForms.Timer` to `DispatcherTimer`, so it no longer hides
+   - Rename `XForma.Timer` to `DispatcherTimer`, so it no longer hides
      `System.Threading.Timer`.
 
    **Status: done**, except the renames that belong with a later phase's
@@ -1077,7 +1077,7 @@ Neither changed the order of the phases. Both added items, which are below.
        so view models don't keep views alive. `Bind` returns a `Binding`
        to dispose early.
    - **Commands:**
-     - Controls take `System.Windows.Input.ICommand`; XForms' own
+     - Controls take `System.Windows.Input.ICommand`; XForma's own
        `ICommand` is gone.
      - `Button` gained `Command` and `CommandParameter`, and is enabled
        while the command can run.
@@ -1302,7 +1302,7 @@ Neither changed the order of the phases. Both added items, which are below.
      surface and error, each with its "on" color, plus subtle foreground,
      outline and disabled), `Typography` (display, title, body, label,
      caption), `Shapes` (corner radii) and `Motion` (durations and easings).
-     `Theme.Create(mode, accent)` builds XForms' themes, and `WithStyle`
+     `Theme.Create(mode, accent)` builds XForma's themes, and `WithStyle`
      adds default control styles.
    - **Scoped:** `View.Theme` sets a theme for a view and its descendants,
      and `ActualTheme` is the effective one (a popup inherits from the view
@@ -1366,7 +1366,7 @@ Neither changed the order of the phases. Both added items, which are below.
      no animator, whose parent allows it. Pages, list rows, scroll views'
      content and popups' content are layers; so are views with animators,
      and native primitives (text boxes, images, lists, scroll views). An
-     `AppContext` switch (`XForms.DisableLightweightViews`) turns lightweight
+     `AppContext` switch (`XForma.DisableLightweightViews`) turns lightweight
      views off, for comparison.
    - **Android and iOS** use the framework's lightweight renderers:
      - The layer's native view draws its lightweight descendants beneath its
@@ -1752,9 +1752,9 @@ Android and, from phase 17, the browser.
     - A test host page and a web build of the test app.
 
     **Status: done.**
-    - **`platform/web`** (`XForms.Framework.Web`): .NET 10 on WebAssembly,
-      with `[JSImport]` and `[JSExport]` and one script, `xforms.js`
-      (served to apps as `_content/XForms.Framework.Web/`). Apps call
+    - **`platform/web`** (`XForma.Framework.Web`): .NET 10 on WebAssembly,
+      with `[JSImport]` and `[JSExport]` and one script, `xforma.js`
+      (served to apps as `_content/XForma.Framework.Web/`). Apps call
       `WebApplication.RunAsync(title, createApp)`.
     - **Layers and drawing:** each layer is an absolutely positioned element.
       Lightweight views and owner-drawn controls draw into a `<canvas>` under
@@ -1765,7 +1765,7 @@ Android and, from phase 17, the browser.
       transforms and opacity are supported.
     - **Layout:** the framework lays the root out to the viewport on
       animation frames, as Win32's host does; elements get their bounds in
-      CSS pixels (XForms' DIPs), and canvases draw at the device pixel
+      CSS pixels (XForma's DIPs), and canvases draw at the device pixel
       ratio.
     - **Text:** measured with the canvas and broken into lines in .NET, so
       drawn text and text elements break alike; a text block is an element
@@ -1787,7 +1787,7 @@ Android and, from phase 17, the browser.
       `<textarea>`), scroll views (native overflow), lists (every item, not
       yet virtualized; no pull-to-refresh), popups (over a backdrop that
       dismisses them).
-    - **Test app:** `test/XForms.Test.Web`, with `?page=` picking the page.
+    - **Test app:** `test/XForma.Test.Web`, with `?page=` picking the page.
       `dotnet publish` it and serve `wwwroot` (the SDK's development server
       didn't serve the app's files here).
     - **Verified** in the browser: the default, accessibility, drawing,
@@ -1862,12 +1862,12 @@ to go:
 
 | Assembly | Layer | Builds on |
 |---|---|---|
-| `XForms.Framework` (+ `.Win32`, `.Android`, `.iOS`, `.Web`) | The platform contract: elements, layout, drawing, raw input, and the views the platforms render | — |
-| `XForms.Toolkit` (+ `.Win32`, `.Android`, `.iOS`, `.Web`) | Cross-platform services for any .NET app, with nothing about a UI (phases 22, 23 and 25) | — |
-| `XForms` (was XForms.Controls; multi-targeted) | Functional controls (what they do, not how they look) and their base classes; panels, gestures and binding; the app's entry point (`XFormsApp.Run`, phase 25) | Framework, Toolkit |
-| `XForms.Themes.<Name>` | How the controls look: `Basic` first | Controls |
-| `XForms.Xaml` | Markup | Framework, Controls |
-| `XForms.Compat.WinUI` | WinUI's API over XForms' controls | Controls, Xaml |
+| `XForma.Framework` (+ `.Win32`, `.Android`, `.iOS`, `.Web`) | The platform contract: elements, layout, drawing, raw input, and the views the platforms render | — |
+| `XForma.Toolkit` (+ `.Win32`, `.Android`, `.iOS`, `.Web`) | Cross-platform services for any .NET app, with nothing about a UI (phases 22, 23 and 25) | — |
+| `XForma` (was XForma.Controls; multi-targeted) | Functional controls (what they do, not how they look) and their base classes; panels, gestures and binding; the app's entry point (`XFormaApp.Run`, phase 25) | Framework, Toolkit |
+| `XForma.Themes.<Name>` | How the controls look: `Basic` first | Controls |
+| `XForma.Xaml` | Markup | Framework, Controls |
+| `XForma.Compat.WinUI` | WinUI's API over XForma's controls | Controls, Xaml |
 
 Two findings shaped the order:
 
@@ -1892,7 +1892,7 @@ Win32, Android and the browser, as before.
 
 19. **Platform contract.** The platforms' side of the framework, made
     explicit and enforced. No change to apps' API.
-    - **A contract namespace, `XForms.Platform`:** `IPlatform`, the renderer
+    - **A contract namespace, `XForma.Platform`:** `IPlatform`, the renderer
       interfaces (`IViewRenderer`, `IListViewRenderer` and the rest) and the
       hosts below. The renderer interfaces become internal, visible only to
       the platforms, since apps never use them.
@@ -1915,17 +1915,17 @@ Win32, Android and the browser, as before.
       - `Focusable` and the accessibility actions a view supports are set by
         the view, not inferred from tap handlers.
     - **An analyzer** (from HotChai.Game's HCG0002): in a platform assembly,
-      a framework internal outside `XForms.Platform`, and not marked
+      a framework internal outside `XForma.Platform`, and not marked
       `[PlatformContract]`, is a build error.
     - **Decide:** whether the renderer interfaces should stay public, so a
       platform could live outside this repository. Making them internal is
       simpler and can be undone.
 
     **Status: done.**
-    - **The analyzer** (`analyzers/XForms.Analyzers`, rule XF0001) runs on
-      every `XForms.Framework.*` project. On the first build it found 50
+    - **The analyzer** (`analyzers/XForma.Analyzers`, rule XF0001) runs on
+      every `XForma.Framework.*` project. On the first build it found 50
       framework internals the platforms used; none are left.
-    - **`XForms.Platform`** holds `IPlatform`, every renderer interface (and
+    - **`XForma.Platform`** holds `IPlatform`, every renderer interface (and
       the two callbacks the platforms make into views, `ITextBoxDelegate` and
       `IPopupDelegate`), `PlatformContractAttribute` and the hosts, in
       `framework/Platform`. The interfaces stay public: apps pass `IPlatform`
@@ -1998,10 +1998,10 @@ Win32, Android and the browser, as before.
         on it, but it's a plain container with no renderer of its own.
         `Frame` stays a native view, since its renderer runs page
         transitions.
-    - **Namespaces:** `XForms.Controls` in the framework becomes
-      `XForms.Primitives`, holding only the views the platforms implement
+    - **Namespaces:** `XForma.Controls` in the framework becomes
+      `XForma.Primitives`, holding only the views the platforms implement
       natively: `TextBlock`, `TextBox`, `Image`, `ScrollViewer`, the items
-      view below and `Popup`. That frees `XForms.Controls` for the controls
+      view below and `Popup`. That frees `XForma.Controls` for the controls
       assembly.
     - **Gestures** move to the toolkit (renamed in phase 21):
       - Tap, double tap and hold become recognizers, replacing `View`'s
@@ -2040,8 +2040,8 @@ Win32, Android and the browser, as before.
       `LayoutTransition`, built only on public and protected API. Two
       members became public for them: `Animator.TranslateByOffset` (layout
       transitions) and `View.ContentPadding` (protected). `Orientation`
-      moved to the `XForms` namespace, since lists use it too.
-    - **`XForms.Primitives`:** `TextBlock`, `TextBox`, `Image`,
+      moved to the `XForma` namespace, since lists use it too.
+    - **`XForma.Primitives`:** `TextBlock`, `TextBox`, `Image`,
       `ScrollViewer`, `Popup`, and the items view. `TextBox` derives from
       `View` and sends its own background.
     - **Lists:** the items view is `ItemsView`, with `ItemContainer` and
@@ -2071,21 +2071,21 @@ Win32, Android and the browser, as before.
       delegate (`OnTapBegan`, `OnTapEnded`); themes will draw from
       `IsPressed`.
 
-21. **Rename the toolkit to `XForms.Controls`.** The functional controls,
+21. **Rename the toolkit to `XForma.Controls`.** The functional controls,
     which say what a control does and leave how it looks to a theme.
-    - `toolkit/XForms.Toolkit` becomes `controls/XForms.Controls`, with the
-      namespace `XForms.Controls` (and `XForms.Layouts` and `XForms.Input`
+    - `toolkit/XForma.Toolkit` becomes `controls/XForma.Controls`, with the
+      namespace `XForma.Controls` (and `XForma.Layouts` and `XForma.Input`
       for the panels and gestures it now holds).
     - Update both solutions, the test apps, SoonerOrLater and the docs
       (`architecture.md`'s layout and rules, this document's name mapping).
 
     **Status: done.**
-    - `controls/XForms.Controls` (assembly and root namespace
-      `XForms.Controls`). The former `XForms.Toolkit` types are in
-      `XForms.Controls`, with `Control`, `ContentControl`, `UserControl`,
+    - `controls/XForma.Controls` (assembly and root namespace
+      `XForma.Controls`). The former `XForma.Toolkit` types are in
+      `XForma.Controls`, with `Control`, `ContentControl`, `UserControl`,
       `Border` and now `Panel`, `ViewCollection` and `LayoutTransition`;
-      the panels stay in `XForms.Layouts` and the gesture recognizers in
-      `XForms.Input`.
+      the panels stay in `XForma.Layouts` and the gesture recognizers in
+      `XForma.Input`.
     - Both solutions, the test apps, the XAML spike and SoonerOrLater
       reference it; `architecture.md` and the README describe the layers
       as they are now.
@@ -2098,7 +2098,7 @@ Win32, Android and the browser, as before.
     all, moves out.
 
     **Status: done.**
-    - **`XForms.Toolkit`** (new, `toolkit/`), what apps use besides
+    - **`XForma.Toolkit`** (new, `toolkit/`), what apps use besides
       controls, for any control set:
       - **Services** (clipboard, launcher, preferences, secure storage,
         sharing, connectivity, file pickers, haptics). The platforms still
@@ -2116,7 +2116,7 @@ Win32, Android and the browser, as before.
       colors), so it's the system's vocabulary rather than our controls'.
       Everything else is a theme **extension** a control library adds,
       after Flutter's `ThemeExtension`: `GetExtension` and `WithExtension`
-      replace `GetStyle` and `WithStyle`. XForms.Controls' `Typography`,
+      replace `GetStyle` and `WithStyle`. XForma.Controls' `Typography`,
       `TextStyle`, `Shapes` and `Motion` are extensions, read through
       extension properties (`theme.Typography`), with defaults when a theme
       has none. `Frame` times its own transitions (`TransitionDuration`).
@@ -2125,7 +2125,7 @@ Win32, Android and the browser, as before.
       when the page closes (`Page.CloseModalAsync`); a page keeps its own
       result.
     - **Light dismiss:** `ILightDismissTarget` and
-      `Application.LightDismissTarget` are gone. XForms.Controls'
+      `Application.LightDismissTarget` are gone. XForma.Controls'
       `LightDismissControl` handles the general
       `Application.PreviewPointerInput` while it's open.
     - **Verified:**
@@ -2163,14 +2163,14 @@ Win32, Android and the browser, as before.
         including the placeholder's. iOS builds only.
 
 23. **Platform layers.** Each layer's platform code lives in its own
-    platform assemblies, apps host XForms without deriving from XForms
+    platform assemblies, apps host XForma without deriving from XForma
     types, and the layers are enforced, so they stay clean.
 
     **Status: done.** As planned below, in four commits:
     - **Hosting:** `Application()`, and `Run` on every platform, with no
       native base classes; Android moves the running app to a re-created
       activity.
-    - **The toolkit's platforms:** `XForms.Toolkit.Win32`, `.Android`,
+    - **The toolkit's platforms:** `XForma.Toolkit.Win32`, `.Android`,
       `.iOS` and `.Web` (in `toolkit/platform/`), registered with
       `Win32ToolkitServices.Register()` and the like; the framework's
       platforms no longer reference the toolkit.
@@ -2192,12 +2192,12 @@ Win32, Android and the browser, as before.
         screen; phase 24 compared its main page properly, against phases 20
         and 22: pixel for pixel.)
       - The browser: navigation and a modal page; preferences, secure
-        storage, the network and haptics through `xforms-toolkit.js`;
+        storage, the network and haptics through `xforma-toolkit.js`;
         SoonerOrLater.
       - The build: a framework platform referencing the toolkit fails with
         XF0002; a new public type in a platform fails with RS0016.
     - **Not done:**
-      - iOS builds only: its new hosting (`Run(args, ...)` with XForms'
+      - iOS builds only: its new hosting (`Run(args, ...)` with XForma's
         delegates, or `Run(windowScene, ...)`) hasn't run.
       - Not exercised: Back before Android 13 (the emulator runs Android
         16), dark mode and text size changing in place on Android (that
@@ -2210,8 +2210,8 @@ Win32, Android and the browser, as before.
       (clipboard, launcher, preferences, secure storage, sharing, haptics,
       connectivity, file pickers: about 1,850 lines across
       `Core/Services.cs`, `NetworkAndFiles.cs` and Win32's
-      `FileDialogs.cs`) live in `XForms.Framework.<Platform>`, so all four
-      reference `XForms.Toolkit` and register its services as they start.
+      `FileDialogs.cs`) live in `XForma.Framework.<Platform>`, so all four
+      reference `XForma.Toolkit` and register its services as they start.
       The layer below depends on the layer above.
     - **What the services need from the platforms is small:**
       - Win32: the main window's handle, as the file dialogs' owner.
@@ -2221,33 +2221,33 @@ Win32, Android and the browser, as before.
         the document picker.
       - The browser: about 16 JavaScript functions (clipboard, storage,
         sharing, vibration, online status, file picking) in the framework's
-        `xforms.js` and `Js`.
+        `xforma.js` and `Js`.
     - **The platform assemblies are open.** On Android and iOS the
       renderers, `DrawContext`, `NativeLayoutView`, `OwnerDrawControl`
       and the platform classes are public (about 30 types), so anything
       referencing a platform assembly can reach into it. Win32 and the
       browser already keep nearly everything internal but their entry
       points.
-    - **Apps derive from XForms' native classes.** An Android app's
+    - **Apps derive from XForma's native classes.** An Android app's
       activity must derive from `AndroidApplicationActivity`, and an iOS
       app's delegate from `NativeApplicationDelegate`. An app that needs
       another base class (AndroidX's `ComponentActivity`, an SDK's own
-      activity or delegate) can't have it, and XForms can't run inside an
+      activity or delegate) can't have it, and XForma can't run inside an
       existing app's activity.
     - **The contract is public.** `IPlatform` and the renderer interfaces
-      (`ITextBoxRenderer` and the rest, 17 types in `XForms.Platform`) are
+      (`ITextBoxRenderer` and the rest, 17 types in `XForma.Platform`) are
       public, because an app's `Application` constructor takes an
       `IPlatform`. No control library, toolkit or app uses them otherwise.
 
     **Strategies, as in HotChai.Game?** HotChai.Game's platform interfaces
     (`IGraphicsServiceStrategy`, `ITextureStrategy` and so on) are
     internal, its platforms see them through `InternalsVisibleTo`, and its
-    analyzer limits the platforms to them. XForms has the same shape since
+    analyzer limits the platforms to them. XForma has the same shape since
     phase 19: `IPlatform` and the renderer interfaces are the strategies,
-    and XF0001 is the same analyzer. What XForms lacks is that the
+    and XF0001 is the same analyzer. What XForma lacks is that the
     interfaces are internal; this phase makes them so. HotChai.Game's
     `Strategy<T>` wrapper (disposal, and a checked cast to the platform's
-    type on a hot path) solves problems XForms doesn't have, since an
+    type on a hot path) solves problems XForma doesn't have, since an
     element owns its renderer and releases it on detach, and renaming
     renderers to strategies would be churn. So: the principle, not the
     class. HotChai.Game's hosting is the other model this phase follows:
@@ -2258,30 +2258,30 @@ Win32, Android and the browser, as before.
 
     | Assembly | Holds | References |
     |---|---|---|
-    | `XForms.Framework` | Core, primitives, and the platform contract (internal) | — |
-    | `XForms.Framework.<Platform>` | Renderers and hosting; public: only its hosting API | Framework |
-    | `XForms.Toolkit` | Service interfaces, binding | Framework |
-    | `XForms.Toolkit.<Platform>` (new: `.Win32`, `.Android`, `.iOS`, `.Web`) | The services' implementations | Toolkit, Framework.<Platform> |
-    | `XForms.Controls` | Controls | Framework, Toolkit |
+    | `XForma.Framework` | Core, primitives, and the platform contract (internal) | — |
+    | `XForma.Framework.<Platform>` | Renderers and hosting; public: only its hosting API | Framework |
+    | `XForma.Toolkit` | Service interfaces, binding | Framework |
+    | `XForma.Toolkit.<Platform>` (new: `.Win32`, `.Android`, `.iOS`, `.Web`) | The services' implementations | Toolkit, Framework.<Platform> |
+    | `XForma.Controls` | Controls | Framework, Toolkit |
 
     - **A platform assembly's public API is its hosting API,** and
       nothing else: one class per platform, with `Run` methods and the
       running host's native objects. Every renderer and helper is
       internal.
-    - **Hosting by composition.** No app derives from an XForms type to
+    - **Hosting by composition.** No app derives from an XForma type to
       host it. Every platform has `Run`, which shows the app in a whole
       host (a window, the page, an activity, a scene):
 
-      | Platform | XForms creates the host | The app's own host |
+      | Platform | XForma creates the host | The app's own host |
       |---|---|---|
       | Win32 | `Win32Application.Run("Title", new App())`: its window and message loop | — (embedding in a caller's window is phase 31) |
       | Browser | `await WebApplication.RunAsync("Title", new App())`: the page | — (embedding in an element is phase 31) |
-      | iOS | `IosApplication.Run(args, new App())` from `Main`: XForms' internal app and scene delegates | `IosApplication.Run(windowScene, new App())` from the app's own scene delegate, with any base class |
+      | iOS | `IosApplication.Run(args, new App())` from `Main`: XForma's internal app and scene delegates | `IosApplication.Run(windowScene, new App())` from the app's own scene delegate, with any base class |
       | Android | — | `AndroidApplication.Run(this, new App())` from the app's own activity's `OnCreate`, with any base class |
 
-      Android has no form where XForms creates the activity: the system
+      Android has no form where XForma creates the activity: the system
       starts the launcher activity itself, and a launcher activity in
-      XForms' library would land in every app's manifest (two launcher
+      XForma's library would land in every app's manifest (two launcher
       icons for an app with its own) and fix its label, theme and intent
       filters. A five-line activity, as HotChai.Game asks for, is where
       Android developers expect that code. The project templates include
@@ -2333,7 +2333,7 @@ Win32, Android and the browser, as before.
       by the app's platform project before `Run`
       (`Win32ToolkitServices.Register()`, and `await
       WebToolkitServices.InitializeAsync()` on the browser, which loads
-      the toolkit's own JavaScript module, `xforms-toolkit.js`). The
+      the toolkit's own JavaScript module, `xforma-toolkit.js`). The
       services find the window, activity or view controller when they're
       used, through `Current`, so registering needs nothing from a running
       app. An app that uses no services needn't reference the toolkit's
@@ -2364,7 +2364,7 @@ Win32, Android and the browser, as before.
        every platform, by composition; the native base classes and
        `AndroidPlatform` and `NativePlatform`'s public constructors go;
        Android re-creation; the test apps and SoonerOrLater updated.
-    2. **The toolkit's platforms:** create `XForms.Toolkit.Win32`,
+    2. **The toolkit's platforms:** create `XForma.Toolkit.Win32`,
        `.Android`, `.iOS` and `.Web`; move the services and their
        JavaScript into them, with the Android result activity; the
        framework platforms drop their toolkit reference; the apps
@@ -2394,25 +2394,25 @@ Win32, Android and the browser, as before.
        project, not automatic registration when the assembly loads.
     2. **The public API analyzer:** adopted.
     3. **Names:** `Win32Application`, `WebApplication`,
-       `AndroidApplication` and `IosApplication`; `XForms.Toolkit.Win32`
+       `AndroidApplication` and `IosApplication`; `XForma.Toolkit.Win32`
        and so on.
     4. **A constructor that touches the platform** throws.
 
     **Also in this phase,** to soften what composition costs app
     developers:
-    - **Hosting rules** in `architecture.md`: what XForms observes on its
+    - **Hosting rules** in `architecture.md`: what XForma observes on its
       own (lifecycle, configuration, back, insets), what an app must leave
-      alone (handling back or intercepting keys before XForms sees them),
+      alone (handling back or intercepting keys before XForma sees them),
       and what it must forward (nothing yet; a later deep-link API would
       take the activity's `OnNewIntent`).
     - **Templates:** the test apps and SoonerOrLater are the pattern
       until there are project templates: the Android activity declares
-      the configuration changes XForms handles in place (dark mode, text
+      the configuration changes XForma handles in place (dark mode, text
       size, orientation and screen size), so re-creation is rare.
 
 24. **Themes.** A control says what it does and what state it's in; a
     theme says how it looks. The controls' current look becomes the first
-    theme, `XForms.Themes.Basic`, and an app chooses its theme explicitly.
+    theme, `XForma.Themes.Basic`, and an app chooses its theme explicitly.
 
     **Status: done,** as planned below, with these differences:
     - **The mechanism** (step 1): `ControlTemplate<TControl>` (for any
@@ -2429,7 +2429,7 @@ Win32, Android and the browser, as before.
       content controls (`MenuBar`, `TabStrip`, `CommandListViewItem`,
       `HyperlinkButton`, `MessageBoxView`), and `ListViewItem`, which is an
       `ItemContainer`; both use the same `TemplateHost`.
-    - **The package** (step 2): `themes/basic/XForms.Themes.Basic`, with
+    - **The package** (step 2): `themes/basic/XForma.Themes.Basic`, with
       `BasicTheme.Apply(base.CreateTheme(mode, accent))` rather than
       `Create(mode, accent)`, so the framework's theme (with the system's
       high-contrast colors) stays the base. It's in the layer check and
@@ -2459,7 +2459,7 @@ Win32, Android and the browser, as before.
       `CommandBarButton`, `DayOfWeekToggleButton`, `ListViewSwipeItem`
       (and `ListViewSwipeDirection`), `ComboBoxItemsView`, `PopupFrame`,
       `MessageBoxView` and `CalendarViewPart`. `ButtonStyle` moved to
-      XForms.Themes.Basic, and `Button.Style` is gone.
+      XForma.Themes.Basic, and `Button.Style` is gone.
     - **Verified, for each group:** every Win32 test page in light and
       dark pixel for pixel against the baseline (apart from the spinning
       progress ring), and the group's own states against the previous
@@ -2486,7 +2486,7 @@ Win32, Android and the browser, as before.
     labels). The rest (`CommandBar`, `MessageBox`, `TabStrip`,
     `RadioButtons`, `MenuBar`, `FlyoutButton`, `CommandListView`,
     `ListView<T>`) only compose those. `Theme` holds the mode and colors,
-    and XForms.Controls' extensions (typography, shapes, motion, per-control
+    and XForma.Controls' extensions (typography, shapes, motion, per-control
     styles such as `ButtonStyle`); `Application.CreateTheme` builds it for
     the mode and accent color.
 
@@ -2494,10 +2494,10 @@ Win32, Android and the browser, as before.
 
     | Concept | Where | What it is |
     |---|---|---|
-    | `Theme` | framework | The data: the mode and colors, and extensions (XForms.Controls' typography, shapes, motion, styles, and now templates). Immutable; inherited down the view tree and overridable per view, as now |
-    | `TemplatedControl` | XForms.Controls | Base for controls with a look: it resolves its template from its theme, hands it its state, and draws through it |
-    | `ControlTemplate<TControl>` | XForms.Controls | One control's look: its drawing, the child views (parts) it adds, its layout of them, and its response to state changes |
-    | `BasicTheme` | XForms.Themes.Basic | Builds a `Theme` with the Basic tokens, styles and a template for every control |
+    | `Theme` | framework | The data: the mode and colors, and extensions (XForma.Controls' typography, shapes, motion, styles, and now templates). Immutable; inherited down the view tree and overridable per view, as now |
+    | `TemplatedControl` | XForma.Controls | Base for controls with a look: it resolves its template from its theme, hands it its state, and draws through it |
+    | `ControlTemplate<TControl>` | XForma.Controls | One control's look: its drawing, the child views (parts) it adds, its layout of them, and its response to state changes |
+    | `BasicTheme` | XForma.Themes.Basic | Builds a `Theme` with the Basic tokens, styles and a template for every control |
 
     WPF and Avalonia call these `ControlTemplate` and (in Avalonia)
     `TemplatedControl`, and a markup layer will want to write templates, so
@@ -2506,7 +2506,7 @@ Win32, Android and the browser, as before.
     express one in markup.
 
     - **Templates in the theme.** The templates are a theme extension of
-      XForms.Controls' (phase 22): a map from control type to template,
+      XForma.Controls' (phase 22): a map from control type to template,
       read and changed through extension methods (`theme.GetTemplate`,
       `theme.WithTemplate`). The framework knows nothing of them. A control
       without its own entry uses its base type's (a subclass of
@@ -2532,7 +2532,7 @@ Win32, Android and the browser, as before.
       state; the controls' tap delegates keep only behavior (click, toggle,
       select).
     - **Styles are the theme's.** `ButtonStyle` describes the Basic look,
-      so it moves to XForms.Themes.Basic. Per-view styling stays the
+      so it moves to XForma.Themes.Basic. Per-view styling stays the
       theme's: `button.Theme = theme.WithExtension(new ButtonStyle { ... })`.
       That removes `Button.Style` (decision 3).
     - **Choosing a theme.** An app chooses it in `CreateTheme`:
@@ -2558,8 +2558,8 @@ Win32, Android and the browser, as before.
        properties and `StateChanged`; the missing-template error. A
        framework hook if it's needed to resolve the template after the view
        has a parent but before its renderer exists. No control uses it yet.
-    2. **The package:** `themes/basic/XForms.Themes.Basic` (referencing
-       XForms.Controls), with `BasicTheme.Create`. The test apps and
+    2. **The package:** `themes/basic/XForma.Themes.Basic` (referencing
+       XForma.Controls), with `BasicTheme.Create`. The test apps and
        SoonerOrLater choose it. Nothing looks different yet.
     3. **The looks, a group at a time,** each control's drawing, parts and
        feedback moving into a Basic template and out of the control:
@@ -2590,47 +2590,47 @@ Win32, Android and the browser, as before.
     4. **Switching theme packages at runtime** isn't supported for now;
        the mode and accent color still change at runtime.
 
-    **Also:** `XForms.Themes.Basic` joins the build's layer check
-    (phase 23): it may reference XForms.Controls, XForms.Toolkit and the
+    **Also:** `XForma.Themes.Basic` joins the build's layer check
+    (phase 23): it may reference XForma.Controls, XForma.Toolkit and the
     framework, and tracks its public API like the other libraries.
 
     **Later, not in this phase:** more themes (Fluent, Material); templates
     in markup (phase 29).
 
 25. **One package for apps, and a standalone toolkit.** An app
-    references two things: the `XForms` package and a theme package. It
+    references two things: the `XForma` package and a theme package. It
     starts with one call that takes its theme, and never references,
     starts or registers the framework or the toolkit, which are libraries
-    XForms uses. The toolkit becomes a cross-platform services library with
+    XForma uses. The toolkit becomes a cross-platform services library with
     nothing about a UI in it, usable by any .NET app.
 
     **Status: done,** as planned below, in four commits (and one that
     completes the second: 0e2d70f has its description but only the move of
-    `controls/` to `xforms/`; 41ff83e has the rest):
-    - **A standalone toolkit:** services only, in `XForms.Toolkit`, with a
+    `controls/` to `xforma/`; 41ff83e has the rest):
+    - **A standalone toolkit:** services only, in `XForma.Toolkit`, with a
       static entry point each (`Clipboard.Default` and the others) and
       registration taking the host's window, activity or view controller as
-      functions. Binding moved into XForms. The toolkit references nothing
-      of XForms.
-    - **The `XForms` package** (`xforms/`): multi-targeted (`net10.0` for
+      functions. Binding moved into XForma. The toolkit references nothing
+      of XForma.
+    - **The `XForma` package** (`xforma/`): multi-targeted (`net10.0` for
       the browser and anything neutral, `net10.0-windows`,
-      `net10.0-android`, `net10.0-ios`), with `XFormsApp.Run` per platform
+      `net10.0-android`, `net10.0-ios`), with `XFormaApp.Run` per platform
       in `Platforms/`. `AppTheme` is a theme package's entry
       (`BasicTheme` derives from it); the framework's
-      `Application.ThemeExtender` is the general hook `XFormsApp.Run` uses
+      `Application.ThemeExtender` is the general hook `XFormaApp.Run` uses
       to add it to every theme the app builds, before an app's own
       `CreateTheme` adjusts that.
-    - **The apps** (the test apps and SoonerOrLater) reference `XForms` and
-      `XForms.Themes.Basic` only (and the test app the XAML spike), and
-      start with `XFormsApp.Run(..., new BasicTheme())`.
+    - **The apps** (the test apps and SoonerOrLater) reference `XForma` and
+      `XForma.Themes.Basic` only (and the test app the XAML spike), and
+      start with `XFormaApp.Run(..., new BasicTheme())`.
     - **Packages:** the twelve libraries pack on Windows (iOS included),
-      version 0.1.0-preview.1; a sample app referencing only the `XForms`
-      and `XForms.Themes.Basic` packages, from a local feed, builds and
+      version 0.1.0-preview.1; a sample app referencing only the `XForma`
+      and `XForma.Themes.Basic` packages, from a local feed, builds and
       runs on Win32, Android and in the browser.
-    - **Enforced:** the layer check allows the toolkit nothing of XForms,
-      its platforms only the toolkit, XForms the framework and toolkit
-      (and their platforms), and themes XForms; it now looks only at a
-      project's own references (not those that come through them). XForms
+    - **Enforced:** the layer check allows the toolkit nothing of XForma,
+      its platforms only the toolkit, XForma the framework and toolkit
+      (and their platforms), and themes XForma; it now looks only at a
+      project's own references (not those that come through them). XForma
       tracks its public API: what every platform shares in
       `PublicAPI.Shipped.txt`, each platform's entry points in
       `PublicAPI/<target>/`.
@@ -2641,26 +2641,26 @@ Win32, Android and the browser, as before.
       started from the app's activity, through the providers; binding (the
       binding page, typed into); Android's activity re-created;
       SoonerOrLater's Android main page against phase 20's; the packaged
-      sample on all three; a deliberate XForms reference from the toolkit
+      sample on all three; a deliberate XForma reference from the toolkit
       failing the build.
     - **Not done:** iOS builds and packs, but hasn't run. The sample isn't
       in the repository (it needs a local feed).
 
     **Where things stand.**
     - **Apps reference five or six projects:** the framework, its
-      platform, the toolkit's platform, XForms.Controls, the theme (and
+      platform, the toolkit's platform, XForma.Controls, the theme (and
       the XAML spike, in the test app).
     - **Apps start through the framework's platforms**
       (`Win32Application.Run`, `AndroidApplication.Run` and the others),
       register the toolkit's services themselves
       (`Win32ToolkitServices.Register()` and the others), and choose their
       theme by overriding `CreateTheme` (`BasicTheme.Apply(...)`).
-    - **XForms.Controls is platform-neutral** (`net10.0`), so it can't
+    - **XForma.Controls is platform-neutral** (`net10.0`), so it can't
       start apps or register services: only a platform's build can.
     - **The toolkit holds binding** (`Binding`, `ViewProperty`, the
       framework views' descriptors) and `Application.Services`, and so
       references the framework. Its platforms find the window, activity or
-      view controller through XForms' hosting classes.
+      view controller through XForma's hosting classes.
 
     **How services are usually organized,** which this follows: those tied
     to the window system (file pickers need an owner window, the share
@@ -2670,20 +2670,20 @@ Win32, Android and the browser, as before.
     pickers need the window's handle. Device and OS services
     (preferences, secure storage, connectivity, the launcher, haptics) have
     nothing to do with UI. Either way, the services library stays
-    independent: XForms wires it up, and an app may use it, or another.
+    independent: XForma wires it up, and an app may use it, or another.
 
     **The model:**
 
     | Package (project) | What it is | Referenced by |
     |---|---|---|
-    | **`XForms`** (today's XForms.Controls, multi-targeted) | The controls and binding; on each platform, the app's entry point (`XFormsApp.Run`), which starts the framework's host with the app and its theme, and registers the toolkit's services with the host's window, activity or view controller | **apps** |
-    | **`XForms.Themes.Basic`** | The first theme | **apps** |
-    | `XForms.Framework` (+ `.Win32`, `.Android`, `.iOS`, `.Web`) | The platform layer, as now | `XForms` |
-    | `XForms.Toolkit` (+ `.Win32`, `.Android`, `.iOS`, `.Web`) | Cross-platform services, standalone, with nothing about UI | `XForms`; any other .NET app, directly |
+    | **`XForma`** (today's XForma.Controls, multi-targeted) | The controls and binding; on each platform, the app's entry point (`XFormaApp.Run`), which starts the framework's host with the app and its theme, and registers the toolkit's services with the host's window, activity or view controller | **apps** |
+    | **`XForma.Themes.Basic`** | The first theme | **apps** |
+    | `XForma.Framework` (+ `.Win32`, `.Android`, `.iOS`, `.Web`) | The platform layer, as now | `XForma` |
+    | `XForma.Toolkit` (+ `.Win32`, `.Android`, `.iOS`, `.Web`) | Cross-platform services, standalone, with nothing about UI | `XForma`; any other .NET app, directly |
 
-    - **`XForms` builds per platform:** `net10.0-windows` (Win32),
+    - **`XForma` builds per platform:** `net10.0-windows` (Win32),
       `net10.0-android`, `net10.0-ios`, and `net10.0` (the browser, whose
-      apps and XForms assemblies target plain `net10.0`, and anything
+      apps and XForma assemblies target plain `net10.0`, and anything
       platform-neutral, such as tests). Each platform's build references
       that platform's framework and toolkit assemblies. Almost all of its
       code (the controls, binding) is shared; only the entry points are
@@ -2691,33 +2691,33 @@ Win32, Android and the browser, as before.
       (and the iOS test app) already do here, with the iOS workload; a Mac
       is needed only to sign and run an iOS app.
     - **One reference on every platform.** NuGet (or a project reference)
-      picks the app's platform's build, so an app references `XForms` and
+      picks the app's platform's build, so an app references `XForma` and
       a theme, whatever its platform.
     - **Starting an app takes its theme:**
 
       ```csharp
       // Win32, from Main
-      XFormsApp.Run("Sooner or Later", new App(), new BasicTheme());
+      XFormaApp.Run("Sooner or Later", new App(), new BasicTheme());
 
       // Android, from the app's own activity (any base class)
-      XFormsApp.Run(this, new App(), new BasicTheme());
+      XFormaApp.Run(this, new App(), new BasicTheme());
 
-      // iOS, from Main (XForms' delegates), or the app's own scene delegate
-      XFormsApp.Run(args, new App(), new BasicTheme());
-      XFormsApp.Run(windowScene, new App(), new BasicTheme());
+      // iOS, from Main (XForma's delegates), or the app's own scene delegate
+      XFormaApp.Run(args, new App(), new BasicTheme());
+      XFormaApp.Run(windowScene, new App(), new BasicTheme());
 
       // The browser, from Main
-      await XFormsApp.RunAsync("Sooner or Later", new App(), new BasicTheme());
+      await XFormaApp.RunAsync("Sooner or Later", new App(), new BasicTheme());
       ```
 
-      `XFormsApp.Run` starts the framework's host (`Win32Application.Run`
-      and the others, which stay public but become what XForms uses, not
+      `XFormaApp.Run` starts the framework's host (`Win32Application.Run`
+      and the others, which stay public but become what XForma uses, not
       what apps call), registers the toolkit's services with what the host
       knows (its window, activity or view controller), and gives the app
       its theme. Android's re-created activity and iOS's scenes work as in
       phase 23.
     - **Themes are objects.** A theme package's entry is a class (Basic's
-      `BasicTheme`) deriving from XForms' `AppTheme`, which adds its tokens, styles and templates to the
+      `BasicTheme`) deriving from XForma's `AppTheme`, which adds its tokens, styles and templates to the
       theme the framework builds for the mode and accent color (the
       system's high-contrast colors included). `BasicTheme.Apply` becomes
       its method. An app overrides `Application.CreateTheme` only to adjust
@@ -2725,7 +2725,7 @@ Win32, Android and the browser, as before.
       the theme package. The framework gets one general hook for this: a
       host's way to add to every theme the app builds.
     - **The toolkit stands alone:**
-      - Namespace `XForms.Toolkit` (decided), so its `Clipboard` doesn't
+      - Namespace `XForma.Toolkit` (decided), so its `Clipboard` doesn't
         meet `System.Windows.Forms.Clipboard` in a WinForms app's usings.
       - A static entry point per service, as MAUI Essentials:
         `Clipboard.Default`, `Launcher.Default`, `Preferences.Default`,
@@ -2736,43 +2736,43 @@ Win32, Android and the browser, as before.
       - Registration takes what the services need of the host, read when a
         service is used: Win32 the owner window (`Func<nint>`), Android the
         activity (`Func<Activity>`), iOS the view controller to present on
-        (`Func<UIViewController>`); the browser nothing. XForms passes its
+        (`Func<UIViewController>`); the browser nothing. XForma passes its
         hosting classes' objects; any other app (WinForms, MAUI, Avalonia)
         passes its own.
-      - Binding moves into `XForms` (decided), with its namespace
+      - Binding moves into `XForma` (decided), with its namespace
         unchanged, so app code stays the same.
-      - The toolkit references nothing of XForms; its platforms reference
+      - The toolkit references nothing of XForma; its platforms reference
         only the toolkit.
     - **Apps may use the services** (`Clipboard.Default.SetTextAsync(...)`,
       as SoonerOrLater does for backups and settings) without referencing
       or registering anything, or use another library instead.
 
     **Keeping it clean:** the layer check (XF0002) allows the toolkit no
-    references, each toolkit platform only the toolkit, `XForms` the
+    references, each toolkit platform only the toolkit, `XForma` the
     framework and toolkit (and on each platform, their platform
-    assemblies), and themes `XForms`. `XForms` tracks its public API, like
+    assemblies), and themes `XForma`. `XForma` tracks its public API, like
     the framework and toolkit, since it's what apps use.
 
     **Steps,** each built for every platform and verified on Win32,
     Android and the browser:
-    1. **The standalone toolkit:** binding moves into XForms.Controls;
-       namespace `XForms.Toolkit`; the static entry points; registration
-       with host providers; no XForms references. The apps register with
+    1. **The standalone toolkit:** binding moves into XForma.Controls;
+       namespace `XForma.Toolkit`; the static entry points; registration
+       with host providers; no XForma references. The apps register with
        their hosting classes' objects for now.
-    2. **The `XForms` package:** XForms.Controls becomes `XForms`
-       (project and assembly, in `xforms/`), multi-targeted, with `XFormsApp.Run` per
+    2. **The `XForma` package:** XForma.Controls becomes `XForma`
+       (project and assembly, in `xforma/`), multi-targeted, with `XFormaApp.Run` per
        platform; the theme base class and the framework's theme hook;
        `BasicTheme` derives from it.
     3. **The apps:** the test apps and SoonerOrLater reference only
-       `XForms` and `XForms.Themes.Basic` (and the test app the XAML
-       spike), start with `XFormsApp.Run`, and drop their registrations
+       `XForma` and `XForma.Themes.Basic` (and the test app the XAML
+       spike), start with `XFormaApp.Run`, and drop their registrations
        and `CreateTheme` overrides.
     4. **Packages:** `dotnet pack` for every library, on Windows; a local
-       feed; a small app that references only the `XForms` and
-       `XForms.Themes.Basic` packages builds for Win32, Android and the
+       feed; a small app that references only the `XForma` and
+       `XForma.Themes.Basic` packages builds for Win32, Android and the
        browser.
     5. **Enforcement and docs:** the layer check's rules, the public API
-       files (`XForms` added), `architecture.md` (the packages and the
+       files (`XForma` added), `architecture.md` (the packages and the
        app's view of them), this document.
 
     **Verifying:** every Win32 test page, light and dark, pixel for pixel;
@@ -2780,23 +2780,23 @@ Win32, Android and the browser, as before.
     phase 23 did (the file dialogs' owner on Win32; the document picker
     starting on Android; Copy and Share only in the browser and on
     Android); binding (the test app's binding page); Android's activity
-    re-created; the packed app from step 4; and a deliberate XForms
+    re-created; the packed app from step 4; and a deliberate XForma
     reference from the toolkit failing the build.
 
     **Decided** (2026-10-22):
-    - The toolkit's namespace is `XForms.Toolkit`; services are reached
-      through static entry points; binding goes into `XForms`.
-    - Apps reference one `XForms` package (multi-targeted) and a theme
-      package, and pass the theme to `XFormsApp.Run`.
+    - The toolkit's namespace is `XForma.Toolkit`; services are reached
+      through static entry points; binding goes into `XForma`.
+    - Apps reference one `XForma` package (multi-targeted) and a theme
+      package, and pass the theme to `XFormaApp.Run`.
     - The theme base class is `AppTheme`.
-    - The `XForms` project moves to `xforms/` (from `controls/`).
+    - The `XForma` project moves to `xforma/` (from `controls/`).
     - The framework and the toolkit are packages of their own (each with
-      its platforms' packages), which `XForms` depends on.
+      its platforms' packages), which `XForma` depends on.
 
 26. **Navigation by path.** Every page an app navigates to has a path,
     such as `/item/42`, registered with a function that makes the page
     from it. The app navigates by path, and the back stack is a list of
-    paths, so XForms can save it and restore it, the browser's address
+    paths, so XForma can save it and restore it, the browser's address
     bar and Back and Forward buttons follow it, and a link can open any
     page. Nothing is found by reflection or made from a `Type`, so it's
     safe for trimming and AOT.
@@ -2815,16 +2815,16 @@ Win32, Android and the browser, as before.
       is gone), which counts as no match.
     - **Changed from the plan:** a page's path is `NavigationPath`, not
       `Path`, which would hide `System.IO.Path` in every page's code.
-    - **Tests:** a unit test project, `test/XForms.Tests` (xUnit), with 29
+    - **Tests:** a unit test project, `test/XForma.Tests` (xUnit), with 29
       tests of matching: fixed text and parameters, case, trailing
       slashes, decoding, which route wins, query values, typed values,
       routes that clash and bad patterns.
     - **The apps:** the test app's pages have routes, and its start page
-      (`XFORMS_TEST_PAGE`, the `page` extra, `?page=`) is a path;
+      (`XFORMA_TEST_PAGE`, the `page` extra, `?page=`) is a path;
       SoonerOrLater's task page is made by its route, `/item/{id}` or
       `/item/new?category={category}`, instead of being kept and reused
       with a view model set on it.
-    - **The start and the browser (step 3):** XForms shows the first
+    - **The start and the browser (step 3):** XForma shows the first
       pages after `OnStart` (and `OnLoadResources`): the stack the platform
       gives, or the app's `StartPath` (`/` unless set); apps no longer
       navigate to their first page. `OnRouteNotFound` chooses what a path
@@ -2837,13 +2837,13 @@ Win32, Android and the browser, as before.
       reload restores the whole stack, and a typed address shows its page
       over the current one. The address wins over the test app's `?page=`.
     - **Restoring and links (step 4):** on Android, `Run` takes the
-      activity's `savedInstanceState` (`XFormsApp.Run(this,
+      activity's `savedInstanceState` (`XFormaApp.Run(this,
       savedInstanceState, new App(), theme)`; a library can't read it
       later), the stack is saved with the activity's state, and a link the
       activity is started with (its intent's data) opens the page for its
       path and query; a new activity for a link while the app runs opens it
       over the current page. On iOS, `Run` takes the scene's connection
-      options; XForms' scene delegate saves the stack as the session's
+      options; XForma's scene delegate saves the stack as the session's
       state-restoration activity and opens URLs while the app runs, and an
       app's own scene delegate calls `IosApplication.Current`'s
       `CreateStateRestorationActivity` and `OpenUrl`. Win32 never restores.
@@ -2864,7 +2864,7 @@ Win32, Android and the browser, as before.
       on Android: the test app three pages deep, sent to the background by
       starting SoonerOrLater, its process ended (`am kill`), and resumed
       with its task's intent, back on Page 3 with the same stack and Back
-      going to Page 2; started with a link (`-d xformstest:///app/5`), on
+      going to Page 2; started with a link (`-d xformatest:///app/5`), on
       that page. iOS builds, but restoring and URLs there haven't run.
     - **Found, not changed:** in the browser, Escape goes back only while
       a view has keyboard focus (as it did before this phase).
@@ -2877,7 +2877,7 @@ Win32, Android and the browser, as before.
     typeof(ItemPage))` and `[QueryProperty]`), Blazor (`[Route]`
     attributes found by scanning assemblies) and WinUI
     (`Frame.Navigate(typeof(Page))`) make pages from types, which is where
-    trimming and AOT break. XForms takes the first way.
+    trimming and AOT break. XForma takes the first way.
 
     **The plan:**
     - **Routes, in the app's code.** An app lists its pages by path, each
@@ -2913,7 +2913,7 @@ Win32, Android and the browser, as before.
     - **The start:** the app's first page is a path, `/` unless the
       platform gives another: the browser's address, a link that opened
       the app, or a restored stack. The test app's start page (now
-      `XFORMS_TEST_PAGE`, `?page=`, and an Android extra) becomes a path,
+      `XFORMA_TEST_PAGE`, `?page=`, and an Android extra) becomes a path,
       such as `/lists`.
     - **The browser:** the address follows the current page
       (`https://host/#/item/42`), each navigation is an entry in the
@@ -3020,7 +3020,7 @@ Win32, Android and the browser, as before.
     days of the week), the combo box's index, the date picker's date and
     the radio buttons' choice. Nine unit tests of the matching. Checked
     with the test app's simulated hot reload (F9, every so many seconds
-    with `XFORMS_SIMULATE_EVERY`, an Android intent extra, or a function
+    with `XFORMA_SIMULATE_EVERY`, an Android intent extra, or a function
     the browser's script calls): on Win32 a typed password and its focus
     carried over a real edit under `dotnet watch` that added a view above
     it; on Android a list's place and selection; in the browser a typed
@@ -3044,7 +3044,7 @@ Win32, Android and the browser, as before.
     and applied again (its context hands back the animators it made, which
     can't be made again once the native object exists), a list makes its
     item views again; pages in a back stack build again when shown; then
-    `Application.HotReloaded`. In the browser, XForms provides Blazor's
+    `Application.HotReloaded`. In the browser, XForma provides Blazor's
     two hooks (`WebHotReload`), applying each delta with
     `MetadataUpdater.ApplyUpdate` and calling the handlers; only when
     `MetadataUpdater.IsSupported`, so a published app trims it away.
@@ -3079,11 +3079,11 @@ Win32, Android and the browser, as before.
     when a template is applied again, so they need no build method of
     their own; and `UserControl.Content` stays settable by the control,
     for content given to it (a border's child, the XAML spike's presenter)
-    rather than built. XForms' own composite controls (the command bar,
+    rather than built. XForma's own composite controls (the command bar,
     the menu bar) still build in their constructors: they're library code,
     not edited while an app runs.
 
-    Step 1, how updates reach a running XForms app, with a handler in the
+    Step 1, how updates reach a running XForma app, with a handler in the
     test app that only logs (`HotReloadLog`):
     - **Win32:** `dotnet watch` applies an edit in about two seconds after
       the build, and the handler runs with the changed types (Visual
@@ -3098,7 +3098,7 @@ Win32, Android and the browser, as before.
       sends updates to the page through its browser script, which applies
       them only through Blazor's hooks (`Blazor._internal.
       applyHotReloadDeltas` and `getApplyUpdateCapabilities`); without
-      them it reloads the page. XForms' web platform provides those hooks
+      them it reloads the page. XForma's web platform provides those hooks
       (step 3), applying the deltas with `MetadataUpdater` and calling the
       handlers, only when hot reload is on.
     - **Fixed on the way:** the web libraries no longer copy their
@@ -3113,7 +3113,7 @@ Win32, Android and the browser, as before.
     again picks up the edit by itself: a click handler, a template's
     `Render` the next time it draws. Code that already ran doesn't: a
     constructor that built a page's views, a theme's `Apply` that built
-    the theme, a template's `Apply` that added its parts. So XForms has to
+    the theme, a template's `Apply` that added its parts. So XForma has to
     run that code again, and keep what the user did when it does.
 
     **How the others do it.** Flutter re-runs every widget's `build()`
@@ -3122,19 +3122,19 @@ Win32, Android and the browser, as before.
     method that sets a page's content, called again by a hot reload
     handler the app writes and registers. Uno and WinUI create a new
     version of a changed class and swap a new page in, which needs pages
-    made by type without arguments. XForms takes Flutter's shape (a build
+    made by type without arguments. XForma takes Flutter's shape (a build
     method run again, state kept) within its retained views: no handler
     for the app to write, and nothing lost.
 
     **The plan:**
     - **`Build()` is the one way to build views.** A page, a
       `UserControl` and a template build what they show in a build
-      method, which XForms calls when they're first shown and again after
+      method, which XForma calls when they're first shown and again after
       every edit:
       - A page overrides `protected override View Build()` and returns its
         content; a `UserControl` the same. Their constructors set up only
         fields and state (a view model, the item shown), never views.
-        `Page.Content` and `UserControl.Content` are set by XForms from
+        `Page.Content` and `UserControl.Content` are set by XForma from
         `Build()`, not by the app.
       - A field that refers to a view (`this._list = new ListView()`) is
         assigned in `Build()`, so after a rebuild it refers to the new
@@ -3156,7 +3156,7 @@ Win32, Android and the browser, as before.
       box's initial text keeps what was typed, as in Flutter.
     - **A handler in the framework** (`[assembly: MetadataUpdateHandler]`,
       internal), since the framework knows every view, the theme and the
-      renderers; XForms adds what it owns (templates, `UserControl`). It
+      renderers; XForma adds what it owns (templates, `UserControl`). It
       does nothing unless .NET calls it (only when the app is running with
       hot reload). On the UI thread, after an update:
       - **The theme is rebuilt** (`CreateTheme` again, which runs the
@@ -3187,7 +3187,7 @@ Win32, Android and the browser, as before.
       file of its own, or a marked `Build()`) is decided with the designer.
     - **No declarative model.** Flutter and React keep state for free
       because their views are descriptions that the framework compares
-      and patches. XForms keeps WinUI's retained views, which code holds
+      and patches. XForma keeps WinUI's retained views, which code holds
       references to and which XAML (phase 29) and WinUI compatibility
       (phase 30) are built on. Patching old views in place instead of
       replacing them was rejected for the same reason: fields assigned in
@@ -3195,7 +3195,7 @@ Win32, Android and the browser, as before.
       would have to be moved across one by one. Replacing the views and
       carrying the user's state over is the sound way in a retained model.
     - **How each platform gets updates** (step 1 checks each, since this
-      depends on the tools, not XForms):
+      depends on the tools, not XForma):
       - Win32: Visual Studio's Hot Reload (F5), and `dotnet watch`.
       - Android: Visual Studio's Hot Reload on the emulator or a device;
         `dotnet watch` if the SDK supports it for Android apps.
@@ -3217,7 +3217,7 @@ Win32, Android and the browser, as before.
        browser; what each needs (Debug settings, the web development
        server, launch profiles) written down.
     2. **`Build()`:** pages and `UserControl` build in `Build()`, called
-       by XForms, and `Content` is no longer the app's to set; templates
+       by XForma, and `Content` is no longer the app's to set; templates
        build their parts in their build method. Every page and control in
        the test app, the Basic theme and SoonerOrLater moves to it. No
        hot reload yet: the apps look and work exactly as before.
@@ -3252,10 +3252,10 @@ Win32, Android and the browser, as before.
     **Decided** (2026-10-22), with no constraint from the current design,
     since nothing has been released:
     - `Build()` is the one way pages, `UserControl`s and templates build
-      their views; XForms calls it, and an app registers nothing.
+      their views; XForma calls it, and an app registers nothing.
     - Controls declare their user state, carried over a rebuild by place
       and type, or by a key; the user's state wins over the code's.
-    - XForms keeps retained views: no declarative model, and no patching
+    - XForma keeps retained views: no declarative model, and no patching
       of old views in place.
     - Everything a view can be given is writable in a C# initializer,
       with event handlers in one fixed form after the tree, so that a
@@ -3265,7 +3265,7 @@ Win32, Android and the browser, as before.
       page by its stack of paths.
 
 28. **Common controls.** The controls apps expect from MAUI, Avalonia,
-    Uno or WinUI and XForms doesn't have yet, so an app doesn't have to
+    Uno or WinUI and XForma doesn't have yet, so an app doesn't have to
     build them itself. It comes after hot reload, so each is written once
     in the shape phase 27 sets (`Build()`, declared user state), and
     before XAML, so markup has them to use.
@@ -3292,8 +3292,8 @@ Win32, Android and the browser, as before.
       that expand, with keyboard and selection as `ListView`'s).
 
     **For each control:**
-    - A functional control in XForms, and its template in
-      `XForms.Themes.Basic`; no look in the control (phase 24).
+    - A functional control in XForma, and its template in
+      `XForma.Themes.Basic`; no look in the control (phase 24).
     - Its accessibility role, name and value on every platform (UI
       Automation, TalkBack, VoiceOver, the browser's ARIA), and its
       keyboard behavior as WinUI's.
@@ -3328,7 +3328,7 @@ Win32, Android and the browser, as before.
     **Decided** (2026-10-22, taking the recommendations when asked to
     carry on through this phase):
     - All three groups, in this phase.
-    - The time picker is drawn, as XForms' date picker is, so it looks the
+    - The time picker is drawn, as XForma's date picker is, so it looks the
       same everywhere.
 
     **Status: done,** with the controls in `architecture.md` (step 4: a
@@ -3614,18 +3614,18 @@ Win32, Android and the browser, as before.
     view's drawer open, Tab goes on into the content behind it; the pane's
     items are a Tab stop each (WinUI makes them one, with arrow keys).
 
-29. **Later: `XForms.Xaml`.** The proof of concept in `spikes/XForms.Xaml`
+29. **Later: `XForma.Xaml`.** The proof of concept in `spikes/XForma.Xaml`
     becomes a layer over the framework and controls, including templates
     written in markup. To be planned in detail when it's next.
 
-30. **Later: `XForms.Compat.WinUI`.** Adapters giving WinUI's names and a
-    `DependencyProperty`-style API over XForms' controls, with XAML
+30. **Later: `XForma.Compat.WinUI`.** Adapters giving WinUI's names and a
+    `DependencyProperty`-style API over XForma's controls, with XAML
     namespace mappings so existing markup loads. It stays separate from any
     Fluent theme, so neither requires the other, and keeps its types in
-    `XForms.Compat.WinUI` rather than Microsoft's namespaces. To be planned
+    `XForma.Compat.WinUI` rather than Microsoft's namespaces. To be planned
     in detail when it's next.
 
-31. **Later: embedding.** XForms inside part of an existing app's UI,
+31. **Later: embedding.** XForma inside part of an existing app's UI,
     beside native content, with `Attach` beside each platform's `Run`
     (phase 23): `Run` shows the app in a whole host; `Attach` puts it in
     a container the caller owns and keeps running its own UI.
@@ -3634,7 +3634,7 @@ Win32, Android and the browser, as before.
       loop, leaving the process's DPI awareness alone. That's how
       WebView2's controller, XAML Islands' `DesktopWindowXamlSource` and
       CEF embed; taking over the caller's top-level window instead would
-      mean competing with its window procedure for every message XForms
+      mean competing with its window procedure for every message XForma
       needs.
     - The browser: `WebApplication.AttachAsync(element, new App())`, in
       one element of an existing page.
@@ -3645,12 +3645,12 @@ Win32, Android and the browser, as before.
       view controller.
 
     The hard part is shared: keyboard focus and Tab moving across the
-    boundary between the host's UI and XForms, and the host and XForms
+    boundary between the host's UI and XForma, and the host and XForma
     each knowing which has focus. To be planned in detail when it's next.
 
 **Candidates from SwiftUI** (recorded 2026-10-22, not yet in order or
 planned). SwiftUI's views are values described again whenever the state
-they read changes; XForms keeps retained views (phase 27), so that model,
+they read changes; XForma keeps retained views (phase 27), so that model,
 chained modifiers (a second way to set what an initializer sets, phase
 27's rule) and property wrappers that hide who owns state aren't adopted.
 What developers praise in SwiftUI is mostly apart from that, and these
@@ -3664,7 +3664,7 @@ carry over. Observation and environment values would come first:
 
 33. **Candidate: environment values.** Typed values that flow down the
     tree and that any subtree can override, as SwiftUI's `@Environment`:
-    one mechanism for what XForms passes down case by case today (the
+    one mechanism for what XForma passes down case by case today (the
     theme, flow direction), and for more, such as navigation reachable
     from any view, a subtree disabled, or a subtree styled differently.
     Keys are typed objects, not strings or reflection.
@@ -3684,5 +3684,5 @@ carry over. Observation and environment values would come first:
 36. **Candidate: implicit animation.** "Animate whatever this change
     causes", as SwiftUI's `withAnimation { ... }`: property and layout
     changes made inside it animate with the theme's motion, without an
-    animation written for each. XForms' animator and layout transitions
+    animation written for each. XForma's animator and layout transitions
     stay for animations written out.

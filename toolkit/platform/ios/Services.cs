@@ -4,7 +4,7 @@ using Foundation;
 using Security;
 using UIKit;
 
-namespace XForms.Toolkit
+namespace XForma.Toolkit
 {
     /// <summary>
     /// iOS's services for the application.
@@ -124,6 +124,7 @@ namespace XForms.Toolkit
     /// </summary>
     internal sealed class KeychainStorage : ISecureStorage
     {
+        // Keeps the name from before XForma: data users already have is stored under it
         private static string Service => (NSBundle.MainBundle.BundleIdentifier ?? "XForms") + ".xforms";
 
         private static SecRecord Query(string key) => new SecRecord(SecKind.GenericPassword)

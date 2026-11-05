@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Runtime.Versioning;
 using System.Text;
-using XForms.Platform;
+using XForma.Platform;
 
-namespace XForms.Web
+namespace XForma.Web
 {
     /// <summary>
     /// Text measured with the browser's canvas and broken into lines here, so

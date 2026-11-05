@@ -5,12 +5,12 @@ using Android.OS;
 using Android.Views.Accessibility;
 using AndroidView = Android.Views.View;
 using NodeAction = Android.Views.Accessibility.Action;
-using XForms.Platform;
+using XForma.Platform;
 
-namespace XForms.Android
+namespace XForma.Android
 {
     /// <summary>
-    /// Describes XForms views to TalkBack and other accessibility services:
+    /// Describes XForma views to TalkBack and other accessibility services:
     /// their roles, labels, values and checked and selected states, and the
     /// actions they support.
     /// </summary>
@@ -230,7 +230,7 @@ namespace XForms.Android
     }
 
     /// <summary>
-    /// Describes a native view's XForms view, and exposes the lightweight
+    /// Describes a native view's XForma view, and exposes the lightweight
     /// views inside a layer.
     /// </summary>
     internal sealed class ViewAccessibilityDelegate : AndroidView.AccessibilityDelegate

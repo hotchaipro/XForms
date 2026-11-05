@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace XForms
+namespace XForma
 {
     /// <summary>
     /// Draws an owner-drawn view's content. Each platform draws with its

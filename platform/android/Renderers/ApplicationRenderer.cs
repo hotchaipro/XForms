@@ -1,7 +1,7 @@
 ﻿using System;
-using XForms.Platform;
+using XForma.Platform;
 
-namespace XForms.Android.Renderers
+namespace XForma.Android.Renderers
 {
     internal class ApplicationRenderer : IApplicationRenderer
     {
@@ -10,7 +10,7 @@ namespace XForms.Android.Renderers
         private AndroidApplication _androidApplication;
 
         public ApplicationRenderer(
-            XForms.Application application,
+            XForma.Application application,
             AndroidApplication androidApplication)
         {
             if (null == application)

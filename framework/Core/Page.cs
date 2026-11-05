@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using XForms.Platform;
+using XForma.Platform;
 
-namespace XForms
+namespace XForma
 {
 
 
@@ -392,7 +392,7 @@ namespace XForms
         private bool _isBuilt;
 
         /// <summary>
-        /// Builds the page's views, and returns its content. XForms calls it
+        /// Builds the page's views, and returns its content. XForma calls it
         /// once, as the page is first shown (before its native object exists),
         /// and again after an edit while the app runs with hot reload.
         /// </summary>

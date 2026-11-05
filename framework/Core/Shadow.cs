@@ -1,6 +1,6 @@
 using System;
 
-namespace XForms
+namespace XForma
 {
     /// <summary>
     /// The shape that casts a <see cref="Shadow"/>: the view's bounds, or the

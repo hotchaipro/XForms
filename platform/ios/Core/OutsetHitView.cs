@@ -2,7 +2,7 @@
 using CoreGraphics;
 using UIKit;
 
-namespace XForms.iOS
+namespace XForma.iOS
 {
     /// <summary>
     /// A view that wraps another (an animation layer), and takes touches as

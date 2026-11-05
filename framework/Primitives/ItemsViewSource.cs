@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Specialized;
 
-namespace XForms.Primitives
+namespace XForma.Primitives
 {
     public abstract class ItemsViewSource : IEnumerable, INotifyCollectionChanged
     {

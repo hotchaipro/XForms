@@ -6,26 +6,26 @@
   </PropertyGroup>
 
   <!-- The platforms are kept to the platform contract (XF0001) -->
-  <ItemGroup Condition="$(MSBuildProjectName.StartsWith('XForms.Framework.'))">
-    <ProjectReference Include="$(MSBuildThisFileDirectory)analyzers\XForms.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="all" />
+  <ItemGroup Condition="$(MSBuildProjectName.StartsWith('XForma.Framework.'))">
+    <ProjectReference Include="$(MSBuildThisFileDirectory)analyzers\XForma.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="all" />
   </ItemGroup>
 
-  <!-- XForms' controls are kept lookless (XF0003) -->
-  <ItemGroup Condition="'$(MSBuildProjectName)' == 'XForms'">
-    <ProjectReference Include="$(MSBuildThisFileDirectory)analyzers\XForms.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="all" />
+  <!-- XForma's controls are kept lookless (XF0003) -->
+  <ItemGroup Condition="'$(MSBuildProjectName)' == 'XForma'">
+    <ProjectReference Include="$(MSBuildThisFileDirectory)analyzers\XForma.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="all" />
   </ItemGroup>
 
   <!--
-    XForms, the framework, its platforms, the toolkit, its platforms and the
+    XForma, the framework, its platforms, the toolkit, its platforms and the
     themes track their
     public API in PublicAPI.Shipped.txt and PublicAPI.Unshipped.txt: public
     API that isn't listed (RS0016), or listed API that's gone (RS0017), fails
     the build, so every change to it shows in review.
   -->
-  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'XForms' or '$(MSBuildProjectName)' == 'XForms.Framework' or $(MSBuildProjectName.StartsWith('XForms.Framework.')) or '$(MSBuildProjectName)' == 'XForms.Toolkit' or $(MSBuildProjectName.StartsWith('XForms.Toolkit.')) or $(MSBuildProjectName.StartsWith('XForms.Themes.'))">
-    <XFormsTracksPublicApi>true</XFormsTracksPublicApi>
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'XForma' or '$(MSBuildProjectName)' == 'XForma.Framework' or $(MSBuildProjectName.StartsWith('XForma.Framework.')) or '$(MSBuildProjectName)' == 'XForma.Toolkit' or $(MSBuildProjectName.StartsWith('XForma.Toolkit.')) or $(MSBuildProjectName.StartsWith('XForma.Themes.'))">
+    <XFormaTracksPublicApi>true</XFormaTracksPublicApi>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(XFormsTracksPublicApi)' == 'true'">
+  <PropertyGroup Condition="'$(XFormaTracksPublicApi)' == 'true'">
     <WarningsAsErrors>$(WarningsAsErrors);RS0016;RS0017</WarningsAsErrors>
     <!-- Nullable annotations aren't used (RS0037, RS0041), and the overload
          rules for optional parameters aren't followed (RS0026, RS0027) -->
@@ -33,7 +33,7 @@
     <!-- Android's generated Resource class isn't API -->
     <AndroidResourceDesignerClassModifier>internal</AndroidResourceDesignerClassModifier>
   </PropertyGroup>
-  <ItemGroup Condition="'$(XFormsTracksPublicApi)' == 'true'">
+  <ItemGroup Condition="'$(XFormaTracksPublicApi)' == 'true'">
     <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="5.0.0" PrivateAssets="all" />
     <AdditionalFiles Include="PublicAPI.Shipped.txt" />
     <AdditionalFiles Include="PublicAPI.Unshipped.txt" />
@@ -43,24 +43,24 @@
   </ItemGroup>
 
   <!--
-    Packages: what apps reference (XForms and a theme), and the libraries
-    XForms depends on (the framework and the toolkit, with their platforms;
+    Packages: what apps reference (XForma and a theme), and the libraries
+    XForma depends on (the framework and the toolkit, with their platforms;
     the toolkit is also usable alone). Nothing else packs.
   -->
   <PropertyGroup>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'XForms' or $(MSBuildProjectName.StartsWith('XForms.Framework')) or $(MSBuildProjectName.StartsWith('XForms.Toolkit')) or $(MSBuildProjectName.StartsWith('XForms.Themes.'))">
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'XForma' or $(MSBuildProjectName.StartsWith('XForma.Framework')) or $(MSBuildProjectName.StartsWith('XForma.Toolkit')) or $(MSBuildProjectName.StartsWith('XForma.Themes.'))">
     <IsPackable>true</IsPackable>
     <Version>0.1.0-preview.1</Version>
     <Authors>Hot Chai Games</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
   <PropertyGroup>
-    <Description Condition="'$(MSBuildProjectName)' == 'XForms'">Cross-platform UI for .NET: the controls, data binding, and the app's entry point (XFormsApp.Run). Apps reference this package and a theme package.</Description>
-    <Description Condition="$(MSBuildProjectName.StartsWith('XForms.Framework'))">XForms' platform layer, which the XForms package uses. Apps reference XForms instead.</Description>
-    <Description Condition="'$(MSBuildProjectName)' == 'XForms.Toolkit'">Cross-platform services for any .NET app: the clipboard, the launcher, preferences, secure storage, sharing, haptics, connectivity and file pickers.</Description>
-    <Description Condition="$(MSBuildProjectName.StartsWith('XForms.Toolkit.'))">XForms.Toolkit's services on one platform, which an app registers (an XForms app's XFormsApp.Run does).</Description>
-    <Description Condition="'$(MSBuildProjectName)' == 'XForms.Themes.Basic'">XForms' Basic theme: the controls in a plain, flat look. Pass new BasicTheme() to XFormsApp.Run.</Description>
+    <Description Condition="'$(MSBuildProjectName)' == 'XForma'">Cross-platform UI for .NET: the controls, data binding, and the app's entry point (XFormaApp.Run). Apps reference this package and a theme package.</Description>
+    <Description Condition="$(MSBuildProjectName.StartsWith('XForma.Framework'))">XForma's platform layer, which the XForma package uses. Apps reference XForma instead.</Description>
+    <Description Condition="'$(MSBuildProjectName)' == 'XForma.Toolkit'">Cross-platform services for any .NET app: the clipboard, the launcher, preferences, secure storage, sharing, haptics, connectivity and file pickers.</Description>
+    <Description Condition="$(MSBuildProjectName.StartsWith('XForma.Toolkit.'))">XForma.Toolkit's services on one platform, which an app registers (an XForma app's XFormaApp.Run does).</Description>
+    <Description Condition="'$(MSBuildProjectName)' == 'XForma.Themes.Basic'">XForma' Basic theme: the controls in a plain, flat look. Pass new BasicTheme() to XFormaApp.Run.</Description>
   </PropertyGroup>
 </Project>

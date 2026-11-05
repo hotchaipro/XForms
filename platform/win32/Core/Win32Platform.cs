@@ -2,14 +2,14 @@
 using System.Diagnostics;
 using System.Reflection;
 using Windows.Win32;
-using XForms.Primitives;
-using XForms.Platform;
-using XForms.Win32.Renderers;
+using XForma.Primitives;
+using XForma.Platform;
+using XForma.Win32.Renderers;
 
-namespace XForms.Win32
+namespace XForma.Win32
 {
     /// <summary>
-    /// PROTOTYPE platform: implements the renderers the XForms test page needs.
+    /// PROTOTYPE platform: implements the renderers the XForma test page needs.
     /// </summary>
     internal sealed class Win32Platform : IPlatform
     {
@@ -245,7 +245,7 @@ namespace XForms.Win32
     }
 
     /// <summary>
-    /// Runs an XForms app in a Win32 window, and gives native code the
+    /// Runs an XForma app in a Win32 window, and gives native code the
     /// running app's window.
     /// </summary>
     public sealed class Win32Application

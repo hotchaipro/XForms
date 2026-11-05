@@ -1,6 +1,6 @@
-XForms.iOS.IosApplication
-XForms.iOS.IosApplication.RootViewController.get -> UIKit.UIViewController
-XForms.iOS.IosApplication.Window.get -> UIKit.UIWindow
-XForms.iOS.IosApplication.WindowScene.get -> UIKit.UIWindowScene
-static XForms.iOS.IosApplication.Current.get -> XForms.iOS.IosApplication
-static XForms.iOS.IosApplication.Run(string[] args, XForms.Application application) -> void
+XForma.iOS.IosApplication
+XForma.iOS.IosApplication.RootViewController.get -> UIKit.UIViewController
+XForma.iOS.IosApplication.Window.get -> UIKit.UIWindow
+XForma.iOS.IosApplication.WindowScene.get -> UIKit.UIWindowScene
+static XForma.iOS.IosApplication.Current.get -> XForma.iOS.IosApplication
+static XForma.iOS.IosApplication.Run(string[] args, XForma.Application application) -> void

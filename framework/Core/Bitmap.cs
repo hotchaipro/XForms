@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using XForms.Platform;
+using XForma.Platform;
 
-namespace XForms
+namespace XForma
 {
     public class Bitmap : Element
     {

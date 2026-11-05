@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using XForms.Primitives;
+using XForma.Primitives;
 
-namespace XForms.Platform
+namespace XForma.Platform
 {
     internal interface IApplicationRenderer
     {
@@ -38,7 +38,7 @@ namespace XForms.Platform
         Color? SystemAccentColor { get; }
 
         /// <summary>
-        /// The system's high-contrast colors, or null to use XForms' own.
+        /// The system's high-contrast colors, or null to use XForma's own.
         /// </summary>
         ColorScheme SystemHighContrastColors { get; }
 

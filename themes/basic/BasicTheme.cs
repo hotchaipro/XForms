@@ -1,13 +1,13 @@
 ﻿using System;
-using XForms.Controls;
+using XForma.Controls;
 
-namespace XForms.Themes.Basic
+namespace XForma.Themes.Basic
 {
     /// <summary>
-    /// The Basic theme: XForms' controls in a plain, flat look. An app
+    /// The Basic theme: XForma's controls in a plain, flat look. An app
     /// chooses it as it starts:
     /// <code>
-    /// XFormsApp.Run("My app", new App(), new BasicTheme());
+    /// XFormaApp.Run("My app", new App(), new BasicTheme());
     /// </code>
     /// </summary>
     public sealed class BasicTheme : AppTheme

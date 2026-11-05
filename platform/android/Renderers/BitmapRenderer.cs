@@ -2,10 +2,10 @@
 using System.IO;
 using System.Threading.Tasks;
 using Android.Graphics;
-using XForms.Platform;
+using XForma.Platform;
 using AndroidBitmap = global::Android.Graphics.Bitmap;
 
-namespace XForms.Android.Renderers
+namespace XForma.Android.Renderers
 {
     internal class BitmapRenderer : ElementRenderer<AndroidBitmap>, IBitmapRenderer
     {

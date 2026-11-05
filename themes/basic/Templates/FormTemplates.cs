@@ -1,8 +1,8 @@
 using System;
 using System.Runtime.CompilerServices;
-using XForms.Controls;
+using XForma.Controls;
 
-namespace XForms.Themes.Basic
+namespace XForma.Themes.Basic
 {
     // The Basic look of the form controls: flat shapes in the accent color
     // for what's on, chosen or done, and the subtle foreground for the rest

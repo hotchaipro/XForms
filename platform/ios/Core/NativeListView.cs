@@ -3,14 +3,14 @@ using System.Collections.Specialized;
 using CoreGraphics;
 using Foundation;
 using UIKit;
-using XForms.Primitives;
+using XForma.Primitives;
 
-namespace XForms.iOS
+namespace XForma.iOS
 {
     /// <summary>
-    /// A UITableView whose rows are XForms list view item containers. Rows are
+    /// A UITableView whose rows are XForma list view item containers. Rows are
     /// recycled by UIKit and rebound through the <see cref="ItemsViewSource"/>, and
-    /// each row's height comes from measuring its XForms content.
+    /// each row's height comes from measuring its XForma content.
     /// </summary>
     internal sealed class NativeListView : UITableView
     {
@@ -232,7 +232,7 @@ namespace XForms.iOS
 
     internal sealed class NativeListViewCell : UITableViewCell
     {
-        public static readonly NSString CellReuseIdentifier = new NSString("XForms.ItemContainer");
+        public static readonly NSString CellReuseIdentifier = new NSString("XForma.ItemContainer");
 
         private ItemContainer _itemContainer;
         private UIView _closingSnapshot;

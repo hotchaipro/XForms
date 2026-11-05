@@ -1,9 +1,9 @@
 ﻿using System;
 using CoreGraphics;
 using UIKit;
-using XForms.Primitives;
+using XForma.Primitives;
 
-namespace XForms.iOS
+namespace XForma.iOS
 {
     internal static class NativeConversions
     {
@@ -49,7 +49,7 @@ namespace XForms.iOS
         }
 
         /// <summary>
-        /// The color space XForms colors are in (as UIColor's are): a CGColor
+        /// The color space XForma colors are in (as UIColor's are): a CGColor
         /// made from components alone is in generic RGB, and comes out lighter.
         /// </summary>
         internal static readonly CGColorSpace Srgb = CGColorSpace.CreateWithName(CGColorSpaceNames.Srgb);

@@ -3,16 +3,16 @@ using System.Runtime.InteropServices.JavaScript;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
 
-namespace XForms.Toolkit
+namespace XForma.Toolkit
 {
     /// <summary>
     /// The JavaScript side of the toolkit's services
-    /// (wwwroot/xforms-toolkit.js), and the events it sends back.
+    /// (wwwroot/xforma-toolkit.js), and the events it sends back.
     /// </summary>
     [SupportedOSPlatform("browser")]
     internal static partial class ToolkitJs
     {
-        private const string Module = "xforms-toolkit";
+        private const string Module = "xforma-toolkit";
 
         private static Task _initialization;
 
@@ -24,7 +24,7 @@ namespace XForms.Toolkit
         private static async Task ImportAsync()
         {
             // NOTE: Relative to the .NET runtime, in _framework
-            await JSHost.ImportAsync(Module, "../_content/XForms.Toolkit.Web/xforms-toolkit.js");
+            await JSHost.ImportAsync(Module, "../_content/XForma.Toolkit.Web/xforma-toolkit.js");
             await InitAsync();
         }
 

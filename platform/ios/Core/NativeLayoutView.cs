@@ -2,12 +2,12 @@ using System;
 using CoreGraphics;
 using Foundation;
 using UIKit;
-using XForms.Platform;
+using XForma.Platform;
 
-namespace XForms.iOS
+namespace XForma.iOS
 {
     /// <summary>
-    /// Native container for any XForms view that lays out children of its own.
+    /// Native container for any XForma view that lays out children of its own.
     /// UIKit has no measure pass, so this view caches its last measurement until
     /// something in its subtree asks for layout, and lays its children out from
     /// <see cref="LayoutSubviews"/> using the shared layout engine in Core.

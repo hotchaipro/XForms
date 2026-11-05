@@ -1,7 +1,7 @@
 ﻿using System;
-using XForms.Platform;
+using XForma.Platform;
 
-namespace XForms.iOS.Renderers
+namespace XForma.iOS.Renderers
 {
     internal class ApplicationRenderer : IApplicationRenderer
     {
@@ -13,7 +13,7 @@ namespace XForms.iOS.Renderers
         private Theme _theme;
 
         public ApplicationRenderer(
-            XForms.Application application,
+            XForma.Application application,
             IosApplication nativeApplication)
         {
             if (null == application)
@@ -191,7 +191,7 @@ namespace XForms.iOS.Renderers
         public void EndTextEntry()
         {
             var window = this._nativeApplicationDelegate.Window;
-            if (Renderers.FrameRenderer.FocusedView(window) is XForms.Primitives.TextBox)
+            if (Renderers.FrameRenderer.FocusedView(window) is XForma.Primitives.TextBox)
             {
                 UIKit.UIApplication.SharedApplication.SendAction(new ObjCRuntime.Selector("resignFirstResponder"), null, null, null);
             }

@@ -1,7 +1,7 @@
 using System;
-using XForms.Platform;
+using XForma.Platform;
 
-namespace XForms
+namespace XForma
 {
     /// <summary>
     /// A window: the app's main one, or one it opened with

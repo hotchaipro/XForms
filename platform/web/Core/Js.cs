@@ -2,24 +2,24 @@
 using System.Runtime.InteropServices.JavaScript;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
-using XForms.Web.Renderers;
-using XForms.Platform;
+using XForma.Web.Renderers;
+using XForma.Platform;
 
-namespace XForms.Web
+namespace XForma.Web
 {
     /// <summary>
-    /// The JavaScript side of the platform (wwwroot/xforms.js), and the events
+    /// The JavaScript side of the platform (wwwroot/xforma.js), and the events
     /// it sends back.
     /// </summary>
     [SupportedOSPlatform("browser")]
     internal static partial class Js
     {
-        private const string Module = "xforms";
+        private const string Module = "xforma";
 
         public static async Task InitializeAsync()
         {
             // NOTE: Relative to the .NET runtime, in _framework
-            await JSHost.ImportAsync(Module, "../_content/XForms.Framework.Web/xforms.js");
+            await JSHost.ImportAsync(Module, "../_content/XForma.Framework.Web/xforma.js");
             await InitAsync();
         }
 

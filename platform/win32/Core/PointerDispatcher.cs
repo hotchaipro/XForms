@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using XForms.Win32.Renderers;
-using XForms.Platform;
+using XForma.Win32.Renderers;
+using XForma.Platform;
 
-namespace XForms.Win32
+namespace XForma.Win32
 {
     /// <summary>
     /// A renderer whose content scrolls.
@@ -17,7 +17,7 @@ namespace XForms.Win32
     }
 
     /// <summary>
-    /// Routes pointer input (mouse, touch and pen) to XForms views the way the
+    /// Routes pointer input (mouse, touch and pen) to XForma views the way the
     /// mobile platforms do: the deepest view that accepts the touch receives the
     /// rest of it, and a touch drag that no view claims scrolls the nearest
     /// scrolling ancestor, then glides when released.

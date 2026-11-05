@@ -1,9 +1,9 @@
 using System;
 using System.Runtime.Versioning;
-using XForms.Primitives;
-using XForms.Platform;
+using XForma.Primitives;
+using XForma.Platform;
 
-namespace XForms.Web.Renderers
+namespace XForma.Web.Renderers
 {
     /// <summary>
     /// The renderer of every view that holds children (panels, content and

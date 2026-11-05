@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    XForma.Toolkit: cross-platform services (the clipboard, the launcher,
+    preferences, secure storage, sharing, haptics, connectivity, file
+    pickers) for any .NET app, with nothing about a UI in it. Each
+    platform's implementation is a project in platform/, which an app
+    registers (an XForma app's start does it).
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>XForma.Toolkit</RootNamespace>
+    <AssemblyName>XForma.Toolkit</AssemblyName>
+    <IsTrimmable>true</IsTrimmable>
+    <IsAotCompatible>true</IsAotCompatible>
+    <!-- Each platform's services are projects of their own, in platform/ -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);platform/**</DefaultItemExcludes>
+  </PropertyGroup>
+
+</Project>

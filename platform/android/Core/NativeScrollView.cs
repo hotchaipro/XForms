@@ -1,12 +1,12 @@
 using System;
 using Android.Content;
 
-namespace XForms.Android
+namespace XForma.Android
 {
     /// <summary>
     /// A vertical ScrollView whose content is laid out by the shared layout engine
     /// (as on the other platforms), so the content's measure and frame are known
-    /// to XForms: measured at the viewport's width with unlimited height, and
+    /// to XForma: measured at the viewport's width with unlimited height, and
     /// arranged at least as tall as the viewport.
     /// </summary>
     internal sealed class NativeScrollView : global::Android.Widget.ScrollView

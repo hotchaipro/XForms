@@ -1,13 +1,13 @@
 ﻿using System;
 using UIKit;
 
-namespace XForms.iOS
+namespace XForma.iOS
 {
     internal static class NativeViewExtensions
     {
         /// <summary>
         /// Asks for the view and every ancestor to be laid out again, dropping the
-        /// cached measurements of the XForms containers along the way.
+        /// cached measurements of the XForma containers along the way.
         /// </summary>
         public static void RequestLayout(
             this UIView view)
@@ -26,7 +26,7 @@ namespace XForms.iOS
         }
 
         /// <summary>
-        /// Converts an XForms available size (which may be infinite) to the size
+        /// Converts an XForma available size (which may be infinite) to the size
         /// UIKit expects for <see cref="UIView.SizeThatFits"/>.
         /// </summary>
         public static CoreGraphics.CGSize ToFittingSize(

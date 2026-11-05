@@ -4,7 +4,7 @@ using System.IO;
 using System.Globalization;
 using System.Threading.Tasks;
 
-namespace XForms.Toolkit
+namespace XForma.Toolkit
 {
     /// <summary>
     /// The system clipboard's text.
@@ -442,7 +442,7 @@ namespace XForms.Toolkit
             string service)
         {
             return new InvalidOperationException(
-                $"{service} has no implementation: register the platform's services first (an XForms app's XFormsApp.Run does; otherwise, for example, Win32ToolkitServices.Register).");
+                $"{service} has no implementation: register the platform's services first (an XForma app's XFormaApp.Run does; otherwise, for example, Win32ToolkitServices.Register).");
         }
     }
 }

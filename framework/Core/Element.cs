@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using XForms.Platform;
+using XForma.Platform;
 
-namespace XForms
+namespace XForma
 {
     public abstract class Element
     {

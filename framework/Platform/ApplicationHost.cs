@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace XForms.Platform
+namespace XForma.Platform
 {
     /// <summary>
     /// The framework's side of the platform contract for the app as a whole:

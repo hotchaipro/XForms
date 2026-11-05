@@ -1,7 +1,7 @@
 using System;
-using XForms.Controls;
+using XForma.Controls;
 
-namespace XForms.Themes.Basic
+namespace XForma.Themes.Basic
 {
     // The Basic look of feedback and disclosure: tooltips and menus on the
     // surface color in a thin frame, info bars tinted by their severity, and

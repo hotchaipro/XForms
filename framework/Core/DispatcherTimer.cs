@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace XForms
+namespace XForma
 {
     /// <summary>
     /// Raises <see cref="Tick"/> on the UI thread after each

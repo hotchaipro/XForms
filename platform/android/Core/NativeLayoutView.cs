@@ -1,19 +1,19 @@
 using System;
 using Android.Views;
-using XForms.Platform;
+using XForma.Platform;
 using AndroidView = Android.Views.View;
 
-namespace XForms.Android
+namespace XForma.Android
 {
     /// <summary>
-    /// Native container for any XForms view that lays out children of its own.
+    /// Native container for any XForma view that lays out children of its own.
     /// Android's layout pass drives it (including its measure cache and dirty
     /// tracking), and it hands the measuring and positioning to the shared layout
     /// engine in Core.
     /// </summary>
     internal class NativeLayoutView : ViewGroup
     {
-        private readonly XForms.View _owner;
+        private readonly XForma.View _owner;
 
         // The child a touch in its hit-test outset went to, until it lifts
         private AndroidView _outsetTarget;
@@ -98,7 +98,7 @@ namespace XForms.Android
 
         public NativeLayoutView(
             global::Android.Content.Context context,
-            XForms.View owner)
+            XForma.View owner)
             : base(context)
         {
             if (null == owner)
@@ -108,7 +108,7 @@ namespace XForms.Android
 
             this._owner = owner;
 
-            // NOTE: XForms views don't clip their children unless ClipToBounds is
+            // NOTE: XForma views don't clip their children unless ClipToBounds is
             // set (which clips to the outline), as on the other platforms. By
             // default Android clips each child to the child's bounds, which cuts
             // off anything a descendant moves or scales outside them.
@@ -116,7 +116,7 @@ namespace XForms.Android
             this.SetClipToPadding(false);
         }
 
-        internal XForms.View Owner
+        internal XForma.View Owner
         {
             get
             {

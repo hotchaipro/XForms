@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Windows.Win32.Graphics.DirectComposition;
 
-namespace XForms.Win32
+namespace XForma.Win32
 {
     /// <summary>
     /// The content a <see cref="ScrollController"/> scrolls.

@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using CoreGraphics;
 using UIKit;
-using XForms.Primitives;
-using XForms.Platform;
+using XForma.Primitives;
+using XForma.Platform;
 
-namespace XForms.iOS.Renderers
+namespace XForma.iOS.Renderers
 {
     /// <summary>
     /// Shows a popup on top of the window: centered, or below (or, without room,

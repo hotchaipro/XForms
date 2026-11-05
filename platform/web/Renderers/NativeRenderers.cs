@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Globalization;
 using System.Runtime.Versioning;
-using XForms.Primitives;
-using XForms.Platform;
+using XForma.Primitives;
+using XForma.Platform;
 
-namespace XForms.Web.Renderers
+namespace XForma.Web.Renderers
 {
     /// <summary>
     /// A renderer whose element scrolls natively.
@@ -689,7 +689,7 @@ namespace XForms.Web.Renderers
             Js.SetBounds(this._indicatorId, x, y, IndicatorSize, IndicatorSize);
             Js.SetStyle(this._indicatorId, "display", null);
             Js.SetStyle(this._indicatorId, "opacity", this._isRefreshing ? "1" : Math.Min(1, distance / RefreshDistance).ToString(CultureInfo.InvariantCulture));
-            Js.SetStyle(this._indicatorId, "animation", this._isRefreshing ? "xforms-spin 0.8s linear infinite" : null);
+            Js.SetStyle(this._indicatorId, "animation", this._isRefreshing ? "xforma-spin 0.8s linear infinite" : null);
             Js.SetStyle(this._indicatorId, "transform", this._isRefreshing ? null : $"rotate({(int)(distance * 3)}deg)");
         }
 
@@ -1026,7 +1026,7 @@ namespace XForms.Web.Renderers
             Js.SetStyle(this._inputId, "caret-color", Css(this._accentColor));
 
             // The page's style sheet colors the placeholder from this
-            Js.SetStyle(this._inputId, "--xforms-placeholder", Css(this._placeholderColor));
+            Js.SetStyle(this._inputId, "--xforma-placeholder", Css(this._placeholderColor));
         }
     }
 

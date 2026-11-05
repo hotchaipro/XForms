@@ -1,7 +1,7 @@
 ﻿using System;
-using XForms.Controls;
+using XForma.Controls;
 
-namespace XForms.Themes.Basic
+namespace XForma.Themes.Basic
 {
     // The Basic look of list rows: the page's background, tinted with the
     // accent while selected

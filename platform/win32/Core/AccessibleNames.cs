@@ -4,7 +4,7 @@ using Windows.Win32.Foundation;
 using Windows.Win32.System.Com;
 using Windows.Win32.UI.Accessibility;
 
-namespace XForms.Win32.Automation
+namespace XForma.Win32.Automation
 {
     /// <summary>
     /// Gives native child windows (such as RichEdit) the accessible name of the

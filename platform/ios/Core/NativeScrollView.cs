@@ -2,10 +2,10 @@ using System;
 using CoreGraphics;
 using UIKit;
 
-namespace XForms.iOS
+namespace XForma.iOS
 {
     /// <summary>
-    /// A UIScrollView that measures its XForms content with an unbounded size
+    /// A UIScrollView that measures its XForma content with an unbounded size
     /// along each scrolling axis and scrolls whatever overflows.
     /// </summary>
     internal sealed class NativeScrollView : UIScrollView

@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Reflection.Metadata;
 
-[assembly: MetadataUpdateHandler(typeof(XForms.HotReload))]
+[assembly: MetadataUpdateHandler(typeof(XForma.HotReload))]
 
-namespace XForms
+namespace XForma
 {
     /// <summary>
     /// What .NET calls after it applies an edit to the running app (hot

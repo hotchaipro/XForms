@@ -7,12 +7,12 @@ using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
-using XForms.Platform;
+using XForma.Platform;
 
-namespace XForms.Android
+namespace XForma.Android
 {
     /// <summary>
-    /// Runs an XForms app in an activity, of any kind: the app's own, with
+    /// Runs an XForma app in an activity, of any kind: the app's own, with
     /// whatever base class it needs. Gives native code the running app's
     /// activity.
     /// </summary>
@@ -31,7 +31,7 @@ namespace XForms.Android
     /// </example>
     public sealed class AndroidApplication
     {
-        private readonly XForms.Application _application;
+        private readonly XForma.Application _application;
         private readonly HostView _hostView;
         private readonly LifecycleCallbacks _lifecycleCallbacks;
         private Activity _activity;
@@ -47,7 +47,7 @@ namespace XForms.Android
 
         private AndroidApplication(
             Activity activity,
-            XForms.Application application)
+            XForma.Application application)
         {
             this._application = application;
 
@@ -89,7 +89,7 @@ namespace XForms.Android
         /// When Android re-creates the activity (for a configuration change it
         /// doesn't declare), the new activity calls this again: the running app
         /// moves to it, keeping its state, and the new app object is left
-        /// unused. Declaring the changes XForms handles in place (dark mode,
+        /// unused. Declaring the changes XForma handles in place (dark mode,
         /// text size, orientation and screen size) makes that rare. When the
         /// activity finishes, the app stops, and the next launch runs a new one.
         /// </para>
@@ -104,7 +104,7 @@ namespace XForms.Android
         public static AndroidApplication Run(
             Activity activity,
             Bundle savedInstanceState,
-            XForms.Application application)
+            XForma.Application application)
         {
             ArgumentNullException.ThrowIfNull(activity);
             ArgumentNullException.ThrowIfNull(application);
@@ -137,6 +137,7 @@ namespace XForms.Android
         }
 
         // Where the back stack is kept in the activity's saved state
+        // Keeps the name from before XForma: data users already have is stored under it
         private const string NavigationStackKey = "xforms.navigation";
 
         // A link's path and query (/item/42?x=1), from the intent's data, or null
@@ -185,7 +186,7 @@ namespace XForms.Android
             var previous = this._activity;
             this._activity = activity;
 
-            // XForms apps draw their own chrome
+            // XForma apps draw their own chrome
             try
             {
                 activity.RequestWindowFeature(WindowFeatures.NoTitle);
@@ -278,7 +279,7 @@ namespace XForms.Android
 
 
         /// <summary>
-        /// Shows the root XForms view, keeping it clear of the system bars and
+        /// Shows the root XForma view, keeping it clear of the system bars and
         /// the soft keyboard. Android 15 and later always lay windows out edge
         /// to edge.
         /// </summary>

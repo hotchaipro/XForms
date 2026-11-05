@@ -1,0 +1,1 @@
+static XForma.XFormaApp.Run(Android.App.Activity activity, Android.OS.Bundle savedInstanceState, XForma.Application application, XForma.Controls.AppTheme theme) -> void

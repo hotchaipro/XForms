@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using Windows.Win32.Graphics.DirectComposition;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
-using XForms.Win32.Renderers;
+using XForma.Win32.Renderers;
 
-namespace XForms.Win32
+namespace XForma.Win32
 {
     /// <summary>
     /// A popup shown above the page, such as a popover or a picker's drop-down.

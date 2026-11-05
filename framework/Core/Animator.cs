@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-namespace XForms
+namespace XForma
 {
     /// <summary>
     /// A render property of an animator's layer, as one number.

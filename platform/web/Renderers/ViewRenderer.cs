@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Runtime.Versioning;
-using XForms.Primitives;
-using XForms.Platform;
+using XForma.Primitives;
+using XForma.Platform;
 
-namespace XForms.Web.Renderers
+namespace XForma.Web.Renderers
 {
     [SupportedOSPlatform("browser")]
     internal abstract class ElementRenderer : IElementRenderer

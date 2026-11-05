@@ -1,16 +1,16 @@
 ﻿using System;
-using XForms.Platform;
+using XForma.Platform;
 using AndroidView = global::Android.Views.View;
 using AndroidViewGroup = global::Android.Views.ViewGroup;
 
-namespace XForms.Android.Renderers
+namespace XForma.Android.Renderers
 {
     internal abstract class PanelRenderer<TNativeLayout> : ViewRenderer<TNativeLayout>
         where TNativeLayout : AndroidViewGroup
     {
         protected PanelRenderer(
             global::Android.Content.Context context,
-            XForms.View view)
+            XForma.View view)
             : base(context, view)
         {
         }

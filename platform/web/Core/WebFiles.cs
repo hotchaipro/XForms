@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Versioning;
 
-namespace XForms.Web
+namespace XForma.Web
 {
     /// <summary>
     /// Keeps the app's files in the browser's storage. In the browser .NET's
@@ -16,7 +16,9 @@ namespace XForms.Web
     [SupportedOSPlatform("browser")]
     internal static class WebFiles
     {
+        // Keeps the name from before XForma: data users already have is stored under it
         private const string Prefix = "xforms-file:";
+        // Keeps the name from before XForma: data users already have is stored under it
         private const string IndexKey = "xforms-files";
         private const string Root = "/";
 
@@ -47,7 +49,7 @@ namespace XForms.Web
                 }
                 catch (Exception ex)
                 {
-                    Console.Error.WriteLine($"XForms: couldn't restore {name}: {ex.Message}");
+                    Console.Error.WriteLine($"XForma: couldn't restore {name}: {ex.Message}");
                 }
             }
         }
@@ -65,7 +67,7 @@ namespace XForms.Web
                 }
                 catch (Exception ex)
                 {
-                    Console.Error.WriteLine($"XForms: couldn't save {name}: {ex.Message}");
+                    Console.Error.WriteLine($"XForma: couldn't save {name}: {ex.Message}");
                 }
             }
 

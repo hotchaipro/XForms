@@ -1,9 +1,9 @@
 ﻿using System;
 using Android.Graphics;
-using XForms.Primitives;
-using XForms.Platform;
+using XForma.Primitives;
+using XForma.Platform;
 
-namespace XForms.Android
+namespace XForma.Android
 {
     internal sealed class OwnerDrawControl : NativeLayoutView
     {
@@ -33,11 +33,11 @@ namespace XForms.Android
                 // NOTE: ClipRect must be explicitly set on every OnDraw call
                 canvas.ClipRect(drawingRect);
 
-                XForms.Rect bounds = new XForms.Rect(
-                    XForms.Android.NativeConversions.PixelsToDevicePixels(this.Context, drawingRect.Left),
-                    XForms.Android.NativeConversions.PixelsToDevicePixels(this.Context, drawingRect.Top),
-                    XForms.Android.NativeConversions.PixelsToDevicePixels(this.Context, drawingRect.Width()),
-                    XForms.Android.NativeConversions.PixelsToDevicePixels(this.Context, drawingRect.Height()));
+                XForma.Rect bounds = new XForma.Rect(
+                    XForma.Android.NativeConversions.PixelsToDevicePixels(this.Context, drawingRect.Left),
+                    XForma.Android.NativeConversions.PixelsToDevicePixels(this.Context, drawingRect.Top),
+                    XForma.Android.NativeConversions.PixelsToDevicePixels(this.Context, drawingRect.Width()),
+                    XForma.Android.NativeConversions.PixelsToDevicePixels(this.Context, drawingRect.Height()));
 
                 var drawContext = new DrawContext(this.Context, canvas);
                 LayerHost.For(this._drawDelegate).Render(drawContext, bounds);

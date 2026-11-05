@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using CoreGraphics;
 using Foundation;
 using UIKit;
-using XForms.Platform;
+using XForma.Platform;
 
-namespace XForms.iOS
+namespace XForma.iOS
 {
     /// <summary>
-    /// Describes XForms views to VoiceOver: their labels, values and traits,
+    /// Describes XForma views to VoiceOver: their labels, values and traits,
     /// and an element for each accessible lightweight view inside a layer.
     /// </summary>
     internal static class NativeAccessibility

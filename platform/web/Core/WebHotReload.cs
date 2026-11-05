@@ -7,13 +7,13 @@ using System.Reflection.Metadata;
 using System.Runtime.Versioning;
 using System.Text.Json;
 
-namespace XForms.Web
+namespace XForma.Web
 {
     /// <summary>
     /// Hot reload in the browser: <c>dotnet watch</c>'s browser script hands
     /// edits to the page through Blazor's hooks
     /// (<c>Blazor._internal.getApplyUpdateCapabilities</c> and
-    /// <c>applyHotReloadDeltas</c>), which XForms provides when the app runs
+    /// <c>applyHotReloadDeltas</c>), which XForma provides when the app runs
     /// with hot reload. Each edit is applied to its assembly, and the
     /// assemblies' update handlers run, as .NET's agent does on the desktop.
     /// </summary>
@@ -117,7 +117,7 @@ namespace XForms.Web
             catch (Exception ex)
             {
                 log.Add("\"" + JsonEncodedText.Encode(ex.ToString()) + "\"");
-                Console.Error.WriteLine($"XForms: hot reload failed: {ex}");
+                Console.Error.WriteLine($"XForma: hot reload failed: {ex}");
             }
 
             return "[" + string.Join(",", log.Select((message) => "{\"message\":" + message + ",\"severity\":2}")) + "]";

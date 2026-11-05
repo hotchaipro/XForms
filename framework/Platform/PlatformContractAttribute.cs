@@ -1,6 +1,6 @@
 using System;
 
-namespace XForms.Platform
+namespace XForma.Platform
 {
     /// <summary>
     /// Marks an internal member of a framework type as part of the platform

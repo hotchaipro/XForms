@@ -5,5 +5,5 @@
 
 Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
-XF0001 | XForms.Platform | Error | PlatformContractAnalyzer
-XF0003 | XForms.Look | Error | LooklessControlsAnalyzer
+XF0001 | XForma.Platform | Error | PlatformContractAnalyzer
+XF0003 | XForma.Look | Error | LooklessControlsAnalyzer

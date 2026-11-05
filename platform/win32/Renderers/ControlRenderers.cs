@@ -2,10 +2,10 @@ using System;
 using System.IO;
 using Windows.Win32.Graphics.Direct2D;
 using Windows.Win32.Graphics.DirectComposition;
-using XForms.Primitives;
-using XForms.Platform;
+using XForma.Primitives;
+using XForma.Platform;
 
-namespace XForms.Win32.Renderers
+namespace XForma.Win32.Renderers
 {
     /// <summary>
     /// Draws an image file or bitmap stretched to the view, optionally painted
@@ -19,7 +19,7 @@ namespace XForms.Win32.Renderers
         private Color _tint = Colors.Transparent;
 
         public ImageRenderer(
-            XForms.Primitives.Image image)
+            XForma.Primitives.Image image)
             : base(image, isContainer: false)
         {
         }

@@ -1,2 +1,2 @@
-XForms.Android.AndroidToolkitServices
-static XForms.Android.AndroidToolkitServices.Register() -> void
+XForma.Android.AndroidToolkitServices
+static XForma.Android.AndroidToolkitServices.Register() -> void
