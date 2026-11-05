@@ -253,6 +253,7 @@ namespace XForms.Controls
             this._commandBar.CommandParameter = this.Item;
 
             // Reset swipe defaults
+            this._swipeNumber += 1;
             this._swipeItem.Animator.Stop();
             this._swipeItem.Animator.Translation = Point.Zero;
             this._contentLayout.Animator.Stop();
@@ -266,6 +267,7 @@ namespace XForms.Controls
             this._commandBar.CommandParameter = null;
 
             // Reset swipe commands
+            this._swipeNumber += 1;
             this._swipeItem.Animator.Stop();
             this._swipeItem.Animator.Translation = Point.Zero;
             this._swipeItem.Reset();
@@ -359,9 +361,14 @@ namespace XForms.Controls
         private bool _longSwipe;
         private UICommand _swipeCommand;
 
+        // Goes up as a swipe begins and as the container binds or recycles, so
+        // a commit can tell that the row has moved on
+        private int _swipeNumber;
+
         bool ISwipeGestureDelegate.OnSwipeBegan(
             int direction)
         {
+            this._swipeNumber += 1;
             this._swipeFencePosition = 0;
             this._swipeEnabled = false;
             this._longSwipe = false;
@@ -557,16 +564,32 @@ namespace XForms.Controls
             }
 
             this._contentLayout.Animator.TranslateTo(new Point(direction * this.Bounds.Size.Width, 0), this.ActualTheme.Motion.Short, new CubicEase(EasingMode.EaseInOut));
+            var commit = this.CommitSwipe();
             this._swipeItem.Animator.TranslateTo(new Point(0, 0), this.ActualTheme.Motion.Short, new CubicEase(EasingMode.EaseInOut)).Completion.ContinueWith((ignore) =>
             {
-                Application.Dispatcher.Post(() =>
-                {
-                    this._swipeCommand?.Execute(this.Item);
+                Application.Dispatcher.Post(commit);
+            });
+        }
 
+        // What runs a committed swipe once its animation ends, or is cut short:
+        // its command on its item, as they were when the swipe was let go, even
+        // if the container has moved on to another item by then. The row settles
+        // only if nothing has happened to it since.
+        internal Action CommitSwipe()
+        {
+            var command = this._swipeCommand;
+            var item = this.Item;
+            int swipe = this._swipeNumber;
+            return () =>
+            {
+                command?.Execute(item);
+
+                if (swipe == this._swipeNumber)
+                {
                     this._contentLayout.Animator.Translation = Point.Zero;
                     this._swipeItem.Animator.Translation = new Point(-1000, 0);
-                });
-            });
+                }
+            };
         }
 
         private void CancelSwipe(
