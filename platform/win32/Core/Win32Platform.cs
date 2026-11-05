@@ -91,6 +91,8 @@ namespace XForms.Win32
 
         public float SystemTextScale => SystemTheme.TextScale;
 
+        public bool IsTouchPrimary => false;
+
         // The text box's own size (its renderer's)
         public float TextEntryFontSize => 15;
 

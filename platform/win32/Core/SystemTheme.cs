@@ -113,8 +113,6 @@ namespace XForms.Win32
                 {
                     Accent = highlight,
                     OnAccent = highlightText,
-                    StrongAccent = highlight,
-                    OnStrongAccent = highlightText,
                     Background = window,
                     Foreground = text,
                     SubtleForeground = text,

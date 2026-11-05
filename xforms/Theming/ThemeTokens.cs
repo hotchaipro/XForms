@@ -91,15 +91,70 @@ namespace XForms.Controls
     }
 
     /// <summary>
+    /// A theme's control sizes.
+    /// </summary>
+    public sealed record Sizes
+    {
+        /// <summary>
+        /// The rows of a popup list (a combo box's, a menu flyout's, a text
+        /// box's suggestions), or null (the default) for the platform's
+        /// primary input: 48 for touch, 36 for a mouse.
+        /// </summary>
+        public float? PopupRowHeight { get; init; }
+    }
+
+    /// <summary>
+    /// How a theme lays out a <see cref="MenuBar"/>.
+    /// </summary>
+    public sealed record MenuBarStyle
+    {
+        /// <summary>The bar's height.</summary>
+        public float Height { get; init; } = 50;
+
+        /// <summary>Each item's width.</summary>
+        public float ItemWidth { get; init; } = 72;
+
+        /// <summary>The space between items.</summary>
+        public float ItemSpacing { get; init; }
+
+        /// <summary>Where the items sit across the bar.</summary>
+        public HorizontalAlignment ItemsAlignment { get; init; } = HorizontalAlignment.Left;
+    }
+
+    /// <summary>
+    /// How a theme lays out a <see cref="CommandBar"/> (a command list's rows
+    /// have one too).
+    /// </summary>
+    public sealed record CommandBarStyle
+    {
+        /// <summary>
+        /// The space between neighbouring buttons' icons and labels. Each
+        /// button's touch area takes its share of it, so a tap between two
+        /// lands on the nearer. Without room for it across the bar, the
+        /// buttons go side by side.
+        /// </summary>
+        public float ButtonSpacing { get; init; }
+
+        /// <summary>The buttons' height.</summary>
+        public float ButtonHeight { get; init; } = 48;
+
+        /// <summary>The labels' font size, or null (the default) for the template's.</summary>
+        public float? LabelFontSize { get; init; }
+    }
+
+    /// <summary>
     /// XForms.Controls' tokens in a theme (its extensions), with defaults when
     /// the theme has none: <c>theme.Typography</c>, <c>theme.Shapes</c>,
-    /// <c>theme.Motion</c>.
+    /// <c>theme.Motion</c>, <c>theme.MenuBarStyle</c>,
+    /// <c>theme.CommandBarStyle</c>, <c>theme.PopupRowHeight</c>.
     /// </summary>
     public static class ThemeTokens
     {
         private static readonly Typography DefaultTypography = new Typography();
         private static readonly Shapes DefaultShapes = new Shapes();
         private static readonly Motion DefaultMotion = new Motion();
+        private static readonly MenuBarStyle DefaultMenuBarStyle = new MenuBarStyle();
+        private static readonly CommandBarStyle DefaultCommandBarStyle = new CommandBarStyle();
 
         extension(Theme theme)
         {
@@ -117,6 +172,21 @@ namespace XForms.Controls
             /// Durations and easing curves.
             /// </summary>
             public Motion Motion => theme.GetExtension<Motion>() ?? DefaultMotion;
+
+            /// <summary>
+            /// How menu bars are laid out.
+            /// </summary>
+            public MenuBarStyle MenuBarStyle => theme.GetExtension<MenuBarStyle>() ?? DefaultMenuBarStyle;
+
+            /// <summary>
+            /// How command bars are laid out.
+            /// </summary>
+            public CommandBarStyle CommandBarStyle => theme.GetExtension<CommandBarStyle>() ?? DefaultCommandBarStyle;
+
+            /// <summary>
+            /// The height of a popup list's rows (see <see cref="Sizes.PopupRowHeight"/>).
+            /// </summary>
+            public float PopupRowHeight => theme.GetExtension<Sizes>()?.PopupRowHeight ?? ((Application.Current?.IsTouchPrimary ?? false) ? 48 : 36);
         }
     }
 }

@@ -527,7 +527,6 @@ virtual XForms.Controls.RangeBase.CoerceValue(double value) -> double
 virtual XForms.Controls.UserControl.Build() -> XForms.View
 XForms.Controls.FlyoutButton.IsSubtleStyle.get -> bool
 XForms.Controls.FlyoutButton.IsSubtleStyle.set -> void
-XForms.Controls.FloatingButton.Swiping -> System.EventHandler<XForms.Input.SwipingEventArgs>
 XForms.Controls.TabStrip.BeginSwitch(int direction) -> XForms.Controls.TabSwitch
 XForms.Controls.TabStrip.FollowSwipe(XForms.Input.SwipingEventArgs e) -> void
 XForms.Controls.TabStrip.Frame.get -> XForms.Frame
@@ -560,23 +559,69 @@ const XForms.Controls.PopupFrame.ContentInset = 6 -> float
 override XForms.Controls.Flyout.GetDefaultScrimColor(XForms.Theme theme) -> XForms.Color
 XForms.Controls.ListView.SelectionBackground.get -> XForms.Color?
 XForms.Controls.ListView.SelectionBackground.set -> void
-XForms.Controls.CommandListView.CommandBarBackground.get -> XForms.Color?
-XForms.Controls.CommandListView.CommandBarBackground.set -> void
-override XForms.Controls.CommandBar.BackgroundColor.get -> XForms.Color
 override XForms.Controls.CommandBar.MeasureOverride(XForms.Size availableSize) -> XForms.Size
-XForms.Controls.CommandListView.CommandBarButtonSpacing.get -> float
-XForms.Controls.CommandListView.CommandBarButtonSpacing.set -> void
-const XForms.Controls.ComboBoxItemsView.RowHeight = 48 -> float
-const XForms.Controls.AutoSuggestBoxListView.RowHeight = 48 -> float
-const XForms.Controls.MenuFlyoutView.RowHeight = 48 -> float
-XForms.Controls.CommandListView.CommandBarLabelFontSize.get -> float?
-XForms.Controls.CommandListView.CommandBarLabelFontSize.set -> void
-XForms.Controls.CommandBarButton.LabelFontSize.get -> float?
-XForms.Controls.CommandBarButton.LabelFontSize.set -> void
 XForms.Controls.FlyoutButton.ButtonSpacing.get -> float
 XForms.Controls.FlyoutButton.ButtonSpacing.set -> void
-XForms.Controls.FlyoutButton.MinimumRadius.get -> float
-XForms.Controls.FlyoutButton.MinimumRadius.set -> void
 const XForms.Input.SwipeGestureRecognizer.Slop = 10 -> float
 XForms.Input.SwipeGestureRecognizer.Velocity.get -> float
 override XForms.Input.SwipeGestureRecognizer.IsDragGesture.get -> bool
+XForms.Controls.AutoSuggestBoxListView.RowHeight.get -> float
+XForms.Controls.ComboBoxItemsView.RowHeight.get -> float
+XForms.Controls.CommandBarStyle
+XForms.Controls.CommandBarStyle.<Clone>$() -> XForms.Controls.CommandBarStyle
+XForms.Controls.CommandBarStyle.ButtonHeight.get -> float
+XForms.Controls.CommandBarStyle.ButtonHeight.init -> void
+XForms.Controls.CommandBarStyle.ButtonSpacing.get -> float
+XForms.Controls.CommandBarStyle.ButtonSpacing.init -> void
+XForms.Controls.CommandBarStyle.CommandBarStyle() -> void
+XForms.Controls.CommandBarStyle.Equals(XForms.Controls.CommandBarStyle other) -> bool
+XForms.Controls.CommandBarStyle.LabelFontSize.get -> float?
+XForms.Controls.CommandBarStyle.LabelFontSize.init -> void
+XForms.Controls.FloatingButton.SwipeRecognizer.get -> XForms.Input.SwipeGestureRecognizer
+XForms.Controls.MenuBarStyle
+XForms.Controls.MenuBarStyle.<Clone>$() -> XForms.Controls.MenuBarStyle
+XForms.Controls.MenuBarStyle.Equals(XForms.Controls.MenuBarStyle other) -> bool
+XForms.Controls.MenuBarStyle.Height.get -> float
+XForms.Controls.MenuBarStyle.Height.init -> void
+XForms.Controls.MenuBarStyle.ItemSpacing.get -> float
+XForms.Controls.MenuBarStyle.ItemSpacing.init -> void
+XForms.Controls.MenuBarStyle.ItemWidth.get -> float
+XForms.Controls.MenuBarStyle.ItemWidth.init -> void
+XForms.Controls.MenuBarStyle.ItemsAlignment.get -> XForms.HorizontalAlignment
+XForms.Controls.MenuBarStyle.ItemsAlignment.init -> void
+XForms.Controls.MenuBarStyle.MenuBarStyle() -> void
+XForms.Controls.MenuFlyoutView.RowHeight.get -> float
+XForms.Controls.Sizes
+XForms.Controls.Sizes.<Clone>$() -> XForms.Controls.Sizes
+XForms.Controls.Sizes.Equals(XForms.Controls.Sizes other) -> bool
+XForms.Controls.Sizes.PopupRowHeight.get -> float?
+XForms.Controls.Sizes.PopupRowHeight.init -> void
+XForms.Controls.Sizes.Sizes() -> void
+XForms.Controls.SwipeCommandCollection.IsFlickEnabled.get -> bool
+XForms.Controls.SwipeCommandCollection.IsFlickEnabled.set -> void
+XForms.Controls.ThemeTokens.extension(XForms.Theme).CommandBarStyle.get -> XForms.Controls.CommandBarStyle
+XForms.Controls.ThemeTokens.extension(XForms.Theme).MenuBarStyle.get -> XForms.Controls.MenuBarStyle
+XForms.Controls.ThemeTokens.extension(XForms.Theme).PopupRowHeight.get -> float
+XForms.Input.SwipeGestureRecognizer.SwipeGestureRecognizer() -> void
+XForms.Input.SwipeGestureRecognizer.Swiping -> System.EventHandler<XForms.Input.SwipingEventArgs>
+override XForms.Controls.CommandBar.OnThemeChanged(XForms.Theme theme) -> void
+override XForms.Controls.CommandBarStyle.Equals(object obj) -> bool
+override XForms.Controls.CommandBarStyle.GetHashCode() -> int
+override XForms.Controls.CommandBarStyle.ToString() -> string
+override XForms.Controls.MenuBar.MeasureOverride(XForms.Size availableSize) -> XForms.Size
+override XForms.Controls.MenuBar.OnThemeChanged(XForms.Theme theme) -> void
+override XForms.Controls.MenuBarStyle.Equals(object obj) -> bool
+override XForms.Controls.MenuBarStyle.GetHashCode() -> int
+override XForms.Controls.MenuBarStyle.ToString() -> string
+override XForms.Controls.Sizes.Equals(object obj) -> bool
+override XForms.Controls.Sizes.GetHashCode() -> int
+override XForms.Controls.Sizes.ToString() -> string
+static XForms.Controls.CommandBarStyle.operator !=(XForms.Controls.CommandBarStyle left, XForms.Controls.CommandBarStyle right) -> bool
+static XForms.Controls.CommandBarStyle.operator ==(XForms.Controls.CommandBarStyle left, XForms.Controls.CommandBarStyle right) -> bool
+static XForms.Controls.MenuBarStyle.operator !=(XForms.Controls.MenuBarStyle left, XForms.Controls.MenuBarStyle right) -> bool
+static XForms.Controls.MenuBarStyle.operator ==(XForms.Controls.MenuBarStyle left, XForms.Controls.MenuBarStyle right) -> bool
+static XForms.Controls.Sizes.operator !=(XForms.Controls.Sizes left, XForms.Controls.Sizes right) -> bool
+static XForms.Controls.Sizes.operator ==(XForms.Controls.Sizes left, XForms.Controls.Sizes right) -> bool
+static XForms.Controls.ThemeTokens.get_CommandBarStyle(XForms.Theme theme) -> XForms.Controls.CommandBarStyle
+static XForms.Controls.ThemeTokens.get_MenuBarStyle(XForms.Theme theme) -> XForms.Controls.MenuBarStyle
+static XForms.Controls.ThemeTokens.get_PopupRowHeight(XForms.Theme theme) -> float

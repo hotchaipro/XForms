@@ -95,6 +95,10 @@ namespace XForms.Web
         [JSImport("themeState", Module)]
         public static partial int ThemeState();
 
+        // A coarse pointer (a finger) is the primary one
+        [JSImport("isTouchPrimary", Module)]
+        public static partial bool IsTouchPrimary();
+
         // Images and drawing
 
         [JSImport("loadImage", Module)]

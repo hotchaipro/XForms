@@ -49,6 +49,12 @@ namespace XForms.Platform
         float SystemTextScale { get; }
 
         /// <summary>
+        /// Whether touch, rather than a mouse, is the primary input: controls
+        /// size their touch targets for it.
+        /// </summary>
+        bool IsTouchPrimary { get; }
+
+        /// <summary>
         /// The size of a text box's text, before the text scale: the
         /// platform's own (iOS's body text, Android's edit text).
         /// </summary>

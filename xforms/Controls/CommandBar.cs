@@ -57,76 +57,17 @@ namespace XForms.Controls
             this.Content = this._buttonsLayout;
         }
 
-        private Color _background = Colors.Transparent;
-
-        // Behind the buttons (a command list's CommandBarBackground)
-        internal Color Background
-        {
-            get
-            {
-                return this._background;
-            }
-
-            set
-            {
-                if (value != this._background)
-                {
-                    this._background = value;
-                    this.InvalidateBackground();
-                }
-            }
-        }
-
-        public override Color BackgroundColor
-        {
-            get
-            {
-                return this._background;
-            }
-        }
-
         // Buttons side by side, each a cell this wide plus its share of the
         // spacing (half on each side of its icon and label, so a tap between
-        // two lands on the nearer); taller when spaced. Without room for the
-        // spacing across the bar, they go back to side by side.
+        // two lands on the nearer). Without room for the spacing across the
+        // bar, they go back to side by side.
         private const float ButtonSize = 48;
-        private const float SpacedButtonHeight = 56;
-        private float _buttonSpacing;
 
-        /// <summary>
-        /// The space between neighbouring buttons' icons and labels (a
-        /// command list's CommandBarButtonSpacing): 0 by default.
-        /// </summary>
-        // The buttons' label size (a command list's CommandBarLabelFontSize)
-        internal float? LabelFontSize
+        protected override void OnThemeChanged(
+            Theme theme)
         {
-            set
-            {
-                foreach (var buttons in new[] { this._primaryButtons.Buttons, this._secondaryButtons.Buttons })
-                {
-                    foreach (var button in buttons)
-                    {
-                        button.LabelFontSize = value;
-                    }
-                }
-            }
-        }
-
-        internal float ButtonSpacing
-        {
-            get
-            {
-                return this._buttonSpacing;
-            }
-
-            set
-            {
-                if (value != this._buttonSpacing)
-                {
-                    this._buttonSpacing = value;
-                    this.InvalidateMeasure();
-                }
-            }
+            base.OnThemeChanged(theme);
+            this.InvalidateMeasure();
         }
 
         protected override Size MeasureOverride(
@@ -151,14 +92,15 @@ namespace XForms.Controls
                 count += button.IsVisible ? 1 : 0;
             }
 
-            float spacing = Math.Max(0, this._buttonSpacing);
+            var style = this.ActualTheme.CommandBarStyle;
+            float spacing = Math.Max(0, style.ButtonSpacing);
             if (!float.IsInfinity(width) && ((count * (ButtonSize + spacing)) > width))
             {
                 spacing = 0;
             }
 
             float buttonWidth = ButtonSize + spacing;
-            float buttonHeight = (spacing > 0) ? SpacedButtonHeight : ButtonSize;
+            float buttonHeight = style.ButtonHeight;
             foreach (var buttons in new[] { this._primaryButtons.Buttons, this._secondaryButtons.Buttons })
             {
                 foreach (var button in buttons)

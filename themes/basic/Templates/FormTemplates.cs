@@ -500,7 +500,7 @@ namespace XForms.Themes.Basic
             var colors = control.ActualTheme.Colors;
             var box = control.AutoSuggestBox;
             var items = box.ItemsSource;
-            const float RowHeight = AutoSuggestBoxListView.RowHeight;
+            float rowHeight = control.RowHeight;
             bool isRightToLeft = control.FlowDirection == FlowDirection.RightToLeft;
 
             drawContext.Clear(Colors.Transparent);
@@ -512,8 +512,8 @@ namespace XForms.Themes.Basic
 
             for (int i = 0; i < box.SuggestionCount; i += 1)
             {
-                var row = new Rect(0, i * RowHeight, control.Bounds.Width, RowHeight);
-                var highlight = new Rect(4, row.Y + 2, Math.Max(0, control.Bounds.Width - 8), RowHeight - 4);
+                var row = new Rect(0, i * rowHeight, control.Bounds.Width, rowHeight);
+                var highlight = new Rect(4, row.Y + 2, Math.Max(0, control.Bounds.Width - 8), rowHeight - 4);
                 if (i == control.PressedIndex)
                 {
                     drawContext.FillRectangle(highlight, colors.Foreground.MultiplyAlpha(0.12f));
@@ -521,10 +521,10 @@ namespace XForms.Themes.Basic
                 else if (i == control.HighlightedIndex)
                 {
                     drawContext.FillRectangle(highlight, control.ActualTheme.Colors.Surface);
-                    drawContext.FillRectangle(new Rect(isRightToLeft ? highlight.Right - 3 : 4, row.Y + ((RowHeight - 16) / 2), 3, 16), colors.Accent);
+                    drawContext.FillRectangle(new Rect(isRightToLeft ? highlight.Right - 3 : 4, row.Y + ((rowHeight - 16) / 2), 3, 16), colors.Accent);
                 }
 
-                drawContext.DrawText(items[i], new Rect(Inset, row.Y, Math.Max(0, control.Bounds.Width - (2 * Inset)), RowHeight), colors.Foreground, format);
+                drawContext.DrawText(items[i], new Rect(Inset, row.Y, Math.Max(0, control.Bounds.Width - (2 * Inset)), rowHeight), colors.Foreground, format);
             }
         }
     }

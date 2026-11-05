@@ -25,8 +25,6 @@ namespace XForms.Controls
                 throw new ArgumentNullException(nameof(menuItem));
             }
 
-            this.Width = 96;
-
             this.MenuBar = menuBar;
             this.MenuItem = menuItem;
             this.IsVisible = menuItem.IsVisible;

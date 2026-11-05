@@ -68,16 +68,6 @@ namespace XForms.Controls
             set;
         } = 12;
 
-        /// <summary>
-        /// The least distance from this button's center to the buttons' (the
-        /// arc's radius): 0 (the default) for as close as the spacing allows.
-        /// </summary>
-        public float MinimumRadius
-        {
-            get;
-            set;
-        }
-
         public bool IsSubtleStyle
         {
             get
@@ -199,8 +189,7 @@ namespace XForms.Controls
                 }
 
                 // Clear of this button, far enough out that neighbours on the
-                // arc are the spacing apart (the circles fill their bounds),
-                // and at least the minimum radius
+                // arc are the spacing apart (the circles fill their bounds)
                 float distance = ((button.Bounds.Size.Width + this._innerButton.Bounds.Size.Width) / 2) + 15;
                 if (step > 0)
                 {
@@ -208,7 +197,6 @@ namespace XForms.Controls
                     distance = Math.Max(distance, (button.Bounds.Size.Width + Math.Max(0, this.ButtonSpacing)) / chord);
                 }
 
-                distance = Math.Max(distance, this.MinimumRadius);
                 var point = Point.Translate(new Point(0, 0), Angle.FromDegrees(angle), -distance);
                 nowait = button.FlyoutAnimator.TranslateTo(point, this.ActualTheme.Motion.Medium, new CubicEase(EasingMode.EaseOut));
 

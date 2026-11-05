@@ -6,12 +6,31 @@ using XForms.Layouts;
 namespace XForms.Test
 {
     /// <summary>
-    /// Tabs over a frame of same-colored pages (their edges show by their
-    /// shadows as they slide), a floating button whose sideways swipe switches
+    /// Tabs over a frame of same-colored pages (their edges show by the edge
+    /// shadow this page's theme gives them, as they slide), a floating button whose sideways swipe switches
     /// tabs as it moves, and a flyout button.
     /// </summary>
     public class TabbedPage : Page
     {
+        private Frame _frame;
+
+        // Its own look for what's in the frame: an edge shadow on sliding pages
+        // (a glow on a dark page), and roomier command bars
+        protected override void OnThemeChanged(
+            Theme theme)
+        {
+            base.OnThemeChanged(theme);
+
+            this._frame.Theme = theme.WithExtension(new CommandBarStyle() { ButtonSpacing = 12, ButtonHeight = 56, LabelFontSize = 11 }) with
+            {
+                PageEdgeShadow = new Shadow()
+                {
+                    Color = (theme.Mode == ThemeMode.Light) ? Color.FromArgb(0x40, 0, 0, 0) : Shadow.GlowColor,
+                    Blur = 16,
+                },
+            };
+        }
+
         protected override View Build()
         {
             var pageLayout = new DockPanel()
@@ -26,6 +45,7 @@ namespace XForms.Test
                 new TextBlock() { Text = "behind", FontSize = 18, HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(8, 0) },
                 Dock.CenterOverlay);
             var frame = new Frame() { Background = Colors.Transparent };
+            this._frame = frame;
             var tabBar = new TabStrip()
             {
                 Height = 70,
@@ -70,7 +90,7 @@ namespace XForms.Test
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
             };
-            addButton.Swiping += (sender, e) => tabBar.FollowSwipe(e);
+            addButton.SwipeRecognizer.Swiping += (sender, e) => tabBar.FollowSwipe(e);
             tray.Children.Add(addButton, Dock.CenterOverlay);
 
             var menuButton = new FlyoutButton()
@@ -162,7 +182,7 @@ namespace XForms.Test
             // bar: four commands, and edit at the end
             if (this._name == "three")
             {
-                var list = new CommandListView() { CommandBarButtonSpacing = 12, CommandBarLabelFontSize = 11 };
+                var list = new CommandListView();
                 foreach (var text in new[] { "never", "schedule", "soon", "done" })
                 {
                     list.CommandBarCommands.PrimaryCommands.Add(new UICommand() { Text = text, Icon = ThemeResources.Default.AboutLogo, Command = new RelayCommand(() => { }) });

@@ -38,7 +38,7 @@ namespace XForms.Themes.Basic
         {
             var colors = control.ActualTheme.Colors;
             var items = control.Items;
-            const float RowHeight = MenuFlyoutView.RowHeight;
+            float rowHeight = control.RowHeight;
             bool isRightToLeft = control.FlowDirection == FlowDirection.RightToLeft;
             float width = control.Bounds.Width;
             var format = control.CreateTextFormat();
@@ -47,8 +47,8 @@ namespace XForms.Themes.Basic
 
             for (int i = 0; i < items.Count; i += 1)
             {
-                var row = new Rect(0, i * RowHeight, width, RowHeight);
-                var highlight = new Rect(4, row.Y + 2, Math.Max(0, width - 8), RowHeight - 4);
+                var row = new Rect(0, i * rowHeight, width, rowHeight);
+                var highlight = new Rect(4, row.Y + 2, Math.Max(0, width - 8), rowHeight - 4);
                 bool isEnabled = control.IsItemEnabled(i);
 
                 if (i == control.PressedIndex)
@@ -60,7 +60,7 @@ namespace XForms.Themes.Basic
                     drawContext.FillRoundedRectangle(highlight, 4, control.ActualTheme.Colors.Surface);
                     if (control.IsFocused)
                     {
-                        drawContext.FillRectangle(new Rect(isRightToLeft ? highlight.Right - 3 : 4, row.Y + ((RowHeight - 16) / 2), 3, 16), colors.Accent);
+                        drawContext.FillRectangle(new Rect(isRightToLeft ? highlight.Right - 3 : 4, row.Y + ((rowHeight - 16) / 2), 3, 16), colors.Accent);
                     }
                 }
 
@@ -70,11 +70,11 @@ namespace XForms.Themes.Basic
                 {
                     const float IconSize = 16;
                     float x = isRightToLeft ? width - 12 - IconSize : 12;
-                    drawContext.DrawImage(icon, new Rect(x, row.Y + ((RowHeight - IconSize) / 2), IconSize, IconSize), color);
+                    drawContext.DrawImage(icon, new Rect(x, row.Y + ((rowHeight - IconSize) / 2), IconSize, IconSize), color);
                 }
 
                 float textX = isRightToLeft ? 12 : MenuFlyoutView.TextInset;
-                drawContext.DrawText(items[i].Text, new Rect(textX, row.Y, Math.Max(0, width - MenuFlyoutView.TextInset - 12), RowHeight), color, format);
+                drawContext.DrawText(items[i].Text, new Rect(textX, row.Y, Math.Max(0, width - MenuFlyoutView.TextInset - 12), rowHeight), color, format);
             }
         }
     }

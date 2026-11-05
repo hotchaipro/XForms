@@ -139,6 +139,8 @@ namespace XForms.Web
         // NOTE: The browser zooms the page itself
         public float SystemTextScale => 1;
 
+        public bool IsTouchPrimary => Js.IsTouchPrimary();
+
         // The text box's own size (its renderer's)
         public float TextEntryFontSize => 15;
 

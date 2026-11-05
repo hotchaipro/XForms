@@ -31,41 +31,31 @@ namespace XForms
         public static PageTransition None { get; } = new NoTransition();
 
         /// <summary>
-        /// The soft shadow along a sliding page's edges, so the edge shows
-        /// even over a page of the same color.
-        /// </summary>
-        private static readonly Shadow EdgeShadow = new Shadow()
-        {
-            Color = Color.FromArgb(0x40, 0, 0, 0),
-            Blur = 16,
-        };
-
-        /// <summary>
-        /// Gives the page its edge shadow, around all it draws (its views
-        /// reaching into the safe area beyond it too).
+        /// Gives the page its theme's edge shadow, if it has one, around all it
+        /// draws (its views reaching into the safe area beyond it too).
         /// </summary>
         internal static void ShowEdgeShadow(
             Page page,
             bool isHorizontal = true)
         {
+            var edgeShadow = page.ActualTheme.PageEdgeShadow;
+            if (null == edgeShadow)
+            {
+                return;
+            }
+
             // Only the moving edges cast it: along the others, the shape stops
             // short of the page's ends by the blur (so it doesn't spill over
             // what's beside the frame, such as a tab bar), or goes on past the
             // screen's edge where the page reaches it
             var reach = page.DrawnOutset;
-            float blur = EdgeShadow.Blur;
+            float blur = edgeShadow.Blur;
             float Along(float edgeReach) => (0 < edgeReach) ? edgeReach + blur : -blur;
             var outset = isHorizontal
                 ? new Thickness(reach.Left, Along(reach.Top), reach.Right, Along(reach.Bottom))
                 : new Thickness(Along(reach.Left), reach.Top, Along(reach.Right), reach.Bottom);
 
-            // In dark mode, a glow: a shadow wouldn't show on a dark page
-            var shadow = EdgeShadow with { Outset = outset };
-            if (page.ActualTheme.Mode != ThemeMode.Light)
-            {
-                shadow = shadow with { Color = Shadow.GlowColor };
-            }
-
+            var shadow = edgeShadow with { Outset = outset };
             page.Shadow = shadow;
             EdgeShadows.AddOrUpdate(page, shadow);
         }

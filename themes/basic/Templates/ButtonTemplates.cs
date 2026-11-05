@@ -159,86 +159,30 @@ namespace XForms.Themes.Basic
         }
     }
 
-    // A pill with the icon left of the label: outlined, and filled with the
-    // accent while checked; it shrinks a little as it's pressed
-    internal sealed class ToggleButtonTemplate : ControlTemplate<ToggleButton>
+    internal sealed class ToggleButtonTemplate : RoundToggleTemplate<ToggleButton>
     {
-        private const float PressedScale = 0.95f;
-        private const float IconSize = 24;
-        private const float IconLabelGap = 6;
-        private const float BorderWidth = 1;
-        private static readonly Thickness Padding = new Thickness(16, 8);
-
         private static readonly TextFormat LabelFormat = new TextFormat()
         {
-            FontSize = 15.0f,
-            HorizontalAlignment = HorizontalAlignment.Left,
-            VerticalAlignment = VerticalAlignment.Center,
+            FontSize = 10.0f,
+            FontWeight = FontWeight.Medium,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Bottom,
         };
 
-        protected override void OnStateChanged(
-            ToggleButton control,
-            TemplateContext context)
-        {
-            var feedback = ScaleFeedback.For(context);
-            if (control.IsPressed)
-            {
-                feedback.To(PressedScale, TimeSpan.FromMilliseconds(25), new CubicEase(EasingMode.EaseIn));
-            }
-            else
-            {
-                feedback.To(1.0f, control.ActualTheme.Motion.Short, new SpringEase(EasingMode.EaseOut));
-            }
-        }
+        protected override bool IsChecked(ToggleButton control) => control.IsChecked;
 
         protected override Size? Measure(
             ToggleButton control,
             Size availableSize)
         {
-            var text = TextLayout.Measure(control.Text ?? string.Empty, LabelFormat);
-            float width = Padding.Left + Padding.Right + (float)Math.Ceiling(text.Width);
-            if (null != control.Icon)
-            {
-                width += IconSize + (string.IsNullOrEmpty(control.Text) ? 0 : IconLabelGap);
-            }
-
-            float height = Padding.Top + Padding.Bottom + Math.Max(IconSize, (float)Math.Ceiling(text.Height));
-            return new Size(width, height);
+            return new Size(72, 60);
         }
 
         protected override void Render(
             ToggleButton control,
             DrawingContext drawContext)
         {
-            var bounds = new Rect(0, 0, control.Bounds.Width, control.Bounds.Height);
-            var colors = control.ActualTheme.Colors;
-            float radius = Math.Min(20, bounds.Height / 2);
-
-            Color foreground;
-            if (control.IsChecked)
-            {
-                drawContext.FillRoundedRectangle(bounds, radius, colors.Accent);
-                foreground = colors.OnAccent;
-            }
-            else
-            {
-                float inset = BorderWidth / 2;
-                drawContext.DrawRoundedRectangle(bounds.Deflate(inset, inset), radius - inset, colors.Outline, BorderWidth);
-                foreground = colors.Foreground;
-            }
-
-            // The icon and label, centered together
-            var text = TextLayout.Measure(control.Text ?? string.Empty, LabelFormat);
-            bool hasIcon = null != control.Icon;
-            float contentWidth = (float)Math.Ceiling(text.Width) + (hasIcon ? IconSize + (string.IsNullOrEmpty(control.Text) ? 0 : IconLabelGap) : 0);
-            float x = bounds.Center.X - (contentWidth / 2);
-            if (hasIcon)
-            {
-                drawContext.DrawImage(control.Icon, new Rect(x, bounds.Center.Y - (IconSize / 2), IconSize, IconSize), foreground);
-                x += IconSize + IconLabelGap;
-            }
-
-            drawContext.DrawText(control.Text, new Rect(x, 0, Math.Max(0, bounds.Right - x), bounds.Height), foreground, LabelFormat);
+            this.RenderRound(control, drawContext, control.Icon, control.Text, LabelFormat);
         }
     }
 
@@ -336,20 +280,18 @@ namespace XForms.Themes.Basic
         }
     }
 
-    // An icon over a small label, in the accent (or gray, for a subtle item),
-    // shrinking as it's pressed: the menu bar's buttons
+    // An icon over a small label, shrinking as it's pressed: the menu bar's
+    // buttons
     internal sealed class MenuButtonTemplate : ControlTemplate<MenuButton>
     {
         private const float PressedScale = 0.9f;
-        private const float MaxIconSize = 28;
-        private const float IconLabelGap = 2;
 
         private static readonly TextFormat LabelFormat = new TextFormat()
         {
-            FontSize = 11.0f,
+            FontSize = 10.0f,
             FontWeight = FontWeight.Medium,
             HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Top,
+            VerticalAlignment = VerticalAlignment.Bottom,
         };
 
         protected override void OnStateChanged(
@@ -373,45 +315,40 @@ namespace XForms.Themes.Basic
         {
             var bounds = new Rect(0, 0, control.Bounds.Width, control.Bounds.Height);
             var theme = control.ActualTheme;
-            var foreground = control.MenuItem.IsSubtleStyle
-                ? theme.Colors.SubtleForeground
-                : TabStripTemplate.SelectedColor(theme);
+            var foreground = (theme.Mode != ThemeMode.Light) ? theme.Colors.Foreground : theme.Colors.OnAccent;
+            if (control.MenuItem.IsSubtleStyle)
+            {
+                foreground = foreground.MultiplyAlpha(0.6f);
+            }
 
-            // A fixed size icon over the label, centered together: a taller
-            // bar has more room around them, not bigger icons
-            float textHeight = (float)Math.Ceiling(LabelFormat.FontSize * 1.25f);
-            float iconSize = Math.Min(MaxIconSize, Math.Min(bounds.Width, bounds.Height - textHeight - IconLabelGap));
-            float top = (bounds.Height - (iconSize + IconLabelGap + textHeight)) / 2;
-            Rect imageBounds = new Rect(bounds.Center.X - (iconSize / 2), top, iconSize, iconSize);
-            Rect textBounds = new Rect(bounds.X, imageBounds.Bottom + IconLabelGap, bounds.Width, textHeight);
+            float margin = Math.Min(bounds.Width, bounds.Height) * 0.1f;
+            bounds = bounds.Inflate(-margin, -margin);
+
+            float imageDimension = Math.Min(bounds.Width, bounds.Height) * 0.75f;
+            float textHeight = bounds.Height * 0.25f;
+            Rect imageBounds = new Rect(
+                bounds.Center.X - (imageDimension / 2f),
+                bounds.Center.Y - ((imageDimension + textHeight) / 2f),
+                imageDimension,
+                imageDimension);
+            Rect textBounds = new Rect(bounds.X, imageBounds.Bottom, bounds.Width, textHeight);
 
             drawContext.DrawImage(control.MenuItem.Icon, imageBounds, foreground);
             drawContext.DrawText(control.MenuItem.Text, textBounds, foreground, LabelFormat);
         }
     }
 
-    // A tab's icon over its label: gray, and the selection's color (with a
-    // bolder, larger label) when checked; it shrinks a little as it's pressed
+    // A tab's icon and label, full size when checked
     internal sealed class TabStripItemTemplate : ControlTemplate<TabStripItem>
     {
-        private const float PressedScale = 0.92f;
-        private const float MaxIconSize = 28;
-        private const float IconLabelGap = 2;
+        private const float UncheckedScale = 0.8f;
 
         private static readonly TextFormat LabelFormat = new TextFormat()
         {
             FontSize = 12.0f,
             FontWeight = FontWeight.Medium,
             HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Top,
-        };
-
-        private static readonly TextFormat CheckedLabelFormat = new TextFormat()
-        {
-            FontSize = 13.0f,
-            FontWeight = FontWeight.SemiBold,
-            HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Top,
+            VerticalAlignment = VerticalAlignment.Bottom,
         };
 
         protected override void OnStateChanged(
@@ -421,28 +358,18 @@ namespace XForms.Themes.Basic
             var feedback = ScaleFeedback.For(context);
             if (control.IsPressed)
             {
-                feedback.To(PressedScale, TimeSpan.FromMilliseconds(25), new CubicEase(EasingMode.EaseIn));
+                feedback.To(control.IsChecked ? 0.95f : UncheckedScale - 0.05f, TimeSpan.FromMilliseconds(25), new CubicEase(EasingMode.EaseIn));
+                feedback.Animator.Opacity = 1.0f;
+            }
+            else if (control.IsChecked)
+            {
+                feedback.To(1.0f, control.ActualTheme.Motion.Short, new SpringEase(EasingMode.EaseOut));
+                feedback.Animator.Opacity = 1.0f;
             }
             else
             {
-                feedback.To(1.0f, control.ActualTheme.Motion.Short, new SpringEase(EasingMode.EaseOut));
-            }
-        }
-
-        private static Color Foreground(
-            TabStripItem control)
-        {
-            var theme = control.ActualTheme;
-            if (control.IsChecked)
-            {
-                return TabStripTemplate.SelectedColor(theme);
-            }
-
-            switch (theme.Mode)
-            {
-                case ThemeMode.Light: return Color.FromRgb(0x6b, 0x6b, 0x6b);
-                case ThemeMode.Dark: return Color.FromRgb(0x99, 0x99, 0x99);
-                default: return theme.Colors.Foreground;
+                feedback.To(UncheckedScale, control.ActualTheme.Motion.Short, new CubicEase(EasingMode.EaseIn));
+                feedback.Animator.Opacity = (control.ActualTheme.Mode != ThemeMode.Light) ? 1.0f : 0.5f;
             }
         }
 
@@ -451,18 +378,32 @@ namespace XForms.Themes.Basic
             DrawingContext drawContext)
         {
             var bounds = new Rect(0, 0, control.Bounds.Width, control.Bounds.Height);
-            var format = control.IsChecked ? CheckedLabelFormat : LabelFormat;
-            var foreground = Foreground(control);
+            var theme = control.ActualTheme;
 
-            // The icon and label, centered together
-            float textHeight = (float)Math.Ceiling(format.FontSize * 1.25f);
-            float iconSize = Math.Min(MaxIconSize, Math.Min(bounds.Width, bounds.Height - textHeight - IconLabelGap));
-            float top = bounds.Y + ((bounds.Height - (iconSize + IconLabelGap + textHeight)) / 2);
-            Rect imageBounds = new Rect(bounds.Center.X - (iconSize / 2), top, iconSize, iconSize);
-            Rect textBounds = new Rect(bounds.X, imageBounds.Bottom + IconLabelGap, bounds.Width, textHeight);
+            float margin = Math.Min(bounds.Width, bounds.Height) * 0.1f;
+            bounds = bounds.Inflate(-margin, -margin);
+
+            float imageDimension = Math.Min(bounds.Width, bounds.Height) * 0.65f;
+            float textHeight = bounds.Height * 0.35f;
+            Rect imageBounds = new Rect(
+                bounds.Center.X - (imageDimension / 2f),
+                bounds.Center.Y - ((imageDimension + textHeight) / 2f),
+                imageDimension,
+                imageDimension);
+            Rect textBounds = new Rect(bounds.X, imageBounds.Bottom, bounds.Width, bounds.Bottom - imageBounds.Bottom);
+
+            Color foreground;
+            if (theme.Mode != ThemeMode.Light)
+            {
+                foreground = control.IsChecked ? theme.Colors.Accent : theme.Colors.SubtleForeground;
+            }
+            else
+            {
+                foreground = theme.Colors.OnAccent;
+            }
 
             drawContext.DrawImage(control.Icon, imageBounds, foreground);
-            drawContext.DrawText(control.Text, textBounds, foreground, format);
+            drawContext.DrawText(control.Text, textBounds, foreground, LabelFormat);
         }
     }
 
@@ -577,11 +518,12 @@ namespace XForms.Themes.Basic
             // button (all of which takes taps): a roomier button has more
             // space around them, not a bigger icon
             var format = LabelFormat;
-            if (control.LabelFontSize.HasValue)
+            var labelFontSize = control.ActualTheme.CommandBarStyle.LabelFontSize;
+            if (labelFontSize.HasValue)
             {
                 format = new TextFormat()
                 {
-                    FontSize = control.LabelFontSize.Value,
+                    FontSize = labelFontSize.Value,
                     FontWeight = LabelFormat.FontWeight,
                     HorizontalAlignment = LabelFormat.HorizontalAlignment,
                     VerticalAlignment = LabelFormat.VerticalAlignment,

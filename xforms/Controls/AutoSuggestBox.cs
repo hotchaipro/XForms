@@ -475,7 +475,7 @@ namespace XForms.Controls
     /// </summary>
     public sealed class AutoSuggestBoxListView : TemplatedControl
     {
-        public const float RowHeight = 48.0f;
+        public float RowHeight => this.ActualTheme.PopupRowHeight;
 
         private readonly AutoSuggestBox _box;
         private int _highlightedIndex = -1;

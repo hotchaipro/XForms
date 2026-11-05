@@ -249,6 +249,10 @@ export function post() {
 // Theme
 
 // Dark (1), more contrast (2), forced colors (4)
+export function isTouchPrimary() {
+    return matchMedia('(pointer: coarse)').matches;
+}
+
 export function themeState() {
     return (window.matchMedia('(prefers-color-scheme: dark)').matches ? 1 : 0)
         | (window.matchMedia('(prefers-contrast: more)').matches ? 2 : 0)

@@ -173,6 +173,17 @@ namespace XForms
         }
 
         /// <summary>
+        /// Whether touch, rather than a mouse, is the platform's primary input.
+        /// </summary>
+        public bool IsTouchPrimary
+        {
+            get
+            {
+                return this.Renderer.IsTouchPrimary;
+            }
+        }
+
+        /// <summary>
         /// The system's theme mode.
         /// </summary>
         public ThemeMode SystemThemeMode

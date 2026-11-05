@@ -133,29 +133,6 @@ namespace XForms.Controls
             }
         }
 
-        private float? _labelFontSize;
-
-        /// <summary>
-        /// The label's font size, or null (the default) for the theme's (its
-        /// command list's CommandBarLabelFontSize).
-        /// </summary>
-        public float? LabelFontSize
-        {
-            get
-            {
-                return this._labelFontSize;
-            }
-
-            set
-            {
-                if (value != this._labelFontSize)
-                {
-                    this._labelFontSize = value;
-                    this.InvalidateVisual();
-                }
-            }
-        }
-
         public string Text
         {
             get

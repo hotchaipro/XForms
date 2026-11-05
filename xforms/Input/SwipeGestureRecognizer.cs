@@ -25,7 +25,8 @@ namespace XForms.Input
     /// sideways (and the gesture then claims the pointer from a scrolling
     /// parent), or nothing if it went mostly up or down (the parent scrolls);
     /// one that lifts within the slop is a tap. A quick swipe that lifts
-    /// before any move arrives is still a swipe.
+    /// before any move arrives is still a swipe. Follow one with
+    /// <see cref="Swiping"/>, on any view, or with a delegate.
     /// </summary>
     public class SwipeGestureRecognizer : GestureRecognizer
     {
@@ -49,6 +50,14 @@ namespace XForms.Input
         private int _swipeDirection;
         private Point _gestureStart;
 
+        /// <summary>
+        /// A swipe for its <see cref="Swiping"/> event, with no delegate.
+        /// </summary>
+        public SwipeGestureRecognizer()
+            : this(new NoDelegate())
+        {
+        }
+
         public SwipeGestureRecognizer(
             ISwipeGestureDelegate swipeDelegate)
             : base(swipeDelegate)
@@ -60,6 +69,11 @@ namespace XForms.Input
 
             this._delegate = swipeDelegate;
         }
+
+        /// <summary>
+        /// A sideways swipe began, moved, ended or was canceled.
+        /// </summary>
+        public event EventHandler<SwipingEventArgs> Swiping;
 
         /// <summary>
         /// How fast the swipe was moving its way as it lifted, in points a
@@ -150,6 +164,7 @@ namespace XForms.Input
                     this._swipeDirection = Math.Sign(rawDx);
                     this.State = GestureState.Changed;
                     this.AddSample(0);
+                    this.Swiping?.Invoke(this, new SwipingEventArgs(SwipePhase.Began, this._swipeDirection, 0, 0));
                     this._delegate.OnSwipeBegan(this._swipeDirection);
                 }
                 else
@@ -170,6 +185,7 @@ namespace XForms.Input
                 if (this.State == GestureState.Changed)
                 {
                     this.AddSample(dx);
+                    this.Swiping?.Invoke(this, new SwipingEventArgs(SwipePhase.Moved, this._swipeDirection, dx, 0));
                     this._delegate.OnSwipeMoved(this._swipeDirection, dx);
                 }
 
@@ -193,7 +209,9 @@ namespace XForms.Input
                 {
                     this.AddSample(dx);
                     this.Velocity = this.MeasureVelocity();
+                    this.Swiping?.Invoke(this, new SwipingEventArgs(SwipePhase.Moved, this._swipeDirection, dx, 0));
                     this._delegate.OnSwipeMoved(this._swipeDirection, dx);
+                    this.Swiping?.Invoke(this, new SwipingEventArgs(SwipePhase.Ended, this._swipeDirection, dx, this.Velocity));
                     this._delegate.OnSwipeEnded(this._swipeDirection, dx);
 
                     this._delegate.OnTapEnded();
@@ -213,6 +231,7 @@ namespace XForms.Input
                 }
                 else if (this.State == GestureState.Changed)
                 {
+                    this.Swiping?.Invoke(this, new SwipingEventArgs(SwipePhase.Canceled, this._swipeDirection, 0, 0));
                     this._delegate.OnSwipeCanceled(this._swipeDirection);
 
                     this._delegate.OnTapEnded();
@@ -264,6 +283,41 @@ namespace XForms.Input
 
             double seconds = (double)(now - this._sampleTimes[first]) / System.Diagnostics.Stopwatch.Frequency;
             return (seconds > 0) ? (float)((this._sampleDistances[last] - this._sampleDistances[first]) / seconds) : 0;
+        }
+
+        private sealed class NoDelegate : ISwipeGestureDelegate
+        {
+            public bool OnSwipeBegan(int direction) => false;
+
+            public bool OnSwipeMoved(int direction, float dx) => false;
+
+            public bool OnSwipeEnded(int direction, float dx) => false;
+
+            public bool OnSwipeCanceled(int direction) => false;
+
+            public void OnTapBegan()
+            {
+            }
+
+            public void OnTapEnded()
+            {
+            }
+
+            public void OnTapped()
+            {
+            }
+
+            public void OnTouchBegan()
+            {
+            }
+
+            public void OnTouchEnded()
+            {
+            }
+
+            public void OnTouchCanceled()
+            {
+            }
         }
     }
 }

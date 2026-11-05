@@ -114,11 +114,6 @@ XForms.View.ExtendsIntoSafeArea.set -> void
 static readonly XForms.Primitives.TextBox.DefaultPadding -> XForms.Thickness
 XForms.Primitives.TextBox.Padding.get -> XForms.Thickness
 XForms.Primitives.TextBox.Padding.set -> void
-XForms.ColorScheme.StrongAccent.get -> XForms.Color
-XForms.ColorScheme.StrongAccent.init -> void
-XForms.ColorScheme.OnStrongAccent.get -> XForms.Color
-XForms.ColorScheme.OnStrongAccent.init -> void
-static XForms.Theme.StrongColor(XForms.Color color) -> XForms.Color
 abstract XForms.DrawingContext.FillShadow(XForms.Rect rectangle, XForms.Shadow shadow) -> void
 XForms.Shadow
 XForms.Shadow.Blur.get -> float
@@ -176,3 +171,6 @@ virtual XForms.Application.OnBackgroundRefreshAsync() -> System.Threading.Tasks.
 virtual XForms.GestureRecognizer.IsDragGesture.get -> bool
 XForms.Frame.Background.get -> XForms.Color?
 XForms.Frame.Background.set -> void
+XForms.Application.IsTouchPrimary.get -> bool
+XForms.Theme.PageEdgeShadow.get -> XForms.Shadow
+XForms.Theme.PageEdgeShadow.init -> void

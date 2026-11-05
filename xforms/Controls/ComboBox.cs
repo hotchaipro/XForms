@@ -289,7 +289,7 @@ namespace XForms.Controls
 
                 // As tall as the items, up to the space available
                 float height = Math.Min(
-                    (this._picker.Items.Count * ComboBoxItemsView.RowHeight) + (2 * Inset),
+                    (this._picker.Items.Count * this.ActualTheme.PopupRowHeight) + (2 * Inset),
                     availableSize.Height);
 
                 this._scrollView.Measure(new Size(
@@ -318,7 +318,7 @@ namespace XForms.Controls
     /// </summary>
     public sealed class ComboBoxItemsView : TemplatedControl
     {
-        public const float RowHeight = 48.0f;
+        public float RowHeight => this.ActualTheme.PopupRowHeight;
 
         private readonly ComboBox _picker;
         private int _highlightIndex;

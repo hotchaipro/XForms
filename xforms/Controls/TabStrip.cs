@@ -255,7 +255,7 @@ namespace XForms.Controls
 
         /// <summary>
         /// Switches tabs as a swipe moves (such as a
-        /// <see cref="FloatingButton.Swiping"/>): the content follows the
+        /// <see cref="SwipeGestureRecognizer.Swiping"/>): the content follows the
         /// finger, moving at twice its speed, so a swipe from the middle to the
         /// edge goes all the way; released, the switch completes past a third
         /// of the way, or with a flick, and goes back otherwise. A swipe to the

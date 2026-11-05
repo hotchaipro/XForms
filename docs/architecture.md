@@ -276,8 +276,9 @@ may return null (the item is gone), which counts as no match.
   share of `TransitionDuration` left. The page is current (and hears it's
   navigated to) as it completes. `TabStrip.BeginSwitch(direction)` does the
   same for the next or previous tab, its selection indicator following,
-  and `TabStrip.FollowSwipe` drives one from a swipe (such as
-  `FloatingButton.Swiping`): the pages move at twice the finger's speed,
+  and `TabStrip.FollowSwipe` drives one from a swipe (the `Swiping` event of
+  any view's `SwipeGestureRecognizer`, such as
+  `FloatingButton.SwipeRecognizer`): the pages move at twice the finger's speed,
   and a release completes past a third of the way, or with a flick.
 
 **The start.** After `OnStart`, XForms shows the first pages: the stack the
@@ -557,8 +558,9 @@ draws it with `FillShadow`; a native view's is the platform's own:
 - Win32: a visual behind the view's, in its innermost animation layer
   (approximating the blur); a view without animators has none.
 
-A frame gives a page a soft shadow while it slides, so its edge shows over
-a page of the same color.
+`Theme.PageEdgeShadow`, if a theme sets it (null by default), is cast by a
+page's moving edges while it slides, so they show over a page of the same
+color.
 
 ## Input
 
@@ -686,9 +688,17 @@ outline and disabled), and **extensions** that control libraries add
 (`GetExtension`, `WithExtension`), as Flutter's theme extensions. The
 framework knows only the mode and colors, which the platforms also fill
 from the system's high-contrast colors. XForms adds its
-`Typography`, `Shapes` and `Motion` (read as `theme.Typography` and so on)
-and its controls' templates (below); a theme package adds its own styles,
-such as XForms.Themes.Basic's `ButtonStyle`.
+`Typography`, `Shapes` and `Motion` (read as `theme.Typography` and so on),
+what its controls lay out by (`MenuBarStyle`, `CommandBarStyle`, and
+`Sizes.PopupRowHeight`, by default 48 where touch is the primary input and 36
+where a mouse is: `Application.IsTouchPrimary`) and its controls' templates
+(below); a theme package adds its own styles, such as XForms.Themes.Basic's
+`ButtonStyle`.
+
+Basic is a neutral starting point, not any one app's look. An app with a look
+of its own has its own `AppTheme`, which applies Basic and then replaces the
+templates and tokens it wants to:
+`new BasicTheme().Apply(theme).WithTemplate(new MyTabStripTemplate()).WithExtension(new MenuBarStyle { ... })`.
 
 The application builds its theme with `CreateTheme(mode, accent)` from the
 mode (the system's, unless the app sets `RequestedThemeMode`) and the accent

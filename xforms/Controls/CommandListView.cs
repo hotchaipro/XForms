@@ -46,6 +46,16 @@ namespace XForms.Controls
             get;
             set;
         }
+
+        /// <summary>
+        /// Whether a quick, short swipe runs its command as a full one does:
+        /// false by default. A side that requires a long swipe never does.
+        /// </summary>
+        public bool IsFlickEnabled
+        {
+            get;
+            set;
+        }
     }
 
     /// <summary>
@@ -74,82 +84,6 @@ namespace XForms.Controls
         public SwipeCommandCollection SwipeCommands
         {
             get;
-        }
-
-        private Color? _commandBarBackground;
-        private float _commandBarButtonSpacing;
-        private float? _commandBarLabelFontSize;
-
-        /// <summary>
-        /// The command bar buttons' label size, or null (the default) for the
-        /// theme's. The icon and label stay centered together in the button.
-        /// </summary>
-        public float? CommandBarLabelFontSize
-        {
-            get
-            {
-                return this._commandBarLabelFontSize;
-            }
-
-            set
-            {
-                this._commandBarLabelFontSize = value;
-                foreach (var container in this.RealizedContainers)
-                {
-                    (container as CommandListViewItemContainer)?.ApplyCommandBarBackground();
-                }
-
-                this.OnPropertyChanged();
-            }
-        }
-
-        /// <summary>
-        /// The space between neighbouring command bar buttons' icons and
-        /// labels: 0 (the default) puts them side by side. Each button's
-        /// touch area takes its share of the space, so a tap between two
-        /// lands on the nearer; spaced buttons are taller too. If the bar
-        /// hasn't room for the spacing, its buttons go side by side.
-        /// </summary>
-        public float CommandBarButtonSpacing
-        {
-            get
-            {
-                return this._commandBarButtonSpacing;
-            }
-
-            set
-            {
-                this._commandBarButtonSpacing = value;
-                foreach (var container in this.RealizedContainers)
-                {
-                    (container as CommandListViewItemContainer)?.ApplyCommandBarBackground();
-                }
-
-                this.OnPropertyChanged();
-            }
-        }
-
-        /// <summary>
-        /// The background behind an item's command bar, or null (the default)
-        /// for none: the selected row's tint shows through.
-        /// </summary>
-        public Color? CommandBarBackground
-        {
-            get
-            {
-                return this._commandBarBackground;
-            }
-
-            set
-            {
-                this._commandBarBackground = value;
-                foreach (var container in this.RealizedContainers)
-                {
-                    (container as CommandListViewItemContainer)?.ApplyCommandBarBackground();
-                }
-
-                this.OnPropertyChanged();
-            }
         }
 
         public override ListViewItem CreateItemContainer()
@@ -296,16 +230,6 @@ namespace XForms.Controls
             }
         }
 
-        // The list's look for the command bar: its background, spacing and
-        // label size
-        internal void ApplyCommandBarBackground()
-        {
-            this._commandBar.Background = this.CommandListView?.CommandBarBackground ?? Colors.Transparent;
-            this._commandBar.ButtonSpacing = this.CommandListView?.CommandBarButtonSpacing ?? 0;
-            var labelFontSize = this.CommandListView?.CommandBarLabelFontSize;
-            this._commandBar.LabelFontSize = (labelFontSize > 0) ? labelFontSize : null;
-        }
-
         protected override void AddContent(
             View content)
         {
@@ -329,7 +253,6 @@ namespace XForms.Controls
                 this._commandBarCommands = commands;
             }
             this._commandBar.CommandParameter = this.Item;
-            this.ApplyCommandBarBackground();
 
             // Reset swipe defaults
             this._swipeItem.Animator.Stop();
@@ -567,16 +490,16 @@ namespace XForms.Controls
         }
 
         // A quick, short swipe its way runs the (short swipe's) command, if
-        // it can run and doesn't need a long swipe
+        // the list asks for that, and it can run and doesn't need a long swipe
         private bool IsFlick(
             int direction)
         {
-            if ((this._swipeRecognizer?.Velocity ?? 0) < FlickVelocity)
+            var swipeCommands = this.CommandListView?.SwipeCommands;
+            if (!(swipeCommands?.IsFlickEnabled ?? false) || ((this._swipeRecognizer?.Velocity ?? 0) < FlickVelocity))
             {
                 return false;
             }
 
-            var swipeCommands = this.CommandListView?.SwipeCommands;
             bool isLongSwipeRequired = (direction > 0)
                 ? (swipeCommands?.IsLongSwipeRequiredForPrimaryCommands ?? false)
                 : (swipeCommands?.IsLongSwipeRequiredForSecondaryCommands ?? false);

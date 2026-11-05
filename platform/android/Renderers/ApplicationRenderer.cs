@@ -136,6 +136,8 @@ namespace XForms.Android.Renderers
         // scaled pixels
         public float SystemTextScale => this._androidApplication.ActivityOrContext.Resources.Configuration.FontScale;
 
+        public bool IsTouchPrimary => true;
+
         // An edit text's own size (the theme's), in scaled pixels
         private float _textEntryFontSize;
 
