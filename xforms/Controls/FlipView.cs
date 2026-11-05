@@ -15,8 +15,6 @@ namespace XForms.Controls
     {
         public static readonly ViewProperty<FlipView, int> SelectedIndexProperty = new(nameof(SelectedIndex), v => v.SelectedIndex, (v, x) => v.SelectedIndex = x);
 
-        private const float ButtonWidth = 32.0f;
-
         private readonly FlipViewStrip _strip;
         private readonly FlipViewButton _previousButton;
         private readonly FlipViewButton _nextButton;
@@ -219,11 +217,11 @@ namespace XForms.Controls
         protected override Size MeasureOverride(
             Size availableSize)
         {
-            float width = float.IsInfinity(availableSize.Width) ? 320 : availableSize.Width;
-            float height = float.IsInfinity(availableSize.Height) ? 240 : availableSize.Height;
+            float width = float.IsInfinity(availableSize.Width) ? this.ActualTheme.FlipViewStyle.DefaultSize.Width : availableSize.Width;
+            float height = float.IsInfinity(availableSize.Height) ? this.ActualTheme.FlipViewStyle.DefaultSize.Height : availableSize.Height;
             this._strip.Measure(new Size(width, height));
-            this._previousButton.Measure(new Size(ButtonWidth, height));
-            this._nextButton.Measure(new Size(ButtonWidth, height));
+            this._previousButton.Measure(new Size(this.ActualTheme.FlipViewStyle.ButtonWidth, height));
+            this._nextButton.Measure(new Size(this.ActualTheme.FlipViewStyle.ButtonWidth, height));
             return new Size(width, height);
         }
 
@@ -233,10 +231,10 @@ namespace XForms.Controls
         {
             this._strip.ItemWidth = finalSize.Width;
             this._strip.Arrange(new Rect(0, 0, finalSize.Width * Math.Max(1, this.Items.Count), finalSize.Height));
-            float buttonHeight = Math.Min(64, finalSize.Height);
+            float buttonHeight = Math.Min(this.ActualTheme.FlipViewStyle.ButtonMaximumHeight, finalSize.Height);
             float y = (finalSize.Height - buttonHeight) / 2;
-            this._previousButton.Arrange(new Rect(0, y, ButtonWidth, buttonHeight));
-            this._nextButton.Arrange(new Rect(finalSize.Width - ButtonWidth, y, ButtonWidth, buttonHeight));
+            this._previousButton.Arrange(new Rect(0, y, this.ActualTheme.FlipViewStyle.ButtonWidth, buttonHeight));
+            this._nextButton.Arrange(new Rect(finalSize.Width - this.ActualTheme.FlipViewStyle.ButtonWidth, y, this.ActualTheme.FlipViewStyle.ButtonWidth, buttonHeight));
             if (!this._isPanning)
             {
                 this.Settle(animated: false);
@@ -515,21 +513,27 @@ namespace XForms.Controls
     /// view): a tap on a dot selects its page; with keyboard focus, Left and
     /// Right (following the flow direction), Home and End move it. Its
     /// theme's template draws it, in the layout it measures: a dot each
-    /// <see cref="DotSpacing"/> apart, centered.
+    /// <see cref="PipsPagerStyle.DotSpacing"/> apart, centered.
     /// </summary>
     public class PipsPager : TemplatedControl
     {
-        public static readonly ViewProperty<PipsPager, int> SelectedPageIndexProperty = new(nameof(SelectedPageIndex), v => v.SelectedPageIndex, (v, x) => v.SelectedPageIndex = x);
+        private StyledValue<float> _height = new StyledValue<float>(Dimension.Auto);
 
-        public const float DotSpacing = 20.0f;
+        public static readonly ViewProperty<PipsPager, int> SelectedPageIndexProperty = new(nameof(SelectedPageIndex), v => v.SelectedPageIndex, (v, x) => v.SelectedPageIndex = x);
 
         private int _numberOfPages;
         private int _selectedPageIndex;
 
+        protected override void OnThemeChanged(
+            Theme theme)
+        {
+            base.OnThemeChanged(theme);
+            this.Height = this._height.Apply(this.Height, theme.PipsPagerStyle.Height);
+        }
+
         public PipsPager()
         {
             this.Focusable = true;
-            this.Height = 28;
         }
 
         public event EventHandler SelectedIndexChanged;
@@ -655,16 +659,16 @@ namespace XForms.Controls
         public Point GetDotCenter(
             int index)
         {
-            float total = this._numberOfPages * DotSpacing;
+            float total = this._numberOfPages * this.ActualTheme.PipsPagerStyle.DotSpacing;
             float start = (this.Bounds.Width - total) / 2;
             int place = this.IsRightToLeft ? this._numberOfPages - 1 - index : index;
-            return new Point(start + (place * DotSpacing) + (DotSpacing / 2), this.Bounds.Height / 2);
+            return new Point(start + (place * this.ActualTheme.PipsPagerStyle.DotSpacing) + (this.ActualTheme.PipsPagerStyle.DotSpacing / 2), this.Bounds.Height / 2);
         }
 
         protected override Size MeasureOverride(
             Size availableSize)
         {
-            return new Size(Math.Min(this._numberOfPages * DotSpacing, availableSize.Width), Math.Min(28, availableSize.Height));
+            return new Size(Math.Min(this._numberOfPages * this.ActualTheme.PipsPagerStyle.DotSpacing, availableSize.Width), Math.Min(this.ActualTheme.PipsPagerStyle.Height, availableSize.Height));
         }
 
         protected override void OnPointerPressed(
@@ -678,7 +682,7 @@ namespace XForms.Controls
         {
             for (int i = 0; i < this._numberOfPages; i += 1)
             {
-                if (Math.Abs(this.GetDotCenter(i).X - e.Position.X) <= DotSpacing / 2)
+                if (Math.Abs(this.GetDotCenter(i).X - e.Position.X) <= this.ActualTheme.PipsPagerStyle.DotSpacing / 2)
                 {
                     this.SelectedPageIndex = i;
                     break;

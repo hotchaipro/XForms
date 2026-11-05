@@ -11,13 +11,6 @@ namespace XForms.Controls
     {
         public static readonly ViewProperty<ProgressBar, double> ValueProperty = new(nameof(Value), v => v.Value, (v, x) => v.Value = x);
 
-        /// <summary>
-        /// The bar's height, unless it's given one.
-        /// </summary>
-        public const float DefaultHeight = 4.0f;
-
-        private const float DefaultWidth = 200.0f;
-
         private bool _isIndeterminate;
         private bool _showError;
         private bool _showPaused;
@@ -103,8 +96,9 @@ namespace XForms.Controls
         protected override Size MeasureOverride(
             Size availableSize)
         {
-            float width = float.IsInfinity(availableSize.Width) ? DefaultWidth : availableSize.Width;
-            return new Size(width, Math.Min(DefaultHeight, availableSize.Height));
+            var style = this.ActualTheme.ProgressBarStyle;
+            float width = float.IsInfinity(availableSize.Width) ? style.DefaultWidth : availableSize.Width;
+            return new Size(width, Math.Min(style.Height, availableSize.Height));
         }
     }
 }

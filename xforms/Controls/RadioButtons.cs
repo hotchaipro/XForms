@@ -7,6 +7,15 @@ namespace XForms.Controls
 {
     public class RadioButtons : ContentControl
     {
+        private StyledValue<float> _height = new StyledValue<float>(Dimension.Auto);
+
+        protected override void OnThemeChanged(
+            Theme theme)
+        {
+            base.OnThemeChanged(theme);
+            this.Height = this._height.Apply(this.Height, theme.RadioButtonStyle.Height);
+        }
+
         public static readonly ViewProperty<RadioButtons, object> SelectedItemProperty = new(nameof(SelectedItem), v => v.SelectedItem, (v, x) => v.SelectedItem = x);
 
         private DockPanel _buttonsLayout;
@@ -21,8 +30,6 @@ namespace XForms.Controls
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Stretch,
             };
-
-            this.Height = 60;
 
             this.Items = new RadioButtonItemCollection(this);
 

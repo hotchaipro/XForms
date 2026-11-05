@@ -1,5 +1,7 @@
 using System;
+using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using XForms.Controls;
 using XForms.Themes.Basic;
@@ -153,6 +155,112 @@ namespace XForms.Tests
             // Basic's arrow buttons are days here, and this theme's are further along
             Assert.Equal(CalendarViewPart.NextMonth, calendar.Press(new Point(400, 30)));
             Assert.Equal(CalendarViewPart.None, calendar.Press(new Point(250, 30)));
+        }
+
+        private static void DeliverTheme(
+            View view,
+            Theme theme)
+        {
+            view.Theme = theme;
+            view.GetType().GetMethod("OnThemeChanged", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(view, new object[] { theme });
+        }
+
+        [Fact]
+        public void AThemeSizesASwitchsTrack()
+        {
+            var theme = Basic.WithExtension(Basic.ToggleSwitchStyle with { TrackWidth = 60, TrackHeight = 30, TouchHeight = 50 });
+            var toggle = new ToggleSwitch() { Theme = theme };
+            SetBounds(toggle, new Size(200, 50));
+
+            Assert.Equal(new Rect(0, 10, 60, 30), toggle.TrackBounds);
+        }
+
+        [Fact]
+        public void AThemeSizesATreeViewsItems()
+        {
+            var theme = Basic.WithExtension(Basic.TreeViewStyle with { ItemHeight = 50, Indent = 30, ChevronWidth = 40, ItemInset = 2 });
+            var item = (TreeViewItem)Activator.CreateInstance(typeof(TreeViewItem), BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public, null, new object[] { null, new TreeViewNode(), null, 2 }, null);
+            DeliverTheme(item, theme);
+            SetBounds(item, new Size(300, 50));
+
+            Assert.Equal(50, item.Height);
+            Assert.Equal(new Rect(62, 0, 40, 50), item.ChevronBounds);
+        }
+
+        [Fact]
+        public void AThemeInsetsAPopupsContent()
+        {
+            var theme = Basic.WithExtension(Basic.PopupStyle with { ContentInset = 20 });
+            var view = new MenuFlyoutView(new MenuFlyout());
+            var frame = (View)Activator.CreateInstance(
+                typeof(MenuFlyout).GetNestedType("MenuFrame", BindingFlags.NonPublic),
+                new object[] { view });
+
+            DeliverTheme(frame, theme);
+
+            Assert.Equal(new Thickness(20), view.Margin);
+        }
+
+        [Fact]
+        public void ASizeTheAppSetsStays()
+        {
+            var item = new NavigationViewItem();
+            DeliverTheme(item, Basic);
+            Assert.Equal(40, item.Height);
+            Assert.Equal(new Thickness(4, 0, 4, 0), item.Margin);
+
+            // The style's value follows the theme...
+            DeliverTheme(item, Basic.WithExtension(Basic.NavigationViewStyle with { ItemHeight = 60 }));
+            Assert.Equal(60, item.Height);
+
+            // ...until the app gives its own, before or after it's attached
+            item.Height = 25;
+            DeliverTheme(item, Basic);
+            Assert.Equal(25, item.Height);
+
+            var early = new NavigationViewItem() { Height = 25 };
+            DeliverTheme(early, Basic);
+            Assert.Equal(25, early.Height);
+        }
+
+        // Tokens are shape only: a value in the framework would be a default look
+        [Fact]
+        public void EveryTokenIsRequired()
+        {
+            var optional = new[]
+            {
+                (typeof(TextStyle), nameof(TextStyle.FontFamily)),
+                (typeof(TextStyle), nameof(TextStyle.FontWeight)),
+                (typeof(CommandBarStyle), nameof(CommandBarStyle.LabelFontSize)),
+            };
+
+            var tokens = typeof(ThemeTokens).Assembly.GetExportedTypes()
+                .Where(t => t.Namespace == typeof(ThemeTokens).Namespace && (t.Name.EndsWith("Style", StringComparison.Ordinal) || (t == typeof(Typography)) || (t == typeof(Shapes)) || (t == typeof(Motion))))
+                .ToList();
+            Assert.Contains(typeof(CheckBoxStyle), tokens);
+
+            foreach (var token in tokens)
+            {
+                foreach (var property in token.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly).Where(p => p.Name != "EqualityContract"))
+                {
+                    bool isRequired = property.IsDefined(typeof(RequiredMemberAttribute), false);
+                    Assert.True(isRequired || optional.Contains((token, property.Name)), $"{token.Name}.{property.Name} isn't required, so the framework gives it a value");
+                }
+            }
+        }
+
+        [Fact]
+        public void BasicSuppliesEveryToken()
+        {
+            var getters = typeof(ThemeTokens).GetMethods(BindingFlags.Static | BindingFlags.Public)
+                .Where(m => m.Name.StartsWith("get_", StringComparison.Ordinal))
+                .ToList();
+            Assert.NotEmpty(getters);
+
+            foreach (var getter in getters)
+            {
+                Assert.NotNull(getter.Invoke(null, new object[] { Basic }));
+            }
         }
 
         [Fact]

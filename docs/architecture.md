@@ -139,7 +139,9 @@ The build enforces these rules:
   API;
 - the contract (`XForms.Platform`) is internal, visible only to the four
   framework platforms (`InternalsVisibleTo`), and XF0001 keeps them to it;
-  nothing else sees the framework's or the toolkit's internals.
+  nothing else sees the framework's or the toolkit's internals;
+- XForms' controls have no look of their own: XF0003 fails the build on one
+  in XForms (see Themes).
 
 Namespaces: the framework uses `XForms`, `XForms.Primitives` (the native
 primitives) and `XForms.Platform` (the contract). XForms.Toolkit uses
@@ -725,18 +727,46 @@ replaces the package's palette with the system's colors where it has them,
 after the package has given its own, so a package can't lose them by accident;
 only the scrim stays the package's, since systems have none.
 
-XForms adds its
-`Typography`, `Shapes` and `Motion` (read as `theme.Typography` and so on),
-what its controls lay out by (`MenuBarStyle`, `CommandBarStyle`, and
-`Sizes.PopupRowHeight`, by default 48 where touch is the primary input and 36
-where a mouse is: `Application.IsTouchPrimary`) and its controls' templates
-(below); a theme package adds its own styles, such as XForms.Themes.Basic's
-`ButtonStyle` and `BasicColors`.
+XForms adds its `Typography`, `Shapes` and `Motion` (read as
+`theme.Typography` and so on), a style for each control with a size
+(`CheckBoxStyle`, `SliderStyle`, `CalendarViewStyle` and so on, read as
+`theme.CheckBoxStyle`, in `xforms/Theming/ControlStyles.cs`) and its controls'
+templates (below); a theme package adds its own styles, such as
+XForms.Themes.Basic's `ButtonStyle` and `BasicColors`.
+
+**Tokens.** XForms declares these tokens' shape, and a theme package gives
+their values. Every property is `required`, so a style can't be half a look,
+and a control whose theme has no style for it throws, as one with no template
+does. A style is what its control measures, arranges and hit-tests by, so a
+theme that changes a check box's box or a calendar's cells moves where presses
+land too, and the template reads the same values to draw (Basic's check mark
+scales with the box). To change part of one, copy the theme's:
+`theme.WithExtension(theme.CheckBoxStyle with { BoxSize = 24 })`. A size a
+control gives one of its own properties (a navigation item's height) is the
+style's until the app sets its own, which then stays.
+
+A control keeps what's behavior: where a layout changes
+(`NavigationView.CompactThreshold`), how far or fast a swipe has to go. Motion
+that follows a gesture stays too, with its timing from `Motion`. Decorative
+motion is the theme's: `FlyoutButtonStyle` says how a flyout button turns,
+shrinks and fans out, and `ExpanderStyle.RevealOffset` how far an expander's
+content slides in.
+
+**XF0003** (`LooklessControlsAnalyzer`) keeps it that way. In the XForms
+assembly, and nowhere else, it fails the build on a literal color, drawing
+outside the template machinery (`TemplatedControl`, `TemplatedContentControl`,
+`ListViewItem`, `Border`, `ControlTemplate`, `TemplateHost`), a numeric
+constant on a view, a literal `Thickness` or `Size`, a literal size, spacing,
+font size or weight assigned to a view, an easing of its own, or a literal
+rotation or scale. A constant that's behavior says why, with
+`[BehaviorConstant("...")]`, which a reason is required for and which excuses
+nothing else. `EveryTokenIsRequired` in `test/XForms.Tests` keeps values out of
+the tokens themselves.
 
 Basic is a neutral starting point, not any one app's look. An app with a look
 of its own has its own `AppTheme`, which applies Basic and then replaces the
 templates and tokens it wants to:
-`new BasicTheme().Apply(theme).WithTemplate(new MyTabStripTemplate()).WithExtension(new MenuBarStyle { ... })`.
+`theme = new BasicTheme().Apply(theme); return theme.WithTemplate(new MyTabStripTemplate()).WithExtension(theme.MenuBarStyle with { ... });`.
 To replace the colors, it overrides `CreateColors` too, and sets `BasicColors`
 for what has no role:
 
@@ -787,8 +817,8 @@ Avalonia's, but in code):
 One template serves every control of its type, so per-control state (an
 animator, a part) lives in `TemplateContext.State`. Controls whose input
 depends on their geometry (the calendar's cells, a picker's text and glyph
-areas, a combo box's rows) keep that geometry and expose it, with their
-state, read-only; the template draws everything else.
+areas, a combo box's rows) work it out from their style and expose it, with
+their state, read-only; the template draws everything else.
 
 **Choosing a theme.** An app passes its theme package to `XFormsApp.Run`
 (`new BasicTheme()`, an `AppTheme`), and there's no fallback: a templated

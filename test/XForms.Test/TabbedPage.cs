@@ -21,7 +21,7 @@ namespace XForms.Test
         {
             base.OnThemeChanged(theme);
 
-            this._frame.Theme = theme.WithExtension(new CommandBarStyle() { ButtonSpacing = 12, ButtonHeight = 56, LabelFontSize = 11 }) with
+            this._frame.Theme = theme.WithExtension(theme.CommandBarStyle with { ButtonSpacing = 12, ButtonHeight = 56, LabelFontSize = 11 }) with
             {
                 PageEdgeShadow = new Shadow()
                 {

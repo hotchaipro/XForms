@@ -275,8 +275,7 @@ namespace XForms.Controls
             public TimeFrame(
                 TimePickerView view)
             {
-                view.Margin = new Thickness(ContentInset);
-                this.Content = view;
+                this.FramedContent = view;
             }
         }
     }
@@ -304,18 +303,10 @@ namespace XForms.Controls
     public sealed class TimePickerView : TemplatedControl
     {
         /// <summary>
-        /// The height of a row in a column.
-        /// </summary>
-        public const float RowHeight = 40.0f;
-
-        /// <summary>
         /// The rows shown in a column: the value in the middle, and two above
         /// and below.
         /// </summary>
         public const int VisibleRows = 5;
-
-        private const float ColumnWidth = 72.0f;
-        private const float ButtonHeight = 44.0f;
 
         private readonly TimePicker _picker;
         private int _hour;
@@ -427,8 +418,8 @@ namespace XForms.Controls
             Size availableSize)
         {
             return new Size(
-                Math.Min(this.ColumnCount * ColumnWidth, availableSize.Width),
-                Math.Min((VisibleRows * RowHeight) + ButtonHeight, availableSize.Height));
+                Math.Min(this.ColumnCount * this.ActualTheme.TimePickerViewStyle.ColumnWidth, availableSize.Width),
+                Math.Min((VisibleRows * this.ActualTheme.TimePickerViewStyle.RowHeight) + this.ActualTheme.TimePickerViewStyle.ButtonHeight, availableSize.Height));
         }
 
         private bool IsRightToLeft
@@ -455,7 +446,7 @@ namespace XForms.Controls
         {
             float step = this.ColumnStep;
             int place = this.IsRightToLeft ? this.ColumnCount - 1 - column : column;
-            return new Rect(place * step, 0, step, VisibleRows * RowHeight);
+            return new Rect(place * step, 0, step, VisibleRows * this.ActualTheme.TimePickerViewStyle.RowHeight);
         }
 
         /// <summary>
@@ -466,7 +457,7 @@ namespace XForms.Controls
             int row)
         {
             var bounds = this.GetColumnBounds(column);
-            return new Rect(bounds.X, row * RowHeight, bounds.Width, RowHeight);
+            return new Rect(bounds.X, row * this.ActualTheme.TimePickerViewStyle.RowHeight, bounds.Width, this.ActualTheme.TimePickerViewStyle.RowHeight);
         }
 
         public Rect AcceptBounds
@@ -474,7 +465,7 @@ namespace XForms.Controls
             get
             {
                 float half = this.Bounds.Width / 2;
-                return new Rect(this.IsRightToLeft ? half : 0, VisibleRows * RowHeight, half, ButtonHeight);
+                return new Rect(this.IsRightToLeft ? half : 0, VisibleRows * this.ActualTheme.TimePickerViewStyle.RowHeight, half, this.ActualTheme.TimePickerViewStyle.ButtonHeight);
             }
         }
 
@@ -483,7 +474,7 @@ namespace XForms.Controls
             get
             {
                 float half = this.Bounds.Width / 2;
-                return new Rect(this.IsRightToLeft ? 0 : half, VisibleRows * RowHeight, half, ButtonHeight);
+                return new Rect(this.IsRightToLeft ? 0 : half, VisibleRows * this.ActualTheme.TimePickerViewStyle.RowHeight, half, this.ActualTheme.TimePickerViewStyle.ButtonHeight);
             }
         }
 
@@ -588,7 +579,7 @@ namespace XForms.Controls
                 if (Contains(bounds, point))
                 {
                     column = i;
-                    row = Math.Clamp((int)(point.Y / RowHeight), 0, VisibleRows - 1);
+                    row = Math.Clamp((int)(point.Y / this.ActualTheme.TimePickerViewStyle.RowHeight), 0, VisibleRows - 1);
                     return TimePickerViewPart.Column;
                 }
             }

@@ -6,3 +6,4 @@
 Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
 XF0001 | XForms.Platform | Error | PlatformContractAnalyzer
+XF0003 | XForms.Look | Error | LooklessControlsAnalyzer

@@ -60,17 +60,12 @@ namespace XForms.Controls
             {
                 get
                 {
-                    return this.Content;
+                    return this.FramedContent;
                 }
 
                 set
                 {
-                    if (null != value)
-                    {
-                        value.Margin = new Thickness(ContentInset);
-                    }
-
-                    this.Content = value;
+                    this.FramedContent = value;
                 }
             }
         }

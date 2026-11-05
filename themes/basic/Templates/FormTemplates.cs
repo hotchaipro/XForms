@@ -199,7 +199,7 @@ namespace XForms.Themes.Basic
                 Animator = new Animator(),
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Stretch,
-                CornerRadius = ProgressBar.DefaultHeight / 2,
+                CornerRadius = control.ActualTheme.ProgressBarStyle.Height / 2,
                 Background = ColorFor(control),
                 IsVisible = false,
                 IsHitTestVisible = false,
@@ -237,7 +237,9 @@ namespace XForms.Themes.Basic
             ProgressBar control,
             TemplateContext context)
         {
-            ((Parts)context.State).Segment.Background = ColorFor(control);
+            var segment = ((Parts)context.State).Segment;
+            segment.Background = ColorFor(control);
+            segment.CornerRadius = control.ActualTheme.ProgressBarStyle.Height / 2;
         }
 
         protected override void OnStateChanged(
@@ -353,7 +355,8 @@ namespace XForms.Themes.Basic
 
             drawContext.Clear(Colors.Transparent);
 
-            var band = new Rect(4, Middle * TimePickerView.RowHeight, Math.Max(0, control.Bounds.Width - 8), TimePickerView.RowHeight);
+            float rowHeight = control.ActualTheme.TimePickerViewStyle.RowHeight;
+            var band = new Rect(4, Middle * rowHeight, Math.Max(0, control.Bounds.Width - 8), rowHeight);
             drawContext.FillRoundedRectangle(band, 4, control.ActualTheme.Colors.Accent);
 
             for (int column = 0; column < control.ColumnCount; column += 1)

@@ -9,7 +9,7 @@ namespace XForms.Controls
     {
         public string FontFamily { get; init; } = FontFamilies.SansSerif;
 
-        public float FontSize { get; init; } = 15;
+        public required float FontSize { get; init; }
 
         public FontWeight FontWeight { get; init; } = FontWeight.Normal;
 
@@ -33,19 +33,19 @@ namespace XForms.Controls
     public sealed record Typography
     {
         /// <summary>Large numbers and headlines.</summary>
-        public TextStyle Display { get; init; } = new TextStyle() { FontSize = 34, FontWeight = FontWeight.Light };
+        public required TextStyle Display { get; init; }
 
         /// <summary>Page and section titles.</summary>
-        public TextStyle Title { get; init; } = new TextStyle() { FontSize = 20, FontWeight = FontWeight.SemiBold };
+        public required TextStyle Title { get; init; }
 
         /// <summary>Body text.</summary>
-        public TextStyle Body { get; init; } = new TextStyle() { FontSize = 15 };
+        public required TextStyle Body { get; init; }
 
         /// <summary>Text in controls: buttons, tabs, fields.</summary>
-        public TextStyle Label { get; init; } = new TextStyle() { FontSize = 14 };
+        public required TextStyle Label { get; init; }
 
         /// <summary>Small supporting text.</summary>
-        public TextStyle Caption { get; init; } = new TextStyle() { FontSize = 12 };
+        public required TextStyle Caption { get; init; }
     }
 
     /// <summary>
@@ -54,13 +54,13 @@ namespace XForms.Controls
     public sealed record Shapes
     {
         /// <summary>Small controls: chips, check boxes, text boxes.</summary>
-        public float SmallCornerRadius { get; init; } = 4;
+        public required float SmallCornerRadius { get; init; }
 
         /// <summary>Buttons, cards and popups.</summary>
-        public float MediumCornerRadius { get; init; } = 8;
+        public required float MediumCornerRadius { get; init; }
 
         /// <summary>Sheets and dialogs.</summary>
-        public float LargeCornerRadius { get; init; } = 16;
+        public required float LargeCornerRadius { get; init; }
     }
 
     /// <summary>
@@ -69,151 +69,136 @@ namespace XForms.Controls
     public sealed record Motion
     {
         /// <summary>Press feedback.</summary>
-        public TimeSpan Short { get; init; } = TimeSpan.FromMilliseconds(100);
+        public required TimeSpan Short { get; init; }
 
         /// <summary>Most transitions.</summary>
-        public TimeSpan Medium { get; init; } = TimeSpan.FromMilliseconds(250);
+        public required TimeSpan Medium { get; init; }
 
         /// <summary>Large movements, such as pages and sheets.</summary>
-        public TimeSpan Long { get; init; } = TimeSpan.FromMilliseconds(400);
+        public required TimeSpan Long { get; init; }
 
         /// <summary>Things that move from one place to another.</summary>
-        public EasingFunction Standard { get; init; } = new CubicEase(EasingMode.EaseInOut);
+        public required EasingFunction Standard { get; init; }
 
         /// <summary>Things that arrive.</summary>
-        public EasingFunction Decelerate { get; init; } = new CubicEase(EasingMode.EaseOut);
+        public required EasingFunction Decelerate { get; init; }
 
         /// <summary>Things that leave.</summary>
-        public EasingFunction Accelerate { get; init; } = new CubicEase(EasingMode.EaseIn);
+        public required EasingFunction Accelerate { get; init; }
 
         /// <summary>Playful arrivals that overshoot and settle.</summary>
-        public EasingFunction Spring { get; init; } = new SpringEase(EasingMode.EaseOut);
+        public required EasingFunction Spring { get; init; }
     }
 
     /// <summary>
-    /// A theme's control sizes.
-    /// </summary>
-    public sealed record Sizes
-    {
-        /// <summary>
-        /// The rows of a popup list (a combo box's, a menu flyout's, a text
-        /// box's suggestions), or null (the default) for the platform's
-        /// primary input: 48 for touch, 36 for a mouse.
-        /// </summary>
-        public float? PopupRowHeight { get; init; }
-    }
-
-    /// <summary>
-    /// How a theme lays out a <see cref="MenuBar"/>.
-    /// </summary>
-    public sealed record MenuBarStyle
-    {
-        /// <summary>The bar's height.</summary>
-        public float Height { get; init; } = 50;
-
-        /// <summary>Each item's width.</summary>
-        public float ItemWidth { get; init; } = 72;
-
-        /// <summary>The space between items.</summary>
-        public float ItemSpacing { get; init; }
-
-        /// <summary>Where the items sit across the bar.</summary>
-        public HorizontalAlignment ItemsAlignment { get; init; } = HorizontalAlignment.Left;
-    }
-
-    /// <summary>
-    /// How a theme lays out a <see cref="CommandBar"/> (a command list's rows
-    /// have one too).
-    /// </summary>
-    public sealed record CommandBarStyle
-    {
-        /// <summary>
-        /// The space between neighbouring buttons' icons and labels. Each
-        /// button's touch area takes its share of it, so a tap between two
-        /// lands on the nearer. Without room for it across the bar, the
-        /// buttons go side by side.
-        /// </summary>
-        public float ButtonSpacing { get; init; }
-
-        /// <summary>The buttons' height.</summary>
-        public float ButtonHeight { get; init; } = 48;
-
-        /// <summary>The labels' font size, or null (the default) for the template's.</summary>
-        public float? LabelFontSize { get; init; }
-    }
-
-    /// <summary>
-    /// XForms.Controls' tokens in a theme (its extensions), with defaults when
-    /// the theme has none: <c>theme.Typography</c>, <c>theme.Shapes</c>,
-    /// <c>theme.Motion</c>, <c>theme.MenuBarStyle</c>,
-    /// <c>theme.CommandBarStyle</c>, <c>theme.PopupRowHeight</c>, and the
-    /// controls' styles (<c>theme.CheckBoxStyle</c> and so on), which only a
-    /// theme package has: a control whose theme has no style for it throws,
-    /// as one with no template does.
+    /// XForms.Controls' tokens in a theme (its extensions): the type scale,
+    /// shapes and motion (<c>theme.Typography</c> and so on) and the controls'
+    /// styles (<c>theme.CheckBoxStyle</c> and so on). These declare only their
+    /// shape: only a theme package has their values, and a theme without one
+    /// that's needed throws, as a control with no template does.
     /// </summary>
     public static class ThemeTokens
     {
-        private static readonly Typography DefaultTypography = new Typography();
-        private static readonly Shapes DefaultShapes = new Shapes();
-        private static readonly Motion DefaultMotion = new Motion();
-        private static readonly MenuBarStyle DefaultMenuBarStyle = new MenuBarStyle();
-        private static readonly CommandBarStyle DefaultCommandBarStyle = new CommandBarStyle();
-
         extension(Theme theme)
         {
-            /// <summary>
-            /// The type scale.
-            /// </summary>
-            public Typography Typography => theme.GetExtension<Typography>() ?? DefaultTypography;
+            /// <summary>The type scale.</summary>
+            public Typography Typography => Require<Typography>(theme);
+
+            /// <summary>Corner radii.</summary>
+            public Shapes Shapes => Require<Shapes>(theme);
+
+            /// <summary>Durations and easing curves.</summary>
+            public Motion Motion => Require<Motion>(theme);
+
+            /// <summary>How menu bars are laid out.</summary>
+            public MenuBarStyle MenuBarStyle => Require<MenuBarStyle>(theme);
+
+            /// <summary>How command bars are laid out.</summary>
+            public CommandBarStyle CommandBarStyle => Require<CommandBarStyle>(theme);
+
+            /// <summary>How popups are laid out.</summary>
+            public PopupStyle PopupStyle => Require<PopupStyle>(theme);
 
             /// <summary>
-            /// Corner radii.
+            /// The height of a popup list's rows, for the platform's primary
+            /// input (see <see cref="PopupStyle"/>).
             /// </summary>
-            public Shapes Shapes => theme.GetExtension<Shapes>() ?? DefaultShapes;
+            public float PopupRowHeight => (Application.Current?.IsTouchPrimary ?? false) ? Require<PopupStyle>(theme).TouchRowHeight : Require<PopupStyle>(theme).RowHeight;
 
-            /// <summary>
-            /// Durations and easing curves.
-            /// </summary>
-            public Motion Motion => theme.GetExtension<Motion>() ?? DefaultMotion;
-
-            /// <summary>
-            /// How menu bars are laid out.
-            /// </summary>
-            public MenuBarStyle MenuBarStyle => theme.GetExtension<MenuBarStyle>() ?? DefaultMenuBarStyle;
-
-            /// <summary>
-            /// How command bars are laid out.
-            /// </summary>
-            public CommandBarStyle CommandBarStyle => theme.GetExtension<CommandBarStyle>() ?? DefaultCommandBarStyle;
-
-            /// <summary>
-            /// The height of a popup list's rows (see <see cref="Sizes.PopupRowHeight"/>).
-            /// </summary>
-            public float PopupRowHeight => theme.GetExtension<Sizes>()?.PopupRowHeight ?? ((Application.Current?.IsTouchPrimary ?? false) ? 48 : 36);
-
-            /// <summary>
-            /// How check boxes are laid out.
-            /// </summary>
+            /// <summary>How check boxes are laid out.</summary>
             public CheckBoxStyle CheckBoxStyle => Require<CheckBoxStyle>(theme);
 
-            /// <summary>
-            /// How sliders are laid out.
-            /// </summary>
+            /// <summary>How toggle switches are laid out.</summary>
+            public ToggleSwitchStyle ToggleSwitchStyle => Require<ToggleSwitchStyle>(theme);
+
+            /// <summary>How sliders are laid out.</summary>
             public SliderStyle SliderStyle => Require<SliderStyle>(theme);
 
-            /// <summary>
-            /// How calendars are laid out.
-            /// </summary>
+            /// <summary>How progress bars are laid out.</summary>
+            public ProgressBarStyle ProgressBarStyle => Require<ProgressBarStyle>(theme);
+
+            /// <summary>How calendars are laid out.</summary>
             public CalendarViewStyle CalendarViewStyle => Require<CalendarViewStyle>(theme);
+
+            /// <summary>How a time picker's popup is laid out.</summary>
+            public TimePickerViewStyle TimePickerViewStyle => Require<TimePickerViewStyle>(theme);
+
+            /// <summary>How picker fields are laid out.</summary>
+            public PickerFieldStyle PickerFieldStyle => Require<PickerFieldStyle>(theme);
+
+            /// <summary>How number boxes are laid out.</summary>
+            public NumberBoxStyle NumberBoxStyle => Require<NumberBoxStyle>(theme);
+
+            /// <summary>How password boxes are laid out.</summary>
+            public PasswordBoxStyle PasswordBoxStyle => Require<PasswordBoxStyle>(theme);
+
+            /// <summary>How menu flyouts are laid out.</summary>
+            public MenuFlyoutStyle MenuFlyoutStyle => Require<MenuFlyoutStyle>(theme);
+
+            /// <summary>How tooltips are laid out.</summary>
+            public ToolTipStyle ToolTipStyle => Require<ToolTipStyle>(theme);
+
+            /// <summary>How info bars are laid out.</summary>
+            public InfoBarStyle InfoBarStyle => Require<InfoBarStyle>(theme);
+
+            /// <summary>How expanders are laid out, and their content arrives.</summary>
+            public ExpanderStyle ExpanderStyle => Require<ExpanderStyle>(theme);
+
+            /// <summary>How tree views' items are laid out.</summary>
+            public TreeViewStyle TreeViewStyle => Require<TreeViewStyle>(theme);
+
+            /// <summary>How navigation views are laid out.</summary>
+            public NavigationViewStyle NavigationViewStyle => Require<NavigationViewStyle>(theme);
+
+            /// <summary>How tab strips are laid out.</summary>
+            public TabStripStyle TabStripStyle => Require<TabStripStyle>(theme);
+
+            /// <summary>How radio buttons are laid out.</summary>
+            public RadioButtonStyle RadioButtonStyle => Require<RadioButtonStyle>(theme);
+
+            /// <summary>How days-of-the-week pickers are laid out.</summary>
+            public DaysOfWeekPickerStyle DaysOfWeekPickerStyle => Require<DaysOfWeekPickerStyle>(theme);
+
+            /// <summary>How flip views are laid out.</summary>
+            public FlipViewStyle FlipViewStyle => Require<FlipViewStyle>(theme);
+
+            /// <summary>How pips pagers are laid out.</summary>
+            public PipsPagerStyle PipsPagerStyle => Require<PipsPagerStyle>(theme);
+
+            /// <summary>How list views' default group headers are laid out.</summary>
+            public ListViewStyle ListViewStyle => Require<ListViewStyle>(theme);
+
+            /// <summary>How flyout buttons move.</summary>
+            public FlyoutButtonStyle FlyoutButtonStyle => Require<FlyoutButtonStyle>(theme);
         }
 
-        private static TStyle Require<TStyle>(
+        private static TToken Require<TToken>(
             Theme theme)
-            where TStyle : class
+            where TToken : class
         {
-            return theme.GetExtension<TStyle>()
+            return theme.GetExtension<TToken>()
                 ?? throw new InvalidOperationException(
-                    $"The theme has no {typeof(TStyle).Name}. Pass a theme to XFormsApp.Run, such as new BasicTheme() (from XForms.Themes.Basic).");
+                    $"The theme has no {typeof(TToken).Name}. Pass a theme to XFormsApp.Run, such as new BasicTheme() (from XForms.Themes.Basic).");
         }
     }
 }

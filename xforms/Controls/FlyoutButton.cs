@@ -59,14 +59,14 @@ namespace XForms.Controls
         /// Open, it's always subtle.
         /// </summary>
         /// <summary>
-        /// The space between neighbouring buttons on the arc they fan out on:
-        /// 12 by default. The arc grows to fit it.
+        /// The space between neighbouring buttons on the arc they fan out on, or
+        /// null (the default) for the theme's. The arc grows to fit it.
         /// </summary>
-        public float ButtonSpacing
+        public float? ButtonSpacing
         {
             get;
             set;
-        } = 12;
+        }
 
         public bool IsSubtleStyle
         {
@@ -111,8 +111,8 @@ namespace XForms.Controls
                 throw new ArgumentNullException(nameof(button));
             }
 
-            // Start the buttons out at half size, hidden behind this one
-            button.FlyoutAnimator.Scale = 0.5f;
+            // Start the buttons out small, hidden behind this one (their
+            // scale is the theme's when the flyout opens)
             button.IsVisible = false;
 
             this._layout.Children.Insert(0, button);
@@ -147,8 +147,10 @@ namespace XForms.Controls
             this._innerButton.IsSubtleStyle = true;
 
             // Rotate and scale the button to the pressed position
-            var nowait = this._innerButton.FlyoutAnimator.RotateTo(Angle.FromDegrees(90), this.ActualTheme.Motion.Medium, new CubicEase(EasingMode.EaseOut));
-            nowait = this._innerButton.FlyoutAnimator.ScaleTo(0.75f, this.ActualTheme.Motion.Medium, new CubicEase(EasingMode.EaseOut));
+            var style = this.ActualTheme.FlyoutButtonStyle;
+            var motion = this.ActualTheme.Motion;
+            var nowait = this._innerButton.FlyoutAnimator.RotateTo(style.OpenRotation, motion.Medium, motion.Decelerate);
+            nowait = this._innerButton.FlyoutAnimator.ScaleTo(style.OpenScale, motion.Medium, motion.Decelerate);
 
             for (int i = 0; i < this._layout.Children.Count - 1; i += 1)
             {
@@ -161,47 +163,38 @@ namespace XForms.Controls
                 button.IsEnabled = true;
                 button.IsVisible = true;
 
-                // Start the buttons out at half size
-                button.FlyoutAnimator.Scale = 0.5f;
+                // Start the buttons out small
+                button.FlyoutAnimator.Scale = style.CollapsedButtonScale;
 
                 // HACK: Redraw button to workaround drawing issue
                 button.InvalidateVisual();
 
                 // Scale the buttons up to full size
-                nowait = button.FlyoutAnimator.ScaleTo(1.0f, this.ActualTheme.Motion.Medium, new CubicEase(EasingMode.EaseOut));
+                nowait = button.FlyoutAnimator.ScaleTo(1.0f, motion.Medium, motion.Decelerate);
 
                 // Spread the buttons out on an arc
                 // TODO: Handle more than 3 buttons
-                float angle = 45;
+                float angle = style.ArcCenter.Degrees;
                 float step = 0;
                 if (this._buttonCount > 1)
                 {
-                    if ((this._buttonCount & 1) == 1)
-                    {
-                        step = 90 / (float)(this._buttonCount - 1);
-                        angle = 0 + ((float)i * step);
-                    }
-                    else
-                    {
-                        step = 60 / (float)(this._buttonCount - 1);
-                        angle = 15 + ((float)i * step);
-                    }
+                    float sweep = (((this._buttonCount & 1) == 1) ? style.ArcSweep : style.EvenArcSweep).Degrees;
+                    step = sweep / (float)(this._buttonCount - 1);
+                    angle = (style.ArcCenter.Degrees - (sweep / 2)) + ((float)i * step);
                 }
 
                 // Clear of this button, far enough out that neighbours on the
                 // arc are the spacing apart (the circles fill their bounds)
-                float distance = ((button.Bounds.Size.Width + this._innerButton.Bounds.Size.Width) / 2) + 15;
+                float distance = ((button.Bounds.Size.Width + this._innerButton.Bounds.Size.Width) / 2) + style.ButtonClearance;
                 if (step > 0)
                 {
                     float chord = (float)(2 * Math.Sin(Angle.FromDegrees(step / 2).Radians));
-                    distance = Math.Max(distance, (button.Bounds.Size.Width + Math.Max(0, this.ButtonSpacing)) / chord);
+                    distance = Math.Max(distance, (button.Bounds.Size.Width + Math.Max(0, this.ButtonSpacing ?? style.ButtonSpacing)) / chord);
                 }
 
                 var point = Point.Translate(new Point(0, 0), Angle.FromDegrees(angle), -distance);
-                nowait = button.FlyoutAnimator.TranslateTo(point, this.ActualTheme.Motion.Medium, new CubicEase(EasingMode.EaseOut));
+                nowait = button.FlyoutAnimator.TranslateTo(point, motion.Medium, motion.Decelerate);
 
-                // CONSIDER: Morph the color from white to accent
-                //this._innerButton.Animate(String.Empty, (value) => { this._innerButton.BackgroundColor = Color.FromRgb(0, 0, 0); }, length: AnimationLengthMs, easing: Easing.CubicOut);
             }
 
             this.Expanding?.Invoke(this, EventArgs.Empty);
@@ -230,6 +223,8 @@ namespace XForms.Controls
             this._innerButton.FlyoutAnimator.Rotation = Angle.FromDegrees(0);
             this._innerButton.FlyoutAnimator.Scale = 1.0f;
             AnimationHandle nowait;
+            var style = this.ActualTheme.FlyoutButtonStyle;
+            var motion = this.ActualTheme.Motion;
 
             var animationTasks = new List<Task>();
 
@@ -245,8 +240,8 @@ namespace XForms.Controls
 
                 // Move and scale the buttons back to the collapsed position,
                 // then hide them (unless the flyout opened again meanwhile)
-                nowait = button.FlyoutAnimator.TranslateTo(new Point(0, 0), this.ActualTheme.Motion.Medium, new CubicEase(EasingMode.EaseOut));
-                this.HideWhenCollapsed(button, button.FlyoutAnimator.ScaleTo(0.5f, this.ActualTheme.Motion.Medium, new CubicEase(EasingMode.EaseOut)));
+                nowait = button.FlyoutAnimator.TranslateTo(new Point(0, 0), motion.Medium, motion.Decelerate);
+                this.HideWhenCollapsed(button, button.FlyoutAnimator.ScaleTo(style.CollapsedButtonScale, motion.Medium, motion.Decelerate));
             }
             this.Collapsing?.Invoke(this, EventArgs.Empty);
 

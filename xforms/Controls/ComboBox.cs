@@ -251,8 +251,6 @@ namespace XForms.Controls
         /// </summary>
         private sealed class ComboBoxDropDown : PopupFrame
         {
-            private const float VerticalPadding = 4.0f;
-
             private readonly ComboBox _picker;
             private readonly ScrollViewer _scrollView;
 
@@ -271,11 +269,11 @@ namespace XForms.Controls
                 this.Content = this._scrollView;
             }
 
-            private static float Inset
+            private float Inset
             {
                 get
                 {
-                    return ContentInset + VerticalPadding;
+                    return this.ContentInset + this.ActualTheme.PopupStyle.ListVerticalPadding;
                 }
             }
 
@@ -284,7 +282,7 @@ namespace XForms.Controls
             {
                 float width = Math.Max(
                     this._picker.Bounds.Width,
-                    this._picker.MaximumTextWidth + (2 * PickerField.TextInset) + (2 * ContentInset));
+                    this._picker.MaximumTextWidth + (2 * this.ActualTheme.PickerFieldStyle.TextInset) + (2 * ContentInset));
                 width = Math.Min(width, availableSize.Width);
 
                 // As tall as the items, up to the space available

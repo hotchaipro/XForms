@@ -284,16 +284,25 @@ namespace XForms.Controls
             public override int GetHashCode() => this.Key?.GetHashCode() ?? 0;
         }
 
+        // A group's header, unless the app gives its own
+        private sealed class DefaultGroupHeader : TextBlock
+        {
+            protected override void OnThemeChanged(
+                Theme theme)
+            {
+                base.OnThemeChanged(theme);
+                var style = theme.ListViewStyle;
+                this.FontWeight = style.GroupHeaderFontWeight;
+                this.Margin = style.GroupHeaderMargin;
+            }
+        }
+
         // The rows the platform list shows: the items, with a header before each
         // group when grouping
         private sealed class Source : ItemsViewSource
         {
             private static readonly ItemViewFactory<object> DefaultHeaderFactory = ItemViewFactory<object>.Create(
-                () => new TextBlock()
-                {
-                    FontWeight = FontWeight.SemiBold,
-                    Margin = new Thickness(12, 12, 12, 4),
-                },
+                () => new DefaultGroupHeader(),
                 (view, key) => view.Text = key?.ToString());
 
             private readonly ListView<T> _list;

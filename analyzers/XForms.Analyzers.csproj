@@ -1,5 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <!-- Compiler extensions for the platform assemblies; loaded by the compiler, not shipped -->
+  <!-- Compiler extensions for the platform assemblies and XForms; loaded by the compiler, not shipped -->
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Nullable>enable</Nullable>

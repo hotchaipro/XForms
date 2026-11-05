@@ -39,14 +39,15 @@ namespace XForms.Themes.Basic
                 drawContext.DrawRoundedRectangle(bounds.Deflate(inset, inset), CornerRadius - inset, colors.Accent, FocusBorderWidth);
             }
 
-            var textBounds = new Rect(PickerField.TextInset, 0, Math.Max(0, bounds.Width - PickerField.TextInset - PickerField.GlyphWidth), bounds.Height);
+            var style = control.ActualTheme.PickerFieldStyle;
+            var textBounds = new Rect(style.TextInset, 0, Math.Max(0, bounds.Width - style.TextInset - style.GlyphWidth), bounds.Height);
             drawContext.DrawText(
                 control.DisplayText,
                 textBounds,
                 control.IsPlaceholder ? colors.SubtleForeground : colors.Foreground,
                 control.CreateTextFormat());
 
-            this.RenderGlyph(drawContext, new Rect(bounds.Width - PickerField.GlyphWidth, 0, PickerField.GlyphWidth, bounds.Height), colors.SubtleForeground);
+            this.RenderGlyph(drawContext, new Rect(bounds.Width - style.GlyphWidth, 0, style.GlyphWidth, bounds.Height), colors.SubtleForeground);
         }
 
         // A downward chevron
@@ -203,7 +204,7 @@ namespace XForms.Themes.Basic
 
                 drawContext.DrawText(
                     items[i].Text,
-                    new Rect(PickerField.TextInset, row.Y, Math.Max(0, bounds.Width - (2 * PickerField.TextInset)), rowHeight),
+                    new Rect(control.ActualTheme.PickerFieldStyle.TextInset, row.Y, Math.Max(0, bounds.Width - (2 * control.ActualTheme.PickerFieldStyle.TextInset)), rowHeight),
                     colors.Foreground,
                     textFormat);
             }

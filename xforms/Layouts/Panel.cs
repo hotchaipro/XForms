@@ -125,6 +125,9 @@ namespace XForms.Controls
         private void AnimateLayoutChanges(
             LayoutTransition transition)
         {
+            var motion = this.ActualTheme.Motion;
+            var duration = transition.Duration ?? motion.Medium;
+            var easing = transition.Easing ?? motion.Decelerate;
             var last = this._lastPositions;
             var positions = new Dictionary<View, Point>();
             foreach (var child in this.VisualChildren)
@@ -143,12 +146,12 @@ namespace XForms.Controls
                 {
                     if (transition.AnimatesMoves && ((previous.X != position.X) || (previous.Y != position.Y)))
                     {
-                        animator.TranslateByOffset(new Point(previous.X - position.X, previous.Y - position.Y), transition.Duration, transition.Easing);
+                        animator.TranslateByOffset(new Point(previous.X - position.X, previous.Y - position.Y), duration, easing);
                     }
                 }
                 else if (transition.AnimatesEntrances)
                 {
-                    animator.FadeFrom(0, transition.Duration, transition.Easing);
+                    animator.FadeFrom(0, duration, easing);
                 }
             }
 

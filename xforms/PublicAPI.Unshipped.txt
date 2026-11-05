@@ -334,31 +334,10 @@ XForms.Controls.ViewAttachments.extension(XForms.View).ContextFlyout.set -> void
 XForms.Controls.ViewAttachments.extension(XForms.View).ToolTip.get -> string
 XForms.Controls.ViewAttachments.extension(XForms.View).ToolTip.set -> void
 const XForms.Controls.AutoSuggestBox.MaximumSuggestions = 8 -> int
-const XForms.Controls.Expander.HeaderHeight = 48 -> float
-const XForms.Controls.InfoBar.IconSize = 20 -> float
-const XForms.Controls.InfoBar.Spacing = 12 -> float
-const XForms.Controls.MenuFlyoutView.TextInset = 40 -> float
-const XForms.Controls.NavigationView.BarHeight = 48 -> float
 const XForms.Controls.NavigationView.CompactThreshold = 640 -> float
-const XForms.Controls.NavigationView.PaneWidth = 260 -> float
-const XForms.Controls.NavigationViewItem.ItemHeight = 40 -> float
-const XForms.Controls.NavigationViewPane.TitleHeight = 56 -> float
-const XForms.Controls.NumberBox.SpinButtonWidth = 32 -> float
-const XForms.Controls.PasswordBox.RevealButtonWidth = 36 -> float
-const XForms.Controls.PipsPager.DotSpacing = 20 -> float
-const XForms.Controls.ProgressBar.DefaultHeight = 4 -> float
 const XForms.Controls.TimePicker.TwelveHourClock = "12HourClock" -> string
 const XForms.Controls.TimePicker.TwentyFourHourClock = "24HourClock" -> string
-const XForms.Controls.TimePickerView.RowHeight = 40 -> float
 const XForms.Controls.TimePickerView.VisibleRows = 5 -> int
-const XForms.Controls.ToggleSwitch.TextGap = 12 -> float
-const XForms.Controls.ToggleSwitch.TouchHeight = 32 -> float
-const XForms.Controls.ToggleSwitch.TrackHeight = 20 -> float
-const XForms.Controls.ToggleSwitch.TrackWidth = 40 -> float
-const XForms.Controls.ToolTip.MaximumWidth = 320 -> float
-const XForms.Controls.TreeViewItem.ChevronWidth = 28 -> float
-const XForms.Controls.TreeViewItem.Indent = 20 -> float
-const XForms.Controls.TreeViewItem.ItemHeight = 36 -> float
 override XForms.Controls.AutoSuggestBox.AccessibilityIsExpanded.get -> bool?
 override XForms.Controls.AutoSuggestBox.Build() -> XForms.View
 override XForms.Controls.AutoSuggestBox.DefaultAccessibilityLabel.get -> string
@@ -553,13 +532,10 @@ XForms.Input.SwipingEventArgs.SwipingEventArgs(XForms.Input.SwipePhase phase, in
 XForms.Input.SwipingEventArgs.Velocity.get -> float
 XForms.Controls.MenuItem.IsSubtleStyle.get -> bool
 XForms.Controls.MenuItem.IsSubtleStyle.set -> void
-const XForms.Controls.PickerField.TextInset = 12 -> float
-const XForms.Controls.PopupFrame.ContentInset = 6 -> float
 override XForms.Controls.Flyout.GetDefaultScrimColor(XForms.Theme theme) -> XForms.Color
 XForms.Controls.ListView.SelectionBackground.get -> XForms.Color?
 XForms.Controls.ListView.SelectionBackground.set -> void
 override XForms.Controls.CommandBar.MeasureOverride(XForms.Size availableSize) -> XForms.Size
-XForms.Controls.FlyoutButton.ButtonSpacing.get -> float
 XForms.Controls.FlyoutButton.ButtonSpacing.set -> void
 XForms.Input.SwipeGestureRecognizer.Velocity.get -> float
 override XForms.Input.SwipeGestureRecognizer.IsDragGesture.get -> bool
@@ -589,12 +565,6 @@ XForms.Controls.MenuBarStyle.ItemsAlignment.get -> XForms.HorizontalAlignment
 XForms.Controls.MenuBarStyle.ItemsAlignment.init -> void
 XForms.Controls.MenuBarStyle.MenuBarStyle() -> void
 XForms.Controls.MenuFlyoutView.RowHeight.get -> float
-XForms.Controls.Sizes
-XForms.Controls.Sizes.<Clone>$() -> XForms.Controls.Sizes
-XForms.Controls.Sizes.Equals(XForms.Controls.Sizes other) -> bool
-XForms.Controls.Sizes.PopupRowHeight.get -> float?
-XForms.Controls.Sizes.PopupRowHeight.init -> void
-XForms.Controls.Sizes.Sizes() -> void
 XForms.Controls.SwipeCommandCollection.IsFlickEnabled.get -> bool
 XForms.Controls.SwipeCommandCollection.IsFlickEnabled.set -> void
 XForms.Controls.ThemeTokens.extension(XForms.Theme).CommandBarStyle.get -> XForms.Controls.CommandBarStyle
@@ -611,15 +581,10 @@ override XForms.Controls.MenuBar.OnThemeChanged(XForms.Theme theme) -> void
 override XForms.Controls.MenuBarStyle.Equals(object obj) -> bool
 override XForms.Controls.MenuBarStyle.GetHashCode() -> int
 override XForms.Controls.MenuBarStyle.ToString() -> string
-override XForms.Controls.Sizes.Equals(object obj) -> bool
-override XForms.Controls.Sizes.GetHashCode() -> int
-override XForms.Controls.Sizes.ToString() -> string
 static XForms.Controls.CommandBarStyle.operator !=(XForms.Controls.CommandBarStyle left, XForms.Controls.CommandBarStyle right) -> bool
 static XForms.Controls.CommandBarStyle.operator ==(XForms.Controls.CommandBarStyle left, XForms.Controls.CommandBarStyle right) -> bool
 static XForms.Controls.MenuBarStyle.operator !=(XForms.Controls.MenuBarStyle left, XForms.Controls.MenuBarStyle right) -> bool
 static XForms.Controls.MenuBarStyle.operator ==(XForms.Controls.MenuBarStyle left, XForms.Controls.MenuBarStyle right) -> bool
-static XForms.Controls.Sizes.operator !=(XForms.Controls.Sizes left, XForms.Controls.Sizes right) -> bool
-static XForms.Controls.Sizes.operator ==(XForms.Controls.Sizes left, XForms.Controls.Sizes right) -> bool
 static XForms.Controls.ThemeTokens.get_CommandBarStyle(XForms.Theme theme) -> XForms.Controls.CommandBarStyle
 static XForms.Controls.ThemeTokens.get_MenuBarStyle(XForms.Theme theme) -> XForms.Controls.MenuBarStyle
 static XForms.Controls.ThemeTokens.get_PopupRowHeight(XForms.Theme theme) -> float
@@ -689,3 +654,371 @@ static XForms.Controls.SliderStyle.operator ==(XForms.Controls.SliderStyle left,
 static XForms.Controls.ThemeTokens.get_CalendarViewStyle(XForms.Theme theme) -> XForms.Controls.CalendarViewStyle
 static XForms.Controls.ThemeTokens.get_CheckBoxStyle(XForms.Theme theme) -> XForms.Controls.CheckBoxStyle
 static XForms.Controls.ThemeTokens.get_SliderStyle(XForms.Theme theme) -> XForms.Controls.SliderStyle
+XForms.Controls.CommandBarStyle.ButtonWidth.get -> float
+XForms.Controls.CommandBarStyle.ButtonWidth.init -> void
+XForms.Controls.CommandBarStyle.SwipeIconSize.get -> XForms.Size
+XForms.Controls.CommandBarStyle.SwipeIconSize.init -> void
+XForms.Controls.DaysOfWeekPickerStyle
+XForms.Controls.DaysOfWeekPickerStyle.<Clone>$() -> XForms.Controls.DaysOfWeekPickerStyle
+XForms.Controls.DaysOfWeekPickerStyle.ButtonSize.get -> float
+XForms.Controls.DaysOfWeekPickerStyle.ButtonSize.init -> void
+XForms.Controls.DaysOfWeekPickerStyle.DaysOfWeekPickerStyle() -> void
+XForms.Controls.DaysOfWeekPickerStyle.Equals(XForms.Controls.DaysOfWeekPickerStyle other) -> bool
+XForms.Controls.DaysOfWeekPickerStyle.MaximumWidth.get -> float
+XForms.Controls.DaysOfWeekPickerStyle.MaximumWidth.init -> void
+XForms.Controls.ExpanderStyle
+XForms.Controls.ExpanderStyle.<Clone>$() -> XForms.Controls.ExpanderStyle
+XForms.Controls.ExpanderStyle.ContentPadding.get -> XForms.Thickness
+XForms.Controls.ExpanderStyle.ContentPadding.init -> void
+XForms.Controls.ExpanderStyle.Equals(XForms.Controls.ExpanderStyle other) -> bool
+XForms.Controls.ExpanderStyle.ExpanderStyle() -> void
+XForms.Controls.ExpanderStyle.HeaderChromeWidth.get -> float
+XForms.Controls.ExpanderStyle.HeaderChromeWidth.init -> void
+XForms.Controls.ExpanderStyle.HeaderHeight.get -> float
+XForms.Controls.ExpanderStyle.HeaderHeight.init -> void
+XForms.Controls.ExpanderStyle.RevealOffset.get -> float
+XForms.Controls.ExpanderStyle.RevealOffset.init -> void
+XForms.Controls.FlipViewStyle
+XForms.Controls.FlipViewStyle.<Clone>$() -> XForms.Controls.FlipViewStyle
+XForms.Controls.FlipViewStyle.ButtonMaximumHeight.get -> float
+XForms.Controls.FlipViewStyle.ButtonMaximumHeight.init -> void
+XForms.Controls.FlipViewStyle.ButtonWidth.get -> float
+XForms.Controls.FlipViewStyle.ButtonWidth.init -> void
+XForms.Controls.FlipViewStyle.DefaultSize.get -> XForms.Size
+XForms.Controls.FlipViewStyle.DefaultSize.init -> void
+XForms.Controls.FlipViewStyle.Equals(XForms.Controls.FlipViewStyle other) -> bool
+XForms.Controls.FlipViewStyle.FlipViewStyle() -> void
+XForms.Controls.FlyoutButton.ButtonSpacing.get -> float?
+XForms.Controls.FlyoutButtonStyle
+XForms.Controls.FlyoutButtonStyle.<Clone>$() -> XForms.Controls.FlyoutButtonStyle
+XForms.Controls.FlyoutButtonStyle.ArcCenter.get -> XForms.Angle
+XForms.Controls.FlyoutButtonStyle.ArcCenter.init -> void
+XForms.Controls.FlyoutButtonStyle.ArcSweep.get -> XForms.Angle
+XForms.Controls.FlyoutButtonStyle.ArcSweep.init -> void
+XForms.Controls.FlyoutButtonStyle.ButtonClearance.get -> float
+XForms.Controls.FlyoutButtonStyle.ButtonClearance.init -> void
+XForms.Controls.FlyoutButtonStyle.ButtonSpacing.get -> float
+XForms.Controls.FlyoutButtonStyle.ButtonSpacing.init -> void
+XForms.Controls.FlyoutButtonStyle.CollapsedButtonScale.get -> float
+XForms.Controls.FlyoutButtonStyle.CollapsedButtonScale.init -> void
+XForms.Controls.FlyoutButtonStyle.Equals(XForms.Controls.FlyoutButtonStyle other) -> bool
+XForms.Controls.FlyoutButtonStyle.EvenArcSweep.get -> XForms.Angle
+XForms.Controls.FlyoutButtonStyle.EvenArcSweep.init -> void
+XForms.Controls.FlyoutButtonStyle.FlyoutButtonStyle() -> void
+XForms.Controls.FlyoutButtonStyle.OpenRotation.get -> XForms.Angle
+XForms.Controls.FlyoutButtonStyle.OpenRotation.init -> void
+XForms.Controls.FlyoutButtonStyle.OpenScale.get -> float
+XForms.Controls.FlyoutButtonStyle.OpenScale.init -> void
+XForms.Controls.InfoBarStyle
+XForms.Controls.InfoBarStyle.<Clone>$() -> XForms.Controls.InfoBarStyle
+XForms.Controls.InfoBarStyle.CloseButtonOutset.get -> float
+XForms.Controls.InfoBarStyle.CloseButtonOutset.init -> void
+XForms.Controls.InfoBarStyle.CloseButtonSize.get -> float
+XForms.Controls.InfoBarStyle.CloseButtonSize.init -> void
+XForms.Controls.InfoBarStyle.DefaultWidth.get -> float
+XForms.Controls.InfoBarStyle.DefaultWidth.init -> void
+XForms.Controls.InfoBarStyle.Equals(XForms.Controls.InfoBarStyle other) -> bool
+XForms.Controls.InfoBarStyle.IconOffset.get -> float
+XForms.Controls.InfoBarStyle.IconOffset.init -> void
+XForms.Controls.InfoBarStyle.IconSize.get -> float
+XForms.Controls.InfoBarStyle.IconSize.init -> void
+XForms.Controls.InfoBarStyle.InfoBarStyle() -> void
+XForms.Controls.InfoBarStyle.Spacing.get -> float
+XForms.Controls.InfoBarStyle.Spacing.init -> void
+XForms.Controls.InfoBarStyle.TitleFontWeight.get -> XForms.FontWeight
+XForms.Controls.InfoBarStyle.TitleFontWeight.init -> void
+XForms.Controls.LayoutTransition.Duration.get -> System.TimeSpan?
+XForms.Controls.ListViewStyle
+XForms.Controls.ListViewStyle.<Clone>$() -> XForms.Controls.ListViewStyle
+XForms.Controls.ListViewStyle.Equals(XForms.Controls.ListViewStyle other) -> bool
+XForms.Controls.ListViewStyle.GroupHeaderFontWeight.get -> XForms.FontWeight
+XForms.Controls.ListViewStyle.GroupHeaderFontWeight.init -> void
+XForms.Controls.ListViewStyle.GroupHeaderMargin.get -> XForms.Thickness
+XForms.Controls.ListViewStyle.GroupHeaderMargin.init -> void
+XForms.Controls.ListViewStyle.ListViewStyle() -> void
+XForms.Controls.MenuFlyoutStyle
+XForms.Controls.MenuFlyoutStyle.<Clone>$() -> XForms.Controls.MenuFlyoutStyle
+XForms.Controls.MenuFlyoutStyle.Equals(XForms.Controls.MenuFlyoutStyle other) -> bool
+XForms.Controls.MenuFlyoutStyle.MenuFlyoutStyle() -> void
+XForms.Controls.MenuFlyoutStyle.MinimumWidth.get -> float
+XForms.Controls.MenuFlyoutStyle.MinimumWidth.init -> void
+XForms.Controls.MenuFlyoutStyle.TextEndInset.get -> float
+XForms.Controls.MenuFlyoutStyle.TextEndInset.init -> void
+XForms.Controls.MenuFlyoutStyle.TextInset.get -> float
+XForms.Controls.MenuFlyoutStyle.TextInset.init -> void
+XForms.Controls.NavigationViewStyle
+XForms.Controls.NavigationViewStyle.<Clone>$() -> XForms.Controls.NavigationViewStyle
+XForms.Controls.NavigationViewStyle.BarHeight.get -> float
+XForms.Controls.NavigationViewStyle.BarHeight.init -> void
+XForms.Controls.NavigationViewStyle.DefaultSize.get -> XForms.Size
+XForms.Controls.NavigationViewStyle.DefaultSize.init -> void
+XForms.Controls.NavigationViewStyle.Equals(XForms.Controls.NavigationViewStyle other) -> bool
+XForms.Controls.NavigationViewStyle.ItemHeight.get -> float
+XForms.Controls.NavigationViewStyle.ItemHeight.init -> void
+XForms.Controls.NavigationViewStyle.ItemMargin.get -> XForms.Thickness
+XForms.Controls.NavigationViewStyle.ItemMargin.init -> void
+XForms.Controls.NavigationViewStyle.ItemSpacing.get -> float
+XForms.Controls.NavigationViewStyle.ItemSpacing.init -> void
+XForms.Controls.NavigationViewStyle.NavigationViewStyle() -> void
+XForms.Controls.NavigationViewStyle.PaneWidth.get -> float
+XForms.Controls.NavigationViewStyle.PaneWidth.init -> void
+XForms.Controls.NavigationViewStyle.TitleHeight.get -> float
+XForms.Controls.NavigationViewStyle.TitleHeight.init -> void
+XForms.Controls.NumberBoxStyle
+XForms.Controls.NumberBoxStyle.<Clone>$() -> XForms.Controls.NumberBoxStyle
+XForms.Controls.NumberBoxStyle.Equals(XForms.Controls.NumberBoxStyle other) -> bool
+XForms.Controls.NumberBoxStyle.NumberBoxStyle() -> void
+XForms.Controls.NumberBoxStyle.SpinButtonWidth.get -> float
+XForms.Controls.NumberBoxStyle.SpinButtonWidth.init -> void
+XForms.Controls.PasswordBoxStyle
+XForms.Controls.PasswordBoxStyle.<Clone>$() -> XForms.Controls.PasswordBoxStyle
+XForms.Controls.PasswordBoxStyle.Equals(XForms.Controls.PasswordBoxStyle other) -> bool
+XForms.Controls.PasswordBoxStyle.PasswordBoxStyle() -> void
+XForms.Controls.PasswordBoxStyle.RevealButtonWidth.get -> float
+XForms.Controls.PasswordBoxStyle.RevealButtonWidth.init -> void
+XForms.Controls.PickerFieldStyle
+XForms.Controls.PickerFieldStyle.<Clone>$() -> XForms.Controls.PickerFieldStyle
+XForms.Controls.PickerFieldStyle.Equals(XForms.Controls.PickerFieldStyle other) -> bool
+XForms.Controls.PickerFieldStyle.GlyphWidth.get -> float
+XForms.Controls.PickerFieldStyle.GlyphWidth.init -> void
+XForms.Controls.PickerFieldStyle.PickerFieldStyle() -> void
+XForms.Controls.PickerFieldStyle.TextInset.get -> float
+XForms.Controls.PickerFieldStyle.TextInset.init -> void
+XForms.Controls.PipsPagerStyle
+XForms.Controls.PipsPagerStyle.<Clone>$() -> XForms.Controls.PipsPagerStyle
+XForms.Controls.PipsPagerStyle.DotSpacing.get -> float
+XForms.Controls.PipsPagerStyle.DotSpacing.init -> void
+XForms.Controls.PipsPagerStyle.Equals(XForms.Controls.PipsPagerStyle other) -> bool
+XForms.Controls.PipsPagerStyle.Height.get -> float
+XForms.Controls.PipsPagerStyle.Height.init -> void
+XForms.Controls.PipsPagerStyle.PipsPagerStyle() -> void
+XForms.Controls.PopupFrame.ContentInset.get -> float
+XForms.Controls.PopupFrame.FramedContent.get -> XForms.View
+XForms.Controls.PopupFrame.FramedContent.set -> void
+XForms.Controls.PopupStyle
+XForms.Controls.PopupStyle.<Clone>$() -> XForms.Controls.PopupStyle
+XForms.Controls.PopupStyle.ContentInset.get -> float
+XForms.Controls.PopupStyle.ContentInset.init -> void
+XForms.Controls.PopupStyle.Equals(XForms.Controls.PopupStyle other) -> bool
+XForms.Controls.PopupStyle.ListVerticalPadding.get -> float
+XForms.Controls.PopupStyle.ListVerticalPadding.init -> void
+XForms.Controls.PopupStyle.PopupStyle() -> void
+XForms.Controls.PopupStyle.RowHeight.get -> float
+XForms.Controls.PopupStyle.RowHeight.init -> void
+XForms.Controls.PopupStyle.TouchRowHeight.get -> float
+XForms.Controls.PopupStyle.TouchRowHeight.init -> void
+XForms.Controls.ProgressBarStyle
+XForms.Controls.ProgressBarStyle.<Clone>$() -> XForms.Controls.ProgressBarStyle
+XForms.Controls.ProgressBarStyle.DefaultWidth.get -> float
+XForms.Controls.ProgressBarStyle.DefaultWidth.init -> void
+XForms.Controls.ProgressBarStyle.Equals(XForms.Controls.ProgressBarStyle other) -> bool
+XForms.Controls.ProgressBarStyle.Height.get -> float
+XForms.Controls.ProgressBarStyle.Height.init -> void
+XForms.Controls.ProgressBarStyle.ProgressBarStyle() -> void
+XForms.Controls.RadioButtonStyle
+XForms.Controls.RadioButtonStyle.<Clone>$() -> XForms.Controls.RadioButtonStyle
+XForms.Controls.RadioButtonStyle.Equals(XForms.Controls.RadioButtonStyle other) -> bool
+XForms.Controls.RadioButtonStyle.Height.get -> float
+XForms.Controls.RadioButtonStyle.Height.init -> void
+XForms.Controls.RadioButtonStyle.RadioButtonStyle() -> void
+XForms.Controls.RadioButtonStyle.Width.get -> float
+XForms.Controls.RadioButtonStyle.Width.init -> void
+XForms.Controls.TabStripStyle
+XForms.Controls.TabStripStyle.<Clone>$() -> XForms.Controls.TabStripStyle
+XForms.Controls.TabStripStyle.Equals(XForms.Controls.TabStripStyle other) -> bool
+XForms.Controls.TabStripStyle.MaximumWidth.get -> float
+XForms.Controls.TabStripStyle.MaximumWidth.init -> void
+XForms.Controls.TabStripStyle.TabStripStyle() -> void
+XForms.Controls.ThemeTokens.extension(XForms.Theme).DaysOfWeekPickerStyle.get -> XForms.Controls.DaysOfWeekPickerStyle
+XForms.Controls.ThemeTokens.extension(XForms.Theme).ExpanderStyle.get -> XForms.Controls.ExpanderStyle
+XForms.Controls.ThemeTokens.extension(XForms.Theme).FlipViewStyle.get -> XForms.Controls.FlipViewStyle
+XForms.Controls.ThemeTokens.extension(XForms.Theme).FlyoutButtonStyle.get -> XForms.Controls.FlyoutButtonStyle
+XForms.Controls.ThemeTokens.extension(XForms.Theme).InfoBarStyle.get -> XForms.Controls.InfoBarStyle
+XForms.Controls.ThemeTokens.extension(XForms.Theme).ListViewStyle.get -> XForms.Controls.ListViewStyle
+XForms.Controls.ThemeTokens.extension(XForms.Theme).MenuFlyoutStyle.get -> XForms.Controls.MenuFlyoutStyle
+XForms.Controls.ThemeTokens.extension(XForms.Theme).NavigationViewStyle.get -> XForms.Controls.NavigationViewStyle
+XForms.Controls.ThemeTokens.extension(XForms.Theme).NumberBoxStyle.get -> XForms.Controls.NumberBoxStyle
+XForms.Controls.ThemeTokens.extension(XForms.Theme).PasswordBoxStyle.get -> XForms.Controls.PasswordBoxStyle
+XForms.Controls.ThemeTokens.extension(XForms.Theme).PickerFieldStyle.get -> XForms.Controls.PickerFieldStyle
+XForms.Controls.ThemeTokens.extension(XForms.Theme).PipsPagerStyle.get -> XForms.Controls.PipsPagerStyle
+XForms.Controls.ThemeTokens.extension(XForms.Theme).PopupStyle.get -> XForms.Controls.PopupStyle
+XForms.Controls.ThemeTokens.extension(XForms.Theme).ProgressBarStyle.get -> XForms.Controls.ProgressBarStyle
+XForms.Controls.ThemeTokens.extension(XForms.Theme).RadioButtonStyle.get -> XForms.Controls.RadioButtonStyle
+XForms.Controls.ThemeTokens.extension(XForms.Theme).TabStripStyle.get -> XForms.Controls.TabStripStyle
+XForms.Controls.ThemeTokens.extension(XForms.Theme).TimePickerViewStyle.get -> XForms.Controls.TimePickerViewStyle
+XForms.Controls.ThemeTokens.extension(XForms.Theme).ToggleSwitchStyle.get -> XForms.Controls.ToggleSwitchStyle
+XForms.Controls.ThemeTokens.extension(XForms.Theme).ToolTipStyle.get -> XForms.Controls.ToolTipStyle
+XForms.Controls.ThemeTokens.extension(XForms.Theme).TreeViewStyle.get -> XForms.Controls.TreeViewStyle
+XForms.Controls.TimePickerViewStyle
+XForms.Controls.TimePickerViewStyle.<Clone>$() -> XForms.Controls.TimePickerViewStyle
+XForms.Controls.TimePickerViewStyle.ButtonHeight.get -> float
+XForms.Controls.TimePickerViewStyle.ButtonHeight.init -> void
+XForms.Controls.TimePickerViewStyle.ColumnWidth.get -> float
+XForms.Controls.TimePickerViewStyle.ColumnWidth.init -> void
+XForms.Controls.TimePickerViewStyle.Equals(XForms.Controls.TimePickerViewStyle other) -> bool
+XForms.Controls.TimePickerViewStyle.RowHeight.get -> float
+XForms.Controls.TimePickerViewStyle.RowHeight.init -> void
+XForms.Controls.TimePickerViewStyle.TimePickerViewStyle() -> void
+XForms.Controls.ToggleSwitchStyle
+XForms.Controls.ToggleSwitchStyle.<Clone>$() -> XForms.Controls.ToggleSwitchStyle
+XForms.Controls.ToggleSwitchStyle.Equals(XForms.Controls.ToggleSwitchStyle other) -> bool
+XForms.Controls.ToggleSwitchStyle.HeaderGap.get -> float
+XForms.Controls.ToggleSwitchStyle.HeaderGap.init -> void
+XForms.Controls.ToggleSwitchStyle.TextGap.get -> float
+XForms.Controls.ToggleSwitchStyle.TextGap.init -> void
+XForms.Controls.ToggleSwitchStyle.ToggleSwitchStyle() -> void
+XForms.Controls.ToggleSwitchStyle.TouchHeight.get -> float
+XForms.Controls.ToggleSwitchStyle.TouchHeight.init -> void
+XForms.Controls.ToggleSwitchStyle.TrackHeight.get -> float
+XForms.Controls.ToggleSwitchStyle.TrackHeight.init -> void
+XForms.Controls.ToggleSwitchStyle.TrackWidth.get -> float
+XForms.Controls.ToggleSwitchStyle.TrackWidth.init -> void
+XForms.Controls.ToolTipStyle
+XForms.Controls.ToolTipStyle.<Clone>$() -> XForms.Controls.ToolTipStyle
+XForms.Controls.ToolTipStyle.Equals(XForms.Controls.ToolTipStyle other) -> bool
+XForms.Controls.ToolTipStyle.MaximumWidth.get -> float
+XForms.Controls.ToolTipStyle.MaximumWidth.init -> void
+XForms.Controls.ToolTipStyle.Padding.get -> XForms.Thickness
+XForms.Controls.ToolTipStyle.Padding.init -> void
+XForms.Controls.ToolTipStyle.ToolTipStyle() -> void
+XForms.Controls.TreeViewStyle
+XForms.Controls.TreeViewStyle.<Clone>$() -> XForms.Controls.TreeViewStyle
+XForms.Controls.TreeViewStyle.ChevronWidth.get -> float
+XForms.Controls.TreeViewStyle.ChevronWidth.init -> void
+XForms.Controls.TreeViewStyle.Equals(XForms.Controls.TreeViewStyle other) -> bool
+XForms.Controls.TreeViewStyle.Indent.get -> float
+XForms.Controls.TreeViewStyle.Indent.init -> void
+XForms.Controls.TreeViewStyle.ItemHeight.get -> float
+XForms.Controls.TreeViewStyle.ItemHeight.init -> void
+XForms.Controls.TreeViewStyle.ItemInset.get -> float
+XForms.Controls.TreeViewStyle.ItemInset.init -> void
+XForms.Controls.TreeViewStyle.TreeViewStyle() -> void
+override XForms.Controls.CommandListViewItemContainer.OnThemeChanged(XForms.Theme theme) -> void
+override XForms.Controls.DaysOfWeekPicker.OnThemeChanged(XForms.Theme theme) -> void
+override XForms.Controls.DaysOfWeekPickerStyle.Equals(object obj) -> bool
+override XForms.Controls.DaysOfWeekPickerStyle.GetHashCode() -> int
+override XForms.Controls.DaysOfWeekPickerStyle.ToString() -> string
+override XForms.Controls.Expander.OnThemeChanged(XForms.Theme theme) -> void
+override XForms.Controls.ExpanderStyle.Equals(object obj) -> bool
+override XForms.Controls.ExpanderStyle.GetHashCode() -> int
+override XForms.Controls.ExpanderStyle.ToString() -> string
+override XForms.Controls.FlipViewStyle.Equals(object obj) -> bool
+override XForms.Controls.FlipViewStyle.GetHashCode() -> int
+override XForms.Controls.FlipViewStyle.ToString() -> string
+override XForms.Controls.FlyoutButtonStyle.Equals(object obj) -> bool
+override XForms.Controls.FlyoutButtonStyle.GetHashCode() -> int
+override XForms.Controls.FlyoutButtonStyle.ToString() -> string
+override XForms.Controls.InfoBarStyle.Equals(object obj) -> bool
+override XForms.Controls.InfoBarStyle.GetHashCode() -> int
+override XForms.Controls.InfoBarStyle.ToString() -> string
+override XForms.Controls.ListViewStyle.Equals(object obj) -> bool
+override XForms.Controls.ListViewStyle.GetHashCode() -> int
+override XForms.Controls.ListViewStyle.ToString() -> string
+override XForms.Controls.MenuFlyoutStyle.Equals(object obj) -> bool
+override XForms.Controls.MenuFlyoutStyle.GetHashCode() -> int
+override XForms.Controls.MenuFlyoutStyle.ToString() -> string
+override XForms.Controls.NavigationView.OnThemeChanged(XForms.Theme theme) -> void
+override XForms.Controls.NavigationViewItem.OnThemeChanged(XForms.Theme theme) -> void
+override XForms.Controls.NavigationViewStyle.Equals(object obj) -> bool
+override XForms.Controls.NavigationViewStyle.GetHashCode() -> int
+override XForms.Controls.NavigationViewStyle.ToString() -> string
+override XForms.Controls.NumberBoxStyle.Equals(object obj) -> bool
+override XForms.Controls.NumberBoxStyle.GetHashCode() -> int
+override XForms.Controls.NumberBoxStyle.ToString() -> string
+override XForms.Controls.PasswordBoxStyle.Equals(object obj) -> bool
+override XForms.Controls.PasswordBoxStyle.GetHashCode() -> int
+override XForms.Controls.PasswordBoxStyle.ToString() -> string
+override XForms.Controls.PickerFieldStyle.Equals(object obj) -> bool
+override XForms.Controls.PickerFieldStyle.GetHashCode() -> int
+override XForms.Controls.PickerFieldStyle.ToString() -> string
+override XForms.Controls.PipsPager.OnThemeChanged(XForms.Theme theme) -> void
+override XForms.Controls.PipsPagerStyle.Equals(object obj) -> bool
+override XForms.Controls.PipsPagerStyle.GetHashCode() -> int
+override XForms.Controls.PipsPagerStyle.ToString() -> string
+override XForms.Controls.PopupFrame.OnThemeChanged(XForms.Theme theme) -> void
+override XForms.Controls.PopupStyle.Equals(object obj) -> bool
+override XForms.Controls.PopupStyle.GetHashCode() -> int
+override XForms.Controls.PopupStyle.ToString() -> string
+override XForms.Controls.ProgressBarStyle.Equals(object obj) -> bool
+override XForms.Controls.ProgressBarStyle.GetHashCode() -> int
+override XForms.Controls.ProgressBarStyle.ToString() -> string
+override XForms.Controls.RadioButtonStyle.Equals(object obj) -> bool
+override XForms.Controls.RadioButtonStyle.GetHashCode() -> int
+override XForms.Controls.RadioButtonStyle.ToString() -> string
+override XForms.Controls.RadioButtons.OnThemeChanged(XForms.Theme theme) -> void
+override XForms.Controls.TabStrip.OnThemeChanged(XForms.Theme theme) -> void
+override XForms.Controls.TabStripStyle.Equals(object obj) -> bool
+override XForms.Controls.TabStripStyle.GetHashCode() -> int
+override XForms.Controls.TabStripStyle.ToString() -> string
+override XForms.Controls.TimePickerViewStyle.Equals(object obj) -> bool
+override XForms.Controls.TimePickerViewStyle.GetHashCode() -> int
+override XForms.Controls.TimePickerViewStyle.ToString() -> string
+override XForms.Controls.ToggleSwitchStyle.Equals(object obj) -> bool
+override XForms.Controls.ToggleSwitchStyle.GetHashCode() -> int
+override XForms.Controls.ToggleSwitchStyle.ToString() -> string
+override XForms.Controls.ToolTipStyle.Equals(object obj) -> bool
+override XForms.Controls.ToolTipStyle.GetHashCode() -> int
+override XForms.Controls.ToolTipStyle.ToString() -> string
+override XForms.Controls.TreeViewStyle.Equals(object obj) -> bool
+override XForms.Controls.TreeViewStyle.GetHashCode() -> int
+override XForms.Controls.TreeViewStyle.ToString() -> string
+static XForms.Controls.DaysOfWeekPickerStyle.operator !=(XForms.Controls.DaysOfWeekPickerStyle left, XForms.Controls.DaysOfWeekPickerStyle right) -> bool
+static XForms.Controls.DaysOfWeekPickerStyle.operator ==(XForms.Controls.DaysOfWeekPickerStyle left, XForms.Controls.DaysOfWeekPickerStyle right) -> bool
+static XForms.Controls.ExpanderStyle.operator !=(XForms.Controls.ExpanderStyle left, XForms.Controls.ExpanderStyle right) -> bool
+static XForms.Controls.ExpanderStyle.operator ==(XForms.Controls.ExpanderStyle left, XForms.Controls.ExpanderStyle right) -> bool
+static XForms.Controls.FlipViewStyle.operator !=(XForms.Controls.FlipViewStyle left, XForms.Controls.FlipViewStyle right) -> bool
+static XForms.Controls.FlipViewStyle.operator ==(XForms.Controls.FlipViewStyle left, XForms.Controls.FlipViewStyle right) -> bool
+static XForms.Controls.FlyoutButtonStyle.operator !=(XForms.Controls.FlyoutButtonStyle left, XForms.Controls.FlyoutButtonStyle right) -> bool
+static XForms.Controls.FlyoutButtonStyle.operator ==(XForms.Controls.FlyoutButtonStyle left, XForms.Controls.FlyoutButtonStyle right) -> bool
+static XForms.Controls.InfoBarStyle.operator !=(XForms.Controls.InfoBarStyle left, XForms.Controls.InfoBarStyle right) -> bool
+static XForms.Controls.InfoBarStyle.operator ==(XForms.Controls.InfoBarStyle left, XForms.Controls.InfoBarStyle right) -> bool
+static XForms.Controls.ListViewStyle.operator !=(XForms.Controls.ListViewStyle left, XForms.Controls.ListViewStyle right) -> bool
+static XForms.Controls.ListViewStyle.operator ==(XForms.Controls.ListViewStyle left, XForms.Controls.ListViewStyle right) -> bool
+static XForms.Controls.MenuFlyoutStyle.operator !=(XForms.Controls.MenuFlyoutStyle left, XForms.Controls.MenuFlyoutStyle right) -> bool
+static XForms.Controls.MenuFlyoutStyle.operator ==(XForms.Controls.MenuFlyoutStyle left, XForms.Controls.MenuFlyoutStyle right) -> bool
+static XForms.Controls.NavigationViewStyle.operator !=(XForms.Controls.NavigationViewStyle left, XForms.Controls.NavigationViewStyle right) -> bool
+static XForms.Controls.NavigationViewStyle.operator ==(XForms.Controls.NavigationViewStyle left, XForms.Controls.NavigationViewStyle right) -> bool
+static XForms.Controls.NumberBoxStyle.operator !=(XForms.Controls.NumberBoxStyle left, XForms.Controls.NumberBoxStyle right) -> bool
+static XForms.Controls.NumberBoxStyle.operator ==(XForms.Controls.NumberBoxStyle left, XForms.Controls.NumberBoxStyle right) -> bool
+static XForms.Controls.PasswordBoxStyle.operator !=(XForms.Controls.PasswordBoxStyle left, XForms.Controls.PasswordBoxStyle right) -> bool
+static XForms.Controls.PasswordBoxStyle.operator ==(XForms.Controls.PasswordBoxStyle left, XForms.Controls.PasswordBoxStyle right) -> bool
+static XForms.Controls.PickerFieldStyle.operator !=(XForms.Controls.PickerFieldStyle left, XForms.Controls.PickerFieldStyle right) -> bool
+static XForms.Controls.PickerFieldStyle.operator ==(XForms.Controls.PickerFieldStyle left, XForms.Controls.PickerFieldStyle right) -> bool
+static XForms.Controls.PipsPagerStyle.operator !=(XForms.Controls.PipsPagerStyle left, XForms.Controls.PipsPagerStyle right) -> bool
+static XForms.Controls.PipsPagerStyle.operator ==(XForms.Controls.PipsPagerStyle left, XForms.Controls.PipsPagerStyle right) -> bool
+static XForms.Controls.PopupStyle.operator !=(XForms.Controls.PopupStyle left, XForms.Controls.PopupStyle right) -> bool
+static XForms.Controls.PopupStyle.operator ==(XForms.Controls.PopupStyle left, XForms.Controls.PopupStyle right) -> bool
+static XForms.Controls.ProgressBarStyle.operator !=(XForms.Controls.ProgressBarStyle left, XForms.Controls.ProgressBarStyle right) -> bool
+static XForms.Controls.ProgressBarStyle.operator ==(XForms.Controls.ProgressBarStyle left, XForms.Controls.ProgressBarStyle right) -> bool
+static XForms.Controls.RadioButtonStyle.operator !=(XForms.Controls.RadioButtonStyle left, XForms.Controls.RadioButtonStyle right) -> bool
+static XForms.Controls.RadioButtonStyle.operator ==(XForms.Controls.RadioButtonStyle left, XForms.Controls.RadioButtonStyle right) -> bool
+static XForms.Controls.TabStripStyle.operator !=(XForms.Controls.TabStripStyle left, XForms.Controls.TabStripStyle right) -> bool
+static XForms.Controls.TabStripStyle.operator ==(XForms.Controls.TabStripStyle left, XForms.Controls.TabStripStyle right) -> bool
+static XForms.Controls.ThemeTokens.get_DaysOfWeekPickerStyle(XForms.Theme theme) -> XForms.Controls.DaysOfWeekPickerStyle
+static XForms.Controls.ThemeTokens.get_ExpanderStyle(XForms.Theme theme) -> XForms.Controls.ExpanderStyle
+static XForms.Controls.ThemeTokens.get_FlipViewStyle(XForms.Theme theme) -> XForms.Controls.FlipViewStyle
+static XForms.Controls.ThemeTokens.get_FlyoutButtonStyle(XForms.Theme theme) -> XForms.Controls.FlyoutButtonStyle
+static XForms.Controls.ThemeTokens.get_InfoBarStyle(XForms.Theme theme) -> XForms.Controls.InfoBarStyle
+static XForms.Controls.ThemeTokens.get_ListViewStyle(XForms.Theme theme) -> XForms.Controls.ListViewStyle
+static XForms.Controls.ThemeTokens.get_MenuFlyoutStyle(XForms.Theme theme) -> XForms.Controls.MenuFlyoutStyle
+static XForms.Controls.ThemeTokens.get_NavigationViewStyle(XForms.Theme theme) -> XForms.Controls.NavigationViewStyle
+static XForms.Controls.ThemeTokens.get_NumberBoxStyle(XForms.Theme theme) -> XForms.Controls.NumberBoxStyle
+static XForms.Controls.ThemeTokens.get_PasswordBoxStyle(XForms.Theme theme) -> XForms.Controls.PasswordBoxStyle
+static XForms.Controls.ThemeTokens.get_PickerFieldStyle(XForms.Theme theme) -> XForms.Controls.PickerFieldStyle
+static XForms.Controls.ThemeTokens.get_PipsPagerStyle(XForms.Theme theme) -> XForms.Controls.PipsPagerStyle
+static XForms.Controls.ThemeTokens.get_PopupStyle(XForms.Theme theme) -> XForms.Controls.PopupStyle
+static XForms.Controls.ThemeTokens.get_ProgressBarStyle(XForms.Theme theme) -> XForms.Controls.ProgressBarStyle
+static XForms.Controls.ThemeTokens.get_RadioButtonStyle(XForms.Theme theme) -> XForms.Controls.RadioButtonStyle
+static XForms.Controls.ThemeTokens.get_TabStripStyle(XForms.Theme theme) -> XForms.Controls.TabStripStyle
+static XForms.Controls.ThemeTokens.get_TimePickerViewStyle(XForms.Theme theme) -> XForms.Controls.TimePickerViewStyle
+static XForms.Controls.ThemeTokens.get_ToggleSwitchStyle(XForms.Theme theme) -> XForms.Controls.ToggleSwitchStyle
+static XForms.Controls.ThemeTokens.get_ToolTipStyle(XForms.Theme theme) -> XForms.Controls.ToolTipStyle
+static XForms.Controls.ThemeTokens.get_TreeViewStyle(XForms.Theme theme) -> XForms.Controls.TreeViewStyle
+static XForms.Controls.TimePickerViewStyle.operator !=(XForms.Controls.TimePickerViewStyle left, XForms.Controls.TimePickerViewStyle right) -> bool
+static XForms.Controls.TimePickerViewStyle.operator ==(XForms.Controls.TimePickerViewStyle left, XForms.Controls.TimePickerViewStyle right) -> bool
+static XForms.Controls.ToggleSwitchStyle.operator !=(XForms.Controls.ToggleSwitchStyle left, XForms.Controls.ToggleSwitchStyle right) -> bool
+static XForms.Controls.ToggleSwitchStyle.operator ==(XForms.Controls.ToggleSwitchStyle left, XForms.Controls.ToggleSwitchStyle right) -> bool
+static XForms.Controls.ToolTipStyle.operator !=(XForms.Controls.ToolTipStyle left, XForms.Controls.ToolTipStyle right) -> bool
+static XForms.Controls.ToolTipStyle.operator ==(XForms.Controls.ToolTipStyle left, XForms.Controls.ToolTipStyle right) -> bool
+static XForms.Controls.TreeViewStyle.operator !=(XForms.Controls.TreeViewStyle left, XForms.Controls.TreeViewStyle right) -> bool
+static XForms.Controls.TreeViewStyle.operator ==(XForms.Controls.TreeViewStyle left, XForms.Controls.TreeViewStyle right) -> bool

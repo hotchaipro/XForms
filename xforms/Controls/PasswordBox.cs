@@ -27,13 +27,11 @@ namespace XForms.Controls
     /// <summary>
     /// A text box for a password, its characters hidden, with a button that
     /// shows them while it's pressed. Its theme's template draws the button,
-    /// <see cref="RevealButtonWidth"/> wide, at the end of the box.
+    /// <see cref="PasswordBoxStyle.RevealButtonWidth"/> wide, at the end of the box.
     /// </summary>
     public class PasswordBox : TemplatedControl
     {
         public static readonly ViewProperty<PasswordBox, string> PasswordProperty = new(nameof(Password), v => v.Password, (v, x) => v.Password = x);
-
-        public const float RevealButtonWidth = 36.0f;
 
         private TextBox _textBox;
         private string _password = string.Empty;
@@ -140,7 +138,7 @@ namespace XForms.Controls
         {
             get
             {
-                float end = (this._passwordRevealMode == PasswordRevealMode.Peek) ? RevealButtonWidth : 0;
+                float end = (this._passwordRevealMode == PasswordRevealMode.Peek) ? this.ActualTheme.PasswordBoxStyle.RevealButtonWidth : 0;
                 return new Thickness(0, 0, end, 0);
             }
         }
@@ -178,8 +176,8 @@ namespace XForms.Controls
         {
             get
             {
-                float x = (this.FlowDirection == FlowDirection.RightToLeft) ? 0 : this.Bounds.Width - RevealButtonWidth;
-                return new Rect(x, 0, RevealButtonWidth, this.Bounds.Height);
+                float x = (this.FlowDirection == FlowDirection.RightToLeft) ? 0 : this.Bounds.Width - this.ActualTheme.PasswordBoxStyle.RevealButtonWidth;
+                return new Rect(x, 0, this.ActualTheme.PasswordBoxStyle.RevealButtonWidth, this.Bounds.Height);
             }
         }
 

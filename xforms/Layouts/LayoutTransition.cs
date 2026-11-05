@@ -15,9 +15,17 @@ namespace XForms.Controls
     /// </remarks>
     public sealed class LayoutTransition
     {
-        public TimeSpan Duration { get; init; } = TimeSpan.FromMilliseconds(250);
+        /// <summary>
+        /// How long children take, or null (the default) for the theme's
+        /// medium duration.
+        /// </summary>
+        public TimeSpan? Duration { get; init; }
 
-        public EasingFunction Easing { get; init; } = new CubicEase(EasingMode.EaseOut);
+        /// <summary>
+        /// How children arrive, or null (the default) for the theme's
+        /// decelerating curve.
+        /// </summary>
+        public EasingFunction Easing { get; init; }
 
         /// <summary>
         /// Whether children that move slide from their old positions.

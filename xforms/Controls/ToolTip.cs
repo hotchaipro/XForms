@@ -12,16 +12,13 @@ namespace XForms.Controls
     /// </summary>
     public sealed class ToolTip : TemplatedControl
     {
-        /// <summary>
-        /// The widest a tooltip grows before its text wraps.
-        /// </summary>
-        public const float MaximumWidth = 320.0f;
-
         private string _text;
 
-        public ToolTip()
+        protected override void OnThemeChanged(
+            Theme theme)
         {
-            this.Padding = new Thickness(8, 5, 8, 6);
+            base.OnThemeChanged(theme);
+            this.Padding = theme.ToolTipStyle.Padding;
         }
 
         public string Text
@@ -67,7 +64,7 @@ namespace XForms.Controls
             Size availableSize)
         {
             var padding = this.Padding;
-            float maxText = Math.Min(MaximumWidth, availableSize.Width) - padding.Left - padding.Right;
+            float maxText = Math.Min(this.ActualTheme.ToolTipStyle.MaximumWidth, availableSize.Width) - padding.Left - padding.Right;
             var size = TextLayout.Measure(this._text ?? string.Empty, this.CreateTextFormat(), Math.Max(0, maxText));
             return new Size(
                 (float)Math.Ceiling(size.Width) + padding.Left + padding.Right,

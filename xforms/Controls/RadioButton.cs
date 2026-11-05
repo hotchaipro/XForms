@@ -12,6 +12,18 @@ namespace XForms.Controls
     /// </summary>
     public sealed class RadioButton : TemplatedControl, ITapGestureDelegate
     {
+        private StyledValue<float> _width = new StyledValue<float>(Dimension.Auto);
+        private StyledValue<float> _height = new StyledValue<float>(Dimension.Auto);
+
+        protected override void OnThemeChanged(
+            Theme theme)
+        {
+            base.OnThemeChanged(theme);
+            var style = theme.RadioButtonStyle;
+            this.Width = this._width.Apply(this.Width, style.Width);
+            this.Height = this._height.Apply(this.Height, style.Height);
+        }
+
         protected override AccessibilityRole DefaultAccessibilityRole
         {
             get
@@ -53,9 +65,6 @@ namespace XForms.Controls
             {
                 throw new ArgumentNullException(nameof(radioButtonItem));
             }
-
-            this.Width = 72;
-            this.Height = 60;
 
             this.RadioButtons = radioButtonGroup;
             this.RadioButtonItem = radioButtonItem;

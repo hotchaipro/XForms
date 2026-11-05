@@ -313,18 +313,7 @@ namespace XForms.Controls
     /// </summary>
     public sealed class TreeViewItem : TemplatedControl, ITapGestureDelegate
     {
-        public const float ItemHeight = 36.0f;
-
-        /// <summary>
-        /// How far each level is indented.
-        /// </summary>
-        public const float Indent = 20.0f;
-
-        /// <summary>
-        /// The width of the chevron's area, at the start of the item's
-        /// indented place.
-        /// </summary>
-        public const float ChevronWidth = 28.0f;
+        private StyledValue<float> _height = new StyledValue<float>(Dimension.Auto);
 
         private readonly TreeView _tree;
 
@@ -339,8 +328,14 @@ namespace XForms.Controls
             this.ParentNode = parentNode;
             this.Level = level;
             this.Focusable = true;
-            this.Height = ItemHeight;
             this.GestureRecognizers.Add(new TapGestureRecognizer(this));
+        }
+
+        protected override void OnThemeChanged(
+            Theme theme)
+        {
+            base.OnThemeChanged(theme);
+            this.Height = this._height.Apply(this.Height, theme.TreeViewStyle.ItemHeight);
         }
 
         public TreeView TreeView
@@ -456,9 +451,10 @@ namespace XForms.Controls
         {
             get
             {
-                float start = 8 + (this.Level * Indent);
-                float x = this.IsRightToLeft ? this.Bounds.Width - start - ChevronWidth : start;
-                return new Rect(x, 0, ChevronWidth, this.Bounds.Height);
+                var style = this.ActualTheme.TreeViewStyle;
+                float start = style.ItemInset + (this.Level * style.Indent);
+                float x = this.IsRightToLeft ? this.Bounds.Width - start - style.ChevronWidth : start;
+                return new Rect(x, 0, style.ChevronWidth, this.Bounds.Height);
             }
         }
 
@@ -469,9 +465,10 @@ namespace XForms.Controls
         {
             get
             {
-                float start = 8 + (this.Level * Indent) + ChevronWidth;
-                float width = Math.Max(0, this.Bounds.Width - start - 8);
-                return new Rect(this.IsRightToLeft ? 8 : start, 0, width, this.Bounds.Height);
+                var style = this.ActualTheme.TreeViewStyle;
+                float start = style.ItemInset + (this.Level * style.Indent) + style.ChevronWidth;
+                float width = Math.Max(0, this.Bounds.Width - start - style.ItemInset);
+                return new Rect(this.IsRightToLeft ? style.ItemInset : start, 0, width, this.Bounds.Height);
             }
         }
 

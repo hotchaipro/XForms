@@ -50,10 +50,11 @@ namespace XForms.Controls
     {
         // How far a swipe has to take the switch (or how fast, in points a
         // second) for it to complete when released
+        [BehaviorConstant("How far a swipe has to go to complete")]
         private const float SwipeCompleteProgress = 1 / 3.0f;
-        private const float SwipeFlickVelocity = 300;
 
-        private static readonly TimeSpan DefaultTransitionDuration = TimeSpan.FromMilliseconds(250);
+        [BehaviorConstant("How fast a swipe has to be to complete")]
+        private const float SwipeFlickVelocity = 300;
 
         private UniformGrid _buttonsLayout;
         private TabStripItem _selection;
@@ -66,13 +67,19 @@ namespace XForms.Controls
 
         public event EventHandler<TabSelectionChangedEventArgs> SelectionChanged;
 
+        protected override void OnThemeChanged(
+            Theme theme)
+        {
+            base.OnThemeChanged(theme);
+            this._buttonsLayout.MaxWidth = theme.TabStripStyle.MaximumWidth;
+        }
+
         public TabStrip()
         {
             this._buttonsLayout = new UniformGrid()
             {
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Center,
-                MaxWidth = 600,
             };
 
             this.HorizontalAlignment = HorizontalAlignment.Stretch;
@@ -177,7 +184,7 @@ namespace XForms.Controls
         {
             get
             {
-                return this._frame?.TransitionDuration ?? DefaultTransitionDuration;
+                return this._frame?.TransitionDuration ?? this.ActualTheme.Motion.Medium;
             }
         }
 

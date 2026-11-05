@@ -204,7 +204,6 @@ XForms.Controls.LayoutTransition.AnimatesEntrances.get -> bool
 XForms.Controls.LayoutTransition.AnimatesEntrances.init -> void
 XForms.Controls.LayoutTransition.AnimatesMoves.get -> bool
 XForms.Controls.LayoutTransition.AnimatesMoves.init -> void
-XForms.Controls.LayoutTransition.Duration.get -> System.TimeSpan
 XForms.Controls.LayoutTransition.Duration.init -> void
 XForms.Controls.LayoutTransition.Easing.get -> XForms.EasingFunction
 XForms.Controls.LayoutTransition.Easing.init -> void
@@ -654,7 +653,6 @@ abstract XForms.Controls.Panel.MeasureChildren(XForms.Size availableSize) -> XFo
 abstract XForms.Controls.PickerField.DisplayText.get -> string
 abstract XForms.Controls.PickerField.MaximumTextWidth.get -> float
 abstract XForms.Controls.PickerField.OpenPicker() -> void
-const XForms.Controls.PickerField.GlyphWidth = 34 -> float
 override XForms.Controls.Border.BackgroundColor.get -> XForms.Color
 override XForms.Controls.Border.Padding.get -> XForms.Thickness
 override XForms.Controls.Border.Padding.set -> void

@@ -62,8 +62,7 @@ namespace XForms.Controls
             public MenuFrame(
                 MenuFlyoutView view)
             {
-                view.Margin = new Thickness(ContentInset);
-                this.Content = view;
+                this.FramedContent = view;
             }
         }
     }
@@ -77,13 +76,6 @@ namespace XForms.Controls
     public sealed class MenuFlyoutView : TemplatedControl
     {
         public float RowHeight => this.ActualTheme.PopupRowHeight;
-
-        /// <summary>
-        /// The space before an item's text (its icon goes in it).
-        /// </summary>
-        public const float TextInset = 40.0f;
-
-        private const float MinimumWidth = 160.0f;
 
         private readonly MenuFlyout _flyout;
         private int _highlightedIndex;
@@ -160,10 +152,10 @@ namespace XForms.Controls
             Size availableSize)
         {
             var format = this.CreateTextFormat();
-            float width = MinimumWidth;
+            float width = this.ActualTheme.MenuFlyoutStyle.MinimumWidth;
             foreach (var item in this.Items)
             {
-                width = Math.Max(width, TextInset + TextLayout.Measure(item.Text ?? string.Empty, format).Width + 24);
+                width = Math.Max(width, this.ActualTheme.MenuFlyoutStyle.TextInset + TextLayout.Measure(item.Text ?? string.Empty, format).Width + this.ActualTheme.MenuFlyoutStyle.TextEndInset);
             }
 
             return new Size(Math.Min(width, availableSize.Width), Math.Min(this.Items.Count * RowHeight, availableSize.Height));

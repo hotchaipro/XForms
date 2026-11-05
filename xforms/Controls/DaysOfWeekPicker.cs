@@ -9,6 +9,17 @@ namespace XForms.Controls
 {
     public class DaysOfWeekPicker : ContentControl
     {
+        private StyledValue<float> _height = new StyledValue<float>(Dimension.Auto);
+
+        protected override void OnThemeChanged(
+            Theme theme)
+        {
+            base.OnThemeChanged(theme);
+            var style = theme.DaysOfWeekPickerStyle;
+            this.Height = this._height.Apply(this.Height, style.ButtonSize);
+            this._buttonsLayout.MaxWidth = style.MaximumWidth;
+        }
+
         private UniformGrid _buttonsLayout;
         private DayOfWeekToggleButton[] _buttons = new DayOfWeekToggleButton[7];
 
@@ -18,10 +29,7 @@ namespace XForms.Controls
             {
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch,
-                MaxWidth = 320,
             };
-
-            this.Height = 40;
 
             this._buttons[(int)DayOfWeek.Monday] = AddButton("M");
             this._buttons[(int)DayOfWeek.Tuesday] = AddButton("T");
@@ -90,6 +98,18 @@ namespace XForms.Controls
     /// </summary>
     public sealed class DayOfWeekToggleButton : TemplatedControl, ITapGestureDelegate
     {
+        private StyledValue<float> _width = new StyledValue<float>(Dimension.Auto);
+        private StyledValue<float> _height = new StyledValue<float>(Dimension.Auto);
+
+        protected override void OnThemeChanged(
+            Theme theme)
+        {
+            base.OnThemeChanged(theme);
+            float size = theme.DaysOfWeekPickerStyle.ButtonSize;
+            this.Width = this._width.Apply(this.Width, size);
+            this.Height = this._height.Apply(this.Height, size);
+        }
+
         private string _text;
         private bool _isChecked;
 
@@ -105,8 +125,6 @@ namespace XForms.Controls
 
             this.DaysOfWeekPicker = parent;
 
-            this.Width = 40;
-            this.Height = 40;
             this.GestureRecognizers.Add(new TapGestureRecognizer(this));
         }
 

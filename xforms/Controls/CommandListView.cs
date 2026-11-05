@@ -188,6 +188,13 @@ namespace XForms.Controls
         private CommandBarCommandCollection _commandBarCommands;
         private DockPanel _contentLayout;
 
+        protected override void OnThemeChanged(
+            Theme theme)
+        {
+            base.OnThemeChanged(theme);
+            this._swipeItem.IconSize = theme.CommandBarStyle.SwipeIconSize;
+        }
+
         public CommandListViewItemContainer()
         {
             this.VerticalAlignment = VerticalAlignment.Stretch;
@@ -197,7 +204,6 @@ namespace XForms.Controls
                 Animator = new(),
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch,
-                IconSize = new Size(30, 30),
             };
             this.AddVisualChild(this._swipeItem);
 
@@ -350,11 +356,22 @@ namespace XForms.Controls
 
         // How far a swipe goes back or on before it changes its mind: whether
         // lifting runs the command, and which command a long swipe runs
+        [BehaviorConstant("How a swipe changes its mind, whatever the row looks like")]
         private const float SwipeHysteresis = 15.0f;
 
         // A short swipe this fast (points a second, its way) as it lifts runs
         // its command: a flick
+        [BehaviorConstant("How fast a swipe has to be to count as a flick")]
         private const float FlickVelocity = 400.0f;
+
+        // How far a swipe has to go before lifting can run its command (a
+        // command that can't run stops it here)
+        [BehaviorConstant("How far a swipe has to go to count")]
+        private const float EnabledMargin = 48.0f;
+
+        // How far across the row a swipe becomes a long swipe
+        [BehaviorConstant("How far a swipe has to go to be a long swipe")]
+        private const float LongSwipeDistancePercentage = 0.7f;
 
         private float _swipeFencePosition;
         private bool _swipeEnabled;
@@ -386,9 +403,6 @@ namespace XForms.Controls
             int direction,
             float dx)
         {
-            const float EnabledMargin = 48.0f;
-            const float LongSwipeDistancePercentage = 0.7f;
-
             if (null == this.Content)
             {
                 return false;
@@ -563,9 +577,9 @@ namespace XForms.Controls
                 return;
             }
 
-            this._contentLayout.Animator.TranslateTo(new Point(direction * this.Bounds.Size.Width, 0), this.ActualTheme.Motion.Short, new CubicEase(EasingMode.EaseInOut));
+            this._contentLayout.Animator.TranslateTo(new Point(direction * this.Bounds.Size.Width, 0), this.ActualTheme.Motion.Short, this.ActualTheme.Motion.Standard);
             var commit = this.CommitSwipe();
-            this._swipeItem.Animator.TranslateTo(new Point(0, 0), this.ActualTheme.Motion.Short, new CubicEase(EasingMode.EaseInOut)).Completion.ContinueWith((ignore) =>
+            this._swipeItem.Animator.TranslateTo(new Point(0, 0), this.ActualTheme.Motion.Short, this.ActualTheme.Motion.Standard).Completion.ContinueWith((ignore) =>
             {
                 Application.Dispatcher.Post(commit);
             });
@@ -600,9 +614,9 @@ namespace XForms.Controls
                 return;
             }
 
-            this._contentLayout.Animator.TranslateTo(Point.Zero, this.ActualTheme.Motion.Short, new CubicEase(EasingMode.EaseInOut));
+            this._contentLayout.Animator.TranslateTo(Point.Zero, this.ActualTheme.Motion.Short, this.ActualTheme.Motion.Standard);
             this._swipeItem.Animator.TranslateTo(
-                new Point(-direction * this.Bounds.Size.Width, 0), this.ActualTheme.Motion.Short, new CubicEase(EasingMode.EaseInOut)).Completion.ContinueWith(
+                new Point(-direction * this.Bounds.Size.Width, 0), this.ActualTheme.Motion.Short, this.ActualTheme.Motion.Standard).Completion.ContinueWith(
                 (ignore) => { this._swipeItem.Animator.Translation = new XForms.Point(-1000, 0); }, TaskContinuationOptions.ExecuteSynchronously);
         }
 

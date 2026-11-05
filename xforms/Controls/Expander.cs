@@ -14,11 +14,6 @@ namespace XForms.Controls
     {
         public static readonly ViewProperty<Expander, bool> IsExpandedProperty = new(nameof(IsExpanded), v => v.IsExpanded, (v, x) => v.IsExpanded = x);
 
-        /// <summary>
-        /// The header's height.
-        /// </summary>
-        public const float HeaderHeight = 48.0f;
-
         private readonly ExpanderHeader _header;
         private readonly Border _contentHost;
         private string _headerText;
@@ -31,15 +26,22 @@ namespace XForms.Controls
             this._contentHost = new Border()
             {
                 Animator = new Animator(),
-                Padding = new Thickness(16, 8, 16, 16),
                 IsVisible = false,
             };
 
-            this._header.Height = HeaderHeight;
             base.Content = new StackPanel()
             {
                 Children = { this._header, this._contentHost },
             };
+        }
+
+        protected override void OnThemeChanged(
+            Theme theme)
+        {
+            base.OnThemeChanged(theme);
+            var style = theme.ExpanderStyle;
+            this._header.Height = style.HeaderHeight;
+            this._contentHost.Padding = style.ContentPadding;
         }
 
         /// <summary>
@@ -120,7 +122,7 @@ namespace XForms.Controls
                         var motion = this.ActualTheme.Motion;
                         animator.Opacity = 0;
                         animator.FadeTo(1, motion.Medium, motion.Decelerate);
-                        animator.TranslateFrom(new Point(0, -12), motion.Medium, motion.Decelerate);
+                        animator.TranslateFrom(new Point(0, -this.ActualTheme.ExpanderStyle.RevealOffset), motion.Medium, motion.Decelerate);
                     }
                 }
                 else
@@ -238,8 +240,8 @@ namespace XForms.Controls
         protected override Size MeasureOverride(
             Size availableSize)
         {
-            float width = float.IsInfinity(availableSize.Width) ? TextLayout.Measure(this._expander.Header ?? string.Empty, this.CreateTextFormat()).Width + 72 : availableSize.Width;
-            return new Size(width, Math.Min(Expander.HeaderHeight, availableSize.Height));
+            float width = float.IsInfinity(availableSize.Width) ? TextLayout.Measure(this._expander.Header ?? string.Empty, this.CreateTextFormat()).Width + this.ActualTheme.ExpanderStyle.HeaderChromeWidth : availableSize.Width;
+            return new Size(width, Math.Min(this.ActualTheme.ExpanderStyle.HeaderHeight, availableSize.Height));
         }
 
         private void Toggle()

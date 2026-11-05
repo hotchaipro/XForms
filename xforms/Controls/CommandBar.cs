@@ -61,7 +61,6 @@ namespace XForms.Controls
         // spacing (half on each side of its icon and label, so a tap between
         // two lands on the nearer). Without room for the spacing across the
         // bar, they go back to side by side.
-        private const float ButtonSize = 48;
 
         protected override void OnThemeChanged(
             Theme theme)
@@ -94,12 +93,12 @@ namespace XForms.Controls
 
             var style = this.ActualTheme.CommandBarStyle;
             float spacing = Math.Max(0, style.ButtonSpacing);
-            if (!float.IsInfinity(width) && ((count * (ButtonSize + spacing)) > width))
+            if (!float.IsInfinity(width) && ((count * (style.ButtonWidth + spacing)) > width))
             {
                 spacing = 0;
             }
 
-            float buttonWidth = ButtonSize + spacing;
+            float buttonWidth = style.ButtonWidth + spacing;
             float buttonHeight = style.ButtonHeight;
             foreach (var buttons in new[] { this._primaryButtons.Buttons, this._secondaryButtons.Buttons })
             {

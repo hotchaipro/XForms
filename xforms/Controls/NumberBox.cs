@@ -26,14 +26,12 @@ namespace XForms.Controls
     /// back to the value, if it isn't a number). Up and Down step it by
     /// <see cref="SmallChange"/>, Page Up and Page Down by
     /// <see cref="LargeChange"/>, and so do its spin buttons. Its theme's
-    /// template draws the spin buttons, each <see cref="SpinButtonWidth"/>
+    /// template draws the spin buttons, each <see cref="NumberBoxStyle.SpinButtonWidth"/>
     /// wide, at the end of the box.
     /// </summary>
     public class NumberBox : TemplatedControl
     {
         public static readonly ViewProperty<NumberBox, double> ValueProperty = new(nameof(Value), v => v.Value, (v, x) => v.Value = x);
-
-        public const float SpinButtonWidth = 32.0f;
 
         private TextBox _textBox;
         private double _value = double.NaN;
@@ -259,7 +257,7 @@ namespace XForms.Controls
         {
             get
             {
-                float end = (this._spinButtonPlacementMode == NumberBoxSpinButtonPlacementMode.Inline) ? 2 * SpinButtonWidth : 0;
+                float end = (this._spinButtonPlacementMode == NumberBoxSpinButtonPlacementMode.Inline) ? 2 * this.ActualTheme.NumberBoxStyle.SpinButtonWidth : 0;
                 return new Thickness(0, 0, end, 0);
             }
         }
@@ -332,8 +330,8 @@ namespace XForms.Controls
         {
             get
             {
-                float x = this.IsRightToLeft ? SpinButtonWidth : this.Bounds.Width - (2 * SpinButtonWidth);
-                return new Rect(x, 0, SpinButtonWidth, this.Bounds.Height);
+                float x = this.IsRightToLeft ? this.ActualTheme.NumberBoxStyle.SpinButtonWidth : this.Bounds.Width - (2 * this.ActualTheme.NumberBoxStyle.SpinButtonWidth);
+                return new Rect(x, 0, this.ActualTheme.NumberBoxStyle.SpinButtonWidth, this.Bounds.Height);
             }
         }
 
@@ -344,8 +342,8 @@ namespace XForms.Controls
         {
             get
             {
-                float x = this.IsRightToLeft ? 0 : this.Bounds.Width - SpinButtonWidth;
-                return new Rect(x, 0, SpinButtonWidth, this.Bounds.Height);
+                float x = this.IsRightToLeft ? 0 : this.Bounds.Width - this.ActualTheme.NumberBoxStyle.SpinButtonWidth;
+                return new Rect(x, 0, this.ActualTheme.NumberBoxStyle.SpinButtonWidth, this.Bounds.Height);
             }
         }
 

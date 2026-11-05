@@ -27,7 +27,7 @@ namespace XForms.Themes.Basic
             format.VerticalAlignment = VerticalAlignment.Center;
             bool isRightToLeft = control.FlowDirection == FlowDirection.RightToLeft;
             format.HorizontalAlignment = isRightToLeft ? HorizontalAlignment.Right : HorizontalAlignment.Left;
-            float inset = NavigationView.BarHeight + 4;
+            float inset = control.ActualTheme.NavigationViewStyle.BarHeight + 4;
             drawContext.DrawText(control.PaneTitle, new Rect(inset, 0, Math.Max(0, bar.Width - (2 * inset)), bar.Height), colors.Foreground, format);
         }
     }

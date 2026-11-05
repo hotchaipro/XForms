@@ -25,18 +25,6 @@ namespace XForms.Controls
     {
         public static readonly ViewProperty<InfoBar, bool> IsOpenProperty = new(nameof(IsOpen), v => v.IsOpen, (v, x) => v.IsOpen = x);
 
-        /// <summary>
-        /// The space inside the bar's edges, and between its parts.
-        /// </summary>
-        public const float Spacing = 12.0f;
-
-        /// <summary>
-        /// The severity icon's size.
-        /// </summary>
-        public const float IconSize = 20.0f;
-
-        private const float CloseButtonSize = 32.0f;
-
         private readonly InfoBarCloseButton _closeButton;
         private string _title;
         private string _message;
@@ -209,7 +197,7 @@ namespace XForms.Controls
         public TextFormat CreateTitleFormat()
         {
             var format = this.ActualTheme.Typography.Body.ToTextFormat();
-            format.FontWeight = FontWeight.SemiBold;
+            format.FontWeight = this.ActualTheme.InfoBarStyle.TitleFontWeight;
             return this.Wrapped(format);
         }
 
@@ -238,8 +226,8 @@ namespace XForms.Controls
         private float TextWidth(
             float width)
         {
-            float closeWidth = this._isClosable ? CloseButtonSize : 0;
-            return Math.Max(0, width - (2 * Spacing) - IconSize - Spacing - closeWidth);
+            float closeWidth = this._isClosable ? this.ActualTheme.InfoBarStyle.CloseButtonSize : 0;
+            return Math.Max(0, width - (2 * this.ActualTheme.InfoBarStyle.Spacing) - this.ActualTheme.InfoBarStyle.IconSize - this.ActualTheme.InfoBarStyle.Spacing - closeWidth);
         }
 
         private float TitleHeight(
@@ -261,8 +249,8 @@ namespace XForms.Controls
         {
             get
             {
-                float x = this.IsRightToLeft ? this.Bounds.Width - Spacing - IconSize : Spacing;
-                return new Rect(x, Spacing + 1, IconSize, IconSize);
+                float x = this.IsRightToLeft ? this.Bounds.Width - this.ActualTheme.InfoBarStyle.Spacing - this.ActualTheme.InfoBarStyle.IconSize : this.ActualTheme.InfoBarStyle.Spacing;
+                return new Rect(x, this.ActualTheme.InfoBarStyle.Spacing + this.ActualTheme.InfoBarStyle.IconOffset, this.ActualTheme.InfoBarStyle.IconSize, this.ActualTheme.InfoBarStyle.IconSize);
             }
         }
 
@@ -274,7 +262,7 @@ namespace XForms.Controls
             get
             {
                 float width = this.TextWidth(this.Bounds.Width);
-                return new Rect(this.TextX(width), Spacing, width, this.TitleHeight(width));
+                return new Rect(this.TextX(width), this.ActualTheme.InfoBarStyle.Spacing, width, this.TitleHeight(width));
             }
         }
 
@@ -286,7 +274,7 @@ namespace XForms.Controls
             get
             {
                 float width = this.TextWidth(this.Bounds.Width);
-                float top = Spacing + this.TitleHeight(width);
+                float top = this.ActualTheme.InfoBarStyle.Spacing + this.TitleHeight(width);
                 return new Rect(this.TextX(width), top, width, this.MessageHeight(width));
             }
         }
@@ -294,25 +282,25 @@ namespace XForms.Controls
         private float TextX(
             float textWidth)
         {
-            return this.IsRightToLeft ? this.Bounds.Width - Spacing - IconSize - Spacing - textWidth : Spacing + IconSize + Spacing;
+            return this.IsRightToLeft ? this.Bounds.Width - this.ActualTheme.InfoBarStyle.Spacing - this.ActualTheme.InfoBarStyle.IconSize - this.ActualTheme.InfoBarStyle.Spacing - textWidth : this.ActualTheme.InfoBarStyle.Spacing + this.ActualTheme.InfoBarStyle.IconSize + this.ActualTheme.InfoBarStyle.Spacing;
         }
 
         protected override Size MeasureOverride(
             Size availableSize)
         {
-            float width = float.IsInfinity(availableSize.Width) ? 480 : availableSize.Width;
+            float width = float.IsInfinity(availableSize.Width) ? this.ActualTheme.InfoBarStyle.DefaultWidth : availableSize.Width;
             float textWidth = this.TextWidth(width);
             float height = this.TitleHeight(textWidth) + this.MessageHeight(textWidth);
 
-            this._closeButton.Measure(new Size(CloseButtonSize, CloseButtonSize));
+            this._closeButton.Measure(new Size(this.ActualTheme.InfoBarStyle.CloseButtonSize, this.ActualTheme.InfoBarStyle.CloseButtonSize));
             if (null != this._actionButton)
             {
                 this._actionButton.Measure(new Size(textWidth, float.PositiveInfinity));
-                height += Spacing + this._actionButton.DesiredSize.Height;
+                height += this.ActualTheme.InfoBarStyle.Spacing + this._actionButton.DesiredSize.Height;
             }
 
-            height = Math.Max(height, IconSize + 2);
-            return new Size(width, Math.Min(height + (2 * Spacing), availableSize.Height));
+            height = Math.Max(height, this.ActualTheme.InfoBarStyle.IconSize + (2 * this.ActualTheme.InfoBarStyle.IconOffset));
+            return new Size(width, Math.Min(height + (2 * this.ActualTheme.InfoBarStyle.Spacing), availableSize.Height));
         }
 
         // NOTE: Arranged in left-to-right terms; a right-to-left parent
@@ -321,13 +309,13 @@ namespace XForms.Controls
             Size finalSize)
         {
             float textWidth = this.TextWidth(finalSize.Width);
-            this._closeButton.Arrange(new Rect(finalSize.Width - Spacing - CloseButtonSize + 6, Spacing - 6, CloseButtonSize, CloseButtonSize));
+            this._closeButton.Arrange(new Rect(finalSize.Width - this.ActualTheme.InfoBarStyle.Spacing - this.ActualTheme.InfoBarStyle.CloseButtonSize + this.ActualTheme.InfoBarStyle.CloseButtonOutset, this.ActualTheme.InfoBarStyle.Spacing - this.ActualTheme.InfoBarStyle.CloseButtonOutset, this.ActualTheme.InfoBarStyle.CloseButtonSize, this.ActualTheme.InfoBarStyle.CloseButtonSize));
 
             if (null != this._actionButton)
             {
-                float top = Spacing + this.TitleHeight(textWidth) + this.MessageHeight(textWidth) + Spacing;
+                float top = this.ActualTheme.InfoBarStyle.Spacing + this.TitleHeight(textWidth) + this.MessageHeight(textWidth) + this.ActualTheme.InfoBarStyle.Spacing;
                 var size = this._actionButton.DesiredSize;
-                this._actionButton.Arrange(new Rect(Spacing + IconSize + Spacing, top, Math.Min(size.Width, textWidth), size.Height));
+                this._actionButton.Arrange(new Rect(this.ActualTheme.InfoBarStyle.Spacing + this.ActualTheme.InfoBarStyle.IconSize + this.ActualTheme.InfoBarStyle.Spacing, top, Math.Min(size.Width, textWidth), size.Height));
             }
         }
     }

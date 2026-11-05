@@ -7,20 +7,12 @@ namespace XForms.Controls
     /// An on and off switch, with an optional header above it and its state's
     /// text beside it, turned by a tap, Space or Enter. Its theme's template
     /// draws it, in the layout the switch measures: the header, then a
-    /// <see cref="TrackWidth"/> by <see cref="TrackHeight"/> track at the start
-    /// of a <see cref="TouchHeight"/> band, then the text after
-    /// <see cref="TextGap"/>.
+    /// track at the start of a band, then the text after it, as the theme's
+    /// <see cref="ToggleSwitchStyle"/> says.
     /// </summary>
     public class ToggleSwitch : TemplatedControl, ITapGestureDelegate
     {
         public static readonly ViewProperty<ToggleSwitch, bool> IsOnProperty = new(nameof(IsOn), v => v.IsOn, (v, x) => v.IsOn = x);
-
-        public const float TrackWidth = 40.0f;
-        public const float TrackHeight = 20.0f;
-        public const float TouchHeight = 32.0f;
-        public const float TextGap = 12.0f;
-
-        private const float HeaderGap = 4.0f;
 
         private string _header;
         private string _onContent = "On";
@@ -212,7 +204,7 @@ namespace XForms.Controls
             get
             {
                 float height = this.HeaderBounds.Height;
-                return (height > 0) ? height + HeaderGap : 0;
+                return (height > 0) ? height + this.ActualTheme.ToggleSwitchStyle.HeaderGap : 0;
             }
         }
 
@@ -231,9 +223,9 @@ namespace XForms.Controls
         {
             get
             {
-                float y = this.BandTop + ((TouchHeight - TrackHeight) / 2);
-                float x = this.IsRightToLeft ? this.Bounds.Width - TrackWidth : 0;
-                return new Rect(x, y, TrackWidth, TrackHeight);
+                float y = this.BandTop + ((this.ActualTheme.ToggleSwitchStyle.TouchHeight - this.ActualTheme.ToggleSwitchStyle.TrackHeight) / 2);
+                float x = this.IsRightToLeft ? this.Bounds.Width - this.ActualTheme.ToggleSwitchStyle.TrackWidth : 0;
+                return new Rect(x, y, this.ActualTheme.ToggleSwitchStyle.TrackWidth, this.ActualTheme.ToggleSwitchStyle.TrackHeight);
             }
         }
 
@@ -244,9 +236,9 @@ namespace XForms.Controls
         {
             get
             {
-                float width = Math.Max(0, this.Bounds.Width - TrackWidth - TextGap);
-                float x = this.IsRightToLeft ? 0 : TrackWidth + TextGap;
-                return new Rect(x, this.BandTop, width, TouchHeight);
+                float width = Math.Max(0, this.Bounds.Width - this.ActualTheme.ToggleSwitchStyle.TrackWidth - this.ActualTheme.ToggleSwitchStyle.TextGap);
+                float x = this.IsRightToLeft ? 0 : this.ActualTheme.ToggleSwitchStyle.TrackWidth + this.ActualTheme.ToggleSwitchStyle.TextGap;
+                return new Rect(x, this.BandTop, width, this.ActualTheme.ToggleSwitchStyle.TouchHeight);
             }
         }
 
@@ -257,13 +249,13 @@ namespace XForms.Controls
             float textWidth = Math.Max(
                 TextLayout.Measure(this._onContent ?? string.Empty, format).Width,
                 TextLayout.Measure(this._offContent ?? string.Empty, format).Width);
-            float width = TrackWidth + ((textWidth > 0) ? TextGap + textWidth : 0);
-            float height = TouchHeight;
+            float width = this.ActualTheme.ToggleSwitchStyle.TrackWidth + ((textWidth > 0) ? this.ActualTheme.ToggleSwitchStyle.TextGap + textWidth : 0);
+            float height = this.ActualTheme.ToggleSwitchStyle.TouchHeight;
             if (!string.IsNullOrEmpty(this._header))
             {
                 var headerSize = TextLayout.Measure(this._header, this.CreateHeaderFormat());
                 width = Math.Max(width, headerSize.Width);
-                height += headerSize.Height + HeaderGap;
+                height += headerSize.Height + this.ActualTheme.ToggleSwitchStyle.HeaderGap;
             }
 
             return new Size(Math.Min(width, availableSize.Width), Math.Min(height, availableSize.Height));

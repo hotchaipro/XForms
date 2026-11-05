@@ -73,8 +73,9 @@ namespace XForms.Themes.Basic
                     drawContext.DrawImage(icon, new Rect(x, row.Y + ((rowHeight - IconSize) / 2), IconSize, IconSize), color);
                 }
 
-                float textX = isRightToLeft ? 12 : MenuFlyoutView.TextInset;
-                drawContext.DrawText(items[i].Text, new Rect(textX, row.Y, Math.Max(0, width - MenuFlyoutView.TextInset - 12), rowHeight), color, format);
+                float textInset = control.ActualTheme.MenuFlyoutStyle.TextInset;
+                float textX = isRightToLeft ? 12 : textInset;
+                drawContext.DrawText(items[i].Text, new Rect(textX, row.Y, Math.Max(0, width - textInset - 12), rowHeight), color, format);
             }
         }
     }

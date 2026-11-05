@@ -9,21 +9,11 @@ namespace XForms.Controls
     /// text entry, with a glyph at the end, and opens the picker's popup when
     /// clicked, or with Enter, Space, F4 or Alt+Down. Its theme's template
     /// draws it, in the layout the field measures: the text from
-    /// <see cref="TextInset"/>, and the glyph in the last
-    /// <see cref="GlyphWidth"/>.
+    /// the theme's <see cref="PickerFieldStyle.TextInset"/>, and the glyph in the
+    /// last <see cref="PickerFieldStyle.GlyphWidth"/>.
     /// </summary>
     public abstract class PickerField : TemplatedControl
     {
-        /// <summary>
-        /// Where the text starts: as a text box's does.
-        /// </summary>
-        public const float TextInset = 12.0f;
-
-        /// <summary>
-        /// The width of the glyph's area, at the end of the field.
-        /// </summary>
-        public const float GlyphWidth = 34.0f;
-
         protected PickerField()
         {
             this.Focusable = true;
@@ -150,7 +140,8 @@ namespace XForms.Controls
                 lineHeight = TextLayout.Measure("Ag", this.CreateTextFormat()).Height;
             }
 
-            float width = TextInset + this.MaximumTextWidth + GlyphWidth;
+            var style = this.ActualTheme.PickerFieldStyle;
+            float width = style.TextInset + this.MaximumTextWidth + style.GlyphWidth;
 
             return new Size(
                 Math.Min(width, availableSize.Width),

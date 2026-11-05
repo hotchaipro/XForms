@@ -35,18 +35,8 @@ namespace XForms.Controls
         /// <summary>
         /// The width below which the pane becomes a drawer.
         /// </summary>
+        [BehaviorConstant("Where the layout changes, not how it looks")]
         public const float CompactThreshold = 640.0f;
-
-        /// <summary>
-        /// The pane's width.
-        /// </summary>
-        public const float PaneWidth = 260.0f;
-
-        /// <summary>
-        /// The height of the bar at the top on a narrow window (with the menu
-        /// button and the pane's title).
-        /// </summary>
-        public const float BarHeight = 48.0f;
 
         private readonly NavigationViewPane _pane;
         private readonly NavigationViewMenuButton _menuButton;
@@ -59,9 +49,16 @@ namespace XForms.Controls
         private bool _isPaneOpen;
         private bool _isNarrow;
 
+        protected override void OnThemeChanged(
+            Theme theme)
+        {
+            base.OnThemeChanged(theme);
+            this._itemsPanel.Spacing = theme.NavigationViewStyle.ItemSpacing;
+        }
+
         public NavigationView()
         {
-            this._itemsPanel = new StackPanel() { Spacing = 2 };
+            this._itemsPanel = new StackPanel();
             this._pane = new NavigationViewPane(this) { Animator = new Animator(), Content = this._itemsPanel };
             // NOTE: The scrim and the button have layers of their own (an
             // animator), to be above the content's native views
@@ -299,7 +296,7 @@ namespace XForms.Controls
             this._contentHost.AccessibilityIsHidden = this._isNarrow && this._isPaneOpen;
 
             var animator = this._pane.Animator;
-            float hidden = (this.FlowDirection == FlowDirection.RightToLeft) ? PaneWidth : -PaneWidth;
+            float hidden = (this.FlowDirection == FlowDirection.RightToLeft) ? this.ActualTheme.NavigationViewStyle.PaneWidth : -this.ActualTheme.NavigationViewStyle.PaneWidth;
             if (isShown)
             {
                 this._pane.IsVisible = true;
@@ -325,8 +322,8 @@ namespace XForms.Controls
         protected override Size MeasureOverride(
             Size availableSize)
         {
-            float width = float.IsInfinity(availableSize.Width) ? 800 : availableSize.Width;
-            float height = float.IsInfinity(availableSize.Height) ? 600 : availableSize.Height;
+            float width = float.IsInfinity(availableSize.Width) ? this.ActualTheme.NavigationViewStyle.DefaultSize.Width : availableSize.Width;
+            float height = float.IsInfinity(availableSize.Height) ? this.ActualTheme.NavigationViewStyle.DefaultSize.Height : availableSize.Height;
 
             bool isNarrow = width < CompactThreshold;
             if (isNarrow != this._isNarrow)
@@ -340,8 +337,8 @@ namespace XForms.Controls
                 this.InvalidateVisual();
             }
 
-            this._pane.Measure(new Size(PaneWidth, height));
-            this._menuButton.Measure(new Size(BarHeight, BarHeight));
+            this._pane.Measure(new Size(this.ActualTheme.NavigationViewStyle.PaneWidth, height));
+            this._menuButton.Measure(new Size(this.ActualTheme.NavigationViewStyle.BarHeight, this.ActualTheme.NavigationViewStyle.BarHeight));
             this._scrim.Measure(new Size(width, height));
             this._contentHost.Measure(this.ContentBounds(width, height).Size);
             return new Size(width, height);
@@ -353,8 +350,8 @@ namespace XForms.Controls
             float height)
         {
             return this._isNarrow
-                ? new Rect(0, BarHeight, width, Math.Max(0, height - BarHeight))
-                : new Rect(PaneWidth, 0, Math.Max(0, width - PaneWidth), height);
+                ? new Rect(0, this.ActualTheme.NavigationViewStyle.BarHeight, width, Math.Max(0, height - this.ActualTheme.NavigationViewStyle.BarHeight))
+                : new Rect(this.ActualTheme.NavigationViewStyle.PaneWidth, 0, Math.Max(0, width - this.ActualTheme.NavigationViewStyle.PaneWidth), height);
         }
 
         /// <summary>
@@ -364,7 +361,7 @@ namespace XForms.Controls
         {
             get
             {
-                return this._isNarrow ? new Rect(0, 0, this.Bounds.Width, BarHeight) : default;
+                return this._isNarrow ? new Rect(0, 0, this.Bounds.Width, this.ActualTheme.NavigationViewStyle.BarHeight) : default;
             }
         }
 
@@ -374,8 +371,8 @@ namespace XForms.Controls
         {
             this._contentHost.Arrange(this.ContentBounds(finalSize.Width, finalSize.Height));
             this._scrim.Arrange(new Rect(0, 0, finalSize.Width, finalSize.Height));
-            this._pane.Arrange(new Rect(0, 0, PaneWidth, finalSize.Height));
-            this._menuButton.Arrange(new Rect(0, 0, BarHeight, BarHeight));
+            this._pane.Arrange(new Rect(0, 0, this.ActualTheme.NavigationViewStyle.PaneWidth, finalSize.Height));
+            this._menuButton.Arrange(new Rect(0, 0, this.ActualTheme.NavigationViewStyle.BarHeight, this.ActualTheme.NavigationViewStyle.BarHeight));
         }
     }
 
@@ -446,16 +443,24 @@ namespace XForms.Controls
     /// </summary>
     public class NavigationViewItem : TemplatedControl, ITapGestureDelegate
     {
-        public const float ItemHeight = 40.0f;
+        private StyledValue<float> _height = new StyledValue<float>(Dimension.Auto);
+        private StyledValue<Thickness> _margin = new StyledValue<Thickness>(Thickness.Zero);
 
         private string _text;
         private Bitmap _icon;
 
+        protected override void OnThemeChanged(
+            Theme theme)
+        {
+            base.OnThemeChanged(theme);
+            var style = theme.NavigationViewStyle;
+            this.Height = this._height.Apply(this.Height, style.ItemHeight);
+            this.Margin = this._margin.Apply(this.Margin, style.ItemMargin);
+        }
+
         public NavigationViewItem()
         {
             this.Focusable = true;
-            this.Height = ItemHeight;
-            this.Margin = new Thickness(4, 0, 4, 0);
             this.GestureRecognizers.Add(new TapGestureRecognizer(this));
         }
 
@@ -613,11 +618,6 @@ namespace XForms.Controls
     /// </summary>
     public sealed class NavigationViewPane : TemplatedControl
     {
-        /// <summary>
-        /// The height of the title area at the top of the pane.
-        /// </summary>
-        public const float TitleHeight = 56.0f;
-
         private readonly NavigationView _owner;
         private View _content;
 
@@ -666,15 +666,15 @@ namespace XForms.Controls
         {
             get
             {
-                float top = this._owner.IsPaneDrawer ? NavigationView.BarHeight : 0;
-                return new Rect(0, top, this.Bounds.Width, TitleHeight);
+                float top = this._owner.IsPaneDrawer ? this.ActualTheme.NavigationViewStyle.BarHeight : 0;
+                return new Rect(0, top, this.Bounds.Width, this.ActualTheme.NavigationViewStyle.TitleHeight);
             }
         }
 
         protected override Size MeasureOverride(
             Size availableSize)
         {
-            float top = (this._owner.IsPaneDrawer ? NavigationView.BarHeight : 0) + TitleHeight;
+            float top = (this._owner.IsPaneDrawer ? this.ActualTheme.NavigationViewStyle.BarHeight : 0) + this.ActualTheme.NavigationViewStyle.TitleHeight;
             this._content?.Measure(new Size(availableSize.Width, Math.Max(0, availableSize.Height - top)));
             return availableSize;
         }
@@ -682,7 +682,7 @@ namespace XForms.Controls
         protected override void ArrangeOverride(
             Size finalSize)
         {
-            float top = (this._owner.IsPaneDrawer ? NavigationView.BarHeight : 0) + TitleHeight;
+            float top = (this._owner.IsPaneDrawer ? this.ActualTheme.NavigationViewStyle.BarHeight : 0) + this.ActualTheme.NavigationViewStyle.TitleHeight;
             this._content?.Arrange(new Rect(0, top, finalSize.Width, Math.Max(0, finalSize.Height - top)));
         }
     }
