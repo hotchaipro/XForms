@@ -164,6 +164,14 @@ namespace XForma.Tests
         }
 
         [Fact]
+        public void ABitmapDrawnBeforeItLoadsDoesNotThrow()
+        {
+            var bitmap = new Bitmap(new FileImageSource("missing.png"));
+
+            bitmap.OnDrawnBeforeLoaded();
+        }
+
+        [Fact]
         public void AFailingRefreshHandlerEndsTheRefresh()
         {
             var container = new RefreshContainer();

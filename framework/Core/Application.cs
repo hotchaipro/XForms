@@ -683,6 +683,34 @@ namespace XForma
         // (pages build again, templates apply again, lists make their item
         // views again), the back stack's pages do when they're shown, and
         // everything is measured and drawn again
+        // Everything draws again
+        internal void InvalidateAllViews()
+        {
+            InvalidateVisuals(this._rootFrame);
+            foreach (var window in this.Windows)
+            {
+                InvalidateVisuals(window.Frame);
+            }
+
+            foreach (var popup in this._openPopups)
+            {
+                if (null != popup.Content)
+                {
+                    InvalidateVisuals(popup.Content);
+                }
+            }
+        }
+
+        private static void InvalidateVisuals(
+            View view)
+        {
+            view.InvalidateVisual();
+            foreach (var child in view.DrawingOrderChildren)
+            {
+                InvalidateVisuals(child);
+            }
+        }
+
         internal void OnHotReload(
             IReadOnlyList<Type> updatedTypes)
         {

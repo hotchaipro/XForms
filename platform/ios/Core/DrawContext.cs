@@ -324,6 +324,11 @@ namespace XForma.iOS
 
             var rect = destinationRectangle.ToCGRect();
             var nativeImage = ((BitmapRenderer)bitmap.Renderer).NativeImage;
+            if (null == nativeImage)
+            {
+                bitmap.OnDrawnBeforeLoaded();
+                return;
+            }
 
             if (tint.IsTransparent)
             {

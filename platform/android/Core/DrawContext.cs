@@ -428,6 +428,11 @@ namespace XForma.Android
             }
 
             var nativeBitmap = ((BitmapRenderer)bitmap.Renderer).NativeBitmap;
+            if (null == nativeBitmap)
+            {
+                bitmap.OnDrawnBeforeLoaded();
+                return;
+            }
 
             this.DrawImage(nativeBitmap, destinationRectangle, tint);
         }
