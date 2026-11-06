@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="AppName.Win32/AppName.Win32.csproj" />
+  <Project Path="AppName.Android/AppName.Android.csproj" />
+  <Project Path="AppName.iOS/AppName.iOS.csproj" />
+  <Project Path="AppName.Web/AppName.Web.csproj" />
+</Solution>

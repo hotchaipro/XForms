@@ -2,13 +2,13 @@ using System.Threading.Tasks;
 using XForma;
 using XForma.Themes.Basic;
 
-namespace XFormaApp
+namespace AppName
 {
     public static class Program
     {
         public static async Task Main()
         {
-            await XFormaApp.RunAsync("XFormaApp", new App(), new BasicTheme());
+            await XFormaApp.RunAsync("AppName", new App(), new BasicTheme());
         }
     }
 }

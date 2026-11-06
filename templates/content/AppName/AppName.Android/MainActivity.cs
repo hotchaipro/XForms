@@ -3,10 +3,10 @@ using Android.OS;
 using XForma;
 using XForma.Themes.Basic;
 
-namespace XFormaApp
+namespace AppName
 {
     [Activity(
-        Label = "XFormaApp",
+        Label = "AppName",
         ConfigurationChanges = global::Android.Content.PM.ConfigChanges.UiMode | global::Android.Content.PM.ConfigChanges.FontScale | global::Android.Content.PM.ConfigChanges.Orientation | global::Android.Content.PM.ConfigChanges.ScreenSize,
         MainLauncher = true)]
     public class MainActivity : Activity

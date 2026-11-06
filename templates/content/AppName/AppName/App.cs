@@ -1,6 +1,6 @@
 using XForma;
 
-namespace XFormaApp
+namespace AppName
 {
     /// <summary>
     /// The app: its pages, by the paths that open them.

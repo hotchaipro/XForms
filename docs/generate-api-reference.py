@@ -55,7 +55,7 @@ def read_api():
     for folder, _ in PROJECTS:
         for path in glob.glob(os.path.join(ROOT, folder, 'PublicAPI*.txt')) + glob.glob(os.path.join(ROOT, folder, 'PublicAPI', '*', 'PublicAPI*.txt')):
             with open(path, encoding='utf-8') as f:
-                entries += [line.strip() for line in f if line.strip() and not line.startswith('#')]
+                entries += [line.strip() for line in f if line.strip() and not line.startswith('#') and 'REMOVED' not in line]
 
     for entry in entries:
         entry = entry.replace('~', '')

@@ -2,14 +2,14 @@ using System;
 using XForma;
 using XForma.Themes.Basic;
 
-namespace XFormaApp
+namespace AppName
 {
     public static class Program
     {
         [STAThread]
         public static void Main()
         {
-            XFormaApp.Run("XFormaApp", new App(), new BasicTheme());
+            XFormaApp.Run("AppName", new App(), new BasicTheme());
         }
     }
 }

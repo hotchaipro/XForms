@@ -5,7 +5,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageType>Template</PackageType>
-    <PackageId>XForma.Templates</PackageId>
+    <PackageId>XForma.Templates</PackageId><Version>0.1.0-preview.1</Version>
     <Description>A new XForma app for Windows, Android, iOS and the web: dotnet new xforma</Description>
     <IsPackable>true</IsPackable>
     <IncludeBuildOutput>false</IncludeBuildOutput>

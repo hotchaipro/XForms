@@ -5,7 +5,7 @@
   "identity": "XForma.App",
   "name": "XForma app",
   "shortName": "xforma",
-  "sourceName": "XFormaApp",
+  "sourceName": "AppName",
   "preferNameDirectory": true,
   "tags": { "language": "C#", "type": "project" },
   "symbols": {

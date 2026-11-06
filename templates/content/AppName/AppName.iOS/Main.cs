@@ -1,7 +1,7 @@
 using XForma;
 using XForma.Themes.Basic;
 
-namespace XFormaApp
+namespace AppName
 {
     public static class Program
     {

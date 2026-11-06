@@ -1,6 +1,0 @@
-<Solution>
-  <Project Path="XFormaApp.Win32/XFormaApp.Win32.csproj" />
-  <Project Path="XFormaApp.Android/XFormaApp.Android.csproj" />
-  <Project Path="XFormaApp.iOS/XFormaApp.iOS.csproj" />
-  <Project Path="XFormaApp.Web/XFormaApp.Web.csproj" />
-</Solution>

@@ -12,6 +12,6 @@
 
   <!-- The app itself, shared by every platform -->
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)XFormaApp/**/*.cs" LinkBase="Shared" />
+    <Compile Include="$(MSBuildThisFileDirectory)AppName/**/*.cs" LinkBase="Shared" />
   </ItemGroup>
 </Project>

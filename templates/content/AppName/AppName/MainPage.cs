@@ -3,7 +3,7 @@ using XForma.Controls;
 using XForma.Layouts;
 using XForma.Primitives;
 
-namespace XFormaApp
+namespace AppName
 {
     /// <summary>
     /// A page: Build returns its views, in plain C#.
