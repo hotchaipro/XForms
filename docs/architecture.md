@@ -50,10 +50,10 @@ The goal is that any control library built on the framework runs on every
 supported platform with the same look and the same layout. All of the
 per-platform complexity stays inside the framework and the platforms.
 
-Planned ([alignment.md](alignment.md#layering), phases 29-31):
-`XForma.Xaml` for markup, `XForma.Compat.WinUI` for WinUI's API, and
-embedding XForma in part of an existing app's UI; and more themes beside
-`XForma.Themes.Basic`.
+Possible later ([alignment.md](alignment.md#layering), phases 30-31):
+`XForma.Compat.WinUI` for WinUI's API, and embedding XForma in part of an
+existing app's UI; and more themes beside `XForma.Themes.Basic`. `XForma.Xaml`
+for markup (phase 29) waits until a real project needs it.
 
 ## The rule for what goes where
 

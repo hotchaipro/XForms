@@ -18,8 +18,9 @@ has a comment saying so, and renaming one would lose users' data.
 
 ## Open work
 
-- Phases 1-28 are done. Next is phase 29, `XForma.Xaml`, waiting on planning with the user
-  (build-time generator recommended over the spike's run-time parser).
+- Phases 1-28 are done. The work toward 1.0 is tracked in the "XForms 1.0 Readiness Review" doc:
+  https://claude.ai/artifact/Sys3XsKDPahxbqnyeF8yCc
+- Phase 29, `XForma.Xaml`, isn't being done until a real project needs it (decided 2026-11-05).
 - Unverified: Win32 from the keyboard (scripted input is blocked when another window holds the
   foreground), what VoiceOver and TalkBack say, a real iPhone or iPad.
 - Known bugs (found 2026-11-03, with the Tab order fix below):

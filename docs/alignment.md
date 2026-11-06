@@ -3614,9 +3614,10 @@ Win32, Android and the browser, as before.
     view's drawer open, Tab goes on into the content behind it; the pane's
     items are a Tab stop each (WinUI makes them one, with arrow keys).
 
-29. **Later: `XForma.Xaml`.** The proof of concept in `spikes/XForma.Xaml`
-    becomes a layer over the framework and controls, including templates
-    written in markup. To be planned in detail when it's next.
+29. **Not until a real project needs it: `XForma.Xaml`.** Decided
+    2026-11-05. If a project does, the proof of concept in
+    `spikes/XForma.Xaml` becomes a layer over the framework and controls,
+    including templates written in markup, planned in detail then.
 
 30. **Later: `XForma.Compat.WinUI`.** Adapters giving WinUI's names and a
     `DependencyProperty`-style API over XForma's controls, with XAML
