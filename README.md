@@ -26,11 +26,14 @@ Xamarin.Forms or to the W3C's XForms standard.
   everywhere else.
 - **A small framework, with controls on top.** All platform-specific code
   lives in a small framework. Control libraries, including XForma's own
-  XForma.Controls, are written once on its public API. The compiler enforces that,
+  controls, are written once on its public API. The compiler enforces that,
   so any control library you write runs on every supported platform.
+- **Your look, not ours.** Controls have no look of their own: each lays out
+  and draws from a theme package, and the compiler rejects look that creeps
+  back into a control. Use the Basic theme, adapt it, or write your own.
 - **No markup or styling machinery.** There's no XAML, styling engine or
-  binding engine to learn or carry. Controls are plain C# that draws and lays
-  itself out.
+  reflection-based binding engine to learn or carry. Views and typed bindings
+  are plain C#.
 - **Lean.** On Windows, XForma uses Win32, DirectComposition, Direct2D and
   DirectWrite directly, with no XAML or Windows App SDK. Its test app is
   about 21 MB self-contained and trimmed, compared with about 221 MB for the
@@ -51,8 +54,9 @@ XForma is a good fit when:
   framework.
 
 It's not the right choice (yet) when:
-- you need macOS, Linux or the web today;
-- you need a large ready-made control set, design tooling or hot reload;
+- you need macOS or Linux today;
+- you need a large ready-made control set, a data grid, markup or a designer;
+- you need a mature ecosystem: XForma has one developer and one app;
 - you want a native look on each platform (consider MAUI), or need to reuse
   WPF or WinUI XAML (consider Avalonia or Uno Platform).
 
@@ -90,11 +94,13 @@ need.
 | `platform/android/` | `XForma.Framework.Android` | Android: native views |
 | `platform/ios/` | `XForma.Framework.iOS` | iOS: UIKit |
 | `platform/web/` | `XForma.Framework.Web` | Browsers: .NET on WebAssembly, DOM elements and canvases |
-| `controls/` | `XForma.Controls` | Controls (buttons, pickers, calendar, menus, flyouts, lists, ...), panels and gestures, built only on the framework's public API |
-| `test/` | `XForma.Test.*` | Test apps for each platform, with shared pages in `test/XForma.Test` |
+| `xforma/` | `XForma` | What apps reference: controls (buttons, pickers, calendar, menus, flyouts, lists, ...), panels, gestures, binding and the app's entry point, built only on the framework's public API |
+| `themes/` | `XForma.Themes.Basic` | How the controls look: the Basic theme, and the base for your own |
+| `toolkit/` | `XForma.Toolkit` | Services for any .NET app: clipboard, preferences, secure storage, sharing, file pickers and more |
+| `analyzers/` | `XForma.Analyzers` | Build rules that keep the layers and the look apart |
+| `test/` | `XForma.Test.*`, `XForma.Tests` | Test apps for each platform, with shared pages in `test/XForma.Test`, and the unit tests |
 
-An app references the framework, one platform project, and the control
-libraries it uses. See [docs/architecture.md](docs/architecture.md) for how
+An app references `XForma` and a theme package. See [docs/architecture.md](docs/architecture.md) for how
 the layers, layout, drawing, input, popups and lists work.
 
 ## Building
@@ -118,18 +124,17 @@ dotnet run --project test/XForma.Test.Win32
 
 ## Status
 
-XForma is in active development, and its API is changing.
+XForma is working toward 1.0, and its API can still change. Version 1.0
+promises four platforms:
 
-| Platform | Status |
+| Platform | Tested on |
 |---|---|
-| Windows (Win32, no XAML) | In development: rendering, input, scrolling, lists, keyboard focus and UI Automation work |
-| Android | In development: rendering, input, scrolling and lists work |
-| iOS | In development: builds, but not yet tested since the latest restructure |
+| Windows (Win32, no XAML) | Windows 11 |
+| Android | Emulators |
+| iOS | Simulators |
+| Web (.NET on WebAssembly) | Edge |
 
-Planned work includes aligning the API with WPF, WinUI and Avalonia
-conventions, lightweight controls, a richer drawing API, an animation system
-played by the compositor, and accessibility and keyboard focus on every
-platform.
+What 1.0 leaves out is listed in [docs/support.md](docs/support.md).
 
 ## Documentation
 
@@ -138,5 +143,7 @@ platform.
 - [Comparisons](docs/comparisons.md): XForma compared with Uno Platform,
   Avalonia, .NET MAUI, Electron, React Native, Flutter and Compose
   Multiplatform.
-- [Alignment](docs/alignment.md): the framework's main gaps, and the plan to
-  align its API with familiar frameworks.
+- [Alignment](docs/alignment.md): how the API lines up with familiar
+  frameworks, and the history of each phase.
+- [Support](docs/support.md): what 1.0 includes and leaves out, supported
+  versions, and how issues are handled.

@@ -50,6 +50,7 @@ namespace XForma.Win32
         private readonly ConcurrentQueue<Action> _invokeQueue = new ConcurrentQueue<Action>();
         private readonly HashSet<ViewRenderer> _dirtyRenderers = new HashSet<ViewRenderer>();
         private readonly List<TextBoxRenderer> _textEntries = new List<TextBoxRenderer>();
+        private readonly List<IHostedWindow> _hostedWindows = new List<IHostedWindow>();
         private HWND _hwnd;
         private bool _isUpdatePending;
         private bool _isLayoutPending;
@@ -473,6 +474,18 @@ namespace XForma.Win32
             this.RequestLayout();
         }
 
+        public void RegisterHostedWindow(
+            IHostedWindow window)
+        {
+            this._hostedWindows.Add(window);
+        }
+
+        public void UnregisterHostedWindow(
+            IHostedWindow window)
+        {
+            this._hostedWindows.Remove(window);
+        }
+
         public void RegisterTextBox(
             TextBoxRenderer textEntry)
         {
@@ -684,6 +697,11 @@ namespace XForma.Win32
             foreach (var textEntry in this._textEntries)
             {
                 textEntry.UpdateWindowPosition();
+            }
+
+            foreach (var window in this._hostedWindows.ToArray())
+            {
+                window.UpdateWindowPosition();
             }
 
             this._focus?.UpdateRing();

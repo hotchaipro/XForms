@@ -41,6 +41,18 @@ namespace XForma.Android
             return new TextBlockRenderer(this._host.Context, textView);
         }
 
+        public IViewRenderer CreateNativeViewHostRenderer(
+            NativeViewHost host)
+        {
+            return new NativeViewHostRenderer(this._host.Context, host);
+        }
+
+        public IWebViewRenderer CreateWebViewRenderer(
+            XForma.Primitives.WebView webView)
+        {
+            return new WebViewRenderer(this._host.Context, webView);
+        }
+
         public IImageRenderer CreateImageRenderer(
             Image image)
         {

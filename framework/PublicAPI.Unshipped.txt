@@ -217,3 +217,21 @@ virtual XForma.View.IsInTabOrder(XForma.View child) -> bool
 virtual XForma.View.IsTabScope.get -> bool
 virtual XForma.View.IsTabStop.get -> bool
 override XForma.Primitives.ItemContainer.IsTabStop.get -> bool
+XForma.Primitives.NativeViewHost
+XForma.Primitives.NativeViewHost.NativeView.get -> object
+XForma.Primitives.NativeViewHost.NativeViewHost(System.Func<object> createNativeView) -> void
+XForma.Primitives.WebView
+XForma.Primitives.WebView.CanGoBack.get -> bool
+XForma.Primitives.WebView.CanGoForward.get -> bool
+XForma.Primitives.WebView.GoBack() -> void
+XForma.Primitives.WebView.GoForward() -> void
+XForma.Primitives.WebView.Navigated -> System.EventHandler<XForma.Primitives.WebViewNavigatedEventArgs>
+XForma.Primitives.WebView.NavigateToString(string html) -> void
+XForma.Primitives.WebView.Reload() -> void
+XForma.Primitives.WebView.Source.get -> System.Uri
+XForma.Primitives.WebView.Source.set -> void
+XForma.Primitives.WebView.WebView() -> void
+XForma.Primitives.WebViewNavigatedEventArgs
+XForma.Primitives.WebViewNavigatedEventArgs.IsSuccess.get -> bool
+XForma.Primitives.WebViewNavigatedEventArgs.Uri.get -> System.Uri
+

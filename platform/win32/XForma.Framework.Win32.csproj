@@ -27,6 +27,8 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.269" PrivateAssets="all" />
+    <!-- Only its loader, WebView2Loader.dll: the API is called directly -->
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.4314.35" IncludeAssets="native;runtime" ExcludeAssets="compile;build;buildTransitive;analyzers" PrivateAssets="none" />
   </ItemGroup>
 
   <ItemGroup>

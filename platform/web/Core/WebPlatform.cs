@@ -33,6 +33,10 @@ namespace XForma.Web
 
         public IImageRenderer CreateImageRenderer(Image image) => new ImageRenderer(image);
 
+        public IViewRenderer CreateNativeViewHostRenderer(NativeViewHost host) => new NativeViewHostRenderer(host);
+
+        public IWebViewRenderer CreateWebViewRenderer(WebView webView) => new WebViewRenderer(webView);
+
         public IBitmapRenderer CreateBitmapRenderer(Bitmap bitmap) => new BitmapRenderer(bitmap);
 
         public IFrameRenderer CreateFrameRenderer(Frame frame) => new FrameRenderer(frame);

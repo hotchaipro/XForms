@@ -13,8 +13,9 @@ Tauri and Qt are covered briefly at the end. The goal is to make the
 trade-offs clear, not to rank the frameworks: most of them are far more
 mature than XForma, and each is the right choice for some apps.
 
-The details here describe these frameworks as of late 2025 and early 2026.
-They change quickly, so check current documentation before deciding.
+The details here describe the other frameworks as of late 2025 and early
+2026, and XForma as of November 2026. They change quickly, so check current
+documentation before deciding.
 
 ## What XForma is optimizing for
 
@@ -28,8 +29,9 @@ XForma makes one bet: **native text, custom look**.
   identical on every platform and don't change when the platform's design
   language does.
 - **Small and layered.** A small framework holds all the platform-specific
-  code. Control libraries, such as the toolkit, are written once on its public
-  API. There's no XAML, no styling system and no data-binding engine to carry.
+  code. Control libraries, such as XForma's own controls, are written once on
+  its public API, and a theme package gives them their look. There's no XAML,
+  no styling engine and no reflection-based binding engine to carry.
 - **Lean.** For example, the Win32 test app is about 21 MB self-contained and
   trimmed. The same app on WinUI 3 was about 221 MB. On Windows, XForma uses
   Win32 and DirectComposition directly, with no XAML.
@@ -40,7 +42,7 @@ See [architecture.md](architecture.md) for how this works.
 
 | | Language and UI model | Control rendering | Text rendering | Text entry | Platforms |
 |---|---|---|---|---|---|
-| **XForma** | C#, code (no markup) | Owner-drawn by control libraries | Native | Native | Windows, Android, iOS (web planned) |
+| **XForma** | C#, code (no markup) | Owner-drawn by control libraries | Native | Native | Windows, Android, iOS, web |
 | **Uno Platform** | C#, XAML (WinUI API) | Skia (default in new apps) or native controls | Skia, or native | Uno's own (Skia) or native | Windows, macOS, Linux, iOS, Android, web |
 | **Avalonia** | C#, XAML (Avalonia's own) | Drawn by Avalonia (Skia) | Avalonia (HarfBuzz, Skia) | Avalonia's own | Windows, macOS, Linux, iOS, Android, web |
 | **.NET MAUI** | C#, XAML or code | Native controls | Native | Native | Windows, macOS, iOS, Android |
@@ -198,7 +200,7 @@ The differences:
   example React Native Skia). XForma has an owner-drawn surface built in.
 - **Ready-made controls.** Pickers and date pickers often come from
   community libraries that wrap native controls, so they look different per
-  platform. XForma's toolkit draws them, so they look the same.
+  platform. XForma's controls draw them, so they look the same.
 - **Windows and macOS** are separate projects maintained by Microsoft. The
   web is supported through React Native for Web.
 
@@ -283,11 +285,12 @@ is the primary platform.
 - A small footprint on Windows, with no XAML or Windows App SDK.
 
 **XForma's gaps today:**
-- Platforms: Windows, Android and iOS (iOS tested on simulators since the
-  restructure), with no macOS, Linux or web yet.
-- Accessibility and keyboard focus are implemented only on Windows.
-- A small control set.
-- No hot reload, designer or tooling.
+- Platforms: Windows, Android, iOS and the web, with no macOS or Linux yet.
+- Accessibility is built on all four platforms, but what VoiceOver and
+  TalkBack say hasn't been checked by a person.
+- A smaller control set, with no data grid.
+- Hot reload, but no designer or markup.
+- No published performance comparison with these frameworks yet.
 - One developer and one app, rather than an ecosystem.
 
 **When XForma is a good fit:** you want both native text and a fully custom

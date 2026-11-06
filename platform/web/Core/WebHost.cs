@@ -81,6 +81,15 @@ namespace XForma.Web
 
         #region Renderers
 
+        public void OnElementLoaded(
+            int id)
+        {
+            if (this._renderers.TryGetValue(id, out var renderer) && (renderer is WebViewRenderer webView))
+            {
+                Run(webView.OnLoaded);
+            }
+        }
+
         public void Register(
             ViewRenderer renderer)
         {

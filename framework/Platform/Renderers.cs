@@ -278,6 +278,27 @@ namespace XForma.Platform
         void SetSource(ImageSource source);
     }
 
+    /// <summary>
+    /// The platform's web view. It calls <see cref="WebView.OnNativeNavigated"/>
+    /// when a page has loaded.
+    /// </summary>
+    internal interface IWebViewRenderer : IViewRenderer
+    {
+        void Navigate(Uri uri);
+
+        void NavigateToString(string html);
+
+        bool CanGoBack { get; }
+
+        bool CanGoForward { get; }
+
+        void GoBack();
+
+        void GoForward();
+
+        void Reload();
+    }
+
     internal interface IScrollViewerRenderer : IViewRenderer
     {
         View Content { get; set; }

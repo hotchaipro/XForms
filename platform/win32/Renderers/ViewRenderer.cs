@@ -11,6 +11,14 @@ using XForma.Platform;
 
 namespace XForma.Win32.Renderers
 {
+    /// <summary>
+    /// A child window that follows a view (see WindowRenderer).
+    /// </summary>
+    internal interface IHostedWindow
+    {
+        void UpdateWindowPosition();
+    }
+
     internal abstract class ElementRenderer : IElementRenderer
     {
         protected ElementRenderer(

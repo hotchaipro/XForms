@@ -101,6 +101,17 @@ export function create(kind) {
     return id;
 }
 
+// An element of the app's, filling the view's
+export function adoptChild(parentId, element) {
+    element.style.width = '100%';
+    element.style.height = '100%';
+    elements.get(parentId).appendChild(element);
+}
+
+export function listenLoad(id) {
+    elements.get(id).addEventListener('load', () => exports.OnElementLoaded(id));
+}
+
 export function destroy(id) {
     const element = elements.get(id);
     if (element) {

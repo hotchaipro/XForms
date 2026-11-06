@@ -47,6 +47,18 @@ namespace XForma.iOS
             return new TextBlockRenderer(textView);
         }
 
+        public IViewRenderer CreateNativeViewHostRenderer(
+            NativeViewHost host)
+        {
+            return new NativeViewHostRenderer(host);
+        }
+
+        public IWebViewRenderer CreateWebViewRenderer(
+            XForma.Primitives.WebView webView)
+        {
+            return new WebViewRenderer(webView);
+        }
+
         public IImageRenderer CreateImageRenderer(
             Image image)
         {

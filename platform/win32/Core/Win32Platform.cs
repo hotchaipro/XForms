@@ -40,6 +40,10 @@ namespace XForma.Win32
 
         public IImageRenderer CreateImageRenderer(Image image) => new ImageRenderer(image);
 
+        public IViewRenderer CreateNativeViewHostRenderer(NativeViewHost host) => new NativeViewHostRenderer(host);
+
+        public IWebViewRenderer CreateWebViewRenderer(WebView webView) => new WebViewRenderer(webView);
+
         public IScrollViewerRenderer CreateScrollViewerRenderer(ScrollViewer scrollView) => new ScrollViewerRenderer(scrollView);
 
         public IPopupRenderer CreatePopupRenderer(Popup popup) => new PopupRenderer(popup);

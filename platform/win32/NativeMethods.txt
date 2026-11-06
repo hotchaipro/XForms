@@ -136,6 +136,7 @@ GetSysColor
 SYS_COLOR_INDEX
 MINMAXINFO
 GetWindowLong
+SetWindowLong
 AdjustWindowRectExForDpi
 WINDOW_LONG_PTR_INDEX
 CoTaskMemFree

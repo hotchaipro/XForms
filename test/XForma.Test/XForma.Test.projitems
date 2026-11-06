@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AccessibilityPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WebViewPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AppLayerPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SafeAreaPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AnimationPage.cs" />

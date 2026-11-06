@@ -31,6 +31,12 @@ namespace XForma.Web
         [JSImport("create", Module)]
         public static partial int Create(string kind);
 
+        [JSImport("adoptChild", Module)]
+        public static partial void AdoptChild(int parentId, [JSMarshalAs<JSType.Object>] JSObject element);
+
+        [JSImport("listenLoad", Module)]
+        public static partial void ListenLoad(int id);
+
         [JSImport("destroy", Module)]
         public static partial void Destroy(int id);
 
@@ -235,6 +241,12 @@ namespace XForma.Web
         internal static void RunPosted()
         {
             WebHost.Current?.RunPosted();
+        }
+
+        [JSExport]
+        internal static void OnElementLoaded(int id)
+        {
+            WebHost.Current?.OnElementLoaded(id);
         }
 
         [JSExport]

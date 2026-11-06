@@ -23,6 +23,8 @@ namespace XForma.Platform
         ITextBlockRenderer CreateTextBlockRenderer(TextBlock label);
 
         IImageRenderer CreateImageRenderer(Image image);
+        IViewRenderer CreateNativeViewHostRenderer(NativeViewHost host);
+        IWebViewRenderer CreateWebViewRenderer(WebView webView);
         IBitmapRenderer CreateBitmapRenderer(Bitmap bitmap);
         IFrameRenderer CreateFrameRenderer(Frame frame);
         IItemsViewRenderer CreateItemsViewRenderer(ItemsView itemsView);
