@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using XForma.Input;
 using XForma.Controls;
 using XForma.Primitives;
@@ -11,14 +11,14 @@ namespace XForma.Controls
     /// </summary>
     public class HyperlinkButton : TemplatedContentControl, ITapGestureDelegate
     {
-        private UriNavigationCommand _command;
+        private UriNavigationCommand? _command;
 
         public HyperlinkButton()
         {
             this.GestureRecognizers.Add(new TapGestureRecognizer(this));
         }
 
-        public Uri NavigationUri
+        public Uri? NavigationUri
         {
             get
             {
@@ -36,7 +36,7 @@ namespace XForma.Controls
             }
         }
 
-        public new View Content
+        public new View? Content
         {
             get
             {

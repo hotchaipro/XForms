@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows.Input;
 using XForma.Controls;
 using XForma.Primitives;
@@ -7,7 +7,7 @@ namespace XForma.Controls
 {
     public class UICommand : ICommand
     {
-        public ICommand Command
+        public ICommand? Command
         {
             get;
             set;
@@ -29,13 +29,13 @@ namespace XForma.Controls
             set;
         }
 
-        public Bitmap Icon
+        public Bitmap? Icon
         {
             get;
             set;
         }
 
-        public string Text
+        public string? Text
         {
             get;
             set;
@@ -64,13 +64,13 @@ namespace XForma.Controls
         }
 
         public bool CanExecute(
-            object parameter)
+            object? parameter)
         {
             return this.Command?.CanExecute(parameter) ?? false;
         }
 
         public void Execute(
-            object parameter)
+            object? parameter)
         {
             this.Command?.Execute(parameter);
         }

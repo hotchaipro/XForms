@@ -32,7 +32,7 @@ namespace XForma
         internal LogEventArgs(
             LogLevel level,
             string message,
-            Exception exception)
+            Exception? exception)
         {
             this.Level = level;
             this.Message = message;
@@ -52,7 +52,7 @@ namespace XForma
         /// <summary>
         /// The exception behind the message, or null.
         /// </summary>
-        public Exception Exception
+        public Exception? Exception
         {
             get;
         }
@@ -67,7 +67,7 @@ namespace XForma
         /// <summary>
         /// Raised for each message, on the thread that wrote it.
         /// </summary>
-        public static event EventHandler<LogEventArgs> MessageLogged;
+        public static event EventHandler<LogEventArgs>? MessageLogged;
 
         /// <summary>
         /// Writes a message to the framework's log. Control libraries and
@@ -76,7 +76,7 @@ namespace XForma
         public static void Write(
             LogLevel level,
             string message,
-            Exception exception = null)
+            Exception? exception = null)
         {
             var handler = MessageLogged;
             if (null != handler)
@@ -103,7 +103,7 @@ namespace XForma
         private static void WriteToConsole(
             LogLevel level,
             string message,
-            Exception exception)
+            Exception? exception)
         {
             try
             {

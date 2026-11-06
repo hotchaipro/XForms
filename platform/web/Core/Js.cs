@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices.JavaScript;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
@@ -59,10 +59,10 @@ namespace XForma.Web
         public static partial void SetBounds(int id, double x, double y, double width, double height);
 
         [JSImport("setStyle", Module)]
-        public static partial void SetStyle(int id, string name, string value);
+        public static partial void SetStyle(int id, string name, string? value);
 
         [JSImport("setAttribute", Module)]
-        public static partial void SetAttribute(int id, string name, string value);
+        public static partial void SetAttribute(int id, string name, string? value);
 
         [JSImport("setText", Module)]
         public static partial void SetText(int id, string text);
@@ -187,7 +187,7 @@ namespace XForma.Web
         public static partial string StorageGet(string key);
 
         [JSImport("storageSet", Module)]
-        public static partial void StorageSet(string key, string value);
+        public static partial void StorageSet(string key, string? value);
 
         // Keyboard, history, accessibility and pulls
 
@@ -251,7 +251,7 @@ namespace XForma.Web
 
         // The drag's text, address and size ("text\0uri\0width\0height"), or null
         [JSExport]
-        internal static string OnDragStart(int id, float x, float y)
+        internal static string? OnDragStart(int id, float x, float y)
         {
             return WebHost.Current?.OnDragStart(id, x, y);
         }

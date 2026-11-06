@@ -25,10 +25,10 @@ namespace XForma.Web.Renderers
         private FontStyle _fontStyle = FontStyle.Normal;
         private FontWeight _fontWeight = FontWeight.Normal;
         private bool _strikethrough;
-        private string _fontFamily;
+        private string? _fontFamily;
         private int _maxLines;
         private IReadOnlyList<TextSpan> _spans = Array.Empty<TextSpan>();
-        private WebTextLayout _layout;
+        private WebTextLayout? _layout;
         private float _layoutWidth = -1;
 
         public TextBlockRenderer(
@@ -41,7 +41,7 @@ namespace XForma.Web.Renderers
             this.ApplyColor();
         }
 
-        public string Text
+        public string? Text
         {
             get => this._text;
             set { this._text = value ?? string.Empty; this.Relayout(); }
@@ -101,7 +101,7 @@ namespace XForma.Web.Renderers
             set { this._strikethrough = value; Js.SetStyle(this.Id, "text-decoration", value ? "line-through" : null); }
         }
 
-        public string FontFamily
+        public string? FontFamily
         {
             set { this._fontFamily = value; this.ApplyFont(); this.Relayout(); }
         }
@@ -269,7 +269,7 @@ namespace XForma.Web.Renderers
     [SupportedOSPlatform("browser")]
     internal sealed class ImageRenderer : ViewRenderer, IImageRenderer
     {
-        private WebImages.Entry _image;
+        private WebImages.Entry? _image;
         private Color _tint = Colors.Transparent;
 
         public ImageRenderer(
@@ -286,9 +286,9 @@ namespace XForma.Web.Renderers
         }
 
         public void SetSource(
-            ImageSource source)
+            ImageSource? source)
         {
-            string url = WebImages.UrlFor(source);
+            string? url = WebImages.UrlFor(source);
             this._image = (null == url) ? null : WebImages.Load(url);
             this.Apply();
             this._image?.WhenLoaded(this.InvalidateMeasure);
@@ -296,7 +296,7 @@ namespace XForma.Web.Renderers
 
         private void Apply()
         {
-            string url = (null == this._image) ? null : $"url(\"{this._image.Url}\")";
+            string? url = (null == this._image) ? null : $"url(\"{this._image.Url}\")";
             if ((null != url) && !this._tint.IsTransparent)
             {
                 Js.SetStyle(this.Id, "background-image", null);
@@ -335,13 +335,13 @@ namespace XForma.Web.Renderers
         {
         }
 
-        public WebImages.Entry Image
+        public WebImages.Entry? Image
         {
             get;
             private set;
         }
 
-        public override object NativeElement
+        public override object? NativeElement
         {
             get
             {
@@ -369,11 +369,11 @@ namespace XForma.Web.Renderers
         /// <summary>
         /// The image, loading (or loaded); null when the source has no URL.
         /// </summary>
-        public WebImages.Entry EnsureImage()
+        public WebImages.Entry? EnsureImage()
         {
             if (null == this.Image)
             {
-                string url = WebImages.UrlFor(((Bitmap)this.Element).Source);
+                string? url = WebImages.UrlFor(((Bitmap)this.Element).Source);
                 if (null != url)
                 {
                     this.Image = WebImages.Load(url);

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using XForma.Platform;
 
@@ -29,13 +29,13 @@ namespace XForma.Primitives
             this.VerticalAlignment = VerticalAlignment.Stretch;
         }
 
-        private View _content;
+        private View? _content;
         private bool? _isVerticalScrollingEnabled;
         private bool? _isHorizontalScrollingEnabled;
         private KeyboardDismissMode _keyboardDismissMode;
         private float? _pendingVerticalOffset;
 
-        public View Content
+        public View? Content
         {
             get
             {
@@ -148,7 +148,7 @@ namespace XForma.Primitives
         }
 
         [PlatformContract]
-        internal new IScrollViewerRenderer Renderer
+        internal new IScrollViewerRenderer? Renderer
         {
             get
             {
@@ -156,7 +156,7 @@ namespace XForma.Primitives
             }
         }
 
-        private IScrollViewerRenderer Native
+        private IScrollViewerRenderer? Native
         {
             get
             {
@@ -182,7 +182,7 @@ namespace XForma.Primitives
             }
         }
 
-        protected override object GetUserState()
+        protected override object? GetUserState()
         {
             float offset = this.VerticalOffset;
             return (offset > 0) ? offset : null;

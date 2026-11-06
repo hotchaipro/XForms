@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows.Input;
 using XForma.Input;
 using XForma.Controls;
@@ -24,7 +24,7 @@ namespace XForma.Controls
             }
         }
 
-        protected override string DefaultAccessibilityLabel
+        protected override string? DefaultAccessibilityLabel
         {
             get
             {
@@ -32,12 +32,12 @@ namespace XForma.Controls
             }
         }
 
-        private string _text;
+        private string? _text;
         private bool _isAlert;
 
-        private ICommand _command;
+        private ICommand? _command;
 
-        public event EventHandler Clicked;
+        public event EventHandler? Clicked;
 
         public Button()
         {
@@ -48,7 +48,7 @@ namespace XForma.Controls
         /// The command the button runs when clicked. The button is enabled
         /// while the command can run.
         /// </summary>
-        public ICommand Command
+        public ICommand? Command
         {
             get
             {
@@ -74,12 +74,12 @@ namespace XForma.Controls
             }
         }
 
-        private object _commandParameter;
+        private object? _commandParameter;
 
         /// <summary>
         /// The value passed to the command.
         /// </summary>
-        public object CommandParameter
+        public object? CommandParameter
         {
             get
             {
@@ -128,7 +128,7 @@ namespace XForma.Controls
             }
         }
 
-        public string Text
+        public string? Text
         {
             get
             {

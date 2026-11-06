@@ -37,8 +37,8 @@ namespace XForma
             public float To;
             public TimeSpan Start;
             public TimeSpan Duration;
-            public EasingFunction Easing;
-            public TaskCompletionSource<bool> Completion;
+            public EasingFunction? Easing;
+            public TaskCompletionSource<bool>? Completion;
 
             public bool IsRunning => null != this.Completion;
         }
@@ -65,7 +65,7 @@ namespace XForma
         public AnimationHandle ScaleTo(
             float scale,
             TimeSpan duration,
-            EasingFunction easing = null)
+            EasingFunction? easing = null)
         {
             return this.Animate(this._scale, scale, duration, easing);
         }
@@ -73,7 +73,7 @@ namespace XForma
         public AnimationHandle FadeTo(
             float opacity,
             TimeSpan duration,
-            EasingFunction easing = null)
+            EasingFunction? easing = null)
         {
             return this.Animate(this._opacity, opacity, duration, easing);
         }
@@ -136,7 +136,7 @@ namespace XForma
             Channel channel,
             float to,
             TimeSpan duration,
-            EasingFunction easing)
+            EasingFunction? easing)
         {
             Finish(channel, false);
 

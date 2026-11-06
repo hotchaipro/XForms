@@ -57,7 +57,7 @@ namespace XForma.Controls
     {
         public AutoSuggestBoxQuerySubmittedEventArgs(
             string queryText,
-            string chosenSuggestion)
+            string? chosenSuggestion)
         {
             this.QueryText = queryText;
             this.ChosenSuggestion = chosenSuggestion;
@@ -75,7 +75,7 @@ namespace XForma.Controls
         /// The suggestion chosen, or null when the text was submitted with
         /// Enter.
         /// </summary>
-        public string ChosenSuggestion
+        public string? ChosenSuggestion
         {
             get;
         }
@@ -98,30 +98,30 @@ namespace XForma.Controls
         /// </summary>
         public const int MaximumSuggestions = 8;
 
-        private TextBox _textBox;
+        private TextBox? _textBox;
         private string _text = string.Empty;
         private string _typedText = string.Empty;
-        private string _placeholderText;
+        private string? _placeholderText;
         private IReadOnlyList<string> _itemsSource = Array.Empty<string>();
-        private Popup _popup;
-        private AutoSuggestBoxListView _list;
+        private Popup? _popup;
+        private AutoSuggestBoxListView? _list;
         private AutoSuggestionBoxTextChangeReason? _changeReason;
 
         public AutoSuggestBox()
         {
         }
 
-        public event EventHandler<AutoSuggestBoxTextChangedEventArgs> TextChanged;
+        public event EventHandler<AutoSuggestBoxTextChangedEventArgs>? TextChanged;
 
         /// <summary>
         /// Raised as the user moves to a suggestion (it's put in the box).
         /// </summary>
-        public event EventHandler<AutoSuggestBoxSuggestionChosenEventArgs> SuggestionChosen;
+        public event EventHandler<AutoSuggestBoxSuggestionChosenEventArgs>? SuggestionChosen;
 
         /// <summary>
         /// Raised when the user submits the text, or chooses a suggestion.
         /// </summary>
-        public event EventHandler<AutoSuggestBoxQuerySubmittedEventArgs> QuerySubmitted;
+        public event EventHandler<AutoSuggestBoxQuerySubmittedEventArgs>? QuerySubmitted;
 
         public string Text
         {
@@ -140,7 +140,7 @@ namespace XForma.Controls
         /// Shown while the box is empty; it also names the box for assistive
         /// technology.
         /// </summary>
-        public string PlaceholderText
+        public string? PlaceholderText
         {
             get
             {
@@ -228,7 +228,7 @@ namespace XForma.Controls
             }
         }
 
-        protected override string DefaultAccessibilityLabel
+        protected override string? DefaultAccessibilityLabel
         {
             get
             {
@@ -273,7 +273,7 @@ namespace XForma.Controls
         }
 
         private void SetText(
-            string text,
+            string? text,
             AutoSuggestionBoxTextChangeReason reason)
         {
             text ??= string.Empty;
@@ -395,7 +395,7 @@ namespace XForma.Controls
         }
 
         private void Submit(
-            string chosenSuggestion)
+            string? chosenSuggestion)
         {
             if ((null == chosenSuggestion) && (null != this._list) && this.IsSuggestionListOpen && (this._list.HighlightedIndex >= 0))
             {

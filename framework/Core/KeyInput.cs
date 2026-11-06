@@ -101,7 +101,7 @@ namespace XForma
         /// <summary>
         /// The view with keyboard focus when the key was pressed.
         /// </summary>
-        public View OriginalSource
+        public View? OriginalSource
         {
             get;
             internal set;

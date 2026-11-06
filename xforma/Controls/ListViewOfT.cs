@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -53,7 +53,7 @@ namespace XForma.Controls
         // The view bound to the item: the reused view if it's this factory's
         // kind, or a new one
         internal View GetView(
-            View reuseView,
+            View? reuseView,
             T item)
         {
             View view;
@@ -92,10 +92,10 @@ namespace XForma.Controls
     /// </example>
     public class ListView<T> : ListView
     {
-        private IReadOnlyList<T> _itemsSource;
-        private ItemViewFactory<T> _itemViewFactory;
-        private Func<T, object> _groupKeySelector;
-        private ItemViewFactory<object> _groupHeaderFactory;
+        private IReadOnlyList<T>? _itemsSource;
+        private ItemViewFactory<T>? _itemViewFactory;
+        private Func<T, object>? _groupKeySelector;
+        private ItemViewFactory<object>? _groupHeaderFactory;
         private readonly Source _source;
 
         public ListView()
@@ -109,7 +109,7 @@ namespace XForma.Controls
         /// <see cref="INotifyCollectionChanged"/> (such as an
         /// <c>ObservableCollection&lt;T&gt;</c>) updates the list as it changes.
         /// </summary>
-        public IReadOnlyList<T> ItemsSource
+        public IReadOnlyList<T>? ItemsSource
         {
             get
             {
@@ -136,7 +136,7 @@ namespace XForma.Controls
             }
         }
 
-        public ItemViewFactory<T> ItemViewFactory
+        public ItemViewFactory<T>? ItemViewFactory
         {
             get
             {
@@ -155,7 +155,7 @@ namespace XForma.Controls
         /// The items should already be in group order: each run of items with
         /// the same key is a group, under a header.
         /// </summary>
-        public Func<T, object> GroupKeySelector
+        public Func<T, object>? GroupKeySelector
         {
             get
             {
@@ -173,7 +173,7 @@ namespace XForma.Controls
         /// How group header views are made and shown, given a group's key. By
         /// default a header is the key as text.
         /// </summary>
-        public ItemViewFactory<object> GroupHeaderFactory
+        public ItemViewFactory<object>? GroupHeaderFactory
         {
             get
             {
@@ -230,7 +230,7 @@ namespace XForma.Controls
         }
 
         internal override bool IsItemRow(
-            object row)
+            object? row)
         {
             return !(row is GroupHeader);
         }
@@ -249,7 +249,7 @@ namespace XForma.Controls
         }
 
         private static bool Contains(
-            IReadOnlyList<T> items,
+            IReadOnlyList<T>? items,
             object item)
         {
             if (null == items)
@@ -279,7 +279,7 @@ namespace XForma.Controls
 
             public object Key { get; }
 
-            public override bool Equals(object obj) => (obj is GroupHeader other) && Equals(other.Key, this.Key);
+            public override bool Equals(object? obj) => (obj is GroupHeader other) && Equals(other.Key, this.Key);
 
             public override int GetHashCode() => this.Key?.GetHashCode() ?? 0;
         }
@@ -331,7 +331,7 @@ namespace XForma.Controls
             }
 
             public override int IndexOf(
-                object item)
+                object? item)
             {
                 for (int i = 0; i < this._rows.Count; i += 1)
                 {
@@ -345,7 +345,7 @@ namespace XForma.Controls
             }
 
             public override View GetItemView(
-                View reuseView,
+                View? reuseView,
                 object row)
             {
                 if (row is GroupHeader header)
@@ -362,7 +362,7 @@ namespace XForma.Controls
             // through, so the platform list can animate it; with groups, the
             // list reloads.
             public void Rebuild(
-                NotifyCollectionChangedEventArgs change)
+                NotifyCollectionChangedEventArgs? change)
             {
                 this._rows.Clear();
                 var items = this._list._itemsSource;
@@ -370,7 +370,7 @@ namespace XForma.Controls
                 if (null != items)
                 {
                     bool isFirst = true;
-                    object lastKey = null;
+                    object? lastKey = null;
                     foreach (var item in items)
                     {
                         if (null != keySelector)

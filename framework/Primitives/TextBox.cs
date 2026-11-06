@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using XForma.Platform;
 
 namespace XForma.Primitives
@@ -22,7 +22,7 @@ namespace XForma.Primitives
             }
         }
 
-        protected override string DefaultAccessibilityLabel
+        protected override string? DefaultAccessibilityLabel
         {
             get
             {
@@ -217,8 +217,8 @@ namespace XForma.Primitives
             this.VerticalAlignment = VerticalAlignment.Top;
         }
 
-        private string _text;
-        private string _placeholderText;
+        private string? _text;
+        private string? _placeholderText;
         private bool _acceptsReturn;
         private KeyboardOptions? _keyboardOptions;
         private bool _focusWhenAttached;
@@ -237,21 +237,21 @@ namespace XForma.Primitives
         /// <summary>
         /// Raised when the text changes, whether the user or code changed it.
         /// </summary>
-        public event EventHandler TextChanged;
+        public event EventHandler? TextChanged;
 
         /// <summary>
         /// Raised when the user submits a single-line text box: Enter, or the
         /// on-screen keyboard's Done or Go key. A text box that accepts Return
         /// never submits.
         /// </summary>
-        public event EventHandler Submitted;
+        public event EventHandler? Submitted;
 
         /// <summary>
         /// Raised when the selection or the caret moves.
         /// </summary>
-        public event EventHandler SelectionChanged;
+        public event EventHandler? SelectionChanged;
 
-        public string Text
+        public string? Text
         {
             get
             {
@@ -462,7 +462,7 @@ namespace XForma.Primitives
             this.Select(0, (this._text ?? string.Empty).Length);
         }
 
-        public string PlaceholderText
+        public string? PlaceholderText
         {
             get
             {
@@ -526,7 +526,7 @@ namespace XForma.Primitives
         }
 
         [PlatformContract]
-        internal new ITextBoxRenderer Renderer
+        internal new ITextBoxRenderer? Renderer
         {
             get
             {
@@ -534,7 +534,7 @@ namespace XForma.Primitives
             }
         }
 
-        private ITextBoxRenderer Native
+        private ITextBoxRenderer? Native
         {
             get
             {
@@ -573,7 +573,7 @@ namespace XForma.Primitives
 
         // User state: the text, when it changed since the box was first
         // attached, with the selection; or the selection alone while focused
-        private string _initialText;
+        private string? _initialText;
 
         protected override void OnAttaching(
             Theme theme)
@@ -582,7 +582,7 @@ namespace XForma.Primitives
             this._initialText = this._text ?? string.Empty;
         }
 
-        protected override object GetUserState()
+        protected override object? GetUserState()
         {
             string text = this.Text ?? string.Empty;
             bool isTextChanged = (null != this._initialText) && (text != this._initialText);
@@ -610,7 +610,7 @@ namespace XForma.Primitives
             }
         }
 
-        private sealed record TextBoxUserState(string Text, int SelectionStart, int SelectionLength);
+        private sealed record TextBoxUserState(string? Text, int SelectionStart, int SelectionLength);
 
         internal override void OnRendererCreated()
         {

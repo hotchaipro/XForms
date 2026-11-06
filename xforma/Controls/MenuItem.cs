@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -54,25 +54,25 @@ namespace XForma.Controls
 
     public class MenuItem : INotifyPropertyChanged
     {
-        private ICommand _command;
-        private Bitmap _icon;
-        private string _text;
+        private ICommand? _command;
+        private Bitmap? _icon;
+        private string? _text;
         private bool _isVisible;
         private bool _isSubtleStyle;
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         /// <summary>
         /// Raised when the item is chosen (before its command runs).
         /// </summary>
-        public event EventHandler Click;
+        public event EventHandler? Click;
 
         public MenuItem()
         {
             this._isVisible = true;
         }
 
-        public ICommand Command
+        public ICommand? Command
         {
             get
             {
@@ -86,7 +86,7 @@ namespace XForma.Controls
             }
         }
 
-        public Bitmap Icon
+        public Bitmap? Icon
         {
             get
             {
@@ -100,7 +100,7 @@ namespace XForma.Controls
             }
         }
 
-        public string Text
+        public string? Text
         {
             get
             {

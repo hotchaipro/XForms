@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using XForma.Layouts;
 using XForma.Controls;
@@ -17,7 +17,7 @@ namespace XForma.Controls
     /// </summary>
     public class MessageBox : Flyout
     {
-        private TaskCompletionSource<MessageBoxResult> _task;
+        private TaskCompletionSource<MessageBoxResult>? _task;
         private MessageBoxResult _result;
 
         public static async Task<MessageBoxResult> ShowAsync(

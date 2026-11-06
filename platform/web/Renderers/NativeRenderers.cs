@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Globalization;
@@ -22,7 +22,7 @@ namespace XForma.Web.Renderers
     [SupportedOSPlatform("browser")]
     internal sealed class ScrollViewerRenderer : ViewRenderer, IScrollViewerRenderer, IScrollingRenderer
     {
-        private View _content;
+        private View? _content;
         private bool _isVerticalScrollingEnabled = true;
         private bool _isHorizontalScrollingEnabled;
         private float _verticalOffset;
@@ -35,7 +35,7 @@ namespace XForma.Web.Renderers
             Js.ListenScroll(this.Id);
         }
 
-        public View Content
+        public View? Content
         {
             get
             {
@@ -167,7 +167,7 @@ namespace XForma.Web.Renderers
         private readonly List<float> _lineExtents = new List<float>();
 
         private readonly int _sizerId;
-        private ItemsViewSource _source;
+        private ItemsViewSource? _source;
         private ListLayout _layout = ListLayout.Vertical;
         private Rect _viewport;
         private float _scrollOffset;
@@ -473,7 +473,7 @@ namespace XForma.Web.Renderers
                 return container;
             }
 
-            ItemContainer reuse = null;
+            ItemContainer? reuse = null;
             if (this._recycled.Count > 0)
             {
                 reuse = this._recycled[this._recycled.Count - 1];
@@ -552,7 +552,7 @@ namespace XForma.Web.Renderers
         }
 
         public void ScrollToItem(
-            object item)
+            object? item)
         {
             int index = this._source?.IndexOf(item) ?? -1;
             if (index < 0)
@@ -725,7 +725,7 @@ namespace XForma.Web.Renderers
         private bool _isPassword;
         private bool _isReadOnly;
         private int _maxLength;
-        private string _placeholder;
+        private string? _placeholder;
         private KeyboardOptions _keyboardOptions = KeyboardOptions.All;
         private Color _foregroundColor;
         private Color _placeholderColor;
@@ -755,7 +755,7 @@ namespace XForma.Web.Renderers
         }
 
         private void CreateInput(
-            string text)
+            string? text)
         {
             if (0 != this._inputId)
             {
@@ -795,13 +795,13 @@ namespace XForma.Web.Renderers
             Js.ListenInput(id, !this._isMultiline);
         }
 
-        public string Text
+        public string? Text
         {
             get => Js.GetValue(this._inputId);
             set => Js.SetValue(this._inputId, value ?? string.Empty);
         }
 
-        public string PlaceholderText
+        public string? PlaceholderText
         {
             get => this._placeholder;
             set { this._placeholder = value; Js.SetAttribute(this._inputId, "placeholder", value); }
@@ -818,7 +818,7 @@ namespace XForma.Web.Renderers
             {
                 if (value != this._isMultiline)
                 {
-                    string text = this.Text;
+                    string? text = this.Text;
                     this._isMultiline = value;
                     this.CreateInput(text);
                     this.InvalidateMeasure();
@@ -1038,7 +1038,7 @@ namespace XForma.Web.Renderers
     internal sealed class PopupRenderer : ElementRenderer, IPopupRenderer
     {
         private readonly int _backdropId;
-        private View _content;
+        private View? _content;
         private bool _isOpen;
 
         public PopupRenderer(
@@ -1062,7 +1062,7 @@ namespace XForma.Web.Renderers
             }
         }
 
-        public View Content
+        public View? Content
         {
             get
             {
@@ -1079,7 +1079,7 @@ namespace XForma.Web.Renderers
             }
         }
 
-        public View PlacementTarget
+        public View? PlacementTarget
         {
             get;
             set;
@@ -1158,10 +1158,10 @@ namespace XForma.Web.Renderers
             ((IPopupDelegate)this.Element).NotifyClosed();
         }
 
-        private View _previousFocus;
+        private View? _previousFocus;
 
         private bool Contains(
-            View view)
+            View? view)
         {
             for (; null != view; view = view.Parent as View)
             {

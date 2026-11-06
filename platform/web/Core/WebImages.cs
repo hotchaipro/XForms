@@ -19,8 +19,8 @@ namespace XForma.Web
         /// <summary>
         /// The URL of an image file in the app's Content folder.
         /// </summary>
-        public static string UrlFor(
-            ImageSource source)
+        public static string? UrlFor(
+            ImageSource? source)
         {
             switch (source)
             {

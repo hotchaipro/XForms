@@ -12,8 +12,8 @@ namespace XForma
     public sealed class Window
     {
         private readonly IApplicationRenderer _renderer;
-        private readonly Application _application;
-        private string _title;
+        private readonly Application? _application;
+        private string? _title;
         private Size _minimumSize;
         private bool _isClosed;
 
@@ -37,7 +37,7 @@ namespace XForma
         /// <summary>
         /// The frame a window the app opened shows (null for the main window).
         /// </summary>
-        internal Frame Frame
+        internal Frame? Frame
         {
             get;
         }
@@ -46,7 +46,7 @@ namespace XForma
         /// The renderer of a window the app opened.
         /// </summary>
         [PlatformContract]
-        internal IWindowRenderer Renderer
+        internal IWindowRenderer? Renderer
         {
             get;
             set;
@@ -67,12 +67,12 @@ namespace XForma
         /// Raised when a window the app opened is closed (by the user, or with
         /// <see cref="Close"/>).
         /// </summary>
-        public event EventHandler Closed;
+        public event EventHandler? Closed;
 
         /// <summary>
         /// The title in the window's title bar (and the task bar).
         /// </summary>
-        public string Title
+        public string? Title
         {
             get
             {
@@ -168,7 +168,7 @@ namespace XForma
             }
         }
 
-        public event EventHandler SizeChanged;
+        public event EventHandler? SizeChanged;
 
         /// <summary>
         /// The parts of the window covered by system bars, a display cutout or
@@ -182,7 +182,7 @@ namespace XForma
             private set;
         }
 
-        public event EventHandler SafeAreaInsetsChanged;
+        public event EventHandler? SafeAreaInsetsChanged;
 
         /// <summary>
         /// The system's bars' insets from the area the pages take (above the

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace XForma.Input
 {
@@ -34,7 +34,7 @@ namespace XForma.Input
         // each point up or down (about 53 degrees from level, or less)
         private const float SidewaysRatio = 0.75f;
 
-        private readonly ISwipeGestureDelegate _delegate;
+        private readonly ISwipeGestureDelegate? _delegate;
         private readonly VelocityTracker _velocity = new VelocityTracker();
         private int _swipeDirection;
         private Point _gestureStart;
@@ -56,7 +56,7 @@ namespace XForma.Input
         /// <summary>
         /// A sideways swipe began, moved, ended or was canceled.
         /// </summary>
-        public event EventHandler<SwipingEventArgs> Swiping;
+        public event EventHandler<SwipingEventArgs>? Swiping;
 
         /// <summary>
         /// How fast the swipe was moving its way as it lifted, in points a

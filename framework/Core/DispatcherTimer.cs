@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -32,7 +32,7 @@ namespace XForma
             this.Tick += (sender, e) => action();
         }
 
-        public event EventHandler Tick;
+        public event EventHandler? Tick;
 
         public TimeSpan Interval
         {

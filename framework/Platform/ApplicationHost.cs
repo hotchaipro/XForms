@@ -40,7 +40,7 @@ namespace XForma.Platform
         /// <summary>
         /// The host for the running app, or null before it's created.
         /// </summary>
-        public static ApplicationHost Current
+        public static ApplicationHost? Current
         {
             get
             {
@@ -71,7 +71,7 @@ namespace XForma.Platform
         /// </summary>
         public void Start(
             IPlatform platform,
-            IReadOnlyList<string> startStack = null)
+            IReadOnlyList<string>? startStack = null)
         {
             this._application.Start(platform, startStack);
         }
@@ -245,7 +245,7 @@ namespace XForma.Platform
         /// A drag is starting in the view: asks what's dragged, or null for no
         /// drag.
         /// </summary>
-        public DataPackage BeginDrag(
+        public DataPackage? BeginDrag(
             View view)
         {
             return DragDropSession.Begin(view);
@@ -259,7 +259,7 @@ namespace XForma.Platform
         public DragOperation UpdateDrag(
             View deepest,
             Point point,
-            DataPackage external)
+            DataPackage? external)
         {
             return DragDropSession.Update(deepest, point, external);
         }
@@ -312,7 +312,7 @@ namespace XForma.Platform
         /// or null when it left the window.
         /// </summary>
         public void PointerOver(
-            View deepest,
+            View? deepest,
             PointerEventArgs e)
         {
             this._application.UpdatePointerOver(deepest, e);

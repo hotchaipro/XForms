@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using XForma.Platform;
@@ -12,19 +12,19 @@ namespace XForma
     public class Frame : View
     {
         private readonly Stack<Page> _backStack = new Stack<Page>();
-        private Page _currentPage;
-        private PageSwitch _pageSwitch;
+        private Page? _currentPage;
+        private PageSwitch? _pageSwitch;
 
         // Every page the frame holds, shown or not (pushed pages, such as
         // tabs, are in neither the back stack nor current), in the order added
         private readonly List<Page> _pages = new List<Page>();
-        private PageBounce _pageBounce;
+        private PageBounce? _pageBounce;
 
         /// <summary>
         /// The window a root frame shows in, for a window the app opened; null
         /// for the main window's.
         /// </summary>
-        internal Window Window
+        internal Window? Window
         {
             get;
             set;
@@ -71,7 +71,7 @@ namespace XForma
         }
 
         [PlatformContract]
-        internal new IFrameRenderer Renderer
+        internal new IFrameRenderer? Renderer
         {
             get
             {
@@ -82,7 +82,7 @@ namespace XForma
         /// <summary>
         /// The page showing, or null.
         /// </summary>
-        public Page CurrentPage
+        public Page? CurrentPage
         {
             get
             {
@@ -136,7 +136,7 @@ namespace XForma
         /// </summary>
         public virtual async Task NavigateAsync(
             Page page,
-            PageTransition transition = null)
+            PageTransition? transition = null)
         {
             if (null == page)
             {
@@ -164,7 +164,7 @@ namespace XForma
         public virtual async Task ReplaceAsync(
             Page page,
             NavigationMode mode = NavigationMode.Forward,
-            PageTransition transition = null)
+            PageTransition? transition = null)
         {
             if (null == page)
             {
@@ -192,7 +192,7 @@ namespace XForma
         /// completes or goes back. Returns null if there's no current page,
         /// it's the page, the current page cancels, or a switch is under way.
         /// </summary>
-        public PageSwitch BeginReplace(
+        public PageSwitch? BeginReplace(
             Page page,
             NavigationMode mode = NavigationMode.Forward)
         {
@@ -231,7 +231,7 @@ namespace XForma
         /// shadow, and springs back when released. Returns null if there's no
         /// current page, or a switch or another bounce is under way.
         /// </summary>
-        public PageBounce BeginBounce()
+        public PageBounce? BeginBounce()
         {
             var currentPage = this._currentPage;
             if ((null == currentPage) || (null != this._pageSwitch) || (null != this._pageBounce))
@@ -280,7 +280,7 @@ namespace XForma
         /// none, or the current page cancels.
         /// </summary>
         public virtual async Task<bool> GoBackAsync(
-            PageTransition transition = null)
+            PageTransition? transition = null)
         {
             if (!this.CanGoBack)
             {
@@ -313,9 +313,9 @@ namespace XForma
         // the leaving one
         private async Task ShowAsync(
             Page arriving,
-            Page leaving,
+            Page? leaving,
             NavigationMode mode,
-            PageTransition transition,
+            PageTransition? transition,
             bool removeLeavingPage,
             bool slideFromStart = false)
         {
@@ -350,7 +350,7 @@ namespace XForma
         // The arriving page is the current one, and the pages hear so
         private void MakeCurrent(
             Page arriving,
-            Page leaving,
+            Page? leaving,
             NavigationMode mode)
         {
             this._currentPage = arriving;

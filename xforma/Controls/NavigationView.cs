@@ -43,9 +43,9 @@ namespace XForma.Controls
         private readonly NavigationViewScrim _scrim;
         private readonly StackPanel _itemsPanel;
         private readonly Border _contentHost;
-        private View _content;
-        private string _paneTitle;
-        private NavigationViewItem _selectedItem;
+        private View? _content;
+        private string? _paneTitle;
+        private NavigationViewItem? _selectedItem;
         private bool _isPaneOpen;
         private bool _isNarrow;
 
@@ -87,7 +87,7 @@ namespace XForma.Controls
         /// <summary>
         /// Raised when the user selects an item.
         /// </summary>
-        public event EventHandler<NavigationViewSelectionChangedEventArgs> SelectionChanged;
+        public event EventHandler<NavigationViewSelectionChangedEventArgs>? SelectionChanged;
 
         /// <summary>
         /// The navigation items, in order.
@@ -101,7 +101,7 @@ namespace XForma.Controls
         /// The pane's title, shown above its items (and in the bar on a
         /// narrow window).
         /// </summary>
-        public string PaneTitle
+        public string? PaneTitle
         {
             get
             {
@@ -119,7 +119,7 @@ namespace XForma.Controls
         /// <summary>
         /// The app's content, beside (or, narrow, beneath) the pane.
         /// </summary>
-        public new View Content
+        public new View? Content
         {
             get
             {
@@ -134,7 +134,7 @@ namespace XForma.Controls
             }
         }
 
-        public NavigationViewItem SelectedItem
+        public NavigationViewItem? SelectedItem
         {
             get
             {
@@ -202,7 +202,7 @@ namespace XForma.Controls
             }
         }
 
-        private NavigationViewItem FirstItem
+        private NavigationViewItem? FirstItem
         {
             get
             {
@@ -226,7 +226,7 @@ namespace XForma.Controls
             this._initialSelectedIndex = this.MenuItems.IndexOf(this._selectedItem);
         }
 
-        protected override object GetUserState()
+        protected override object? GetUserState()
         {
             int index = this.MenuItems.IndexOf(this._selectedItem);
             return (index != this._initialSelectedIndex) ? index : null;
@@ -300,7 +300,7 @@ namespace XForma.Controls
 
         // The pane is one Tab stop: the item that's focused, or else the
         // selected one, or else the first. Up and Down reach the rest
-        internal NavigationViewItem TabStopItem
+        internal NavigationViewItem? TabStopItem
         {
             get
             {
@@ -467,7 +467,7 @@ namespace XForma.Controls
         }
 
         public int IndexOf(
-            NavigationViewItem item)
+            NavigationViewItem? item)
         {
             return (null == item) ? -1 : this._items.IndexOf(item);
         }
@@ -493,8 +493,8 @@ namespace XForma.Controls
         private StyledValue<float> _height = new StyledValue<float>(Dimension.Auto);
         private StyledValue<Thickness> _margin = new StyledValue<Thickness>(Thickness.Zero);
 
-        private string _text;
-        private Bitmap _icon;
+        private string? _text;
+        private Bitmap? _icon;
 
         protected override void OnThemeChanged(
             Theme theme)
@@ -519,7 +519,7 @@ namespace XForma.Controls
             }
         }
 
-        public string Text
+        public string? Text
         {
             get
             {
@@ -533,7 +533,7 @@ namespace XForma.Controls
             }
         }
 
-        public Bitmap Icon
+        public Bitmap? Icon
         {
             get
             {
@@ -551,7 +551,7 @@ namespace XForma.Controls
         /// Anything the app keeps with the item (such as the path it
         /// navigates to).
         /// </summary>
-        public object Tag
+        public object? Tag
         {
             get;
             set;
@@ -560,7 +560,7 @@ namespace XForma.Controls
         /// <summary>
         /// The navigation view it's in.
         /// </summary>
-        public NavigationView NavigationView
+        public NavigationView? NavigationView
         {
             get;
             internal set;
@@ -582,7 +582,7 @@ namespace XForma.Controls
             }
         }
 
-        protected override string DefaultAccessibilityLabel
+        protected override string? DefaultAccessibilityLabel
         {
             get
             {
@@ -674,7 +674,7 @@ namespace XForma.Controls
     public sealed class NavigationViewPane : TemplatedControl
     {
         private readonly NavigationView _owner;
-        private View _content;
+        private View? _content;
 
         internal NavigationViewPane(
             NavigationView owner)
@@ -691,7 +691,7 @@ namespace XForma.Controls
             }
         }
 
-        protected override string DefaultAccessibilityLabel
+        protected override string? DefaultAccessibilityLabel
         {
             get
             {
@@ -699,7 +699,7 @@ namespace XForma.Controls
             }
         }
 
-        internal new View Content
+        internal new View? Content
         {
             get
             {

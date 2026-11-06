@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using XForma.Platform;
 
@@ -48,7 +48,7 @@ namespace XForma
         /// <see cref="Application.RegisterFont"/>, or an installed family's name.
         /// Null (the default) is the platform's UI font.
         /// </summary>
-        public string FontFamily
+        public string? FontFamily
         {
             get;
             set;
@@ -158,14 +158,14 @@ namespace XForma
     /// </summary>
     public sealed class TextLayout : IDisposable
     {
-        private ITextLayoutRenderer _native;
+        private ITextLayoutRenderer? _native;
 
         public TextLayout(
-            string text,
+            string? text,
             TextFormat format,
             float maxWidth = float.PositiveInfinity,
             float maxHeight = float.PositiveInfinity,
-            IReadOnlyList<TextSpan> spans = null)
+            IReadOnlyList<TextSpan>? spans = null)
         {
             if (null == format)
             {
@@ -185,7 +185,7 @@ namespace XForma
         /// says, within the width), for sizing owner-drawn controls.
         /// </summary>
         public static Size Measure(
-            string text,
+            string? text,
             TextFormat format,
             float maxWidth = float.PositiveInfinity)
         {

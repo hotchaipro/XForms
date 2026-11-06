@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using System.Windows.Input;
 using XForma.Input;
@@ -27,11 +27,11 @@ namespace XForma.Controls
     /// </summary>
     public class ImageToggleButton : TemplatedControl, ITapGestureDelegate
     {
-        public event EventHandler<ToggledEventArgs> IsCheckedChanged;
+        public event EventHandler<ToggledEventArgs>? IsCheckedChanged;
 
         private bool _isChecked;
-        private Bitmap _checkedIcon;
-        private Bitmap _uncheckedIcon;
+        private Bitmap? _checkedIcon;
+        private Bitmap? _uncheckedIcon;
         private Color _tintColor;
         private Size? _iconSize;
 
@@ -44,13 +44,13 @@ namespace XForma.Controls
         /// The value passed to the command when it runs (and when asked whether
         /// it can).
         /// </summary>
-        public object CommandParameter
+        public object? CommandParameter
         {
             get;
             set;
         }
 
-        public ICommand ToggleCommand
+        public ICommand? ToggleCommand
         {
             get;
             set;
@@ -67,7 +67,7 @@ namespace XForma.Controls
             this._initialIsChecked = this.IsChecked;
         }
 
-        protected override object GetUserState()
+        protected override object? GetUserState()
         {
             return (this.IsChecked != this._initialIsChecked) ? this.IsChecked : null;
         }
@@ -104,7 +104,7 @@ namespace XForma.Controls
             }
         }
 
-        public Bitmap CheckedIcon
+        public Bitmap? CheckedIcon
         {
             get
             {
@@ -119,7 +119,7 @@ namespace XForma.Controls
             }
         }
 
-        public Bitmap UncheckedIcon
+        public Bitmap? UncheckedIcon
         {
             get
             {

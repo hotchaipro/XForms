@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Immutable;
 
 namespace XForma.Controls
@@ -18,7 +18,7 @@ namespace XForma.Controls
         /// The template for the control type, or for its nearest base type
         /// that has one (a subclass of a control looks like it); or null.
         /// </summary>
-        public ControlTemplate Get(
+        public ControlTemplate? Get(
             Type controlType)
         {
             for (var type = controlType; null != type; type = type.BaseType)
@@ -43,7 +43,7 @@ namespace XForma.Controls
         }
 
         public bool Equals(
-            ControlTemplates other)
+            ControlTemplates? other)
         {
             return (null != other) && (this.Templates == other.Templates);
         }

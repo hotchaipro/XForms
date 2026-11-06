@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using XForma.Primitives;
 
 namespace XForma.Controls
@@ -9,7 +9,7 @@ namespace XForma.Controls
     /// </summary>
     public abstract class UserControl : Control
     {
-        private View _content;
+        private View? _content;
 
         public UserControl()
         {
@@ -46,7 +46,7 @@ namespace XForma.Controls
         /// sets up only its state. A field that refers to a view is assigned
         /// here, so after a rebuild it refers to the new view.
         /// </remarks>
-        protected virtual View Build()
+        protected virtual View? Build()
         {
             return null;
         }
@@ -97,7 +97,7 @@ namespace XForma.Controls
         /// The control's content: what <see cref="Build"/> returns, or what
         /// the control is given.
         /// </summary>
-        protected View Content
+        protected View? Content
         {
             get
             {

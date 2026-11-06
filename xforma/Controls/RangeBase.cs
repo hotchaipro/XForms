@@ -40,7 +40,7 @@ namespace XForma.Controls
         {
         }
 
-        public event EventHandler<RangeValueChangedEventArgs> ValueChanged;
+        public event EventHandler<RangeValueChangedEventArgs>? ValueChanged;
 
         public double Minimum
         {

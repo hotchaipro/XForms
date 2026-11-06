@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using XForma.Platform;
@@ -21,7 +21,7 @@ namespace XForma.Primitives
             this.Text = text;
         }
 
-        public string Text { get; init; }
+        public string? Text { get; init; }
 
         public FontWeight? FontWeight { get; init; }
 
@@ -53,7 +53,7 @@ namespace XForma.Primitives
         }
 
         // Values the app set; the rest keep the platform's defaults
-        private string _text;
+        private string? _text;
         private TextAlignment? _textAlignment;
         private TextAlignment? _verticalTextAlignment;
         private bool? _wordWrap;
@@ -64,10 +64,10 @@ namespace XForma.Primitives
         private FontStyle? _fontStyle;
         private FontWeight? _fontWeight;
         private bool? _strikethrough;
-        private string _fontFamily;
+        private string? _fontFamily;
         private int _maxLines;
         private IReadOnlyList<TextSpan> _spans = Array.Empty<TextSpan>();
-        private ObservableCollection<Run> _inlines;
+        private ObservableCollection<Run>? _inlines;
 
         protected override AccessibilityRole DefaultAccessibilityRole
         {
@@ -77,7 +77,7 @@ namespace XForma.Primitives
             }
         }
 
-        protected override string DefaultAccessibilityLabel
+        protected override string? DefaultAccessibilityLabel
         {
             get
             {
@@ -128,7 +128,7 @@ namespace XForma.Primitives
         /// family registered with <see cref="Application.RegisterFont"/>, or an
         /// installed family's name. Null is the platform's UI font.
         /// </summary>
-        public string FontFamily
+        public string? FontFamily
         {
             get
             {
@@ -164,7 +164,7 @@ namespace XForma.Primitives
             }
         }
 
-        public string Text
+        public string? Text
         {
             get
             {
@@ -184,7 +184,7 @@ namespace XForma.Primitives
         }
 
         private void SetText(
-            string value)
+            string? value)
         {
             this._text = value;
             this.Native?.Text = value;
@@ -360,7 +360,7 @@ namespace XForma.Primitives
         }
 
         [PlatformContract]
-        internal new ITextBlockRenderer Renderer
+        internal new ITextBlockRenderer? Renderer
         {
             get
             {
@@ -368,7 +368,7 @@ namespace XForma.Primitives
             }
         }
 
-        private ITextBlockRenderer Native
+        private ITextBlockRenderer? Native
         {
             get
             {

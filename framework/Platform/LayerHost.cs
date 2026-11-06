@@ -104,7 +104,7 @@ namespace XForma.Platform
         /// The renderer of the layer the view draws into (its own, for a view
         /// with a native object).
         /// </summary>
-        public IViewRenderer Layer
+        public IViewRenderer? Layer
         {
             get
             {
@@ -249,7 +249,7 @@ namespace XForma.Platform
         /// The deepest visible, hit-testable lightweight view under the point
         /// (in this view's coordinates), or null.
         /// </summary>
-        public View HitTestLightweight(
+        public View? HitTestLightweight(
             Point point)
         {
             return this._view.HitTestLightweight(point);
@@ -352,7 +352,7 @@ namespace XForma.Platform
         /// <summary>
         /// The lightweight view in this layer that has keyboard focus, or null.
         /// </summary>
-        public View FocusedLightweight
+        public View? FocusedLightweight
         {
             get
             {
@@ -398,7 +398,7 @@ namespace XForma.Platform
         /// What a screen reader reads for the view: its label, or the text of
         /// what's inside it.
         /// </summary>
-        public string AccessibilityText
+        public string? AccessibilityText
         {
             get
             {

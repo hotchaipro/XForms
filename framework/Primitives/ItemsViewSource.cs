@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Specialized;
 
@@ -6,7 +6,7 @@ namespace XForma.Primitives
 {
     public abstract class ItemsViewSource : IEnumerable, INotifyCollectionChanged
     {
-        public event NotifyCollectionChangedEventHandler CollectionChanged;
+        public event NotifyCollectionChangedEventHandler? CollectionChanged;
 
         protected ItemsViewSource()
         {
@@ -23,19 +23,19 @@ namespace XForma.Primitives
         }
 
         public abstract int IndexOf(
-            object item);
+            object? item);
 
         /// <summary>
         /// The view for an item: the view it reuses (made for an earlier item),
         /// bound to this item, or a new one.
         /// </summary>
         public abstract View GetItemView(
-            View reuseView,
+            View? reuseView,
             object item);
 
         public virtual ItemContainer GetItemContainer(
             ItemsView itemsView,
-            ItemContainer reuseContainer,
+            ItemContainer? reuseContainer,
             object item)
         {
             if (null == itemsView)

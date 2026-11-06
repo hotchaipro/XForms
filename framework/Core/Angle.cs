@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace XForma
 {
@@ -46,7 +46,7 @@ namespace XForma
         }
 
         public override bool Equals(
-            object obj)
+            object? obj)
         {
             if (obj is Angle)
             {

@@ -52,9 +52,9 @@ namespace XForma
         /// <summary>
         /// The route a path matches, or null.
         /// </summary>
-        internal Route Match(
+        internal Route? Match(
             string path,
-            out Func<Route, Page> createPage)
+            out Func<Route, Page>? createPage)
         {
             createPage = null;
             if (!TrySplit(path, out var segments, out var query))
@@ -62,7 +62,7 @@ namespace XForma
                 return null;
             }
 
-            RouteEntry best = null;
+            RouteEntry? best = null;
             foreach (var entry in this._entries)
             {
                 if (entry.Matches(segments) && ((null == best) || entry.IsMoreSpecificThan(best)))
@@ -84,7 +84,7 @@ namespace XForma
         /// Makes the page for a path, or returns null when no route matches (or
         /// its function returns null).
         /// </summary>
-        internal Page CreatePage(
+        internal Page? CreatePage(
             string path)
         {
             var route = this.Match(path, out var createPage);
@@ -106,8 +106,8 @@ namespace XForma
         // of each name)
         private static bool TrySplit(
             string path,
-            out string[] segments,
-            out Dictionary<string, string> query)
+            out string[]? segments,
+            out Dictionary<string, string>? query)
         {
             segments = null;
             query = null;
@@ -150,30 +150,30 @@ namespace XForma
         private sealed class RouteEntry
         {
             // Each path segment: its fixed text, or null for a parameter
-            private string[] _literals;
+            private string[]? _literals;
 
             // Each path segment's parameter name, or null for fixed text
-            private string[] _parameters;
+            private string[]? _parameters;
 
             // Query names in the path, and the parameter each fills
-            private List<(string Key, string Name)> _queryParameters;
+            private List<(string Key, string Name)>? _queryParameters;
 
-            private HashSet<string> _names;
+            private HashSet<string>? _names;
 
-            public string Pattern
+            public string? Pattern
             {
                 get;
                 private set;
             }
 
             // The paths it matches, regardless of names and queries
-            public string Shape
+            public string? Shape
             {
                 get;
                 private set;
             }
 
-            public Func<Route, Page> CreatePage
+            public Func<Route, Page>? CreatePage
             {
                 get;
                 private set;
@@ -206,7 +206,7 @@ namespace XForma
                 var shape = new List<string>();
                 for (int i = 0; i < parts.Length; i += 1)
                 {
-                    string name = ParseParameter(parts[i], pattern);
+                    string? name = ParseParameter(parts[i], pattern);
                     if (null != name)
                     {
                         AddName(name);
@@ -226,7 +226,7 @@ namespace XForma
                     foreach (var pair in pattern.Substring(queryStart + 1).Split('&', StringSplitOptions.RemoveEmptyEntries))
                     {
                         int separator = pair.IndexOf('=');
-                        string name = (separator > 0) ? ParseParameter(pair.Substring(separator + 1), pattern) : null;
+                        string? name = (separator > 0) ? ParseParameter(pair.Substring(separator + 1), pattern) : null;
                         if (null == name)
                         {
                             throw new ArgumentException($"The route {pattern} has a query '{pair}' that isn't name={{parameter}}.", nameof(pattern));
@@ -250,7 +250,7 @@ namespace XForma
             }
 
             // A segment's parameter name, or null for fixed text
-            private static string ParseParameter(
+            private static string? ParseParameter(
                 string segment,
                 string pattern)
             {
@@ -272,7 +272,7 @@ namespace XForma
             }
 
             public bool Matches(
-                string[] segments)
+                string[]? segments)
             {
                 if (segments.Length != this._literals.Length)
                 {
@@ -311,8 +311,8 @@ namespace XForma
 
             public Route CreateRoute(
                 string path,
-                string[] segments,
-                Dictionary<string, string> query)
+                string[]? segments,
+                Dictionary<string, string>? query)
             {
                 var values = new Dictionary<string, string>(StringComparer.Ordinal);
                 for (int i = 0; i < segments.Length; i += 1)

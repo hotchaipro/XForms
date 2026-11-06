@@ -44,8 +44,8 @@ namespace XForma
         private readonly ViewProperty<TView, TValue> _property;
         private readonly TSource _source;
         private readonly Func<TSource, TValue> _getValue;
-        private readonly Action<TSource, TValue> _setValue;
-        private WeakPropertyChangedHandler _sourceHandler;
+        private readonly Action<TSource, TValue>? _setValue;
+        private WeakPropertyChangedHandler? _sourceHandler;
         private bool _isUpdating;
         private bool _isDisposed;
 
@@ -54,7 +54,7 @@ namespace XForma
             ViewProperty<TView, TValue> property,
             TSource source,
             Func<TSource, TValue> getValue,
-            Action<TSource, TValue> setValue)
+            Action<TSource, TValue>? setValue)
         {
             this._view = new WeakReference<TView>(view);
             this._property = property;
@@ -209,7 +209,7 @@ namespace XForma
             ViewProperty<TView, TValue> property,
             TSource source,
             Func<TSource, TValue> getValue,
-            Action<TSource, TValue> setValue)
+            Action<TSource, TValue>? setValue)
             where TView : View
         {
             if (null == view)

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using XForma.Input;
 using XForma.Controls;
 using XForma.Primitives;
@@ -25,16 +25,16 @@ namespace XForma.Controls
                 return this._flyoutAnimator;
             }
         }
-        private Bitmap _icon;
+        private Bitmap? _icon;
         private bool _isSubtleStyle;
 
-        public event EventHandler Clicked;
+        public event EventHandler? Clicked;
 
         /// <summary>
         /// The button was swiped sideways and released: 1 to the right, -1 to
         /// the left.
         /// </summary>
-        public event EventHandler<int> Swiped;
+        public event EventHandler<int>? Swiped;
 
         /// <summary>
         /// The button's swipe: its <see cref="SwipeGestureRecognizer.Swiping"/>
@@ -85,7 +85,7 @@ namespace XForma.Controls
             }
         }
 
-        public Bitmap Icon
+        public Bitmap? Icon
         {
             get
             {

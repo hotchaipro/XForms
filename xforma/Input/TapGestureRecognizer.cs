@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace XForma.Input
 {
@@ -94,11 +94,11 @@ namespace XForma.Input
         // How long a touch that may yet become a drag holds back its pressed look
         private static readonly TimeSpan PressDelay = TimeSpan.FromMilliseconds(100);
 
-        private readonly ITapGestureDelegate _delegate;
+        private readonly ITapGestureDelegate? _delegate;
         private Point _gestureStart;
         private PointerDeviceType _deviceType;
-        private DispatcherTimer _holdTimer;
-        private DispatcherTimer _pressTimer;
+        private DispatcherTimer? _holdTimer;
+        private DispatcherTimer? _pressTimer;
         private bool _isPressShown;
         private bool _isHolding;
         private DateTime _lastTapTime;
@@ -125,19 +125,19 @@ namespace XForma.Input
         /// Raised when a pointer is pressed and released over the view without
         /// moving, or the view is activated.
         /// </summary>
-        public event EventHandler<TappedEventArgs> Tapped;
+        public event EventHandler<TappedEventArgs>? Tapped;
 
         /// <summary>
         /// Raised for a second tap soon after a first, close to it.
         /// </summary>
-        public event EventHandler<TappedEventArgs> DoubleTapped;
+        public event EventHandler<TappedEventArgs>? DoubleTapped;
 
         /// <summary>
         /// Raised when a pointer is held down on the view without moving
         /// (<see cref="HoldingState.Started"/>), and again when it's released
         /// or moves away. A held pointer doesn't also tap.
         /// </summary>
-        public event EventHandler<HoldingEventArgs> Holding;
+        public event EventHandler<HoldingEventArgs>? Holding;
 
         /// <summary>
         /// Whether a press that may yet be a tap is down on the view (for

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using XForma.Input;
 using XForma.Layouts;
@@ -110,10 +110,10 @@ namespace XForma.Controls
             this.Height = this._height.Apply(this.Height, size);
         }
 
-        private string _text;
+        private string? _text;
         private bool _isChecked;
 
-        public event EventHandler<ToggledEventArgs> IsCheckedChanged;
+        public event EventHandler<ToggledEventArgs>? IsCheckedChanged;
 
         internal DayOfWeekToggleButton(
             DaysOfWeekPicker parent)
@@ -128,7 +128,7 @@ namespace XForma.Controls
             this.GestureRecognizers.Add(new TapGestureRecognizer(this));
         }
 
-        public string Text
+        public string? Text
         {
             get
             {
@@ -156,7 +156,7 @@ namespace XForma.Controls
             this._initialIsChecked = this.IsChecked;
         }
 
-        protected override object GetUserState()
+        protected override object? GetUserState()
         {
             return (this.IsChecked != this._initialIsChecked) ? this.IsChecked : null;
         }

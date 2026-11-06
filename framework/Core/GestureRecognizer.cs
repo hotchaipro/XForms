@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace XForma
@@ -55,9 +55,9 @@ namespace XForma
     /// </remarks>
     public abstract class GestureRecognizer
     {
-        private readonly IGestureRecognizerDelegate _delegate;
+        private readonly IGestureRecognizerDelegate? _delegate;
         private readonly HashSet<int> _pointers = new HashSet<int>();
-        private PointerEventArgs _lastEvent;
+        private PointerEventArgs? _lastEvent;
 
         /// <summary>
         /// A recognizer that reports through its own events.
@@ -84,7 +84,7 @@ namespace XForma
         /// <summary>
         /// The view the recognizer is attached to, or null.
         /// </summary>
-        protected View View
+        protected View? View
         {
             get;
             private set;

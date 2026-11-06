@@ -75,8 +75,8 @@ namespace XForma.Web.Renderers
         }
 
         private void Push(
-            Uri uri,
-            string html)
+            Uri? uri,
+            string? html)
         {
             this._history.RemoveRange(this._current + 1, this._history.Count - (this._current + 1));
             this._history.Add((uri, html));

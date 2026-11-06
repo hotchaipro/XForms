@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using XForma.Input;
 using XForma.Layouts;
@@ -10,8 +10,8 @@ namespace XForma.Controls
     public class TabSelectionChangedEventArgs : EventArgs
     {
         public TabSelectionChangedEventArgs(
-            Page selection,
-            Page previousSelection,
+            Page? selection,
+            Page? previousSelection,
             NavigationMode navigationMode)
         {
             this.Selection = selection;
@@ -19,13 +19,13 @@ namespace XForma.Controls
             this.NavigationMode = navigationMode;
         }
 
-        public Page Selection
+        public Page? Selection
         {
             get;
             private set;
         }
 
-        public Page PreviousSelection
+        public Page? PreviousSelection
         {
             get;
             private set;
@@ -57,15 +57,15 @@ namespace XForma.Controls
         private const float SwipeFlickVelocity = 300;
 
         private UniformGrid _buttonsLayout;
-        private TabStripItem _selection;
-        private Frame _frame;
+        private TabStripItem? _selection;
+        private Frame? _frame;
         private float _selectionPosition;
-        private TabSwitch _switch;
-        private TabSwitch _swipeSwitch;
-        private PageBounce _swipeBounce;
+        private TabSwitch? _switch;
+        private TabSwitch? _swipeSwitch;
+        private PageBounce? _swipeBounce;
         private bool _isUpdatingChecks;
 
-        public event EventHandler<TabSelectionChangedEventArgs> SelectionChanged;
+        public event EventHandler<TabSelectionChangedEventArgs>? SelectionChanged;
 
         protected override void OnThemeChanged(
             Theme theme)
@@ -90,7 +90,7 @@ namespace XForma.Controls
             this.Content = this._buttonsLayout;
         }
 
-        public Page SelectedPage
+        public Page? SelectedPage
         {
             get
             {
@@ -161,7 +161,7 @@ namespace XForma.Controls
         /// changes, the strip replaces the frame's page, sliding in from the
         /// side of the tab.
         /// </summary>
-        public Frame Frame
+        public Frame? Frame
         {
             get
             {
@@ -232,7 +232,7 @@ namespace XForma.Controls
         /// Returns null if there's no tab that way, a switch is under way, or
         /// the current page cancels.
         /// </summary>
-        public TabSwitch BeginSwitch(
+        public TabSwitch? BeginSwitch(
             int direction)
         {
             if ((0 == direction) || (null != this._switch) || (null == this._selection))
@@ -248,7 +248,7 @@ namespace XForma.Controls
                 return null;
             }
 
-            PageSwitch pageSwitch = null;
+            PageSwitch? pageSwitch = null;
             if ((null != this._frame) && (null != target.TabPage))
             {
                 pageSwitch = this._frame.BeginReplace(target.TabPage, (to > from) ? NavigationMode.Forward : NavigationMode.Back);
@@ -419,7 +419,7 @@ namespace XForma.Controls
             }
         }
 
-        private TabStripItem ItemAt(
+        private TabStripItem? ItemAt(
             int index)
         {
             if (index < 0)
@@ -445,7 +445,7 @@ namespace XForma.Controls
         }
 
         private int IndexOf(
-            TabStripItem target)
+            TabStripItem? target)
         {
             if (null == target)
             {
@@ -542,7 +542,7 @@ namespace XForma.Controls
             TabStrip strip,
             int from,
             int to,
-            PageSwitch pageSwitch)
+            PageSwitch? pageSwitch)
         {
             this._strip = strip;
             this.From = from;
@@ -554,7 +554,7 @@ namespace XForma.Controls
 
         internal int To { get; }
 
-        internal PageSwitch PageSwitch { get; }
+        internal PageSwitch? PageSwitch { get; }
 
         /// <summary>
         /// How far it's gone: 0 (still on the tab it started from) to 1 (all

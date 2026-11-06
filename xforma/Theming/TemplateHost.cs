@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace XForma.Controls
 {
@@ -12,7 +12,7 @@ namespace XForma.Controls
 
         void AddTemplatePart(View part, int index);
 
-        bool RemoveTemplatePart(View part);
+        bool RemoveTemplatePart(View? part);
 
         DrawnAnimator CreateTemplateDrawnAnimator();
 
@@ -28,8 +28,8 @@ namespace XForma.Controls
     internal sealed class TemplateHost
     {
         private readonly View _view;
-        private ControlTemplate _template;
-        private Theme _theme;
+        private ControlTemplate? _template;
+        private Theme? _theme;
         private int _partCount;
 
         public TemplateHost(
@@ -44,7 +44,7 @@ namespace XForma.Controls
             get;
         }
 
-        public ControlTemplate Template
+        public ControlTemplate? Template
         {
             get
             {
@@ -153,7 +153,7 @@ namespace XForma.Controls
         }
 
         public void RemovePart(
-            View part)
+            View? part)
         {
             if (((ITemplatedView)this._view).RemoveTemplatePart(part))
             {

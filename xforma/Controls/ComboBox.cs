@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using XForma.Controls;
 using XForma.Primitives;
 
@@ -15,15 +15,15 @@ namespace XForma.Controls
 
         private int _selectedIndex = -1;
         private float _maximumTextWidth = -1;
-        private Popup _popup;
-        private ComboBoxItemsView _itemsView;
+        private Popup? _popup;
+        private ComboBoxItemsView? _itemsView;
 
         public ComboBox()
         {
             this.Items = new ComboBoxItemCollection(this);
         }
 
-        public event EventHandler<ComboBoxItem> SelectionChanged;
+        public event EventHandler<ComboBoxItem>? SelectionChanged;
 
         public ComboBoxItemCollection Items
         {
@@ -41,7 +41,7 @@ namespace XForma.Controls
             this._initialSelectedIndex = this.SelectedIndex;
         }
 
-        protected override object GetUserState()
+        protected override object? GetUserState()
         {
             return (this.SelectedIndex != this._initialSelectedIndex) ? this.SelectedIndex : null;
         }
@@ -68,7 +68,7 @@ namespace XForma.Controls
             }
         }
 
-        public ComboBoxItem SelectedItem
+        public ComboBoxItem? SelectedItem
         {
             get
             {
@@ -81,7 +81,7 @@ namespace XForma.Controls
             }
         }
 
-        protected override string DefaultAccessibilityLabel
+        protected override string? DefaultAccessibilityLabel
         {
             get
             {
@@ -363,7 +363,7 @@ namespace XForma.Controls
             }
         }
 
-        internal ScrollViewer ScrollViewer
+        internal ScrollViewer? ScrollViewer
         {
             get;
             set;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace XForma.Controls
@@ -187,7 +187,7 @@ namespace XForma.Controls
         /// since one template serves every control of its type. Cleared when
         /// the control's template changes.
         /// </summary>
-        public object State
+        public object? State
         {
             get;
             set;
@@ -206,7 +206,7 @@ namespace XForma.Controls
         /// Removes a part the template added.
         /// </summary>
         public void RemovePart(
-            View part)
+            View? part)
         {
             this._control.TemplateHost.RemovePart(part);
         }

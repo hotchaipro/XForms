@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Windows.Input;
 using XForma.Input;
@@ -83,7 +83,7 @@ namespace XForma.Controls
             }
         }
 
-        protected override string DefaultAccessibilityLabel
+        protected override string? DefaultAccessibilityLabel
         {
             get
             {
@@ -91,27 +91,27 @@ namespace XForma.Controls
             }
         }
 
-        private string _text;
-        private Bitmap _icon;
+        private string? _text;
+        private Bitmap? _icon;
 
         public CommandBarButton()
         {
             this.GestureRecognizers.Add(new TapGestureRecognizer(this));
         }
 
-        public ICommand Command
+        public ICommand? Command
         {
             get;
             set;
         }
 
-        private object _commandParameter;
+        private object? _commandParameter;
 
         /// <summary>
         /// The value passed to the command. The button shows only while the
         /// command can run with it.
         /// </summary>
-        public object CommandParameter
+        public object? CommandParameter
         {
             get
             {
@@ -129,7 +129,7 @@ namespace XForma.Controls
             }
         }
 
-        public Bitmap Icon
+        public Bitmap? Icon
         {
             get
             {
@@ -144,7 +144,7 @@ namespace XForma.Controls
             }
         }
 
-        public string Text
+        public string? Text
         {
             get
             {

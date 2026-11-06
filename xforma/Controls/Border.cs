@@ -24,7 +24,7 @@ namespace XForma.Controls
         /// <summary>
         /// The view inside the border.
         /// </summary>
-        public View Child
+        public View? Child
         {
             get
             {

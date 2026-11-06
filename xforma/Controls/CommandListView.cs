@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using XForma.Controls;
@@ -98,7 +98,7 @@ namespace XForma.Controls
     /// </summary>
     public class CommandListViewItem : TemplatedContentControl
     {
-        private object _item;
+        private object? _item;
 
         /// <summary>
         /// The item the view shows. The list's item source sets it as the view
@@ -106,7 +106,7 @@ namespace XForma.Controls
         /// does nothing (<see cref="OnItemChanged"/> isn't called): to show an
         /// item's changes, have the item notify them.
         /// </summary>
-        public object Item
+        public object? Item
         {
             get
             {
@@ -133,7 +133,7 @@ namespace XForma.Controls
 
 
 
-        private CommandListViewItemContainer CommandContainer
+        private CommandListViewItemContainer? CommandContainer
         {
             get
             {
@@ -185,7 +185,7 @@ namespace XForma.Controls
     {
         private ListViewSwipeItem _swipeItem;
         private CommandBar _commandBar;
-        private CommandBarCommandCollection _commandBarCommands;
+        private CommandBarCommandCollection? _commandBarCommands;
         private DockPanel _contentLayout;
 
         protected override void OnThemeChanged(
@@ -226,7 +226,7 @@ namespace XForma.Controls
             this.GestureRecognizers.Add(this._swipeRecognizer);
         }
 
-        private CommandListView CommandListView
+        private CommandListView? CommandListView
         {
             get
             {
@@ -376,7 +376,7 @@ namespace XForma.Controls
         private float _swipeFencePosition;
         private bool _swipeEnabled;
         private bool _longSwipe;
-        private UICommand _swipeCommand;
+        private UICommand? _swipeCommand;
 
         // Goes up as a swipe begins and as the container binds or recycles, so
         // a commit can tell that the row has moved on
@@ -532,7 +532,7 @@ namespace XForma.Controls
         private void UpdateSwipeCommand(
             int direction)
         {
-            IReadOnlyList<UICommand> commands;
+            IReadOnlyList<UICommand>? commands;
             if (direction > 0)
             {
                 commands = this.CommandListView?.SwipeCommands.PrimaryCommands;
@@ -542,7 +542,7 @@ namespace XForma.Controls
                 commands = this.CommandListView?.SwipeCommands.SecondaryCommands;
             }
 
-            UICommand command = null;
+            UICommand? command = null;
 
             if (null != commands)
             {

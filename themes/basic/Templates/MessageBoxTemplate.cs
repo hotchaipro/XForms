@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using XForma.Controls;
 using XForma.Layouts;
 using XForma.Primitives;
@@ -10,8 +10,8 @@ namespace XForma.Themes.Basic
     {
         private sealed class Parts
         {
-            public DockPanel Layout;
-            public TextBlock Message;
+            public DockPanel? Layout;
+            public TextBlock? Message;
         }
 
         protected override void Apply(

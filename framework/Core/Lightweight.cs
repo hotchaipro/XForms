@@ -39,7 +39,7 @@ namespace XForma
             }
         }
 
-        public object NativeElement
+        public object? NativeElement
         {
             get
             {
@@ -60,7 +60,7 @@ namespace XForma
         }
 
         // The native ancestor this view draws into, if it's attached to one
-        protected IViewRenderer Layer
+        protected IViewRenderer? Layer
         {
             get
             {
@@ -120,7 +120,7 @@ namespace XForma
         /// <summary>
         /// The view's shadow, which its layer draws beneath it.
         /// </summary>
-        public Shadow Shadow
+        public Shadow? Shadow
         {
             get
             {
@@ -134,7 +134,7 @@ namespace XForma
             }
         }
 
-        private Shadow _shadow;
+        private Shadow? _shadow;
 
         // The framework hit-tests lightweight views (see View.HitTestOutset)
         public Thickness HitTestOutset
@@ -178,14 +178,14 @@ namespace XForma
         }
 
         public void AddHostedView(
-            IViewRenderer child,
+            IViewRenderer? child,
             int index)
         {
             throw new InvalidOperationException("A lightweight view hosts no native views.");
         }
 
         public void RemoveHostedView(
-            IViewRenderer child)
+            IViewRenderer? child)
         {
             throw new InvalidOperationException("A lightweight view hosts no native views.");
         }
@@ -231,7 +231,7 @@ namespace XForma
 
         public void ClearChildren() => this.Invalidate();
 
-        public void InsertChild(int index, IViewRenderer childRenderer) => this.Invalidate();
+        public void InsertChild(int index, IViewRenderer? childRenderer) => this.Invalidate();
 
         public void RemoveChildAt(int index) => this.Invalidate();
 
@@ -264,14 +264,14 @@ namespace XForma
         private FontStyle _fontStyle = FontStyle.Normal;
         private FontWeight _fontWeight = FontWeight.Normal;
         private bool _strikethrough;
-        private string _fontFamily;
+        private string? _fontFamily;
         private int _maxLines;
-        private IReadOnlyList<TextSpan> _spans;
+        private IReadOnlyList<TextSpan>? _spans;
         private TextAlignment _horizontalTextAlignment = TextAlignment.Start;
         private TextAlignment _verticalTextAlignment = TextAlignment.Start;
 
         // The layout for the last width it was made for
-        private TextLayout _layout;
+        private TextLayout? _layout;
         private float _layoutWidth = float.NaN;
         private float _layoutHeight = float.NaN;
 
@@ -281,7 +281,7 @@ namespace XForma
         {
         }
 
-        public string Text
+        public string? Text
         {
             get { return this._text; }
             set { this._text = value ?? string.Empty; this.OnTextChanged(); }
@@ -341,7 +341,7 @@ namespace XForma
             set { this._strikethrough = value; this.OnTextChanged(); }
         }
 
-        public string FontFamily
+        public string? FontFamily
         {
             set { this._fontFamily = value; this.OnTextChanged(); }
         }

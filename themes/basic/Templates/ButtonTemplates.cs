@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using XForma.Controls;
 
 namespace XForma.Themes.Basic
@@ -105,8 +105,8 @@ namespace XForma.Themes.Basic
         protected void RenderRound(
             TControl control,
             DrawingContext drawContext,
-            Bitmap icon,
-            string text,
+            Bitmap? icon,
+            string? text,
             TextFormat format)
         {
             var bounds = new Rect(0, 0, control.Bounds.Width, control.Bounds.Height);

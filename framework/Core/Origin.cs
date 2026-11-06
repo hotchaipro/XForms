@@ -51,7 +51,7 @@ namespace XForma
         }
 
         public override bool Equals(
-            object obj)
+            object? obj)
         {
             if (obj is Origin)
             {

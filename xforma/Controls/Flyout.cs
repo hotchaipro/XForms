@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using XForma.Controls;
 using XForma.Primitives;
 
@@ -30,7 +30,7 @@ namespace XForma.Controls
         /// <summary>
         /// The view shown inside the popover's frame.
         /// </summary>
-        public new View Content
+        public new View? Content
         {
             get
             {
@@ -56,7 +56,7 @@ namespace XForma.Controls
         /// </summary>
         private sealed class FlyoutFrame : PopupFrame
         {
-            public View Body
+            public View? Body
             {
                 get
                 {

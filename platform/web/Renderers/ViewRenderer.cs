@@ -21,7 +21,7 @@ namespace XForma.Web.Renderers
             get;
         }
 
-        public abstract object NativeElement
+        public abstract object? NativeElement
         {
             get;
         }
@@ -53,7 +53,7 @@ namespace XForma.Web.Renderers
         private bool _isVisible = true;
         private bool _isHitTestVisible = true;
         private Color _backgroundColor = Colors.Transparent;
-        private AnimationLayerStack _layers;
+        private AnimationLayerStack? _layers;
 
         protected ViewRenderer(
             View view,
@@ -90,7 +90,7 @@ namespace XForma.Web.Renderers
             }
         }
 
-        protected WebHost Host
+        protected WebHost? Host
         {
             get
             {
@@ -114,7 +114,7 @@ namespace XForma.Web.Renderers
             }
         }
 
-        public ViewRenderer ParentRenderer
+        public ViewRenderer? ParentRenderer
         {
             get;
             private set;
@@ -173,7 +173,7 @@ namespace XForma.Web.Renderers
 
         protected void InsertChild(
             int index,
-            IViewRenderer child)
+            IViewRenderer? child)
         {
             this._ownChildren.Insert(index, child);
             if (child is ViewRenderer native)
@@ -197,7 +197,7 @@ namespace XForma.Web.Renderers
         }
 
         protected void AddChild(
-            IViewRenderer child)
+            IViewRenderer? child)
         {
             this.InsertChild(this._ownChildren.Count, child);
         }
@@ -221,7 +221,7 @@ namespace XForma.Web.Renderers
         }
 
         protected void RemoveChild(
-            IViewRenderer child)
+            IViewRenderer? child)
         {
             int index = this._ownChildren.IndexOf(child);
             if (index >= 0)
@@ -259,7 +259,7 @@ namespace XForma.Web.Renderers
         // The native views of lightweight descendants, after the view's own
         // children, in drawing order among themselves
         public void AddHostedView(
-            IViewRenderer child,
+            IViewRenderer? child,
             int index)
         {
             var renderer = (ViewRenderer)child;
@@ -271,7 +271,7 @@ namespace XForma.Web.Renderers
         }
 
         public void RemoveHostedView(
-            IViewRenderer child)
+            IViewRenderer? child)
         {
             var renderer = (ViewRenderer)child;
             if (this._hostedViews.Remove(renderer))
@@ -332,7 +332,7 @@ namespace XForma.Web.Renderers
         }
 
         // CSS's box shadow, around the element's (rounded) border box
-        public Shadow Shadow
+        public Shadow? Shadow
         {
             set
             {
@@ -576,7 +576,7 @@ namespace XForma.Web.Renderers
                 return;
             }
 
-            string ariaRole = role switch
+            string? ariaRole = role switch
             {
                 AccessibilityRole.Button => "button",
                 AccessibilityRole.ToggleButton => "checkbox",
@@ -625,7 +625,7 @@ namespace XForma.Web.Renderers
 
         // Elements standing for the accessible lightweight views drawn into
         // this layer: invisible, over each view, with its role and label
-        private Dictionary<View, int> _accessibleElements;
+        private Dictionary<View, int>? _accessibleElements;
 
         private void UpdateAccessibleElements()
         {

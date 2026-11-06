@@ -16,8 +16,8 @@ namespace XForma.Controls
 
         private readonly ExpanderHeader _header;
         private readonly Border _contentHost;
-        private string _headerText;
-        private View _content;
+        private string? _headerText;
+        private View? _content;
         private bool _isExpanded;
 
         public Expander()
@@ -47,18 +47,18 @@ namespace XForma.Controls
         /// <summary>
         /// Raised as the content starts to show.
         /// </summary>
-        public event EventHandler Expanding;
+        public event EventHandler? Expanding;
 
         /// <summary>
         /// Raised when the content is hidden.
         /// </summary>
-        public event EventHandler Collapsed;
+        public event EventHandler? Collapsed;
 
         /// <summary>
         /// The header's text, which also names the expander for assistive
         /// technology.
         /// </summary>
-        public string Header
+        public string? Header
         {
             get
             {
@@ -76,7 +76,7 @@ namespace XForma.Controls
         /// <summary>
         /// What shows beneath the header while expanded.
         /// </summary>
-        public new View Content
+        public new View? Content
         {
             get
             {
@@ -146,7 +146,7 @@ namespace XForma.Controls
             this._initialIsExpanded = this.IsExpanded;
         }
 
-        protected override object GetUserState()
+        protected override object? GetUserState()
         {
             return (this.IsExpanded != this._initialIsExpanded) ? this.IsExpanded : null;
         }
@@ -195,7 +195,7 @@ namespace XForma.Controls
             }
         }
 
-        protected override string DefaultAccessibilityLabel
+        protected override string? DefaultAccessibilityLabel
         {
             get
             {

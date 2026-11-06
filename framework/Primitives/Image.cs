@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using XForma.Platform;
 
 namespace XForma.Primitives
@@ -13,7 +13,7 @@ namespace XForma.Primitives
             }
         }
 
-        private ImageSource _source;
+        private ImageSource? _source;
         private Color _tint = Colors.Transparent;
 
         public Image()
@@ -36,7 +36,7 @@ namespace XForma.Primitives
             }
         }
 
-        public ImageSource Source
+        public ImageSource? Source
         {
             get
             {
@@ -54,7 +54,7 @@ namespace XForma.Primitives
         }
 
         [PlatformContract]
-        internal new IImageRenderer Renderer
+        internal new IImageRenderer? Renderer
         {
             get
             {
@@ -62,7 +62,7 @@ namespace XForma.Primitives
             }
         }
 
-        private IImageRenderer Native
+        private IImageRenderer? Native
         {
             get
             {

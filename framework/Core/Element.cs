@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using XForma.Platform;
 
@@ -64,17 +64,17 @@ namespace XForma
 
         private Dictionary<IAttachedProperty, object> _properties;
 
-        private IElementRenderer _renderer;
+        private IElementRenderer? _renderer;
 
         // The theme last given to OnThemeChanged
-        private Theme _deliveredTheme;
+        private Theme? _deliveredTheme;
 
         protected Element()
         {
             this._properties = new Dictionary<IAttachedProperty, object>();
         }
 
-        protected Application Application
+        protected Application? Application
         {
             get
             {
@@ -96,7 +96,7 @@ namespace XForma
         }
 
         // The theme set on the element itself, if any
-        internal virtual Theme LocalTheme
+        internal virtual Theme? LocalTheme
         {
             get
             {
@@ -105,7 +105,7 @@ namespace XForma
         }
 
         // The element whose theme this one inherits
-        internal virtual Element ParentElement
+        internal virtual Element? ParentElement
         {
             get
             {
@@ -119,7 +119,7 @@ namespace XForma
         /// object initializer has run by then.
         /// </summary>
         [PlatformContract]
-        internal IElementRenderer Renderer
+        internal IElementRenderer? Renderer
         {
             get
             {
@@ -137,7 +137,7 @@ namespace XForma
         /// push values to it; until it exists, the element keeps them.
         /// </summary>
         [PlatformContract]
-        internal IElementRenderer CreatedRenderer
+        internal IElementRenderer? CreatedRenderer
         {
             get
             {
@@ -246,7 +246,7 @@ namespace XForma
         /// Whether the element is this element or one of its descendants.
         /// </summary>
         public bool HasDescendant(
-            Element element)
+            Element? element)
         {
             for (var ancestor = element; null != ancestor; ancestor = ancestor.ParentElement)
             {
@@ -261,7 +261,7 @@ namespace XForma
 
         private void SetProperty(
             IAttachedProperty property,
-            object value)
+            object? value)
         {
             this._properties[property] = value;
         }

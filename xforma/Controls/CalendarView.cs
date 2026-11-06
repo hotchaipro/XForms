@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using XForma.Controls;
 using XForma.Primitives;
@@ -32,7 +32,7 @@ namespace XForma.Controls
         /// <summary>
         /// Raised when the user chooses a day.
         /// </summary>
-        public event EventHandler<DateTime?> SelectedDateChanged;
+        public event EventHandler<DateTime?>? SelectedDateChanged;
 
         public DateTime? SelectedDate
         {
@@ -80,7 +80,7 @@ namespace XForma.Controls
             }
         }
 
-        protected override string DefaultAccessibilityLabel
+        protected override string? DefaultAccessibilityLabel
         {
             get
             {

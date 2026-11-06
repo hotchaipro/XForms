@@ -9,7 +9,7 @@ namespace XForma.Controls
     /// </summary>
     public abstract class PopupFrame : TemplatedControl
     {
-        private View _framedContent;
+        private View? _framedContent;
 
         protected PopupFrame()
         {
@@ -31,7 +31,7 @@ namespace XForma.Controls
         /// The frame's content, inset from its edges (for a frame that doesn't
         /// lay its content out itself).
         /// </summary>
-        protected View FramedContent
+        protected View? FramedContent
         {
             get
             {

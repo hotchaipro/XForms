@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using XForma.Input;
 using XForma.Controls;
 using XForma.Primitives;
@@ -56,7 +56,7 @@ namespace XForma.Controls
         /// The value passed to the command when it runs (and when asked whether
         /// it can).
         /// </summary>
-        public object CommandParameter
+        public object? CommandParameter
         {
             get;
             set;

@@ -116,11 +116,11 @@ namespace XForma
     {
         internal static readonly AnimationHandle Completed = new AnimationHandle(Task.FromResult(true), null);
 
-        private readonly Action _cancel;
+        private readonly Action? _cancel;
 
         internal AnimationHandle(
             Task<bool> completion,
-            Action cancel)
+            Action? cancel)
         {
             this.Completion = completion;
             this._cancel = cancel;
@@ -178,8 +178,8 @@ namespace XForma
 
         private readonly float[] _values = { 0, 0, 1, 1, 0, 1, 0, 0, 0, 0 };
         private readonly Running[] _running = new Running[ChannelCount];
-        private View _view;
-        private IAnimationLayer _layer;
+        private View? _view;
+        private IAnimationLayer? _layer;
         private Point _transformOrigin = new Point(0.5f, 0.5f);
         private bool _isClipEnabled;
 
@@ -192,9 +192,9 @@ namespace XForma
         {
             public float From;
             public float To;
-            public AnimationTiming Timing;
+            public AnimationTiming? Timing;
             public TimeSpan Start;
-            public TaskCompletionSource<bool> Completion;
+            public TaskCompletionSource<bool>? Completion;
         }
 
         #region Values
@@ -298,7 +298,7 @@ namespace XForma
 
         #region Animations
 
-        public AnimationHandle TranslateTo(Point point, TimeSpan duration, EasingFunction easing = null, TimeSpan delay = default, bool loop = false, bool autoReverse = false)
+        public AnimationHandle TranslateTo(Point point, TimeSpan duration, EasingFunction? easing = null, TimeSpan delay = default, bool loop = false, bool autoReverse = false)
         {
             var timing = Timing(duration, easing, delay, loop, autoReverse);
             return Combine(
@@ -310,7 +310,7 @@ namespace XForma
         /// Animates the translation from the point to its current value, as for
         /// a layout change: <c>TranslateFrom(oldPosition - newPosition)</c>.
         /// </summary>
-        public AnimationHandle TranslateFrom(Point point, TimeSpan duration, EasingFunction easing = null, TimeSpan delay = default)
+        public AnimationHandle TranslateFrom(Point point, TimeSpan duration, EasingFunction? easing = null, TimeSpan delay = default)
         {
             var timing = Timing(duration, easing, delay, false, false);
             var target = this.Translation;
@@ -323,7 +323,7 @@ namespace XForma
         /// Animates the translation from an offset back to where it's heading,
         /// continuing from where it is now, for a layout change.
         /// </summary>
-        public AnimationHandle TranslateByOffset(Point offset, TimeSpan duration, EasingFunction easing = null)
+        public AnimationHandle TranslateByOffset(Point offset, TimeSpan duration, EasingFunction? easing = null)
         {
             var timing = Timing(duration, easing, default, false, false);
             float toX = this._values[(int)AnimationChannel.TranslationX];
@@ -335,7 +335,7 @@ namespace XForma
                 this.Animate(AnimationChannel.TranslationY, fromY, toY, timing));
         }
 
-        public AnimationHandle ScaleTo(float scale, TimeSpan duration, EasingFunction easing = null, TimeSpan delay = default, bool loop = false, bool autoReverse = false)
+        public AnimationHandle ScaleTo(float scale, TimeSpan duration, EasingFunction? easing = null, TimeSpan delay = default, bool loop = false, bool autoReverse = false)
         {
             var timing = Timing(duration, easing, delay, loop, autoReverse);
             return Combine(
@@ -343,7 +343,7 @@ namespace XForma
                 this.Animate(AnimationChannel.ScaleY, this.Get(AnimationChannel.ScaleY), scale, timing));
         }
 
-        public AnimationHandle ScaleFrom(float scale, TimeSpan duration, EasingFunction easing = null, TimeSpan delay = default)
+        public AnimationHandle ScaleFrom(float scale, TimeSpan duration, EasingFunction? easing = null, TimeSpan delay = default)
         {
             var timing = Timing(duration, easing, delay, false, false);
             return Combine(
@@ -351,7 +351,7 @@ namespace XForma
                 this.Animate(AnimationChannel.ScaleY, scale, this.Get(AnimationChannel.ScaleY), timing));
         }
 
-        public AnimationHandle RotateTo(Angle angle, TimeSpan duration, EasingFunction easing = null, TimeSpan delay = default, bool loop = false, bool autoReverse = false)
+        public AnimationHandle RotateTo(Angle angle, TimeSpan duration, EasingFunction? easing = null, TimeSpan delay = default, bool loop = false, bool autoReverse = false)
         {
             return this.Animate(AnimationChannel.Rotation, this.Get(AnimationChannel.Rotation), (float)angle.Degrees, Timing(duration, easing, delay, loop, autoReverse));
         }
@@ -360,17 +360,17 @@ namespace XForma
         /// Animates the rotation between two angles, for example a looping
         /// spin: <c>RotateFrom(Angle.Zero, Angle.FromDegrees(360), period, loop: true)</c>.
         /// </summary>
-        public AnimationHandle RotateFrom(Angle from, Angle to, TimeSpan duration, EasingFunction easing = null, TimeSpan delay = default, bool loop = false, bool autoReverse = false)
+        public AnimationHandle RotateFrom(Angle from, Angle to, TimeSpan duration, EasingFunction? easing = null, TimeSpan delay = default, bool loop = false, bool autoReverse = false)
         {
             return this.Animate(AnimationChannel.Rotation, (float)from.Degrees, (float)to.Degrees, Timing(duration, easing, delay, loop, autoReverse));
         }
 
-        public AnimationHandle FadeTo(float opacity, TimeSpan duration, EasingFunction easing = null, TimeSpan delay = default, bool loop = false, bool autoReverse = false)
+        public AnimationHandle FadeTo(float opacity, TimeSpan duration, EasingFunction? easing = null, TimeSpan delay = default, bool loop = false, bool autoReverse = false)
         {
             return this.Animate(AnimationChannel.Opacity, this.Get(AnimationChannel.Opacity), opacity, Timing(duration, easing, delay, loop, autoReverse));
         }
 
-        public AnimationHandle FadeFrom(float opacity, TimeSpan duration, EasingFunction easing = null, TimeSpan delay = default)
+        public AnimationHandle FadeFrom(float opacity, TimeSpan duration, EasingFunction? easing = null, TimeSpan delay = default)
         {
             return this.Animate(AnimationChannel.Opacity, opacity, this.Get(AnimationChannel.Opacity), Timing(duration, easing, delay, false, false));
         }
@@ -378,7 +378,7 @@ namespace XForma
         /// <summary>
         /// Animates the clip to a rectangle (in the view's coordinates).
         /// </summary>
-        public AnimationHandle RevealTo(Rect clip, TimeSpan duration, EasingFunction easing = null, TimeSpan delay = default)
+        public AnimationHandle RevealTo(Rect clip, TimeSpan duration, EasingFunction? easing = null, TimeSpan delay = default)
         {
             var timing = Timing(duration, easing, delay, false, false);
             var from = this.Clip ?? this.FullBounds();
@@ -394,7 +394,7 @@ namespace XForma
         /// Reveals the whole view, growing the clip from a rectangle (such as
         /// an empty one at an edge); the clip is removed when it completes.
         /// </summary>
-        public AnimationHandle RevealFrom(Rect clip, TimeSpan duration, EasingFunction easing = null, TimeSpan delay = default)
+        public AnimationHandle RevealFrom(Rect clip, TimeSpan duration, EasingFunction? easing = null, TimeSpan delay = default)
         {
             var timing = Timing(duration, easing, delay, false, false);
             var to = this.FullBounds();
@@ -433,7 +433,7 @@ namespace XForma
 
         #region Engine
 
-        private static AnimationTiming Timing(TimeSpan duration, EasingFunction easing, TimeSpan delay, bool loop, bool autoReverse)
+        private static AnimationTiming Timing(TimeSpan duration, EasingFunction? easing, TimeSpan delay, bool loop, bool autoReverse)
         {
             return new AnimationTiming()
             {

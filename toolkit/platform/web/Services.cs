@@ -49,7 +49,7 @@ namespace XForma.Toolkit
         // NOTE: The browser only says whether there's text by reading it
         public bool HasText => true;
 
-        public async Task<string> GetTextAsync()
+        public async Task<string>? GetTextAsync()
         {
             try
             {
@@ -98,9 +98,9 @@ namespace XForma.Toolkit
 
         public bool ContainsKey(string key) => null != ToolkitJs.StorageGet(this._prefix + key);
 
-        public string Get(
+        public string? Get(
             string key,
-            string defaultValue = null)
+            string? defaultValue = null)
         {
             return ToolkitJs.StorageGet(this._prefix + key) ?? defaultValue;
         }
@@ -212,7 +212,7 @@ namespace XForma.Toolkit
             ToolkitJs.ListenOnline();
         }
 
-        public static WebConnectivity Current
+        public static WebConnectivity? Current
         {
             get;
             private set;
@@ -226,7 +226,7 @@ namespace XForma.Toolkit
             }
         }
 
-        public event EventHandler ConnectivityChanged;
+        public event EventHandler? ConnectivityChanged;
 
         private static NetworkAccess Read()
         {
@@ -252,7 +252,7 @@ namespace XForma.Toolkit
     internal sealed class WebFilePicker : IFilePicker
     {
         public async Task<IReadOnlyList<PickedFile>> PickAsync(
-            FilePickerOptions options = null)
+            FilePickerOptions? options = null)
         {
             string accept = string.Join(",", options?.FileTypes?.Select((type) => "." + type.TrimStart('.')) ?? Array.Empty<string>());
             string picked = await ToolkitJs.PickFilesAsync(accept, options?.AllowMultiple ?? false);
@@ -276,7 +276,7 @@ namespace XForma.Toolkit
         public async Task<bool> SaveAsync(
             string suggestedName,
             Func<Stream, Task> write,
-            FilePickerOptions options = null)
+            FilePickerOptions? options = null)
         {
             if (null == write)
             {

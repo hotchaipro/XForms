@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using XForma.Primitives;
@@ -23,8 +23,8 @@ namespace XForma.Controls
     public class ItemClickEventArgs : EventArgs
     {
         public ItemClickEventArgs(
-            object clickedItem,
-            View itemView)
+            object? clickedItem,
+            View? itemView)
         {
             this.ClickedItem = clickedItem;
             this.ItemView = itemView;
@@ -33,7 +33,7 @@ namespace XForma.Controls
         /// <summary>
         /// The item that was clicked (as WinUI's <c>ItemClickEventArgs</c>).
         /// </summary>
-        public object ClickedItem
+        public object? ClickedItem
         {
             get;
         }
@@ -41,7 +41,7 @@ namespace XForma.Controls
         /// <summary>
         /// The view showing the item.
         /// </summary>
-        public View ItemView
+        public View? ItemView
         {
             get;
         }
@@ -52,8 +52,8 @@ namespace XForma.Controls
         private static readonly object[] None = Array.Empty<object>();
 
         public SelectionChangedEventArgs(
-            object oldItem,
-            object newItem)
+            object? oldItem,
+            object? newItem)
         {
             this.OldItem = oldItem;
             this.NewItem = newItem;
@@ -64,8 +64,8 @@ namespace XForma.Controls
         public SelectionChangedEventArgs(
             IReadOnlyList<object> removedItems,
             IReadOnlyList<object> addedItems,
-            object oldItem,
-            object newItem)
+            object? oldItem,
+            object? newItem)
         {
             this.RemovedItems = removedItems ?? None;
             this.AddedItems = addedItems ?? None;
@@ -76,7 +76,7 @@ namespace XForma.Controls
         /// <summary>
         /// The item selected before (the first, with several), or null.
         /// </summary>
-        public object OldItem
+        public object? OldItem
         {
             get;
         }
@@ -84,7 +84,7 @@ namespace XForma.Controls
         /// <summary>
         /// The item selected now (the first, with several), or null.
         /// </summary>
-        public object NewItem
+        public object? NewItem
         {
             get;
         }
@@ -135,9 +135,9 @@ namespace XForma.Controls
         /// <summary>
         /// Raised when the user taps an item (whatever the selection mode).
         /// </summary>
-        public event EventHandler<ItemClickEventArgs> ItemClick;
+        public event EventHandler<ItemClickEventArgs>? ItemClick;
 
-        public event EventHandler<SelectionChangedEventArgs> SelectionChanged;
+        public event EventHandler<SelectionChangedEventArgs>? SelectionChanged;
 
         public ListView()
         {
@@ -156,8 +156,8 @@ namespace XForma.Controls
         /// <summary>
         /// The container showing the item, if it's in view, or null.
         /// </summary>
-        public new ListViewItem ContainerFromItem(
-            object item)
+        public new ListViewItem? ContainerFromItem(
+            object? item)
         {
             return base.ContainerFromItem(item) as ListViewItem;
         }
@@ -217,7 +217,7 @@ namespace XForma.Controls
             this._initialSelection = this._selectedItems.ToArray();
         }
 
-        protected override object GetUserState()
+        protected override object? GetUserState()
         {
             var place = base.GetUserState();
             bool isSelectionChanged = !this._selectedItems.SequenceEqual(this._initialSelection);
@@ -230,7 +230,7 @@ namespace XForma.Controls
         }
 
         protected override void SetUserState(
-            object state)
+            object? state)
         {
             if (state is ListState listState)
             {
@@ -242,9 +242,9 @@ namespace XForma.Controls
             }
         }
 
-        private sealed record ListState(object Place, object[] Selection);
+        private sealed record ListState(object? Place, object[]? Selection);
 
-        public object SelectedItem
+        public object? SelectedItem
         {
             get
             {
@@ -293,7 +293,7 @@ namespace XForma.Controls
         }
 
         internal bool IsSelected(
-            object item)
+            object? item)
         {
             return (null != item) && this._selectedItems.Contains(item);
         }
@@ -326,7 +326,7 @@ namespace XForma.Controls
                 return;
             }
 
-            object oldItem = this.SelectedItem;
+            object? oldItem = this.SelectedItem;
             foreach (var item in removed)
             {
                 this._selectedItems.Remove(item);
@@ -366,7 +366,7 @@ namespace XForma.Controls
         /// header), which isn't clicked or selected.
         /// </summary>
         internal virtual bool IsItemRow(
-            object row)
+            object? row)
         {
             return true;
         }
@@ -378,7 +378,7 @@ namespace XForma.Controls
         internal void OnItemTapped(
             ListViewItem container)
         {
-            object item = container.Item;
+            object? item = container.Item;
             if (!this.IsItemRow(item))
             {
                 return;

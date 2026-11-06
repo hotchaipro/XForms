@@ -37,7 +37,7 @@ namespace XForma
         /// <summary>
         /// The view the request started at, before going to its ancestors.
         /// </summary>
-        public View OriginalSource
+        public View? OriginalSource
         {
             get;
             internal set;

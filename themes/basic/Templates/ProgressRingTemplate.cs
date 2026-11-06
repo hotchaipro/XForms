@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using XForma.Controls;
 
 namespace XForma.Themes.Basic
@@ -12,7 +12,7 @@ namespace XForma.Themes.Basic
 
         private sealed class Spin
         {
-            public Animator Animator;
+            public Animator? Animator;
             public bool IsSpinning;
         }
 

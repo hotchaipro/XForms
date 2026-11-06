@@ -33,9 +33,9 @@ namespace XForma.Controls
     {
         public static readonly ViewProperty<PasswordBox, string> PasswordProperty = new(nameof(Password), v => v.Password, (v, x) => v.Password = x);
 
-        private TextBox _textBox;
+        private TextBox? _textBox;
         private string _password = string.Empty;
-        private string _placeholderText;
+        private string? _placeholderText;
         private PasswordRevealMode _passwordRevealMode;
         private bool _isRevealPressed;
 
@@ -46,7 +46,7 @@ namespace XForma.Controls
         /// <summary>
         /// Raised when the password changes.
         /// </summary>
-        public event EventHandler PasswordChanged;
+        public event EventHandler? PasswordChanged;
 
         public string Password
         {
@@ -84,7 +84,7 @@ namespace XForma.Controls
         /// Shown while the box is empty; it also names the box for assistive
         /// technology.
         /// </summary>
-        public string PlaceholderText
+        public string? PlaceholderText
         {
             get
             {

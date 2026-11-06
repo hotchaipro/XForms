@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using XForma.Controls;
 
 namespace XForma.Themes.Basic
@@ -25,7 +25,7 @@ namespace XForma.Themes.Basic
         public float? CornerRadius { get; init; }
 
         /// <summary>The text style: the theme's label style by default.</summary>
-        public TextStyle TextStyle { get; init; }
+        public TextStyle? TextStyle { get; init; }
 
         /// <summary>
         /// Combines two styles: this one's values, and the other's where this

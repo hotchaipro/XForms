@@ -33,11 +33,11 @@ namespace XForma.Controls
     {
         public static readonly ViewProperty<NumberBox, double> ValueProperty = new(nameof(Value), v => v.Value, (v, x) => v.Value = x);
 
-        private TextBox _textBox;
+        private TextBox? _textBox;
         private double _value = double.NaN;
         private double _minimum = double.MinValue;
         private double _maximum = double.MaxValue;
-        private string _placeholderText;
+        private string? _placeholderText;
         private NumberBoxSpinButtonPlacementMode _spinButtonPlacementMode;
         private NumberBoxPart _pressedPart;
 
@@ -48,7 +48,7 @@ namespace XForma.Controls
         /// <summary>
         /// Raised when the value changes.
         /// </summary>
-        public event EventHandler<RangeValueChangedEventArgs> ValueChanged;
+        public event EventHandler<RangeValueChangedEventArgs>? ValueChanged;
 
         /// <summary>
         /// The number, or NaN while the box is empty.
@@ -123,7 +123,7 @@ namespace XForma.Controls
         /// Shown while the box is empty; it also names the box for assistive
         /// technology.
         /// </summary>
-        public string PlaceholderText
+        public string? PlaceholderText
         {
             get
             {
@@ -171,7 +171,7 @@ namespace XForma.Controls
             }
         }
 
-        protected override string DefaultAccessibilityLabel
+        protected override string? DefaultAccessibilityLabel
         {
             get
             {
@@ -239,7 +239,7 @@ namespace XForma.Controls
             this._initialValue = this.Value;
         }
 
-        protected override object GetUserState()
+        protected override object? GetUserState()
         {
             return this.Value.Equals(this._initialValue) ? null : this.Value;
         }

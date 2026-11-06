@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows.Input;
 
 namespace XForma.Controls
@@ -10,11 +10,11 @@ namespace XForma.Controls
     public class RelayCommand : ICommand
     {
         private readonly Action<object> _execute;
-        private readonly Func<object, bool> _canExecute;
+        private readonly Func<object, bool>? _canExecute;
 
         public RelayCommand(
             Action execute,
-            Func<bool> canExecute = null)
+            Func<bool>? canExecute = null)
             : this(
                   (_) => execute(),
                   (null != canExecute) ? (_) => canExecute() : null)
@@ -27,22 +27,22 @@ namespace XForma.Controls
 
         public RelayCommand(
             Action<object> execute,
-            Func<object, bool> canExecute = null)
+            Func<object, bool>? canExecute = null)
         {
             this._execute = execute ?? throw new ArgumentNullException(nameof(execute));
             this._canExecute = canExecute;
         }
 
-        public event EventHandler CanExecuteChanged;
+        public event EventHandler? CanExecuteChanged;
 
         public bool CanExecute(
-            object parameter)
+            object? parameter)
         {
             return this._canExecute?.Invoke(parameter) ?? true;
         }
 
         public void Execute(
-            object parameter)
+            object? parameter)
         {
             if (this.CanExecute(parameter))
             {

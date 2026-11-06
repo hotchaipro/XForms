@@ -12,13 +12,13 @@ namespace XForma
     public sealed class Route
     {
         private readonly Dictionary<string, string> _values;
-        private readonly HashSet<string> _names;
+        private readonly HashSet<string>? _names;
 
         internal Route(
             string path,
-            string pattern,
+            string? pattern,
             Dictionary<string, string> values,
-            HashSet<string> names)
+            HashSet<string>? names)
         {
             this.Path = path;
             this.Pattern = pattern;
@@ -37,7 +37,7 @@ namespace XForma
         /// <summary>
         /// The route it matched, such as <c>/item/{id}</c>.
         /// </summary>
-        public string Pattern
+        public string? Pattern
         {
             get;
         }
@@ -47,7 +47,7 @@ namespace XForma
         /// query value's (null when the path doesn't give it). Throws for a
         /// name the route doesn't have.
         /// </summary>
-        public string this[string name]
+        public string? this[string name]
         {
             get
             {

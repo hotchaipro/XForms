@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -36,7 +36,7 @@ namespace XForma.Controls
         }
 
         public int IndexOf(
-            ComboBoxItem item)
+            ComboBoxItem? item)
         {
             return this._items.IndexOf(item);
         }
@@ -85,9 +85,9 @@ namespace XForma.Controls
 
     public class ComboBoxItem : INotifyPropertyChanged
     {
-        private string _text;
+        private string? _text;
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         public ComboBoxItem()
         {
@@ -99,7 +99,7 @@ namespace XForma.Controls
             this._text = text;
         }
 
-        public string Text
+        public string? Text
         {
             get
             {
@@ -113,13 +113,13 @@ namespace XForma.Controls
             }
         }
 
-        public object Value
+        public object? Value
         {
             get;
             set;
         }
 
-        public override string ToString()
+        public override string? ToString()
         {
             return this._text;
         }

@@ -14,7 +14,7 @@ namespace XForma.Controls
     {
         public static readonly ViewProperty<ToggleSwitch, bool> IsOnProperty = new(nameof(IsOn), v => v.IsOn, (v, x) => v.IsOn = x);
 
-        private string _header;
+        private string? _header;
         private string _onContent = "On";
         private string _offContent = "Off";
         private bool _isOn;
@@ -30,13 +30,13 @@ namespace XForma.Controls
         /// <summary>
         /// Raised when <see cref="IsOn"/> changes.
         /// </summary>
-        public event EventHandler<ToggledEventArgs> Toggled;
+        public event EventHandler<ToggledEventArgs>? Toggled;
 
         /// <summary>
         /// Text above the switch, which also names it for assistive
         /// technology.
         /// </summary>
-        public string Header
+        public string? Header
         {
             get
             {
@@ -160,7 +160,7 @@ namespace XForma.Controls
             this._initialIsOn = this.IsOn;
         }
 
-        protected override object GetUserState()
+        protected override object? GetUserState()
         {
             return (this.IsOn != this._initialIsOn) ? this.IsOn : null;
         }

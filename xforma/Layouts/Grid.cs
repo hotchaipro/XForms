@@ -82,7 +82,7 @@ namespace XForma.Layouts
 
         public bool Equals(GridLength other) => (this.Value == other.Value) && (this.GridUnitType == other.GridUnitType);
 
-        public override bool Equals(object obj) => (obj is GridLength other) && this.Equals(other);
+        public override bool Equals(object? obj) => (obj is GridLength other) && this.Equals(other);
 
         public override int GetHashCode() => HashCode.Combine(this.Value, this.GridUnitType);
 

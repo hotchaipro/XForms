@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using XForma.Platform;
@@ -18,7 +18,7 @@ namespace XForma
             this.Source = source;
         }
 
-        public Task LoadAsync()
+        public Task? LoadAsync()
         {
             return this.Renderer?.LoadAsync();
         }
@@ -30,7 +30,7 @@ namespace XForma
         }
 
         [PlatformContract]
-        internal new IBitmapRenderer Renderer
+        internal new IBitmapRenderer? Renderer
         {
             get
             {

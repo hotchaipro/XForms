@@ -24,10 +24,10 @@ namespace XForma.Controls
         public const string TwentyFourHourClock = "24HourClock";
 
         private TimeSpan? _selectedTime;
-        private string _clockIdentifier;
+        private string? _clockIdentifier;
         private int _minuteIncrement = 1;
-        private Popup _popup;
-        private TimePickerView _view;
+        private Popup? _popup;
+        private TimePickerView? _view;
 
         public TimePicker()
         {
@@ -36,7 +36,7 @@ namespace XForma.Controls
         /// <summary>
         /// Raised when the user accepts a time.
         /// </summary>
-        public event EventHandler<TimeSpan?> SelectedTimeChanged;
+        public event EventHandler<TimeSpan?>? SelectedTimeChanged;
 
         // User state: the time chosen, when that changed since it was first
         // attached (null is a time too: none)
@@ -49,7 +49,7 @@ namespace XForma.Controls
             this._initialSelectedTime = this.SelectedTime;
         }
 
-        protected override object GetUserState()
+        protected override object? GetUserState()
         {
             return (this.SelectedTime != this._initialSelectedTime) ? new TimeState(this.SelectedTime) : null;
         }

@@ -15,7 +15,7 @@ namespace XForma.Primitives
     /// </remarks>
     public class ItemContainer : View
     {
-        private View _content;
+        private View? _content;
 
         public ItemContainer()
         {
@@ -26,8 +26,8 @@ namespace XForma.Primitives
         /// The container of a view that shows an item (the view, or one of its
         /// ancestors, is a container's content), or null.
         /// </summary>
-        public static ItemContainer ContainerFromContent(
-            View view)
+        public static ItemContainer? ContainerFromContent(
+            View? view)
         {
             for (var element = view?.Parent; null != element; element = (element as View)?.Parent)
             {
@@ -43,7 +43,7 @@ namespace XForma.Primitives
         /// <summary>
         /// The items view the container is showing an item for.
         /// </summary>
-        public ItemsView ItemsView
+        public ItemsView? ItemsView
         {
             get;
             private set;
@@ -52,7 +52,7 @@ namespace XForma.Primitives
         /// <summary>
         /// The item the container is showing.
         /// </summary>
-        public object Item
+        public object? Item
         {
             get;
             private set;
@@ -63,7 +63,7 @@ namespace XForma.Primitives
         /// unless the items view needs another kind of view (a group header,
         /// say).
         /// </summary>
-        public View Content
+        public View? Content
         {
             get
             {
@@ -122,7 +122,7 @@ namespace XForma.Primitives
         }
 
         // A container isn't attached to its items view, but looks like it
-        internal override Element ParentElement
+        internal override Element? ParentElement
         {
             get
             {

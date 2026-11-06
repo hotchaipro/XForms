@@ -14,8 +14,8 @@ namespace XForma.Primitives
     public class Popup : Element, IPopupDelegate
     {
         private bool _isOpen;
-        private View _content;
-        private View _placementTarget;
+        private View? _content;
+        private View? _placementTarget;
 
         public Popup()
         {
@@ -24,9 +24,9 @@ namespace XForma.Primitives
         /// <summary>
         /// Raised when the popup closes, however it was closed.
         /// </summary>
-        public event EventHandler Closed;
+        public event EventHandler? Closed;
 
-        public View Content
+        public View? Content
         {
             get
             {
@@ -122,7 +122,7 @@ namespace XForma.Primitives
             }
         }
 
-        public View PlacementTarget
+        public View? PlacementTarget
         {
             get
             {
@@ -194,7 +194,7 @@ namespace XForma.Primitives
         }
 
         [PlatformContract]
-        internal new IPopupRenderer Renderer
+        internal new IPopupRenderer? Renderer
         {
             get
             {
@@ -202,7 +202,7 @@ namespace XForma.Primitives
             }
         }
 
-        private IPopupRenderer Native
+        private IPopupRenderer? Native
         {
             get
             {
@@ -234,7 +234,7 @@ namespace XForma.Primitives
         }
 
         // A popup looks like the view it opens from
-        internal override Element ParentElement
+        internal override Element? ParentElement
         {
             get
             {

@@ -17,7 +17,7 @@ namespace XForma.Controls
         {
         }
 
-        public string Content
+        public string? Content
         {
             get;
             set;
@@ -26,7 +26,7 @@ namespace XForma.Controls
         /// <summary>
         /// Anything the app keeps with the node.
         /// </summary>
-        public object Tag
+        public object? Tag
         {
             get;
             set;
@@ -62,7 +62,7 @@ namespace XForma.Controls
             }
         }
 
-        internal event EventHandler ExpandedChanged;
+        internal event EventHandler? ExpandedChanged;
     }
 
     /// <summary>
@@ -95,7 +95,7 @@ namespace XForma.Controls
     {
         private readonly StackPanel _panel;
         private readonly List<TreeViewItem> _items = new List<TreeViewItem>();
-        private TreeViewNode _selectedNode;
+        private TreeViewNode? _selectedNode;
 
         public TreeView()
         {
@@ -106,7 +106,7 @@ namespace XForma.Controls
         /// <summary>
         /// Raised when the user chooses an item (a tap, Enter or Space).
         /// </summary>
-        public event EventHandler<TreeViewItemInvokedEventArgs> ItemInvoked;
+        public event EventHandler<TreeViewItemInvokedEventArgs>? ItemInvoked;
 
         /// <summary>
         /// The top-level nodes, in order.
@@ -116,7 +116,7 @@ namespace XForma.Controls
             get;
         } = new List<TreeViewNode>();
 
-        public TreeViewNode SelectedNode
+        public TreeViewNode? SelectedNode
         {
             get
             {
@@ -193,7 +193,7 @@ namespace XForma.Controls
         }
 
         // The node keyboard focus is on (or was last on, or the selected one)
-        private TreeViewNode _currentNode;
+        private TreeViewNode? _currentNode;
 
         // The tree is one Tab stop, as WinUI's: its current item (or, hidden
         // in a collapsed node, the selected or first item); the arrow keys
@@ -218,7 +218,7 @@ namespace XForma.Controls
 
         private void AddItems(
             TreeViewNode node,
-            TreeViewNode parent,
+            TreeViewNode? parent,
             int level)
         {
             var item = new TreeViewItem(this, node, parent, level);
@@ -320,7 +320,7 @@ namespace XForma.Controls
         internal TreeViewItem(
             TreeView tree,
             TreeViewNode node,
-            TreeViewNode parentNode,
+            TreeViewNode? parentNode,
             int level)
         {
             this._tree = tree;
@@ -351,7 +351,7 @@ namespace XForma.Controls
             get;
         }
 
-        internal TreeViewNode ParentNode
+        internal TreeViewNode? ParentNode
         {
             get;
         }
@@ -380,7 +380,7 @@ namespace XForma.Controls
             }
         }
 
-        protected override string DefaultAccessibilityLabel
+        protected override string? DefaultAccessibilityLabel
         {
             get
             {

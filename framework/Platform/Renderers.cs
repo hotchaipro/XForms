@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using XForma.Primitives;
@@ -59,7 +59,7 @@ namespace XForma.Platform
         /// <see cref="View.Shadow"/>), or null. It's beneath the view's
         /// innermost animation layer, so it moves with all of them.
         /// </summary>
-        Shadow Shadow { set; }
+        Shadow? Shadow { set; }
 
         /// <summary>
         /// How far past its bounds the native view takes presses (see
@@ -82,9 +82,9 @@ namespace XForma.Platform
         /// in drawing order among the views it hosts. Hosted views are drawn
         /// above the lightweight content and this view's own children.
         /// </summary>
-        void AddHostedView(IViewRenderer child, int index);
+        void AddHostedView(IViewRenderer? child, int index);
 
-        void RemoveHostedView(IViewRenderer child);
+        void RemoveHostedView(IViewRenderer? child);
 
         /// <summary>
         /// Draws the lightweight views inside this view again.
@@ -123,7 +123,7 @@ namespace XForma.Platform
         /// Inserts a child's native view at the index in drawing order (a
         /// lightweight child has none; it's drawn into the layer).
         /// </summary>
-        void InsertChild(int index, IViewRenderer childRenderer);
+        void InsertChild(int index, IViewRenderer? childRenderer);
 
         void RemoveChildAt(int index);
 
@@ -155,7 +155,7 @@ namespace XForma.Platform
 
     internal interface ITextBlockRenderer : IViewRenderer
     {
-        string Text { get; set; }
+        string? Text { get; set; }
 
         TextAlignment HorizontalTextAlignment { get; set; }
 
@@ -177,7 +177,7 @@ namespace XForma.Platform
 
         bool Strikethrough { get; set; }
 
-        string FontFamily { set; }
+        string? FontFamily { set; }
 
         int MaxLines { set; }
 
@@ -222,8 +222,8 @@ namespace XForma.Platform
         /// </summary>
         void SetBorder(Color color, float width);
 
-        string Text { get; set; }
-        string PlaceholderText { get; set; }
+        string? Text { get; set; }
+        string? PlaceholderText { get; set; }
         bool Multiline { get; set; }
         KeyboardOptions KeyboardOptions { get; set; }
 
@@ -275,7 +275,7 @@ namespace XForma.Platform
     {
         void SetTint(Color color);
 
-        void SetSource(ImageSource source);
+        void SetSource(ImageSource? source);
     }
 
     /// <summary>
@@ -301,7 +301,7 @@ namespace XForma.Platform
 
     internal interface IScrollViewerRenderer : IViewRenderer
     {
-        View Content { get; set; }
+        View? Content { get; set; }
 
         bool IsVerticalScrollingEnabled { get; set; }
 
@@ -339,7 +339,7 @@ namespace XForma.Platform
 
         void Bind(ItemsViewSource source);
 
-        void ScrollToItem(object item);
+        void ScrollToItem(object? item);
 
         /// <summary>
         /// The index of the first item in view, at the leading edge (0 when
@@ -373,9 +373,9 @@ namespace XForma.Platform
 
     internal interface IPopupRenderer : IElementRenderer
     {
-        View Content { get; set; }
+        View? Content { get; set; }
 
-        View PlacementTarget { get; set; }
+        View? PlacementTarget { get; set; }
 
         /// <summary>
         /// Whether a press outside the popup closes it, and it holds keyboard

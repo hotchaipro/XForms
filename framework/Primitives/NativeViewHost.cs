@@ -20,7 +20,7 @@ namespace XForma.Primitives
     /// </remarks>
     public class NativeViewHost : View
     {
-        private readonly Func<object> _createNativeView;
+        private readonly Func<object>? _createNativeView;
 
         /// <summary>
         /// Hosts the view that the function creates, once, as this view is first
@@ -40,7 +40,7 @@ namespace XForma.Primitives
         /// <summary>
         /// The platform's view, or null before it's created.
         /// </summary>
-        public object NativeView
+        public object? NativeView
         {
             get
             {

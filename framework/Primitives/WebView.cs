@@ -45,19 +45,19 @@ namespace XForma.Primitives
     /// </summary>
     public class WebView : NativeViewHost
     {
-        private Uri _source;
-        private string _html;
+        private Uri? _source;
+        private string? _html;
 
         /// <summary>
         /// Raised when a page has finished loading.
         /// </summary>
-        public event EventHandler<WebViewNavigatedEventArgs> Navigated;
+        public event EventHandler<WebViewNavigatedEventArgs>? Navigated;
 
         /// <summary>
         /// The page's address: setting it goes there, and it follows the user's
         /// navigation.
         /// </summary>
-        public Uri Source
+        public Uri? Source
         {
             get
             {
@@ -132,7 +132,7 @@ namespace XForma.Primitives
             this.Native?.Reload();
         }
 
-        private IWebViewRenderer Native
+        private IWebViewRenderer? Native
         {
             get
             {

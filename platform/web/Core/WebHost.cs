@@ -20,7 +20,7 @@ namespace XForma.Web
         private readonly Queue<Action> _posted = new Queue<Action>();
         private readonly HashSet<ViewRenderer> _dirtyRenderers = new HashSet<ViewRenderer>();
         private List<Action<TimeSpan>> _frameCallbacks = new List<Action<TimeSpan>>();
-        private ViewRenderer _root;
+        private ViewRenderer? _root;
         private bool _isPostPending;
         private bool _isFramePending;
         private bool _isLayoutPending;
@@ -36,7 +36,7 @@ namespace XForma.Web
             LayerHost.AccessibilityStateChanged += this.OnAccessibilityStateChanged;
         }
 
-        public static WebHost Current
+        public static WebHost? Current
         {
             get;
             private set;
@@ -58,17 +58,17 @@ namespace XForma.Web
             private set;
         } = 1;
 
-        public event Action ThemeChanged;
+        public event Action? ThemeChanged;
 
-        public event Action ViewportChanged;
+        public event Action? ViewportChanged;
 
         /// <summary>
         /// Raised when the page is hidden (another tab, or closing), when the
         /// app should save its state.
         /// </summary>
-        public event Action Suspending;
+        public event Action? Suspending;
 
-        public event Action Resuming;
+        public event Action? Resuming;
 
         private bool _isHidden;
 
@@ -108,13 +108,13 @@ namespace XForma.Web
             return (null != view) && (ApplicationHost.Current?.CanBeginDrag(view) ?? false);
         }
 
-        public string OnDragStart(
+        public string? OnDragStart(
             int id,
             float x,
             float y)
         {
             var (view, _) = this.DragHit(id, x, y);
-            DataPackage data = null;
+            DataPackage? data = null;
             Run(() =>
             {
                 data = (null != view) ? ApplicationHost.Current?.BeginDrag(view) : null;
@@ -255,7 +255,7 @@ namespace XForma.Web
         }
 
         public void SetRoot(
-            ViewRenderer root)
+            ViewRenderer? root)
         {
             this._root = root;
             Js.SetRoot(root.Id);
@@ -472,14 +472,14 @@ namespace XForma.Web
 
             public override void Post(
                 SendOrPostCallback d,
-                object state)
+                object? state)
             {
                 this._host.Post(() => d(state));
             }
 
             public override void Send(
                 SendOrPostCallback d,
-                object state)
+                object? state)
             {
                 d(state);
             }
@@ -557,7 +557,7 @@ namespace XForma.Web
         /// The view with keyboard focus (a lightweight one inside the focused
         /// element's layer), or null.
         /// </summary>
-        public View FocusedView
+        public View? FocusedView
         {
             get
             {
@@ -659,7 +659,7 @@ namespace XForma.Web
                 return false;
             }
 
-            ViewRenderer renderer = null;
+            ViewRenderer? renderer = null;
             if ((0 != id) && !this._renderers.TryGetValue(id, out renderer))
             {
                 return false;
@@ -736,7 +736,7 @@ namespace XForma.Web
         // History: the stack (and whether a popup was open) that the browser's
         // current entry stands for; null when it stands for none yet, so the
         // next navigation replaces it
-        private string[] _historyStack;
+        private string[]? _historyStack;
         private bool _historyPopup;
 
         /// <summary>

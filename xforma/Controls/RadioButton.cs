@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows.Input;
 using XForma.Input;
 using XForma.Controls;
@@ -32,7 +32,7 @@ namespace XForma.Controls
             }
         }
 
-        protected override string DefaultAccessibilityLabel
+        protected override string? DefaultAccessibilityLabel
         {
             get
             {
@@ -50,7 +50,7 @@ namespace XForma.Controls
 
         private bool _isChecked;
 
-        public event EventHandler<ToggledEventArgs> IsCheckedChanged;
+        public event EventHandler<ToggledEventArgs>? IsCheckedChanged;
 
         internal RadioButton(
             RadioButtons radioButtonGroup,
@@ -85,7 +85,7 @@ namespace XForma.Controls
             this._initialIsChecked = this.IsChecked;
         }
 
-        protected override object GetUserState()
+        protected override object? GetUserState()
         {
             return (this.IsChecked != this._initialIsChecked) ? this.IsChecked : null;
         }
@@ -120,7 +120,7 @@ namespace XForma.Controls
             }
         }
 
-        public ICommand Command
+        public ICommand? Command
         {
             get;
             set;

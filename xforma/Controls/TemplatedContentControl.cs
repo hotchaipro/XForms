@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace XForma.Controls
 {
@@ -22,12 +22,12 @@ namespace XForma.Controls
         /// Raised when the control's state changes: pressed, pointer over,
         /// focused, or its own.
         /// </summary>
-        public event EventHandler StateChanged;
+        public event EventHandler? StateChanged;
 
         /// <summary>
         /// The template giving the control its look, once it's attached.
         /// </summary>
-        public ControlTemplate Template
+        public ControlTemplate? Template
         {
             get
             {

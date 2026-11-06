@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using XForma.Layouts;
 using XForma.Controls;
 using XForma.Primitives;
@@ -19,9 +19,9 @@ namespace XForma.Controls
         public static readonly ViewProperty<RadioButtons, object> SelectedItemProperty = new(nameof(SelectedItem), v => v.SelectedItem, (v, x) => v.SelectedItem = x);
 
         private DockPanel _buttonsLayout;
-        private object _selectedValue;
+        private object? _selectedValue;
 
-        public event EventHandler<SelectionChangedEventArgs> SelectionChanged;
+        public event EventHandler<SelectionChangedEventArgs>? SelectionChanged;
 
         public RadioButtons()
         {
@@ -38,7 +38,7 @@ namespace XForma.Controls
 
         // User state: the item chosen, when that changed since they were first
         // attached (null is a choice too: none)
-        private object _initialSelectedItem;
+        private object? _initialSelectedItem;
 
         protected override void OnAttaching(
             Theme theme)
@@ -47,7 +47,7 @@ namespace XForma.Controls
             this._initialSelectedItem = this.SelectedItem;
         }
 
-        protected override object GetUserState()
+        protected override object? GetUserState()
         {
             return Equals(this.SelectedItem, this._initialSelectedItem) ? null : new SelectionState(this.SelectedItem);
         }
@@ -61,9 +61,9 @@ namespace XForma.Controls
             }
         }
 
-        private sealed record SelectionState(object Item);
+        private sealed record SelectionState(object? Item);
 
-        public object SelectedItem
+        public object? SelectedItem
         {
             get
             {
@@ -72,8 +72,8 @@ namespace XForma.Controls
 
             set
             {
-                object oldSelectedItem = this._selectedValue;
-                object newSelectedItem = value;
+                object? oldSelectedItem = this._selectedValue;
+                object? newSelectedItem = value;
 
                 if (Equals(oldSelectedItem, newSelectedItem))
                 {
@@ -132,9 +132,9 @@ namespace XForma.Controls
         }
 
         private void OnButtonClicked(
-            RadioButton selectedButton)
+            RadioButton? selectedButton)
         {
-            object newSelectedItem = selectedButton?.RadioButtonItem.Value;
+            object? newSelectedItem = selectedButton?.RadioButtonItem.Value;
 
             this.SelectedItem = newSelectedItem;
         }

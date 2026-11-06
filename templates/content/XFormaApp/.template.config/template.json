@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Hot Chai Games",
+  "classifications": [ "XForma", "Windows", "Android", "iOS", "Web", "Cross-platform" ],
+  "identity": "XForma.App",
+  "name": "XForma app",
+  "shortName": "xforma",
+  "sourceName": "XFormaApp",
+  "preferNameDirectory": true,
+  "tags": { "language": "C#", "type": "project" },
+  "symbols": {
+    "version": {
+      "type": "parameter",
+      "datatype": "string",
+      "defaultValue": "0.1.0-preview.1",
+      "replaces": "XFORMA_VERSION",
+      "description": "The version of XForma's packages"
+    }
+  }
+}

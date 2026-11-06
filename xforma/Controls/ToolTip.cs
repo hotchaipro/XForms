@@ -12,7 +12,7 @@ namespace XForma.Controls
     /// </summary>
     public sealed class ToolTip : TemplatedControl
     {
-        private string _text;
+        private string? _text;
 
         protected override void OnThemeChanged(
             Theme theme)
@@ -21,7 +21,7 @@ namespace XForma.Controls
             this.Padding = theme.ToolTipStyle.Padding;
         }
 
-        public string Text
+        public string? Text
         {
             get
             {
@@ -44,7 +44,7 @@ namespace XForma.Controls
             }
         }
 
-        protected override string DefaultAccessibilityLabel
+        protected override string? DefaultAccessibilityLabel
         {
             get
             {
@@ -129,8 +129,8 @@ namespace XForma.Controls
 
             private readonly WeakReference<View> _view;
             private readonly DispatcherTimer _timer = new DispatcherTimer();
-            private Popup _toolTipPopup;
-            private ToolTip _toolTip;
+            private Popup? _toolTipPopup;
+            private ToolTip? _toolTip;
             private bool _isPointerOver;
 
             public Attachment(
@@ -147,13 +147,13 @@ namespace XForma.Controls
                 view.ContextRequested += this.View_ContextRequested;
             }
 
-            public string ToolTipText
+            public string? ToolTipText
             {
                 get;
                 set;
             }
 
-            public Popup ContextFlyout
+            public Popup? ContextFlyout
             {
                 get;
                 set;

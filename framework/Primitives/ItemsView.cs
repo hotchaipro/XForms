@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using XForma.Platform;
 
@@ -80,8 +80,8 @@ namespace XForma.Primitives
         private Thickness _padding;
         private Color? _backgroundColor;
         private Color? _accentColor;
-        private ItemsViewSource _source;
-        private object _pendingScrollItem;
+        private ItemsViewSource? _source;
+        private object? _pendingScrollItem;
         private ListLayout _layout = ListLayout.Vertical;
         private bool _isRefreshEnabled;
         private bool _isRefreshing;
@@ -126,7 +126,7 @@ namespace XForma.Primitives
         /// <see cref="IsRefreshEnabled"/> set). <see cref="IsRefreshing"/> is
         /// true until the app sets it back to false when it's done.
         /// </summary>
-        public event EventHandler RefreshRequested;
+        public event EventHandler? RefreshRequested;
 
         /// <summary>
         /// How the items are laid out: a vertical list (the default), a
@@ -216,7 +216,7 @@ namespace XForma.Primitives
         }
 
         [PlatformContract]
-        internal new IItemsViewRenderer Renderer
+        internal new IItemsViewRenderer? Renderer
         {
             get
             {
@@ -224,7 +224,7 @@ namespace XForma.Primitives
             }
         }
 
-        private IItemsViewRenderer Native
+        private IItemsViewRenderer? Native
         {
             get
             {
@@ -381,7 +381,7 @@ namespace XForma.Primitives
         }
 
         public void ScrollToItem(
-            object item)
+            object? item)
         {
             var native = this.Native;
             if (null != native)
@@ -397,8 +397,8 @@ namespace XForma.Primitives
         /// <summary>
         /// The container showing the item, if it's in view, or null.
         /// </summary>
-        public ItemContainer ContainerFromItem(
-            object item)
+        public ItemContainer? ContainerFromItem(
+            object? item)
         {
             if (null == item)
             {
@@ -419,13 +419,13 @@ namespace XForma.Primitives
         #region Keyboard
 
         // The item keyboard focus is on (or was last on): the list's Tab stop
-        private object _currentItem;
+        private object? _currentItem;
 
         /// <summary>
         /// The container Tab stops at in the list: the current item's, while
         /// it's in view, or else the first focusable one in view, or null.
         /// </summary>
-        internal ItemContainer TabStopContainer
+        internal ItemContainer? TabStopContainer
         {
             get
             {
@@ -458,7 +458,7 @@ namespace XForma.Primitives
 
                 // Or the first item made (where a platform's first item in
                 // view isn't)
-                ItemContainer first = null;
+                ItemContainer? first = null;
                 int firstIndex = int.MaxValue;
                 foreach (var container in this._realizedContainers)
                 {
@@ -661,14 +661,14 @@ namespace XForma.Primitives
             return this.Application.Platform.CreateItemsViewRenderer(this);
         }
 
-        protected override object GetUserState()
+        protected override object? GetUserState()
         {
             int index = this.Native?.FirstVisibleIndex ?? 0;
             return (index > 0) ? index : null;
         }
 
         protected override void SetUserState(
-            object state)
+            object? state)
         {
             if (state is int index)
             {

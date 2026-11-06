@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices.JavaScript;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
@@ -14,7 +14,7 @@ namespace XForma.Toolkit
     {
         private const string Module = "xforma-toolkit";
 
-        private static Task _initialization;
+        private static Task? _initialization;
 
         public static Task InitializeAsync()
         {
@@ -44,7 +44,7 @@ namespace XForma.Toolkit
         public static partial string StorageGet(string key);
 
         [JSImport("storageSet", Module)]
-        public static partial void StorageSet(string key, string value);
+        public static partial void StorageSet(string key, string? value);
 
         [JSImport("storageClear", Module)]
         public static partial void StorageClear(string prefix);
@@ -53,7 +53,7 @@ namespace XForma.Toolkit
         public static partial bool CanShare();
 
         [JSImport("share", Module)]
-        public static partial Task ShareAsync(string title, string text, string url);
+        public static partial Task ShareAsync(string? title, string? text, string? url);
 
         [JSImport("vibrate", Module)]
         public static partial bool Vibrate(int milliseconds);

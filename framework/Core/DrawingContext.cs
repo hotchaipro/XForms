@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace XForma
 {
@@ -99,7 +99,7 @@ namespace XForma
         /// Draws a bitmap, optionally tinted; a null bitmap draws nothing.
         /// </summary>
         public abstract void DrawImage(
-            Bitmap bitmap,
+            Bitmap? bitmap,
             Rect destinationRectangle,
             Color tint);
 
@@ -138,7 +138,7 @@ namespace XForma
         /// as it says.
         /// </summary>
         public virtual void DrawText(
-            string text,
+            string? text,
             Rect bounds,
             Color color,
             TextFormat textFormat)

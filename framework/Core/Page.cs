@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using XForma.Platform;
@@ -9,13 +9,13 @@ namespace XForma
 
     public class Page : View
     {
-        private View _content;
+        private View? _content;
         private Color? _backgroundColor;
         private bool _usesSafeArea = true;
         private Color? _bottomSafeAreaColor;
 
         // The views reaching into the safe area, and on which edges
-        private Dictionary<View, SafeAreaEdges> _extendingViews;
+        private Dictionary<View, SafeAreaEdges>? _extendingViews;
         private SafeAreaEdges _extendedEdges;
 
         public Page()
@@ -135,7 +135,7 @@ namespace XForma
 
                 // The page fills its frame (which the platform places it in):
                 // the frame's place in the main page, which has the insets
-                Page main = null;
+                Page? main = null;
                 float x = 0, y = 0;
                 for (View view = frame; view.Parent is View parent; view = parent)
                 {
@@ -362,7 +362,7 @@ namespace XForma
         /// The page's content, which fills it: what <see cref="Build"/>
         /// returns.
         /// </summary>
-        public View Content
+        public View? Content
         {
             get
             {
@@ -404,7 +404,7 @@ namespace XForma
         /// window, a view model) belong in the constructor or
         /// <see cref="View.OnAttached"/>, which run once.
         /// </remarks>
-        protected virtual View Build()
+        protected virtual View? Build()
         {
             return null;
         }
@@ -475,7 +475,7 @@ namespace XForma
         /// <c>/item/42</c>; null for a page made otherwise (one shown in a
         /// <see cref="Frame"/> inside a page).
         /// </summary>
-        public string NavigationPath
+        public string? NavigationPath
         {
             get;
             internal set;
@@ -490,11 +490,11 @@ namespace XForma
             return this.Application.CloseModalAsync(this);
         }
 
-        private object _result;
+        private object? _result;
 
         // Completed when the page leaves the back stack, for whoever navigated
         // to it waiting for a result
-        internal TaskCompletionSource<object> ResultCompletion
+        internal TaskCompletionSource<object>? ResultCompletion
         {
             get;
             set;

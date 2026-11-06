@@ -63,7 +63,7 @@ namespace XForma.Controls
     /// </summary>
     public class RefreshContainer : TemplatedControl
     {
-        private View _content;
+        private View? _content;
         private bool _isRefreshing;
 
         public RefreshContainer()
@@ -74,13 +74,13 @@ namespace XForma.Controls
         /// Raised when the user pulls to refresh, or the app asks
         /// (<see cref="RequestRefresh"/>).
         /// </summary>
-        public event EventHandler<RefreshRequestedEventArgs> RefreshRequested;
+        public event EventHandler<RefreshRequestedEventArgs>? RefreshRequested;
 
         /// <summary>
         /// The list inside (or any view, refreshed only by
         /// <see cref="RequestRefresh"/>).
         /// </summary>
-        public new View Content
+        public new View? Content
         {
             get
             {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using XForma.Primitives;
@@ -33,7 +33,7 @@ namespace XForma.Platform
         /// coordinates. The platform calls <see cref="ApplicationHost.EndDrag"/>
         /// when it ends.
         /// </summary>
-        void StartDrag(View source, DataPackage data, Point position);
+        void StartDrag(View? source, DataPackage data, Point position);
 
         /// <summary>
         /// Styles the platform's own parts (title bar, system bars) for the
@@ -81,7 +81,7 @@ namespace XForma.Platform
         /// </summary>
         float TextEntryLineHeight { get; }
 
-        string WindowTitle { set; }
+        string? WindowTitle { set; }
 
         bool CanResizeWindow { get; }
 

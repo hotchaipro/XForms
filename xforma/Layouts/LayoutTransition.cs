@@ -25,7 +25,7 @@ namespace XForma.Controls
         /// How children arrive, or null (the default) for the theme's
         /// decelerating curve.
         /// </summary>
-        public EasingFunction Easing { get; init; }
+        public EasingFunction? Easing { get; init; }
 
         /// <summary>
         /// Whether children that move slide from their old positions.

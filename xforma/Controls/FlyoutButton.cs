@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using XForma.Input;
@@ -10,8 +10,8 @@ namespace XForma.Controls
 {
     public class FlyoutButton : LightDismissControl
     {
-        public event EventHandler Expanding;
-        public event EventHandler Collapsing;
+        public event EventHandler? Expanding;
+        public event EventHandler? Collapsing;
 
         private DockPanel _layout;
         private InnerButton _innerButton;
@@ -38,7 +38,7 @@ namespace XForma.Controls
             this.Content = this._layout;
         }
 
-        public Bitmap Icon
+        public Bitmap? Icon
         {
             get
             {
@@ -292,7 +292,7 @@ namespace XForma.Controls
             }
 
             // Labeled by the flyout button's label
-            protected override string DefaultAccessibilityLabel
+            protected override string? DefaultAccessibilityLabel
             {
                 get
                 {

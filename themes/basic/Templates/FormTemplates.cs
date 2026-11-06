@@ -185,7 +185,7 @@ namespace XForma.Themes.Basic
 
         private sealed class Parts
         {
-            public Border Segment;
+            public Border? Segment;
             public float Width;
             public bool IsSweeping;
         }
@@ -405,7 +405,7 @@ namespace XForma.Themes.Basic
         }
 
         private static Color FormPressed(
-            ColorScheme colors)
+            ColorScheme? colors)
         {
             return colors.Foreground.MultiplyAlpha(0.12f);
         }

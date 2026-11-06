@@ -40,7 +40,7 @@ namespace XForma.Input
         /// parent (a pan that only goes sideways declines a drag that went
         /// mostly up or down). Null always begins.
         /// </summary>
-        public Func<Point, bool> ShouldBegin
+        public Func<Point, bool>? ShouldBegin
         {
             get;
             set;

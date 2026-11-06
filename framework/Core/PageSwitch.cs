@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 
 namespace XForma
@@ -16,7 +16,7 @@ namespace XForma
 
         private readonly Frame _frame;
         private readonly Animator _animator;
-        private readonly Animator _leavingAnimator;
+        private readonly Animator? _leavingAnimator;
         private readonly Point _offset;
         private float _progress;
         private bool _isEnded;

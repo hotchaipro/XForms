@@ -82,7 +82,7 @@ namespace XForma.Controls
         {
         }
 
-        public override string AccessibilityValue
+        public override string? AccessibilityValue
         {
             get
             {

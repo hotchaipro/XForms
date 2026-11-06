@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace XForma.Controls
@@ -12,7 +12,7 @@ namespace XForma.Controls
     public abstract class Panel : View
     {
         // Where each child was last arranged, for layout transitions
-        private Dictionary<View, Point> _lastPositions;
+        private Dictionary<View, Point>? _lastPositions;
 
         protected Panel()
         {
@@ -22,7 +22,7 @@ namespace XForma.Controls
         /// How the children animate when the layout changes, or null (the
         /// default) for no animation. Set it before adding children.
         /// </summary>
-        public LayoutTransition ChildTransitions
+        public LayoutTransition? ChildTransitions
         {
             get;
             set;

@@ -20,7 +20,7 @@ namespace XForma.Web
         private static readonly Dictionary<string, (float Ascent, float Descent)> Metrics = new Dictionary<string, (float, float)>();
 
         public static string Font(
-            string family,
+            string? family,
             float size,
             FontWeight weight,
             FontStyle style)

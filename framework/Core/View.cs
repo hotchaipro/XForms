@@ -11,15 +11,15 @@ namespace XForma
     {
         private bool _isVisible = true;
         private bool _isHitTestVisible = true;
-        private Animator _animator;
-        private List<Animator> _ownAnimators;
+        private Animator? _animator;
+        private List<Animator>? _ownAnimators;
 
         protected View()
         {
         }
 
         [PlatformContract]
-        internal new IViewRenderer Renderer
+        internal new IViewRenderer? Renderer
         {
             get
             {
@@ -27,7 +27,7 @@ namespace XForma
             }
         }
 
-        private IViewRenderer Native
+        private IViewRenderer? Native
         {
             get
             {
@@ -117,7 +117,7 @@ namespace XForma
         // One native layer per animator: the app's (or the framework's) outside,
         // the control's own inside it
         private void CreateAnimationLayers(
-            IViewRenderer native)
+            IViewRenderer? native)
         {
             if ((null == this._animator) && this.HasFrameworkAnimator)
             {
@@ -167,10 +167,10 @@ namespace XForma
         /// Raised when a property of the view changes, whether code or the user
         /// (typing, toggling, choosing) changed it.
         /// </summary>
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         protected void OnPropertyChanged(
-            [CallerMemberName] string propertyName = null)
+            [CallerMemberName] string? propertyName = null)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
@@ -182,7 +182,7 @@ namespace XForma
         protected bool SetProperty<T>(
             ref T field,
             T value,
-            [CallerMemberName] string propertyName = null)
+            [CallerMemberName] string? propertyName = null)
         {
             if (EqualityComparer<T>.Default.Equals(field, value))
             {
@@ -201,7 +201,7 @@ namespace XForma
         /// <summary>
         /// The view this view was added to, or null.
         /// </summary>
-        public Element Parent
+        public Element? Parent
         {
             get;
             internal set;
@@ -232,18 +232,18 @@ namespace XForma
         /// Raised when the view is added to a parent (or shown), once its native
         /// object exists.
         /// </summary>
-        public event EventHandler Attached;
+        public event EventHandler? Attached;
 
         /// <summary>
         /// Raised when the view is removed from its parent.
         /// </summary>
-        public event EventHandler Detached;
+        public event EventHandler? Detached;
 
         /// <summary>
         /// Attaches the view to its parent: creates its native object if it
         /// doesn't have one yet, and returns it for the parent to add.
         /// </summary>
-        internal IViewRenderer AttachTo(
+        internal IViewRenderer? AttachTo(
             Element parent)
         {
             this.Parent = parent;
@@ -304,7 +304,7 @@ namespace XForma
         /// takes that of the old view in the same place, of the same type (see
         /// <see cref="GetUserState"/>).
         /// </summary>
-        public string Name
+        public string? Name
         {
             get;
             set;
@@ -318,7 +318,7 @@ namespace XForma
         /// <see cref="SetUserState"/>). A control with such state overrides
         /// both.
         /// </summary>
-        protected virtual object GetUserState()
+        protected virtual object? GetUserState()
         {
             return null;
         }
@@ -342,8 +342,8 @@ namespace XForma
         /// <c>Build</c>; a library control that builds views again itself
         /// calls them.
         /// </summary>
-        protected static object SaveUserState(
-            View views)
+        protected static object? SaveUserState(
+            View? views)
         {
             return (null != views) ? UserStateNode.Save(views) : null;
         }
@@ -354,7 +354,7 @@ namespace XForma
         /// <see cref="Name"/>, then by place and type.
         /// </summary>
         protected static void RestoreUserState(
-            object saved,
+            object? saved,
             View newViews)
         {
             if (!(saved is UserStateNode root) || (null == newViews))
@@ -365,7 +365,7 @@ namespace XForma
             var named = new Dictionary<string, View>(StringComparer.Ordinal);
             CollectNamed(newViews, named);
 
-            View focus = null;
+            View? focus = null;
             Restore(root, newViews, named, ref focus);
 
             // Once the new views are laid out and in place
@@ -378,9 +378,9 @@ namespace XForma
         // A view's user state as recorded, with its children's
         private sealed class UserStateNode
         {
-            public Type Type;
-            public string Name;
-            public object State;
+            public Type? Type;
+            public string? Name;
+            public object? State;
             public bool IsFocused;
             public List<UserStateNode> Children = new List<UserStateNode>();
 
@@ -423,7 +423,7 @@ namespace XForma
             UserStateNode from,
             View to,
             Dictionary<string, View> named,
-            ref View focus)
+            ref View? focus)
         {
             if (from.Type != to.GetType())
             {
@@ -587,8 +587,8 @@ namespace XForma
         // The children in the order they were added (layout order), and in
         // drawing order (by ZIndex, then layout order), which the native
         // children follow; null until the first child
-        private List<View> _children;
-        private List<View> _drawingOrder;
+        private List<View>? _children;
+        private List<View>? _drawingOrder;
 
         /// <summary>
         /// The view's children, in the order they were added. A view with
@@ -603,7 +603,7 @@ namespace XForma
             }
         }
 
-        private IContainerRenderer Container
+        private IContainerRenderer? Container
         {
             get
             {
@@ -823,7 +823,7 @@ namespace XForma
         #region Drawing
 
         private bool _drawsContent;
-        private List<DrawnAnimator> _drawnAnimators;
+        private List<DrawnAnimator>? _drawnAnimators;
 
         internal bool DrawsContentInternal
         {
@@ -1078,7 +1078,7 @@ namespace XForma
                     return this._drawingOrder;
                 }
 
-                List<View> children = null;
+                List<View>? children = null;
                 foreach (var child in this.GetChildElements())
                 {
                     if (child is View view)
@@ -1114,7 +1114,7 @@ namespace XForma
         /// native view inside lightweight ancestors): the nearest ancestor with
         /// a native object, or null before the view is attached to one.
         /// </summary>
-        internal IViewRenderer FindLayer()
+        internal IViewRenderer? FindLayer()
         {
             for (var parent = this.Parent as View; null != parent; parent = parent.Parent as View)
             {
@@ -1169,7 +1169,7 @@ namespace XForma
         }
 
         // The layer hosting this native view, if its parent is lightweight
-        private IViewRenderer _hostLayer;
+        private IViewRenderer? _hostLayer;
 
         private void HostNativeDescendants()
         {
@@ -1282,10 +1282,10 @@ namespace XForma
         /// The deepest visible, hit-testable lightweight view under the point
         /// (in this view's coordinates), or null.
         /// </summary>
-        internal View HitTestLightweight(
+        internal View? HitTestLightweight(
             Point point)
         {
-            View hit = null;
+            View? hit = null;
             var children = this.DrawingOrderChildren;
             for (int i = 0; i < children.Count; i += 1)
             {
@@ -1322,15 +1322,15 @@ namespace XForma
         // On Android and iOS, a lightweight view has no native object to take
         // keyboard focus: its layer's native view takes it, and the layer
         // keeps track of which lightweight view inside it is focused.
-        private View _focusedLightweight;
-        private View _pendingLightweightFocus;
+        private View? _focusedLightweight;
+        private View? _pendingLightweightFocus;
         private bool _hasNativeFocus;
 
         /// <summary>
         /// The lightweight view inside this layer that has keyboard focus, or
         /// null.
         /// </summary>
-        internal View FocusedLightweight
+        internal View? FocusedLightweight
         {
             get
             {
@@ -1342,7 +1342,7 @@ namespace XForma
         /// The layer view (the nearest ancestor with a native object) that a
         /// lightweight view draws into.
         /// </summary>
-        internal View LayerView
+        internal View? LayerView
         {
             get
             {
@@ -1400,7 +1400,7 @@ namespace XForma
         }
 
         private void SetLightweightFocus(
-            View view)
+            View? view)
         {
             var previous = this._focusedLightweight;
             if (previous == view)
@@ -1485,7 +1485,7 @@ namespace XForma
         /// Where keys and focus go after this view: its parent, or for an
         /// item's container (which isn't attached), its items view.
         /// </summary>
-        internal View KeyboardParent
+        internal View? KeyboardParent
         {
             get
             {
@@ -1601,7 +1601,7 @@ namespace XForma
             }
         }
 
-        private View FindTabScope()
+        private View? FindTabScope()
         {
             if (!this._isVisible)
             {
@@ -1704,14 +1704,14 @@ namespace XForma
 
         #region Theme
 
-        private Theme _theme;
+        private Theme? _theme;
 
         /// <summary>
         /// A theme for this view and its descendants, or null (the default) to
         /// inherit its parent's. Use it for a section that looks different,
         /// such as a dark banner in a light app.
         /// </summary>
-        public Theme Theme
+        public Theme? Theme
         {
             get
             {
@@ -1726,7 +1726,7 @@ namespace XForma
             }
         }
 
-        internal override Theme LocalTheme
+        internal override Theme? LocalTheme
         {
             get
             {
@@ -1734,7 +1734,7 @@ namespace XForma
             }
         }
 
-        internal override Element ParentElement
+        internal override Element? ParentElement
         {
             get
             {
@@ -1753,7 +1753,7 @@ namespace XForma
         /// <c>new ProgressRing { Animator = new() }</c>. Controls never set their
         /// own; they use <see cref="Controls.Control.CreateOwnAnimator"/>.
         /// </summary>
-        public Animator Animator
+        public Animator? Animator
         {
             get
             {
@@ -1841,7 +1841,7 @@ namespace XForma
         #region Accessibility
 
         private AccessibilityRole? _accessibilityRole;
-        private string _accessibilityLabel;
+        private string? _accessibilityLabel;
 
         /// <summary>
         /// What the view is to assistive technology. Controls provide a default.
@@ -1865,7 +1865,7 @@ namespace XForma
         /// What assistive technology reads for the view. Controls with text
         /// provide a default.
         /// </summary>
-        public string AccessibilityLabel
+        public string? AccessibilityLabel
         {
             get
             {
@@ -1888,7 +1888,7 @@ namespace XForma
             }
         }
 
-        protected virtual string DefaultAccessibilityLabel
+        protected virtual string? DefaultAccessibilityLabel
         {
             get
             {
@@ -2022,7 +2022,7 @@ namespace XForma
         }
 
         private static bool IsAnimatedAway(
-            Animator animator)
+            Animator? animator)
         {
             const float Nothing = 0.001f;
             return (null != animator)
@@ -2033,7 +2033,7 @@ namespace XForma
         /// The value assistive technology reads after the label, such as a
         /// picker's current choice, or null.
         /// </summary>
-        public virtual string AccessibilityValue
+        public virtual string? AccessibilityValue
         {
             get
             {
@@ -2098,11 +2098,11 @@ namespace XForma
         /// The text a screen reader reads for the view: its label, then its
         /// value. A list item without a label is named by the text inside it.
         /// </summary>
-        internal string AccessibilityText
+        internal string? AccessibilityText
         {
             get
             {
-                string label = this.AccessibilityLabel;
+                string? label = this.AccessibilityLabel;
                 if (string.IsNullOrEmpty(label) && (this.AccessibilityRole == AccessibilityRole.ListItem))
                 {
                     var text = new System.Text.StringBuilder();
@@ -2111,7 +2111,7 @@ namespace XForma
                 }
 
                 // A picker may be labeled by its value
-                string value = this.AccessibilityValue;
+                string? value = this.AccessibilityValue;
                 if (string.IsNullOrEmpty(value) || (value == label))
                 {
                     return label;
@@ -2186,7 +2186,7 @@ namespace XForma
         /// Raised (for the platforms) when a view's accessible state, value or
         /// label changes.
         /// </summary>
-        internal static event Action<View> AccessibilityStateChanged;
+        internal static event Action<View>? AccessibilityStateChanged;
 
         /// <summary>
         /// Tells assistive technology that the view's checked or selected
@@ -2222,7 +2222,7 @@ namespace XForma
         private FlowDirection? _flowDirection;
         private int _zIndex;
         private bool _clipToBounds;
-        private Shadow _shadow;
+        private Shadow? _shadow;
         private Thickness _hitTestOutset;
         private Rect _frame;
         private Size _contentMeasureSize = new Size(float.NaN, float.NaN);
@@ -2459,7 +2459,7 @@ namespace XForma
             Rect rect)
         {
             var extension = Thickness.Zero;
-            Page page = null;
+            Page? page = null;
             float x = rect.X, y = rect.Y;
             // The page that keeps clear of the system's bars: the main frame's
             // (a page in a frame inside it, such as a tab's, passes it on)
@@ -2651,7 +2651,7 @@ namespace XForma
         /// default) for none. It moves, scales and fades with the view's
         /// animators. A frame gives its pages one while they slide.
         /// </summary>
-        public Shadow Shadow
+        public Shadow? Shadow
         {
             get
             {
@@ -3071,7 +3071,7 @@ namespace XForma
 
         #endregion Layout
 
-        private GestureRecognizerCollection _gestureRecognizers;
+        private GestureRecognizerCollection? _gestureRecognizers;
 
         /// <summary>
         /// The gesture recognizers that interpret the view's pointer input
@@ -3088,29 +3088,29 @@ namespace XForma
 
         #region Pointer input
 
-        private HashSet<int> _capturedPointers;
+        private HashSet<int>? _capturedPointers;
 
-        public event EventHandler<PointerEventArgs> PointerPressed;
+        public event EventHandler<PointerEventArgs>? PointerPressed;
 
-        public event EventHandler<PointerEventArgs> PointerMoved;
+        public event EventHandler<PointerEventArgs>? PointerMoved;
 
-        public event EventHandler<PointerEventArgs> PointerReleased;
+        public event EventHandler<PointerEventArgs>? PointerReleased;
 
-        public event EventHandler<PointerEventArgs> PointerCanceled;
+        public event EventHandler<PointerEventArgs>? PointerCanceled;
 
-        public event EventHandler<PointerEventArgs> PointerWheelChanged;
+        public event EventHandler<PointerEventArgs>? PointerWheelChanged;
 
         /// <summary>
         /// Raised when a hovering pointer (a mouse or pen, not a touch) moves
         /// over the view or one of its descendants.
         /// </summary>
-        public event EventHandler<PointerEventArgs> PointerEntered;
+        public event EventHandler<PointerEventArgs>? PointerEntered;
 
         /// <summary>
         /// Raised when a hovering pointer leaves the view and its descendants,
         /// or the window.
         /// </summary>
-        public event EventHandler<PointerEventArgs> PointerExited;
+        public event EventHandler<PointerEventArgs>? PointerExited;
 
         private bool _isPointerOver;
 
@@ -3246,7 +3246,7 @@ namespace XForma
             int focusRequests = FocusRequests;
 
             // A drag an ancestor's gesture took over goes on to it
-            Drag drag = null;
+            Drag? drag = null;
             _drags?.TryGetValue(e.PointerId, out drag);
             if ((null != drag) && (drag.Origin == this) && (null != drag.Taker))
             {
@@ -3426,7 +3426,7 @@ namespace XForma
 
         // The view a drag goes on to: a list's item containers may be held by
         // native cells, so they name their list
-        private View ParentForDrag
+        private View? ParentForDrag
         {
             get
             {
@@ -3469,9 +3469,9 @@ namespace XForma
         // ancestor whose gesture took the drag over, if one did
         private sealed class Drag
         {
-            public View Origin;
+            public View? Origin;
             public Point Start;
-            public View Taker;
+            public View? Taker;
 
             // The event in the taker's coordinates: the views between move
             // (the platforms give a view's positions as it is, translated by
@@ -3501,7 +3501,7 @@ namespace XForma
             }
         }
 
-        private static Dictionary<int, Drag> _drags;
+        private static Dictionary<int, Drag>? _drags;
 
         // A drag past the slop that the pressed view leaves unclaimed (a tap
         // on a button fails) is offered to its ancestors' drag gestures,
@@ -3613,7 +3613,7 @@ namespace XForma
         }
 
         // The lightweight views that took pointers pressed on this layer
-        private Dictionary<int, View> _pointerOwners;
+        private Dictionary<int, View>? _pointerOwners;
 
         /// <summary>
         /// How long a touch or pen is held still to ask for the context menu.
@@ -3625,18 +3625,18 @@ namespace XForma
         // canceled (so it isn't also a tap)
         private sealed class LongPress
         {
-            public View Layer;
+            public View? Layer;
             public int PointerId;
             public long StartTicks;
             public Point Start;
-            public View Target;
+            public View? Target;
             public Point TargetPosition;
             public PointerDeviceType DeviceType;
-            public DispatcherTimer Timer;
+            public DispatcherTimer? Timer;
             public bool IsAnswered;
         }
 
-        private static LongPress _longPress;
+        private static LongPress? _longPress;
 
         // Returns whether the event was used up (the moves and release of an
         // answered long press); the release becomes a cancel for the views
@@ -3732,7 +3732,7 @@ namespace XForma
         private bool DispatchToLightweight(
             PointerEventArgs e)
         {
-            View owner = null;
+            View? owner = null;
             this._pointerOwners?.TryGetValue(e.PointerId, out owner);
 
             if ((null != owner) && (e.State != PointerInputState.Began))
@@ -3793,13 +3793,13 @@ namespace XForma
         private bool? _isKeyboardFocusable;
         private bool _isFocused;
 
-        public event EventHandler GotFocus;
+        public event EventHandler? GotFocus;
 
-        public event EventHandler LostFocus;
+        public event EventHandler? LostFocus;
 
-        public event EventHandler<KeyEventArgs> KeyDown;
+        public event EventHandler<KeyEventArgs>? KeyDown;
 
-        public event EventHandler<KeyEventArgs> KeyUp;
+        public event EventHandler<KeyEventArgs>? KeyUp;
 
         /// <summary>
         /// Whether keyboard focus can move to the view (with Tab). By default,
@@ -3887,7 +3887,7 @@ namespace XForma
         internal static int FocusRequests;
 
         // The view with keyboard focus, and whether its ring shows
-        private static View _focusedView;
+        private static View? _focusedView;
         private static bool _isFocusRingVisible;
 
         /// <summary>
@@ -4103,7 +4103,7 @@ namespace XForma
         /// right-click, a long press, the Menu key or Shift+F10), and then for
         /// its ancestors until one handles it.
         /// </summary>
-        public event EventHandler<ContextRequestedEventArgs> ContextRequested;
+        public event EventHandler<ContextRequestedEventArgs>? ContextRequested;
 
         /// <summary>
         /// Called when the user asks for the view's (or, unhandled, a
@@ -4177,7 +4177,7 @@ namespace XForma
             return false;
         }
 
-        private EventHandler _activated;
+        private EventHandler? _activated;
 
         /// <summary>
         /// Raised when the view is activated without a pointer: Enter or Space

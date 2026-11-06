@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using XForma.Input;
 using XForma.Controls;
 using XForma.Primitives;
@@ -19,7 +19,7 @@ namespace XForma.Controls
             }
         }
 
-        protected override string DefaultAccessibilityLabel
+        protected override string? DefaultAccessibilityLabel
         {
             get
             {
@@ -35,11 +35,11 @@ namespace XForma.Controls
             }
         }
 
-        public event EventHandler<ToggledEventArgs> IsCheckedChanged;
+        public event EventHandler<ToggledEventArgs>? IsCheckedChanged;
 
         private bool _isChecked;
-        private string _text;
-        private Bitmap _icon;
+        private string? _text;
+        private Bitmap? _icon;
         public TabStripItem()
         {
             this.GestureRecognizers.Add(new TapGestureRecognizer(this));
@@ -56,7 +56,7 @@ namespace XForma.Controls
             this._initialIsChecked = this.IsChecked;
         }
 
-        protected override object GetUserState()
+        protected override object? GetUserState()
         {
             return (this.IsChecked != this._initialIsChecked) ? this.IsChecked : null;
         }
@@ -95,7 +95,7 @@ namespace XForma.Controls
             }
         }
 
-        public Bitmap Icon
+        public Bitmap? Icon
         {
             get
             {
@@ -110,7 +110,7 @@ namespace XForma.Controls
             }
         }
 
-        public string Text
+        public string? Text
         {
             get
             {
@@ -133,7 +133,7 @@ namespace XForma.Controls
             }
         }
 
-        public Page TabPage
+        public Page? TabPage
         {
             get;
             internal set;

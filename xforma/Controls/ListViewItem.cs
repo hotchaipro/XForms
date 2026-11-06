@@ -49,7 +49,7 @@ namespace XForma.Controls
         /// The container of a view that shows a list item (the view, or one of
         /// its ancestors, is a container's content), or null.
         /// </summary>
-        public static new ListViewItem ContainerFromContent(
+        public static new ListViewItem? ContainerFromContent(
             View view)
         {
             return ItemContainer.ContainerFromContent(view) as ListViewItem;
@@ -58,7 +58,7 @@ namespace XForma.Controls
         /// <summary>
         /// The list the container is showing an item for.
         /// </summary>
-        public ListView ListView
+        public ListView? ListView
         {
             get
             {

@@ -123,7 +123,7 @@ namespace XForma.Controls
         }
 
         // The highlighted item, read as the menu's value
-        public override string AccessibilityValue
+        public override string? AccessibilityValue
         {
             get
             {

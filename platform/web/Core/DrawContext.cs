@@ -118,7 +118,7 @@ namespace XForma.Web
             get;
         } = new List<WebImages.Entry>();
 
-        public override void DrawImage(Bitmap bitmap, Rect destinationRectangle, Color tint)
+        public override void DrawImage(Bitmap? bitmap, Rect destinationRectangle, Color tint)
         {
             if (bitmap?.Renderer is BitmapRenderer renderer)
             {

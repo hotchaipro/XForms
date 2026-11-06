@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -48,16 +48,16 @@ namespace XForma.Controls
 
     public class RadioButtonItem : INotifyPropertyChanged
     {
-        private Bitmap _icon;
-        private string _text;
+        private Bitmap? _icon;
+        private string? _text;
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         public RadioButtonItem()
         {
         }
 
-        public Bitmap Icon
+        public Bitmap? Icon
         {
             get
             {
@@ -71,7 +71,7 @@ namespace XForma.Controls
             }
         }
 
-        public string Text
+        public string? Text
         {
             get
             {
@@ -85,7 +85,7 @@ namespace XForma.Controls
             }
         }
 
-        public object Value
+        public object? Value
         {
             get;
             set;

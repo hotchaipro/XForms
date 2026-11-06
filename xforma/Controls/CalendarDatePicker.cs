@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using XForma.Controls;
 using XForma.Primitives;
@@ -13,14 +13,14 @@ namespace XForma.Controls
         public static readonly ViewProperty<CalendarDatePicker, DateTime?> SelectedDateProperty = new(nameof(SelectedDate), v => v.SelectedDate, (v, x) => v.SelectedDate = x);
 
         private DateTime? _selectedDate;
-        private Popup _popup;
-        private CalendarView _calendar;
+        private Popup? _popup;
+        private CalendarView? _calendar;
 
         public CalendarDatePicker()
         {
         }
 
-        public event EventHandler<DateTime?> SelectedDateChanged;
+        public event EventHandler<DateTime?>? SelectedDateChanged;
 
         // User state: the date chosen, when that changed since it was first
         // attached (null is a date too: none)
@@ -33,7 +33,7 @@ namespace XForma.Controls
             this._initialSelectedDate = this.SelectedDate;
         }
 
-        protected override object GetUserState()
+        protected override object? GetUserState()
         {
             return (this.SelectedDate != this._initialSelectedDate) ? new DateState(this.SelectedDate) : null;
         }

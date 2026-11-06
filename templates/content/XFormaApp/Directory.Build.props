@@ -1,0 +1,17 @@
+<Project>
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <XFormaVersion>XFORMA_VERSION</XFormaVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="XForma" Version="$(XFormaVersion)" />
+    <PackageReference Include="XForma.Themes.Basic" Version="$(XFormaVersion)" />
+  </ItemGroup>
+
+  <!-- The app itself, shared by every platform -->
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)XFormaApp/**/*.cs" LinkBase="Shared" />
+  </ItemGroup>
+</Project>

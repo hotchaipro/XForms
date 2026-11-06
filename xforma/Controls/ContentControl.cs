@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using XForma.Primitives;
 
 namespace XForma.Controls
@@ -8,7 +8,7 @@ namespace XForma.Controls
     /// </summary>
     public abstract class ContentControl : Control
     {
-        private View _content;
+        private View? _content;
 
         public ContentControl()
         {
@@ -30,7 +30,7 @@ namespace XForma.Controls
             }
         }
 
-        protected View Content
+        protected View? Content
         {
             get
             {

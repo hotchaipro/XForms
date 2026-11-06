@@ -14,7 +14,7 @@ namespace XForma.Controls
     {
         public static readonly ViewProperty<CheckBox, bool?> IsCheckedProperty = new(nameof(IsChecked), v => v.IsChecked, (v, x) => v.IsChecked = x);
 
-        private string _text;
+        private string? _text;
         private bool? _isChecked = false;
 
         public CheckBox()
@@ -28,9 +28,9 @@ namespace XForma.Controls
         /// <summary>
         /// Raised when <see cref="IsChecked"/> changes.
         /// </summary>
-        public event EventHandler IsCheckedChanged;
+        public event EventHandler? IsCheckedChanged;
 
-        public string Text
+        public string? Text
         {
             get
             {
@@ -85,7 +85,7 @@ namespace XForma.Controls
             }
         }
 
-        protected override string DefaultAccessibilityLabel
+        protected override string? DefaultAccessibilityLabel
         {
             get
             {
@@ -127,7 +127,7 @@ namespace XForma.Controls
             this._initialIsChecked = this.IsChecked;
         }
 
-        protected override object GetUserState()
+        protected override object? GetUserState()
         {
             return (this.IsChecked != this._initialIsChecked) ? new CheckState(this.IsChecked) : null;
         }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using XForma.Primitives;
@@ -8,14 +8,14 @@ namespace XForma
 {
     public abstract class Application
     {
-        private static Application _CurrentApplication;
+        private static Application? _CurrentApplication;
 
-        private IPlatform _platform;
+        private IPlatform? _platform;
         private Frame _rootFrame;
         private readonly List<Popup> _openPopups = new List<Popup>();
         private ThemeMode? _requestedThemeMode;
         private Color? _accentColor;
-        private Theme _theme;
+        private Theme? _theme;
 
         /// <summary>
         /// How far a press can move and still be a tap (or a hold), in points.
@@ -48,9 +48,9 @@ namespace XForma
         /// Raised when the application's theme changes: its mode, accent color
         /// or design tokens.
         /// </summary>
-        public event EventHandler ThemeChanged;
+        public event EventHandler? ThemeChanged;
 
-        public static Application Current
+        public static Application? Current
         {
             get
             {
@@ -66,9 +66,9 @@ namespace XForma
         /// app running on Windows and Android. A web app keeps running either
         /// way, and iOS ends the app either way, after this event.
         /// </summary>
-        public event EventHandler<ApplicationExceptionEventArgs> UnhandledException;
+        public event EventHandler<ApplicationExceptionEventArgs>? UnhandledException;
 
-        private static Exception _lastReported;
+        private static Exception? _lastReported;
         private static bool _lastReportedHandled;
         private static bool _isWatchingExceptions;
 
@@ -191,9 +191,9 @@ namespace XForma
             }
         }
 
-        private IApplicationRenderer _renderer;
-        private Dispatcher _dispatcher;
-        private Window _mainWindow;
+        private IApplicationRenderer? _renderer;
+        private Dispatcher? _dispatcher;
+        private Window? _mainWindow;
 
         internal IApplicationRenderer Renderer
         {
@@ -215,7 +215,7 @@ namespace XForma
         // browser's address, a link), or null for StartPath
         internal void Start(
             IPlatform platform,
-            IReadOnlyList<string> startStack)
+            IReadOnlyList<string>? startStack)
         {
             this.AttachPlatform(platform);
             this._theme = null;
@@ -372,7 +372,7 @@ namespace XForma
         /// package's palette. Null (the default) for
         /// <see cref="ColorScheme.Plain"/>.
         /// </summary>
-        public Func<ThemeMode, Color, ColorScheme> ThemePalette
+        public Func<ThemeMode, Color, ColorScheme>? ThemePalette
         {
             get;
             set;
@@ -383,7 +383,7 @@ namespace XForma
         /// override adjusts it: set by what hosts the app, such as a control
         /// library adding its theme package's tokens and templates.
         /// </summary>
-        public Func<Theme, Theme> ThemeExtender
+        public Func<Theme, Theme>? ThemeExtender
         {
             get;
             set;
@@ -462,7 +462,7 @@ namespace XForma
         // The modal pages showing, newest last
         private readonly List<Page> _modals = new List<Page>();
 
-        private Routes _routes;
+        private Routes? _routes;
 
         /// <summary>
         /// Lists the app's pages by path, each with a function that makes the
@@ -533,7 +533,7 @@ namespace XForma
 
         // The page for a path from outside the app, or for the path
         // OnRouteNotFound chooses instead; null to show nothing new
-        private Page CreatePageFromOutside(
+        private Page? CreatePageFromOutside(
             string path)
         {
             var page = this.Routes.CreatePage(path);
@@ -549,7 +549,7 @@ namespace XForma
         // The first pages: the platform's stack (as far as its paths match),
         // or StartPath; shown at once, without transitions
         private async Task NavigateToStartAsync(
-            IReadOnlyList<string> startStack)
+            IReadOnlyList<string>? startStack)
         {
             var pages = new List<Page>();
             if ((null != startStack) && (0 < startStack.Count))
@@ -672,7 +672,7 @@ namespace XForma
         /// theme, the pages and the controls showing have been built again,
         /// for anything else the app built once (a cache).
         /// </summary>
-        public event EventHandler<HotReloadEventArgs> HotReloaded;
+        public event EventHandler<HotReloadEventArgs>? HotReloaded;
 
         // After an edit while the app runs with hot reload (from the
         // framework's MetadataUpdateHandler, on the UI thread): the theme is
@@ -735,7 +735,7 @@ namespace XForma
         /// </summary>
         public Task NavigateAsync(
             string path,
-            PageTransition transition = null)
+            PageTransition? transition = null)
         {
             return this.ShowPageAsync(this.CreatePage(path), transition);
         }
@@ -747,7 +747,7 @@ namespace XForma
         /// </summary>
         public async Task<TResult> NavigateAsync<TResult>(
             string path,
-            PageTransition transition = null)
+            PageTransition? transition = null)
         {
             var page = this.CreatePage(path);
             var completion = new TaskCompletionSource<object>();
@@ -765,7 +765,7 @@ namespace XForma
 
         private async Task ShowPageAsync(
             Page page,
-            PageTransition transition)
+            PageTransition? transition)
         {
             // Close any open popups before navigating
             while (this.TryClosePopup())
@@ -904,13 +904,13 @@ namespace XForma
         /// gets it (the event's <see cref="PointerEventArgs.OriginalSource"/>).
         /// Set <see cref="PointerEventArgs.Handled"/> to keep it from the view.
         /// </summary>
-        public event EventHandler<PointerEventArgs> PreviewPointerInput;
+        public event EventHandler<PointerEventArgs>? PreviewPointerInput;
 
         /// <summary>
         /// Raised for every key press before the focused view gets it. Set
         /// <see cref="KeyEventArgs.Handled"/> to keep it from the view.
         /// </summary>
-        public event EventHandler<KeyEventArgs> PreviewKeyDown;
+        public event EventHandler<KeyEventArgs>? PreviewKeyDown;
 
         // The views under a hovering pointer, deepest first
         private List<View> _pointerOverPath = new List<View>();
@@ -936,7 +936,7 @@ namespace XForma
         /// <see cref="View.PointerEntered"/>, outermost first.
         /// </summary>
         internal void UpdatePointerOver(
-            View deepest,
+            View? deepest,
             PointerEventArgs e)
         {
             this._pointerOverVersion += 1;
@@ -1035,7 +1035,7 @@ namespace XForma
         /// </summary>
         public async Task<Window> OpenWindowAsync(
             string path,
-            string title = null,
+            string? title = null,
             Size? size = null)
         {
             var page = this.CreatePage(path);
@@ -1087,7 +1087,7 @@ namespace XForma
             }
         }
 
-        public event EventHandler TextScaleChanged;
+        public event EventHandler? TextScaleChanged;
 
         // Lays text out again at the system's new text size
         private void UpdateTextScale()
@@ -1257,7 +1257,7 @@ namespace XForma
 
         // The platform shows the count (even before the app starts, in a
         // background refresh)
-        internal event EventHandler BadgeCountChanged;
+        internal event EventHandler? BadgeCountChanged;
 
         /// <summary>
         /// How often the system may wake the app in the background to call
@@ -1343,7 +1343,7 @@ namespace XForma
         /// The platform's side of the contract for this app (see
         /// <see cref="ApplicationHost.For"/>).
         /// </summary>
-        internal ApplicationHost Host
+        internal ApplicationHost? Host
         {
             get;
             set;

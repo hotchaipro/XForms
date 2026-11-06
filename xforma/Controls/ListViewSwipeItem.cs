@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using XForma.Controls;
 using XForma.Primitives;
 
@@ -21,7 +21,7 @@ namespace XForma.Controls
     public class ListViewSwipeItem : TemplatedControl
     {
         private ListViewSwipeDirection _swipeDirection;
-        private UICommand _command;
+        private UICommand? _command;
         private Size _iconSize;
 
         public ListViewSwipeItem()
@@ -43,7 +43,7 @@ namespace XForma.Controls
             }
         }
 
-        public UICommand Command
+        public UICommand? Command
         {
             get
             {
@@ -58,7 +58,7 @@ namespace XForma.Controls
             }
         }
 
-        public Bitmap Icon
+        public Bitmap? Icon
         {
             get
             {
@@ -81,7 +81,7 @@ namespace XForma.Controls
             }
         }
 
-        public string Text
+        public string? Text
         {
             get
             {

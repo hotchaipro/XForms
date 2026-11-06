@@ -26,12 +26,12 @@ namespace XForma.Controls
         public static readonly ViewProperty<InfoBar, bool> IsOpenProperty = new(nameof(IsOpen), v => v.IsOpen, (v, x) => v.IsOpen = x);
 
         private readonly InfoBarCloseButton _closeButton;
-        private string _title;
-        private string _message;
+        private string? _title;
+        private string? _message;
         private InfoBarSeverity _severity;
         private bool _isOpen;
         private bool _isClosable = true;
-        private View _actionButton;
+        private View? _actionButton;
 
         public InfoBar()
         {
@@ -43,9 +43,9 @@ namespace XForma.Controls
         /// <summary>
         /// Raised when the user closes the bar with its close button.
         /// </summary>
-        public event EventHandler Closed;
+        public event EventHandler? Closed;
 
-        public string Title
+        public string? Title
         {
             get
             {
@@ -59,7 +59,7 @@ namespace XForma.Controls
             }
         }
 
-        public string Message
+        public string? Message
         {
             get
             {
@@ -136,7 +136,7 @@ namespace XForma.Controls
         /// A button (or another view) beneath the message, for what the user
         /// can do about it.
         /// </summary>
-        public View ActionButton
+        public View? ActionButton
         {
             get
             {
@@ -168,7 +168,7 @@ namespace XForma.Controls
             }
         }
 
-        protected override string DefaultAccessibilityLabel
+        protected override string? DefaultAccessibilityLabel
         {
             get
             {

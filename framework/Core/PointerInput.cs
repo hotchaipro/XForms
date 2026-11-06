@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace XForma
 {
@@ -119,7 +119,7 @@ namespace XForma
         /// <summary>
         /// The view the event was first delivered to.
         /// </summary>
-        public View OriginalSource
+        public View? OriginalSource
         {
             get;
             internal set;

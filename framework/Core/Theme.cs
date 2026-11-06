@@ -127,13 +127,13 @@ namespace XForma
 
         public ThemeMode Mode { get; init; }
 
-        public ColorScheme Colors { get; init; }
+        public ColorScheme? Colors { get; init; }
 
         /// <summary>
         /// The shadow along a sliding page's moving edges, so they show over a
         /// page of the same color; null (the default) for none.
         /// </summary>
-        public Shadow PageEdgeShadow { get; init; }
+        public Shadow? PageEdgeShadow { get; init; }
 
         /// <summary>
         /// How a frame's pages come and go when navigating doesn't name a
@@ -142,7 +142,7 @@ namespace XForma
         /// for <see cref="XForma.PageTransition.SlideOver"/>, otherwise
         /// together with it.
         /// </summary>
-        public PageTransition PageTransition { get; init; }
+        public PageTransition? PageTransition { get; init; }
 
         /// <summary>
         /// What control libraries keep in the theme, by type: a type scale,

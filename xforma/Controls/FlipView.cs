@@ -40,7 +40,7 @@ namespace XForma.Controls
         /// <summary>
         /// Raised when the shown view changes.
         /// </summary>
-        public event EventHandler SelectionChanged;
+        public event EventHandler? SelectionChanged;
 
         /// <summary>
         /// The views, in order.
@@ -75,7 +75,7 @@ namespace XForma.Controls
         }
 
         // Read as "2 of 4"
-        public override string AccessibilityValue
+        public override string? AccessibilityValue
         {
             get
             {
@@ -94,7 +94,7 @@ namespace XForma.Controls
             this._initialSelectedIndex = this.SelectedIndex;
         }
 
-        protected override object GetUserState()
+        protected override object? GetUserState()
         {
             return (this.SelectedIndex != this._initialSelectedIndex) ? this.SelectedIndex : null;
         }
@@ -536,7 +536,7 @@ namespace XForma.Controls
             this.Focusable = true;
         }
 
-        public event EventHandler SelectedIndexChanged;
+        public event EventHandler? SelectedIndexChanged;
 
         public int NumberOfPages
         {
@@ -601,7 +601,7 @@ namespace XForma.Controls
             }
         }
 
-        public override string AccessibilityValue
+        public override string? AccessibilityValue
         {
             get
             {

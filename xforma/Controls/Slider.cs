@@ -18,7 +18,7 @@ namespace XForma.Controls
     {
         public static readonly ViewProperty<Slider, double> ValueProperty = new(nameof(Value), v => v.Value, (v, x) => v.Value = x);
 
-        private string _header;
+        private string? _header;
         private double _stepFrequency = 1;
         private bool _isDragging;
         private int? _pendingTouch;
@@ -33,7 +33,7 @@ namespace XForma.Controls
         /// Text above the track, which also names the slider for assistive
         /// technology.
         /// </summary>
-        public string Header
+        public string? Header
         {
             get
             {
@@ -96,7 +96,7 @@ namespace XForma.Controls
             }
         }
 
-        protected override string DefaultAccessibilityLabel
+        protected override string? DefaultAccessibilityLabel
         {
             get
             {
@@ -173,7 +173,7 @@ namespace XForma.Controls
             this._initialValue = this.Value;
         }
 
-        protected override object GetUserState()
+        protected override object? GetUserState()
         {
             return (this.Value != this._initialValue) ? this.Value : null;
         }

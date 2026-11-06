@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using XForma.Layouts;
 using XForma.Controls;
@@ -171,13 +171,13 @@ namespace XForma.Controls
             }
         }
 
-        private object _commandParameter;
+        private object? _commandParameter;
 
         /// <summary>
         /// The value the bar's buttons pass to their commands, such as the list
         /// item the bar acts on.
         /// </summary>
-        public object CommandParameter
+        public object? CommandParameter
         {
             get
             {

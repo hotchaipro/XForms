@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using System.Runtime.Versioning;
 using System.Threading;
@@ -115,7 +115,7 @@ namespace XForma.Web
         public bool UsesSystemDragGesture => true;
 
         public void StartDrag(
-            View source,
+            View? source,
             DataPackage data,
             Point position)
         {
@@ -148,7 +148,7 @@ namespace XForma.Web
 
         public Color? SystemAccentColor => null;
 
-        public ColorScheme SystemHighContrastColors => null;
+        public ColorScheme? SystemHighContrastColors => null;
 
         // NOTE: The browser zooms the page itself
         public float SystemTextScale => 1;
@@ -161,7 +161,7 @@ namespace XForma.Web
         // As drawn text measures it (the text box's line is the font's height)
         public float TextEntryLineHeight => 0;
 
-        public string WindowTitle
+        public string? WindowTitle
         {
             set
             {
@@ -231,12 +231,12 @@ namespace XForma.Web
         /// <summary>
         /// The running app's host, or null before <see cref="RunAsync"/>.
         /// </summary>
-        public static WebApplication Current
+        public static WebApplication? Current
         {
             get;
             private set;
         }
-        private static Task _initialization;
+        private static Task? _initialization;
 
         /// <summary>
         /// Loads the platform's script into the page (once).

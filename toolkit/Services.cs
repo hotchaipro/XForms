@@ -13,7 +13,7 @@ namespace XForma.Toolkit
     {
         bool HasText { get; }
 
-        Task<string> GetTextAsync();
+        Task<string>? GetTextAsync();
 
         Task SetTextAsync(string text);
     }
@@ -40,7 +40,7 @@ namespace XForma.Toolkit
         /// <summary>
         /// The value, or the default when it isn't set.
         /// </summary>
-        string Get(string key, string defaultValue = null);
+        string? Get(string key, string? defaultValue = null);
 
         void Set(string key, string value);
 
@@ -72,11 +72,11 @@ namespace XForma.Toolkit
     /// </summary>
     public sealed class ShareRequest
     {
-        public string Title { get; init; }
+        public string? Title { get; init; }
 
-        public string Text { get; init; }
+        public string? Text { get; init; }
 
-        public Uri Uri { get; init; }
+        public Uri? Uri { get; init; }
     }
 
     /// <summary>
@@ -121,13 +121,13 @@ namespace XForma.Toolkit
     /// </summary>
     public sealed class FilePickerOptions
     {
-        public string Title { get; init; }
+        public string? Title { get; init; }
 
         /// <summary>
         /// The file name extensions to offer (such as ".txt"), or null for any
         /// file.
         /// </summary>
-        public IReadOnlyList<string> FileTypes { get; init; }
+        public IReadOnlyList<string>? FileTypes { get; init; }
 
         /// <summary>
         /// Whether more than one file can be picked.
@@ -170,13 +170,13 @@ namespace XForma.Toolkit
         /// <summary>
         /// Lets the user pick files to open. Returns none when they cancel.
         /// </summary>
-        Task<IReadOnlyList<PickedFile>> PickAsync(FilePickerOptions options = null);
+        Task<IReadOnlyList<PickedFile>> PickAsync(FilePickerOptions? options = null);
 
         /// <summary>
         /// Lets the user choose where to save a file, then writes it with the
         /// callback. Returns false when they cancel.
         /// </summary>
-        Task<bool> SaveAsync(string suggestedName, Func<Stream, Task> write, FilePickerOptions options = null);
+        Task<bool> SaveAsync(string suggestedName, Func<Stream, Task> write, FilePickerOptions? options = null);
     }
 
     public enum HapticFeedbackType
@@ -209,7 +209,7 @@ namespace XForma.Toolkit
             T defaultValue)
             where T : IConvertible
         {
-            string value = preferences.Get(key);
+            string? value = preferences.Get(key);
             if (null == value)
             {
                 return defaultValue;
@@ -240,7 +240,7 @@ namespace XForma.Toolkit
     /// </summary>
     public static class Clipboard
     {
-        private static IClipboard _default;
+        private static IClipboard? _default;
 
         /// <summary>
         /// The platform's implementation, set when its services are
@@ -265,7 +265,7 @@ namespace XForma.Toolkit
     /// </summary>
     public static class Launcher
     {
-        private static ILauncher _default;
+        private static ILauncher? _default;
 
         /// <summary>
         /// The platform's implementation, set when its services are
@@ -290,7 +290,7 @@ namespace XForma.Toolkit
     /// </summary>
     public static class Preferences
     {
-        private static IPreferences _default;
+        private static IPreferences? _default;
 
         /// <summary>
         /// The platform's implementation, set when its services are
@@ -315,7 +315,7 @@ namespace XForma.Toolkit
     /// </summary>
     public static class SecureStorage
     {
-        private static ISecureStorage _default;
+        private static ISecureStorage? _default;
 
         /// <summary>
         /// The platform's implementation, set when its services are
@@ -340,7 +340,7 @@ namespace XForma.Toolkit
     /// </summary>
     public static class Share
     {
-        private static IShare _default;
+        private static IShare? _default;
 
         /// <summary>
         /// The platform's implementation, set when its services are
@@ -365,7 +365,7 @@ namespace XForma.Toolkit
     /// </summary>
     public static class HapticFeedback
     {
-        private static IHapticFeedback _default;
+        private static IHapticFeedback? _default;
 
         /// <summary>
         /// The platform's implementation, set when its services are
@@ -390,7 +390,7 @@ namespace XForma.Toolkit
     /// </summary>
     public static class Connectivity
     {
-        private static IConnectivity _default;
+        private static IConnectivity? _default;
 
         /// <summary>
         /// The platform's implementation, set when its services are
@@ -415,7 +415,7 @@ namespace XForma.Toolkit
     /// </summary>
     public static class FilePicker
     {
-        private static IFilePicker _default;
+        private static IFilePicker? _default;
 
         /// <summary>
         /// The platform's implementation, set when its services are

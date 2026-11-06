@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 
 namespace XForma
@@ -218,8 +218,8 @@ namespace XForma
     /// </summary>
     public sealed class PageTransitionContext
     {
-        private Animator _animator;
-        private Animator _animatorBeneath;
+        private Animator? _animator;
+        private Animator? _animatorBeneath;
 
         internal PageTransitionContext(
             Page page,

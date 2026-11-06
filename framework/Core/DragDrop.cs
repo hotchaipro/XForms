@@ -40,13 +40,13 @@ namespace XForma
     /// </summary>
     public sealed class DataPackage
     {
-        public string Text
+        public string? Text
         {
             get;
             set;
         }
 
-        public Uri Uri
+        public Uri? Uri
         {
             get;
             set;
@@ -55,7 +55,7 @@ namespace XForma
         /// <summary>
         /// Any object, for a drop in the same app.
         /// </summary>
-        public object LocalData
+        public object? LocalData
         {
             get;
             set;
@@ -120,7 +120,7 @@ namespace XForma
     public sealed class DragEventArgs : EventArgs
     {
         internal DragEventArgs(
-            DataPackage data,
+            DataPackage? data,
             Point position,
             DragOperation acceptedOperation,
             bool isFromThisApp)
@@ -131,7 +131,7 @@ namespace XForma
             this.IsFromThisApp = isFromThisApp;
         }
 
-        public DataPackage Data
+        public DataPackage? Data
         {
             get;
         }
@@ -162,7 +162,7 @@ namespace XForma
     public partial class View
     {
         private bool _canDrag;
-        private DragSourceRecognizer _dragRecognizer;
+        private DragSourceRecognizer? _dragRecognizer;
 
         /// <summary>
         /// Whether the user can drag the view: by moving a mouse over it while
@@ -209,17 +209,17 @@ namespace XForma
             set;
         }
 
-        public event EventHandler<DragStartingEventArgs> DragStarting;
+        public event EventHandler<DragStartingEventArgs>? DragStarting;
 
-        public event EventHandler<DropCompletedEventArgs> DropCompleted;
+        public event EventHandler<DropCompletedEventArgs>? DropCompleted;
 
-        public event EventHandler<DragEventArgs> DragEnter;
+        public event EventHandler<DragEventArgs>? DragEnter;
 
-        public event EventHandler<DragEventArgs> DragOver;
+        public event EventHandler<DragEventArgs>? DragOver;
 
-        public event EventHandler<DragEventArgs> DragLeave;
+        public event EventHandler<DragEventArgs>? DragLeave;
 
-        public event EventHandler<DragEventArgs> Drop;
+        public event EventHandler<DragEventArgs>? Drop;
 
         internal bool RaiseDragStarting(
             DragStartingEventArgs e)
@@ -283,7 +283,7 @@ namespace XForma
     /// </summary>
     internal sealed class DragSourceRecognizer : GestureRecognizer
     {
-        private DispatcherTimer _timer;
+        private DispatcherTimer? _timer;
         private Point _start;
 
         protected override bool IsDragGesture
@@ -377,14 +377,14 @@ namespace XForma
     /// </summary>
     internal static class DragDropSession
     {
-        private static View _source;
-        private static DataPackage _localData;
-        private static View _target;
-        private static DataPackage _targetData;
+        private static View? _source;
+        private static DataPackage? _localData;
+        private static View? _target;
+        private static DataPackage? _targetData;
         private static DragOperation _accepted;
 
         // A drag from the keyboard: the views it can drop on, and where it is
-        private static List<View> _keyboardTargets;
+        private static List<View>? _keyboardTargets;
         private static int _keyboardIndex;
 
         internal static bool IsKeyboardDrag
@@ -399,8 +399,8 @@ namespace XForma
         /// The view inside which a drag starts asks what's dragged, or null if
         /// nothing there can be.
         /// </summary>
-        public static DataPackage Begin(
-            View view)
+        public static DataPackage? Begin(
+            View? view)
         {
             for (; null != view; view = view.KeyboardParent)
             {
@@ -425,7 +425,7 @@ namespace XForma
         /// Whether a drag could start in the view.
         /// </summary>
         public static bool CanBegin(
-            View view)
+            View? view)
         {
             for (; null != view; view = view.KeyboardParent)
             {
@@ -439,7 +439,7 @@ namespace XForma
         }
 
         // The view allowing the drop, and the point in its coordinates
-        private static View FindTarget(
+        private static View? FindTarget(
             View deepest,
             ref Point point)
         {
@@ -479,7 +479,7 @@ namespace XForma
         public static DragOperation Update(
             View deepest,
             Point point,
-            DataPackage external)
+            DataPackage? external)
         {
             var data = _localData ?? external ?? new DataPackage();
             var target = FindTarget(deepest, ref point);
@@ -521,7 +521,7 @@ namespace XForma
         public static DragOperation Drop(
             View deepest,
             Point point,
-            DataPackage external)
+            DataPackage? external)
         {
             var operation = Update(deepest, point, external);
             var target = _target;
@@ -559,7 +559,7 @@ namespace XForma
 
         private static void CollectTargets(
             View view,
-            View source,
+            View? source,
             List<View> targets)
         {
             if (!view.IsVisible)

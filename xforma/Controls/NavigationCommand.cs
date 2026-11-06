@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows.Input;
 using XForma.Controls;
 using XForma.Primitives;
@@ -11,7 +11,7 @@ namespace XForma.Controls
         {
         }
 
-        public Uri NavigationUri
+        public Uri? NavigationUri
         {
             get;
             set;
@@ -37,15 +37,15 @@ namespace XForma.Controls
         }
 
         public bool CanExecute(
-            object parameter)
+            object? parameter)
         {
             return true;
         }
 
         public void Execute(
-            object parameter)
+            object? parameter)
         {
-            Uri navigationUri = this.NavigationUri;
+            Uri? navigationUri = this.NavigationUri;
             if (null != navigationUri)
             {
                 Application.Current.OpenUri(navigationUri);
