@@ -241,14 +241,6 @@ An exception that nothing in the app caught.
 | `Handled.get -> bool` | Keeps the app running where the platform allows it (see `UnhandledException`). |
 | `Handled.set -> void` | Keeps the app running where the platform allows it (see `UnhandledException`). |
 
-## ApplicationServicesExtensions
-
-| Member | |
-|---|---|
-| `extension(XForma.Application)` |  |
-| `extension(XForma.Application).Services.get -> XForma.PlatformServices` |  |
-| `get_Services(XForma.Application application) -> XForma.PlatformServices` |  |
-
 ## Binding
 
 Keeps a view property up to date with a value from a source, such as a view model, and (for a two-way binding) the source with the view.
@@ -720,18 +712,6 @@ The shape of an animation's progress over time. Platforms sample it to play the 
 | `FileImageSource(string path) -> void` |  |
 | `Path.get -> string` |  |
 
-## FilePickerOptions
-
-| Member | |
-|---|---|
-| `AllowMultiple.get -> bool` |  |
-| `AllowMultiple.init -> void` |  |
-| `FilePickerOptions() -> void` |  |
-| `FileTypes.get -> System.Collections.Generic.IReadOnlyList<string>` |  |
-| `FileTypes.init -> void` |  |
-| `Title.get -> string` |  |
-| `Title.init -> void` |  |
-
 ## FlowDirection
 
 The direction a view lays out its children in.
@@ -836,13 +816,6 @@ Where a gesture recognizer is in following the pointer on its view.
 | `GradientStop(XForma.Color color, float offset) -> void` |  |
 | `Offset.get -> float` | Where the color is along the gradient, from 0 to 1. |
 
-## HapticFeedbackType
-
-| Member | |
-|---|---|
-| `Click = 0 -> XForma.HapticFeedbackType` |  |
-| `LongPress = 1 -> XForma.HapticFeedbackType` |  |
-
 ## HorizontalAlignment
 
 Where a view sits horizontally in the space its parent gives it.
@@ -874,28 +847,6 @@ One animator's native layer: a platform's compositor layer, or a view whose rend
 | `SetValue(XForma.AnimationChannel channel, float value) -> void` | Sets the channel's value now, ending any animation of it. |
 | `TransformOrigin.set -> void` | The point that scale and rotation are around, relative to the layer's size: (0.5, 0.5) is the center. |
 
-## IClipboard
-
-| Member | |
-|---|---|
-| `GetTextAsync() -> System.Threading.Tasks.Task<string>` |  |
-| `HasText.get -> bool` |  |
-| `SetTextAsync(string text) -> System.Threading.Tasks.Task` |  |
-
-## IConnectivity
-
-| Member | |
-|---|---|
-| `ConnectivityChanged -> System.EventHandler` |  |
-| `NetworkAccess.get -> XForma.NetworkAccess` |  |
-
-## IFilePicker
-
-| Member | |
-|---|---|
-| `PickAsync(XForma.FilePickerOptions options = null) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<XForma.PickedFile>>` |  |
-| `SaveAsync(string suggestedName, System.Func<System.IO.Stream, System.Threading.Tasks.Task> write, XForma.FilePickerOptions options = null) -> System.Threading.Tasks.Task<bool>` |  |
-
 ## IGestureRecognizerDelegate
 
 | Member | |
@@ -903,44 +854,6 @@ One animator's native layer: a platform's compositor layer, or a view whose rend
 | `OnTouchBegan() -> void` |  |
 | `OnTouchCanceled() -> void` |  |
 | `OnTouchEnded() -> void` |  |
-
-## IHapticFeedback
-
-| Member | |
-|---|---|
-| `IsSupported.get -> bool` |  |
-| `Perform(XForma.HapticFeedbackType type) -> void` |  |
-
-## ILauncher
-
-| Member | |
-|---|---|
-| `OpenAsync(System.Uri uri) -> System.Threading.Tasks.Task<bool>` |  |
-
-## IPreferences
-
-| Member | |
-|---|---|
-| `Clear() -> void` |  |
-| `ContainsKey(string key) -> bool` |  |
-| `Get(string key, string defaultValue = null) -> string` |  |
-| `Remove(string key) -> void` |  |
-| `Set(string key, string value) -> void` |  |
-
-## ISecureStorage
-
-| Member | |
-|---|---|
-| `GetAsync(string key) -> System.Threading.Tasks.Task<string>` |  |
-| `Remove(string key) -> bool` |  |
-| `RemoveAll() -> void` |  |
-| `SetAsync(string key, string value) -> System.Threading.Tasks.Task` |  |
-
-## IShare
-
-| Member | |
-|---|---|
-| `RequestAsync(XForma.ShareRequest request) -> System.Threading.Tasks.Task` |  |
 
 ## ImageProperties
 
@@ -1106,15 +1019,6 @@ How much a message from the framework matters.
 | `Back = 1 -> XForma.NavigationMode` |  |
 | `Forward = 0 -> XForma.NavigationMode` |  |
 
-## NetworkAccess
-
-| Member | |
-|---|---|
-| `Internet = 3 -> XForma.NetworkAccess` |  |
-| `Local = 2 -> XForma.NetworkAccess` |  |
-| `None = 1 -> XForma.NetworkAccess` |  |
-| `Unknown = 0 -> XForma.NetworkAccess` |  |
-
 ## Orientation
 
 The direction a panel stacks or wraps its children in, or a list lays its items out in.
@@ -1259,38 +1163,6 @@ A segment of a path: the end point, and the control points of a curve.
 | `MoveTo = 0 -> XForma.PathSegmentKind` |  |
 | `QuadraticTo = 2 -> XForma.PathSegmentKind` |  |
 
-## PickedFile
-
-| Member | |
-|---|---|
-| `Name.get -> string` |  |
-| `OpenReadAsync() -> System.Threading.Tasks.Task<System.IO.Stream>` |  |
-| `PickedFile(string name, System.Func<System.Threading.Tasks.Task<System.IO.Stream>> open) -> void` |  |
-
-## PlatformServices
-
-| Member | |
-|---|---|
-| `Clipboard.get -> XForma.IClipboard` |  |
-| `Clipboard.set -> void` |  |
-| `Connectivity.get -> XForma.IConnectivity` |  |
-| `Connectivity.set -> void` |  |
-| `Current.get -> XForma.PlatformServices` |  |
-| `Current.set -> void` |  |
-| `FilePicker.get -> XForma.IFilePicker` |  |
-| `FilePicker.set -> void` |  |
-| `HapticFeedback.get -> XForma.IHapticFeedback` |  |
-| `HapticFeedback.set -> void` |  |
-| `Launcher.get -> XForma.ILauncher` |  |
-| `Launcher.set -> void` |  |
-| `PlatformServices() -> void` |  |
-| `Preferences.get -> XForma.IPreferences` |  |
-| `Preferences.set -> void` |  |
-| `SecureStorage.get -> XForma.ISecureStorage` |  |
-| `SecureStorage.set -> void` |  |
-| `Share.get -> XForma.IShare` |  |
-| `Share.set -> void` |  |
-
 ## Point
 
 | Member | |
@@ -1354,13 +1226,6 @@ A pointer (touch, mouse or pen) pressing, moving, releasing or turning a wheel o
 | `Canceled = 3 -> XForma.PointerInputState` |  |
 | `Ended = 2 -> XForma.PointerInputState` |  |
 | `Moved = 1 -> XForma.PointerInputState` |  |
-
-## PreferencesExtensions
-
-| Member | |
-|---|---|
-| `Get<T>(this XForma.IPreferences preferences, string key, T defaultValue) -> T` |  |
-| `Set<T>(this XForma.IPreferences preferences, string key, T value) -> void` |  |
 
 ## Rect
 
@@ -1465,18 +1330,6 @@ The shape that casts a `Shadow`: the view's bounds, or the ellipse (a circle, fo
 |---|---|
 | `Ellipse = 1 -> XForma.ShadowShape` |  |
 | `Rectangle = 0 -> XForma.ShadowShape` |  |
-
-## ShareRequest
-
-| Member | |
-|---|---|
-| `ShareRequest() -> void` |  |
-| `Text.get -> string` |  |
-| `Text.init -> void` |  |
-| `Title.get -> string` |  |
-| `Title.init -> void` |  |
-| `Uri.get -> System.Uri` |  |
-| `Uri.init -> void` |  |
 
 ## Size
 

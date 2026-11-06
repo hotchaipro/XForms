@@ -2,7 +2,7 @@
 
 Generated from the public API and its doc comments by `docs/generate-api-reference.py`.
 
-- [XForma](XForma.md): 116 types
+- [XForma](XForma.md): 100 types
 - [XForma.Controls](XForma.Controls.md): 148 types
 - [XForma.Element](XForma.Element.md): 2 types
 - [XForma.Input](XForma.Input.md): 13 types

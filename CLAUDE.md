@@ -21,8 +21,12 @@ has a comment saying so, and renaming one would lose users' data.
 - Phases 1-28 are done. The work toward 1.0 is tracked in the "XForms 1.0 Readiness Review" doc:
   https://claude.ai/artifact/Sys3XsKDPahxbqnyeF8yCc
 - Phase 29, `XForma.Xaml`, isn't being done until a real project needs it (decided 2026-11-05).
-- Unverified: Win32 from the keyboard (scripted input is blocked when another window holds the
-  foreground), what VoiceOver and TalkBack say, a real iPhone or iPad.
+- Unverified: a drag on iOS (the simulator's input tool can't do it), real touch on the web,
+  Safari itself, a real iPhone or iPad beyond installing Sooner Or Later. Postponed past 1.0: what
+  VoiceOver and TalkBack say, and screen readers on the web.
+- Before committing a framework change, run `dotnet test test/XForma.Tests`; for a change that could
+  show, `test/visual/Check-Screens.ps1` too. CI is postponed.
+- `docs/api` is generated: run `python docs/generate-api-reference.py` after a build.
 
 ## Layout
 

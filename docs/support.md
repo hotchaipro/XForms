@@ -49,6 +49,8 @@ are handled.
 - A `PanGestureRecognizer`'s translation is measured in its view's coordinates, so
   a view that moves itself as it's panned gets a shrinking distance. Put the
   recognizer on a view that stays put, such as the moving view's parent.
+- Keyboard focus and pointer state are per process. They haven't been checked with
+  more than one window open, which only Windows allows.
 - On Windows, a drag from the app shows the system's cursor, without a picture of
   what's dragged. The other platforms show a plain box the size of the view.
 
