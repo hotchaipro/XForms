@@ -1385,7 +1385,7 @@ namespace XForma
             for (int i = 0; i < children.Count; i += 1)
             {
                 var child = children[i];
-                if (!child.IsLightweight || !child._isVisible || !child._isHitTestVisible)
+                if (!child.IsLightweight || !child._isVisible || !child._isHitTestVisible || !parent.IsInTabOrder(child))
                 {
                     continue;
                 }
@@ -1512,7 +1512,7 @@ namespace XForma
             }
 
             var focusable = new List<View>();
-            CollectFocusable(root, focusable);
+            CollectFocusable(root.ActiveTabScope, focusable);
             // From outside the list, every view is a candidate; from inside,
             // every other view
             int index = focusable.IndexOf(this);
@@ -1539,7 +1539,7 @@ namespace XForma
             for (int i = 0; i < children.Count; i += 1)
             {
                 var child = children[i];
-                if (!child._isVisible || !child._isHitTestVisible || !child.HasRenderer)
+                if (!child._isVisible || !child._isHitTestVisible || !child.HasRenderer || !parent.IsInTabOrder(child))
                 {
                     continue;
                 }
@@ -1566,11 +1566,72 @@ namespace XForma
         }
 
         /// <summary>
+        /// Whether Tab can reach this child, and the views inside it: not
+        /// content an open drawer covers, say.
+        /// </summary>
+        [PlatformContract]
+        protected internal virtual bool IsInTabOrder(
+            View child)
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Whether Tab stays inside this view for now, wrapping around, as in
+        /// an open drawer.
+        /// </summary>
+        protected internal virtual bool IsTabScope
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Where Tab moves among, in the tree under this view: the view inside
+        /// it that's keeping Tab, or else this view.
+        /// </summary>
+        [PlatformContract]
+        internal View ActiveTabScope
+        {
+            get
+            {
+                return this.FindTabScope() ?? this;
+            }
+        }
+
+        private View FindTabScope()
+        {
+            if (!this._isVisible)
+            {
+                return null;
+            }
+
+            if (this.IsTabScope)
+            {
+                return this;
+            }
+
+            var children = this.DrawingOrderChildren;
+            for (int i = children.Count - 1; i >= 0; i -= 1)
+            {
+                var scope = children[i].FindTabScope();
+                if (null != scope)
+                {
+                    return scope;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// Whether Tab stops at the view: it's focusable, and (for an item in a
         /// list) it's the list's current item. Arrow keys reach the rest.
         /// </summary>
         [PlatformContract]
-        internal virtual bool IsTabStop
+        protected internal virtual bool IsTabStop
         {
             get
             {

@@ -86,9 +86,6 @@ namespace XForma.iOS
                 return;
             }
 
-            AppBadge.Watch(application);
-            Schedule(application);
-
             bool isDone = false;
             task.ExpirationHandler = () =>
             {
@@ -102,11 +99,14 @@ namespace XForma.iOS
             bool succeeded = true;
             try
             {
+                AppBadge.Watch(application);
+                Schedule(application);
                 await ApplicationHost.For(application).RefreshInBackgroundAsync();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 succeeded = false;
+                FrameworkLog.Write(LogLevel.Warning, "The background refresh failed.", ex);
             }
 
             if (!isDone)

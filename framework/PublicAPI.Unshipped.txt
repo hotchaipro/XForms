@@ -196,3 +196,24 @@ XForma.GestureState.Ready = 0 -> XForma.GestureState
 XForma.GestureState.Recognized = 2 -> XForma.GestureState
 abstract XForma.GestureRecognizer.OnPointerInput(XForma.PointerEventArgs e) -> void
 XForma.View.IsDragPossible.get -> bool
+XForma.Application.UnhandledException -> System.EventHandler<XForma.ApplicationExceptionEventArgs>
+static XForma.Application.ReportException(System.Exception exception) -> bool
+XForma.ApplicationExceptionEventArgs
+XForma.ApplicationExceptionEventArgs.Exception.get -> System.Exception
+XForma.ApplicationExceptionEventArgs.Handled.get -> bool
+XForma.ApplicationExceptionEventArgs.Handled.set -> void
+XForma.FrameworkLog
+static XForma.FrameworkLog.MessageLogged -> System.EventHandler<XForma.LogEventArgs>
+static XForma.FrameworkLog.Write(XForma.LogLevel level, string message, System.Exception exception = null) -> void
+XForma.LogEventArgs
+XForma.LogEventArgs.Exception.get -> System.Exception
+XForma.LogEventArgs.Level.get -> XForma.LogLevel
+XForma.LogEventArgs.Message.get -> string
+XForma.LogLevel
+XForma.LogLevel.Error = 2 -> XForma.LogLevel
+XForma.LogLevel.Information = 0 -> XForma.LogLevel
+XForma.LogLevel.Warning = 1 -> XForma.LogLevel
+virtual XForma.View.IsInTabOrder(XForma.View child) -> bool
+virtual XForma.View.IsTabScope.get -> bool
+virtual XForma.View.IsTabStop.get -> bool
+override XForma.Primitives.ItemContainer.IsTabStop.get -> bool

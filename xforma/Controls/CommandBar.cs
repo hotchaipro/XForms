@@ -124,19 +124,12 @@ namespace XForma.Controls
         internal virtual void SetCommands(
             CommandBarCommandCollection commands)
         {
+            this._primaryButtons.Clear();
+            this._secondaryButtons.Clear();
+
             if (null == commands)
             {
-                if ((this._primaryButtons.Count == 0) && (this._secondaryButtons.Count == 0))
-                {
-                    return;
-                }
-
-                throw new NotSupportedException();
-            }
-
-            if ((this._primaryButtons.Count != 0) || (this._secondaryButtons.Count != 0))
-            {
-                throw new NotImplementedException();
+                return;
             }
 
             foreach (var command in commands.PrimaryCommands)
@@ -146,6 +139,7 @@ namespace XForma.Controls
                     Text = command.Text,
                     Icon = command.Icon,
                     Command = command.Command,
+                    CommandParameter = this._commandParameter,
                 });
             }
 
@@ -156,7 +150,24 @@ namespace XForma.Controls
                     Text = command.Text,
                     Icon = command.Icon,
                     Command = command.Command,
+                    CommandParameter = this._commandParameter,
                 });
+            }
+        }
+
+        internal IReadOnlyList<CommandBarButton> PrimaryButtons
+        {
+            get
+            {
+                return this._primaryButtons.Buttons;
+            }
+        }
+
+        internal IReadOnlyList<CommandBarButton> SecondaryButtons
+        {
+            get
+            {
+                return this._secondaryButtons.Buttons;
             }
         }
 

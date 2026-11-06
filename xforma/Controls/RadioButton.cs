@@ -71,7 +71,7 @@ namespace XForma.Controls
 
             this.GestureRecognizers.Add(new TapGestureRecognizer(this));
 
-            radioButtonItem.PropertyChanged += MenuItem_PropertyChanged; // TODO: Matching detach event handler
+            WeakPropertyChanged<RadioButton>.Subscribe(radioButtonItem, this, static (button) => button.InvalidateVisual());
         }
 
         // User state: whether it's checked, when that changed since it was
@@ -124,13 +124,6 @@ namespace XForma.Controls
         {
             get;
             set;
-        }
-
-        private void MenuItem_PropertyChanged(
-            object sender,
-            System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            this.InvalidateVisual();
         }
 
         public RadioButtons RadioButtons

@@ -131,7 +131,7 @@ namespace XForma.Primitives
         }
 
         // A list is one Tab stop: the container of its current item
-        internal override bool IsTabStop
+        protected internal override bool IsTabStop
         {
             get
             {

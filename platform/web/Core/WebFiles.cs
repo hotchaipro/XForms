@@ -49,7 +49,7 @@ namespace XForma.Web
                 }
                 catch (Exception ex)
                 {
-                    Console.Error.WriteLine($"XForma: couldn't restore {name}: {ex.Message}");
+                    FrameworkLog.Write(LogLevel.Warning, $"Couldn't restore {name}.", ex);
                 }
             }
         }
@@ -67,7 +67,7 @@ namespace XForma.Web
                 }
                 catch (Exception ex)
                 {
-                    Console.Error.WriteLine($"XForma: couldn't save {name}: {ex.Message}");
+                    FrameworkLog.Write(LogLevel.Warning, $"Couldn't save {name}.", ex);
                 }
             }
 

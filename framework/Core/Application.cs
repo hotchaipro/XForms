@@ -59,6 +59,84 @@ namespace XForma
         }
 
         /// <summary>
+        /// Raised when nothing in the app caught an exception, for crash
+        /// reporting. It's usually on the UI thread; an exception from another
+        /// thread raises it there, and the app ends whatever the handler does.
+        /// Setting <see cref="ApplicationExceptionEventArgs.Handled"/> keeps the
+        /// app running on Windows and Android. A web app keeps running either
+        /// way, and iOS ends the app either way, after this event.
+        /// </summary>
+        public event EventHandler<ApplicationExceptionEventArgs> UnhandledException;
+
+        private static Exception _lastReported;
+        private static bool _lastReportedHandled;
+        private static bool _isWatchingExceptions;
+
+        /// <summary>
+        /// Reports an exception that nothing can deal with, as code at the top
+        /// of an <c>async void</c> method or a callback should: it's written to
+        /// <see cref="FrameworkLog"/> and raises
+        /// <see cref="UnhandledException"/>. Returns whether a handler handled it.
+        /// </summary>
+        public static bool ReportException(
+            Exception exception)
+        {
+            ArgumentNullException.ThrowIfNull(exception);
+
+            // A platform can hear of one exception more than once, as it
+            // unwinds through its layers
+            if (ReferenceEquals(exception, _lastReported))
+            {
+                return _lastReportedHandled;
+            }
+
+            _lastReported = exception;
+            _lastReportedHandled = false;
+            FrameworkLog.Write(LogLevel.Error, "Unhandled exception.", exception);
+
+            var handler = _CurrentApplication?.UnhandledException;
+            if (null != handler)
+            {
+                var args = new ApplicationExceptionEventArgs(exception);
+                try
+                {
+                    handler(_CurrentApplication, args);
+                    _lastReportedHandled = args.Handled;
+                }
+                catch (Exception handlerException)
+                {
+                    FrameworkLog.Write(LogLevel.Error, "An UnhandledException handler failed.", handlerException);
+                }
+            }
+
+            return _lastReportedHandled;
+        }
+
+        // Exceptions no platform's event loop sees: on other threads, and in
+        // tasks nothing awaited
+        private static void WatchExceptions()
+        {
+            if (_isWatchingExceptions)
+            {
+                return;
+            }
+
+            _isWatchingExceptions = true;
+            AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
+            {
+                if (e.ExceptionObject is Exception exception)
+                {
+                    ReportException(exception);
+                }
+            };
+
+            TaskScheduler.UnobservedTaskException += (sender, e) =>
+            {
+                FrameworkLog.Write(LogLevel.Warning, "A task failed and nothing awaited it.", e.Exception);
+            };
+        }
+
+        /// <summary>
         /// Creates the app, before it runs: a platform's <c>Run</c> method
         /// starts it. Do the app's work in <see cref="OnStart"/>, when the
         /// platform is there; the constructor can't use the dispatcher,
@@ -92,6 +170,7 @@ namespace XForma
 
             this._platform = platform ?? throw new ArgumentNullException(nameof(platform));
             _CurrentApplication = this;
+            WatchExceptions();
 
             this._renderer = platform.CreateApplicationRenderer(this);
             this._dispatcher = new Dispatcher(this._renderer);
@@ -1106,6 +1185,11 @@ namespace XForma
             this.Platform.NavigateToUri(uri);
         }
 
+        /// <summary>
+        /// Ends the app, on Windows and Android. iOS and the browser don't let
+        /// an app close itself, so there it does nothing: an app that has to
+        /// end on them shows the user a page saying so.
+        /// </summary>
         public virtual void Exit()
         {
             this.Renderer.Exit();

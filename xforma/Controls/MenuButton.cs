@@ -31,12 +31,10 @@ namespace XForma.Controls
 
             this.GestureRecognizers.Add(new TapGestureRecognizer(this));
 
-            menuItem.PropertyChanged += MenuItem_PropertyChanged; // TODO: Matching detach event handler
+            WeakPropertyChanged<MenuButton>.Subscribe(menuItem, this, static (button) => button.OnMenuItemChanged());
         }
 
-        private void MenuItem_PropertyChanged(
-            object sender,
-            System.ComponentModel.PropertyChangedEventArgs e)
+        private void OnMenuItemChanged()
         {
             this.IsVisible = this.MenuItem.IsVisible;
             this.InvalidateVisual();

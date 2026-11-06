@@ -146,6 +146,18 @@ namespace XForma.Controls
 
         private async void Refresh()
         {
+            try
+            {
+                await this.RefreshAsync();
+            }
+            catch (Exception exception)
+            {
+                Application.ReportException(exception);
+            }
+        }
+
+        private async Task RefreshAsync()
+        {
             this._isRefreshing = true;
             this.OnPropertyChanged(nameof(this.IsRefreshing));
 
@@ -153,6 +165,11 @@ namespace XForma.Controls
             try
             {
                 this.RefreshRequested?.Invoke(this, args);
+            }
+            catch (Exception exception)
+            {
+                // The refresh ends, so the indicator doesn't spin forever
+                Application.ReportException(exception);
             }
             finally
             {

@@ -25,6 +25,12 @@ namespace XForma.Android.Renderers
 
             this._application = application;
             this._applicationHost = ApplicationHost.For(application);
+
+            // An exception on its way out to Java: the app can keep running
+            global::Android.Runtime.AndroidEnvironment.UnhandledExceptionRaiser += (sender, e) =>
+            {
+                e.Handled = Application.ReportException(e.Exception);
+            };
             this._androidApplication = androidApplication;
 
             androidApplication.Suspending += Application_Suspending;

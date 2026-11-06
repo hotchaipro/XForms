@@ -11,7 +11,7 @@ namespace XForma.iOS.Renderers
     internal class ImageRenderer : ViewRenderer<UIImageView>, IImageRenderer
     {
         private UIImageView _nativeImageView;
-        private ImageSource _imageSource;
+        private int _loadNumber;
         private UIImage _image;
         private Color _tint = Colors.Transparent;
 
@@ -47,15 +47,30 @@ namespace XForma.iOS.Renderers
             this._nativeImageView.Image = image;
         }
 
+        // An image that doesn't load shows nothing, and the app carries on. The
+        // latest source wins, whichever loads first (a list reuses its images)
         public async void SetSource(
             ImageSource source)
         {
-            await this.LoadSourceAsync(source);
-            this._imageSource = source;
+            int loadNumber = ++this._loadNumber;
+            try
+            {
+                await this.LoadSourceAsync(source, loadNumber);
+            }
+            catch (Exception ex)
+            {
+                FrameworkLog.Write(LogLevel.Warning, "An image didn't load.", ex);
+                if (loadNumber == this._loadNumber)
+                {
+                    this._image = null;
+                    this.ShowImage();
+                }
+            }
         }
 
         private async Task LoadSourceAsync(
-            ImageSource source)
+            ImageSource source,
+            int loadNumber)
         {
             var fileImageSource = source as FileImageSource;
             if (null != fileImageSource)
@@ -63,8 +78,17 @@ namespace XForma.iOS.Renderers
                 string resourceName = Path.GetFileName(fileImageSource.Path).ToLowerInvariant();
                 // Loaded off the UI thread; shown on it (UIKit's views are only
                 // touched there), where the await comes back to
-                this._image = await Task.Run(() => UIImage.FromBundle(resourceName));
-                this.ShowImage();
+                var image = await Task.Run(() => UIImage.FromBundle(resourceName));
+                if (null == image)
+                {
+                    throw new FileNotFoundException("Resource not found", resourceName);
+                }
+
+                if (loadNumber == this._loadNumber)
+                {
+                    this._image = image;
+                    this.ShowImage();
+                }
             }
             else
             {

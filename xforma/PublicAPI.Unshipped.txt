@@ -1022,3 +1022,6 @@ static XForma.Controls.ToolTipStyle.operator !=(XForma.Controls.ToolTipStyle lef
 static XForma.Controls.ToolTipStyle.operator ==(XForma.Controls.ToolTipStyle left, XForma.Controls.ToolTipStyle right) -> bool
 static XForma.Controls.TreeViewStyle.operator !=(XForma.Controls.TreeViewStyle left, XForma.Controls.TreeViewStyle right) -> bool
 static XForma.Controls.TreeViewStyle.operator ==(XForma.Controls.TreeViewStyle left, XForma.Controls.TreeViewStyle right) -> bool
+override XForma.Controls.NavigationView.IsInTabOrder(XForma.View child) -> bool
+override XForma.Controls.NavigationView.IsTabScope.get -> bool
+override XForma.Controls.NavigationViewItem.IsTabStop.get -> bool

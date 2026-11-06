@@ -252,10 +252,17 @@ namespace XForma.Controls
             FloatingButton button,
             AnimationHandle collapsing)
         {
-            await collapsing;
-            if (!this._isExpanded)
+            try
             {
-                button.IsVisible = false;
+                await collapsing;
+                if (!this._isExpanded)
+                {
+                    button.IsVisible = false;
+                }
+            }
+            catch (Exception exception)
+            {
+                Application.ReportException(exception);
             }
         }
 

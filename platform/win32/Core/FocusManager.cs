@@ -89,9 +89,13 @@ namespace XForma.Win32
                 focusable.Add(renderer);
             }
 
+            var view = renderer.Element as View;
             foreach (var child in TabOrder(renderer.Children))
             {
-                this.CollectFocusable(child, focusable);
+                if ((null == view) || !(child.Element is View childView) || view.IsInTabOrder(childView))
+                {
+                    this.CollectFocusable(child, focusable);
+                }
             }
         }
 
@@ -314,6 +318,12 @@ namespace XForma.Win32
             if (null == root)
             {
                 return;
+            }
+
+            // Or inside what's keeping it, such as an open drawer
+            if ((root.Element is View rootView) && (rootView.ActiveTabScope.Renderer is ViewRenderer scope))
+            {
+                root = scope;
             }
 
             var focusable = new List<ViewRenderer>();

@@ -114,5 +114,76 @@ namespace XForma.Tests
             Assert.IsType<NavigationViewScrim>(children[3]);
             Assert.IsType<NavigationViewPane>(drawn[2]);
         }
+
+        private static readonly Theme Basic = new XForma.Themes.Basic.BasicTheme().Create(ThemeMode.Light, Colors.Blue);
+
+        private static NavigationView Narrow(
+            bool isOpen)
+        {
+            var navigationView = new NavigationView() { Theme = Basic };
+            navigationView.MenuItems.Add(new NavigationViewItem() { Text = "one" });
+            navigationView.MenuItems.Add(new NavigationViewItem() { Text = "two" });
+            navigationView.SetIsNarrow(true);
+            navigationView.IsPaneOpen = isOpen;
+            return navigationView;
+        }
+
+        private static View ContentHost(
+            NavigationView navigationView)
+        {
+            return navigationView.DrawingOrderChildren[0];
+        }
+
+        [Fact]
+        public void ClosedATabReachesTheContentAndTheRestOfTheTree()
+        {
+            var navigationView = Narrow(isOpen: false);
+            var parent = new Box(navigationView);
+
+            Assert.True(navigationView.IsInTabOrder(ContentHost(navigationView)));
+            Assert.Same(parent, parent.ActiveTabScope);
+        }
+
+        [Fact]
+        public void AnOpenDrawerKeepsTabInsideIt()
+        {
+            var navigationView = Narrow(isOpen: true);
+            var parent = new Box(new Box(), new Box(navigationView));
+
+            Assert.False(navigationView.IsInTabOrder(ContentHost(navigationView)));
+            Assert.True(navigationView.IsInTabOrder(navigationView.TabOrderChildren[1]));
+            Assert.Same(navigationView, parent.ActiveTabScope);
+        }
+
+        [Fact]
+        public void AWidePaneKeepsNothing()
+        {
+            var navigationView = new NavigationView() { Theme = Basic };
+            navigationView.SetIsNarrow(false);
+            navigationView.IsPaneOpen = true;
+
+            Assert.True(navigationView.IsInTabOrder(ContentHost(navigationView)));
+            Assert.False(navigationView.IsTabScope);
+        }
+
+        [Fact]
+        public void APaneIsOneTabStopTheFirstItemWithNothingSelected()
+        {
+            var navigationView = Narrow(isOpen: false);
+
+            Assert.True(navigationView.MenuItems[0].IsTabStop);
+            Assert.False(navigationView.MenuItems[1].IsTabStop);
+        }
+
+        [Fact]
+        public void APanesTabStopIsTheSelectedItem()
+        {
+            var navigationView = Narrow(isOpen: false);
+
+            navigationView.SelectedItem = navigationView.MenuItems[1];
+
+            Assert.False(navigationView.MenuItems[0].IsTabStop);
+            Assert.True(navigationView.MenuItems[1].IsTabStop);
+        }
     }
 }

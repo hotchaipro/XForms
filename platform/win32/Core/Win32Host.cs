@@ -1088,10 +1088,13 @@ namespace XForma.Win32
             catch (Exception ex)
             {
                 // Surface failures instead of letting them unwind through native frames
-                System.IO.File.AppendAllText(
-                    System.IO.Path.Combine(AppContext.BaseDirectory, "crash.log"),
-                    $"{DateTime.Now:O} {ex}{Environment.NewLine}");
-                Environment.FailFast("Unhandled exception in the window procedure.", ex);
+                if (!Application.ReportException(ex))
+                {
+                    System.IO.File.AppendAllText(
+                        System.IO.Path.Combine(AppContext.BaseDirectory, "crash.log"),
+                        $"{DateTime.Now:O} {ex}{Environment.NewLine}");
+                    Environment.FailFast("Unhandled exception in the window procedure.", ex);
+                }
             }
 
             return PInvoke.DefWindowProc(hwnd, msg, wParam, lParam);

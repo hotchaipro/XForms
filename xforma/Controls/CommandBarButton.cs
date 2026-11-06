@@ -49,6 +49,17 @@ namespace XForma.Controls
             this._commandBar.InvalidateMeasure();
         }
 
+        public void Clear()
+        {
+            foreach (var button in this._buttons)
+            {
+                this._commandBar.ButtonsLayout.Children.Remove(button);
+            }
+
+            this._buttons.Clear();
+            this._commandBar.InvalidateMeasure();
+        }
+
         internal IReadOnlyList<CommandBarButton> Buttons
         {
             get

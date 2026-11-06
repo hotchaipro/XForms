@@ -299,7 +299,7 @@ namespace XForma.Web
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"XForma: {ex}");
+                Application.ReportException(ex);
             }
         }
 
@@ -313,7 +313,7 @@ namespace XForma.Web
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"XForma: {ex}");
+                Application.ReportException(ex);
             }
         }
 

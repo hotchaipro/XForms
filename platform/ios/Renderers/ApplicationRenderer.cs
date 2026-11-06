@@ -235,9 +235,9 @@ namespace XForma.iOS.Renderers
             this._applicationHost.Resume();
         }
 
+        // iOS doesn't let an app close itself
         public void Exit()
         {
-            throw new NotImplementedException();
         }
 
         public void ApplyTheme(

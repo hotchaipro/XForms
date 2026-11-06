@@ -274,6 +274,48 @@ namespace XForma.Controls
             this.MenuItems[(index + direction + count) % count].Focus();
         }
 
+        // While the drawer is open, Tab stays in it and the button that closes
+        // it, not the content it covers
+        private bool IsDrawerOpen
+        {
+            get
+            {
+                return this._isNarrow && this._isPaneOpen;
+            }
+        }
+
+        protected override bool IsTabScope
+        {
+            get
+            {
+                return this.IsDrawerOpen;
+            }
+        }
+
+        protected override bool IsInTabOrder(
+            View child)
+        {
+            return !this.IsDrawerOpen || (child != this._contentHost);
+        }
+
+        // The pane is one Tab stop: the item that's focused, or else the
+        // selected one, or else the first. Up and Down reach the rest
+        internal NavigationViewItem TabStopItem
+        {
+            get
+            {
+                foreach (var item in this.MenuItems)
+                {
+                    if (item.IsFocused)
+                    {
+                        return item;
+                    }
+                }
+
+                return this._selectedItem ?? this.FirstItem;
+            }
+        }
+
         protected override void OnKeyDown(
             KeyEventArgs keyInputEvent)
         {
@@ -325,7 +367,18 @@ namespace XForma.Controls
             float width = float.IsInfinity(availableSize.Width) ? this.ActualTheme.NavigationViewStyle.DefaultSize.Width : availableSize.Width;
             float height = float.IsInfinity(availableSize.Height) ? this.ActualTheme.NavigationViewStyle.DefaultSize.Height : availableSize.Height;
 
-            bool isNarrow = width < CompactThreshold;
+            this.SetIsNarrow(width < CompactThreshold);
+
+            this._pane.Measure(new Size(this.ActualTheme.NavigationViewStyle.PaneWidth, height));
+            this._menuButton.Measure(new Size(this.ActualTheme.NavigationViewStyle.BarHeight, this.ActualTheme.NavigationViewStyle.BarHeight));
+            this._scrim.Measure(new Size(width, height));
+            this._contentHost.Measure(this.ContentBounds(width, height).Size);
+            return new Size(width, height);
+        }
+
+        internal void SetIsNarrow(
+            bool isNarrow)
+        {
             if (isNarrow != this._isNarrow)
             {
                 this._isNarrow = isNarrow;
@@ -336,12 +389,6 @@ namespace XForma.Controls
                 this._pane.InvalidateVisual();
                 this.InvalidateVisual();
             }
-
-            this._pane.Measure(new Size(this.ActualTheme.NavigationViewStyle.PaneWidth, height));
-            this._menuButton.Measure(new Size(this.ActualTheme.NavigationViewStyle.BarHeight, this.ActualTheme.NavigationViewStyle.BarHeight));
-            this._scrim.Measure(new Size(width, height));
-            this._contentHost.Measure(this.ContentBounds(width, height).Size);
-            return new Size(width, height);
         }
 
         // Where the content goes: beside the pane, or below the bar
@@ -462,6 +509,14 @@ namespace XForma.Controls
         {
             this.Focusable = true;
             this.GestureRecognizers.Add(new TapGestureRecognizer(this));
+        }
+
+        protected override bool IsTabStop
+        {
+            get
+            {
+                return base.IsTabStop && ((null == this.NavigationView) || (this.NavigationView.TabStopItem == this));
+            }
         }
 
         public string Text

@@ -11,7 +11,7 @@ namespace XForma.Android.Renderers
     internal class ImageRenderer : ViewRenderer<AndroidImageView>, IImageRenderer
     {
         private AndroidImageView _nativeImageView;
-        private ImageSource _imageSource;
+        private int _loadNumber;
 
         public ImageRenderer(
             global::Android.Content.Context context,
@@ -37,15 +37,29 @@ namespace XForma.Android.Renderers
             }
         }
 
+        // An image that doesn't load shows nothing, and the app carries on. The
+        // latest source wins, whichever loads first (a list reuses its images)
         public async void SetSource(
             ImageSource source)
         {
-            await this.LoadSourceAsync(source);
-            this._imageSource = source;
+            int loadNumber = ++this._loadNumber;
+            try
+            {
+                await this.LoadSourceAsync(source, loadNumber);
+            }
+            catch (Exception ex)
+            {
+                FrameworkLog.Write(LogLevel.Warning, "An image didn't load.", ex);
+                if (loadNumber == this._loadNumber)
+                {
+                    this._nativeImageView.SetImageBitmap(null);
+                }
+            }
         }
 
         private async Task LoadSourceAsync(
-            ImageSource source)
+            ImageSource source,
+            int loadNumber)
         {
             var fileImageSource = source as FileImageSource;
             if (null != fileImageSource)
@@ -62,7 +76,10 @@ namespace XForma.Android.Renderers
                     throw new FileNotFoundException("Resource not found", resourceName);
                 }
 
-                this._nativeImageView.SetImageBitmap(nativeBitmap);
+                if (loadNumber == this._loadNumber)
+                {
+                    this._nativeImageView.SetImageBitmap(nativeBitmap);
+                }
             }
             else
             {

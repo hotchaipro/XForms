@@ -267,7 +267,7 @@ namespace XForma.Web
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"XForma: the app didn't start: {ex}");
+                FrameworkLog.Write(LogLevel.Error, "The app didn't start.", ex);
                 throw;
             }
         }
