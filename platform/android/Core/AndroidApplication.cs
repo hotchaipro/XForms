@@ -446,13 +446,11 @@ namespace XForma.Android
             bool isLightBackground)
         {
             this._isStatusBarLight = isLightBackground;
+            this._statusBarColor = background;
 
             this.UpdateSystemBarAppearance();
         }
 
-        /// <summary>
-        /// Colors the area behind the navigation bar, with icons that contrast with it.
-        /// </summary>
         /// <summary>
         /// The focused text entry, if one has focus, gives it up (the root
         /// frame takes it) and the soft keyboard hides.
@@ -482,17 +480,48 @@ namespace XForma.Android
             }
         }
 
+        /// <summary>
+        /// Colors the area behind the navigation bar, with icons that contrast with it.
+        /// </summary>
         internal void SetNavigationBarColors(
             Color background,
             bool isLightBackground)
         {
             this._isNavigationBarLight = isLightBackground;
+            this._navigationBarColor = background;
 
             this.UpdateSystemBarAppearance();
         }
 
+        private Color _statusBarColor = Colors.Transparent;
+        private Color _navigationBarColor = Colors.Transparent;
+
         private void UpdateSystemBarAppearance()
         {
+            // From Android 15 the app draws behind the bars, and their colors do
+            // nothing. Before it, the bars have colors of their own, which
+            // the icons have to contrast with
+            var window = this._activity?.Window;
+            if ((null != window) && !OperatingSystem.IsAndroidVersionAtLeast(35))
+            {
+#pragma warning disable CA1422
+                window.SetStatusBarColor(this._statusBarColor.ToAndroidColor());
+                window.SetNavigationBarColor(this._navigationBarColor.ToAndroidColor());
+
+                if (!OperatingSystem.IsAndroidVersionAtLeast(30))
+                {
+                    var flags = window.DecorView.SystemUiVisibility;
+                    flags = this._isStatusBarLight ? (flags | global::Android.Views.StatusBarVisibility.Visible | (global::Android.Views.StatusBarVisibility)global::Android.Views.SystemUiFlags.LightStatusBar) : (flags & ~(global::Android.Views.StatusBarVisibility)global::Android.Views.SystemUiFlags.LightStatusBar);
+                    if (OperatingSystem.IsAndroidVersionAtLeast(26))
+                    {
+                        flags = this._isNavigationBarLight ? (flags | (global::Android.Views.StatusBarVisibility)global::Android.Views.SystemUiFlags.LightNavigationBar) : (flags & ~(global::Android.Views.StatusBarVisibility)global::Android.Views.SystemUiFlags.LightNavigationBar);
+                    }
+
+                    window.DecorView.SystemUiVisibility = flags;
+                }
+#pragma warning restore CA1422
+            }
+
             if (OperatingSystem.IsAndroidVersionAtLeast(30))
             {
                 var lightStatusBars = WindowInsetsControllerAppearance.LightStatusBars;
