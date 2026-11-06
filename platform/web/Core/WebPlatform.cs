@@ -111,6 +111,16 @@ namespace XForma.Web
             this._host.RequestFrame(onFrame);
         }
 
+        // The browser recognizes the gesture (see WebHost)
+        public bool UsesSystemDragGesture => true;
+
+        public void StartDrag(
+            View source,
+            DataPackage data,
+            Point position)
+        {
+        }
+
         // A page can't close itself
         public void Exit()
         {

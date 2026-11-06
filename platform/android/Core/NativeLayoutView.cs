@@ -116,6 +116,12 @@ namespace XForma.Android
             this.SetClipToPadding(false);
         }
 
+        public override bool OnDragEvent(
+            global::Android.Views.DragEvent e)
+        {
+            return AndroidDragDrop.OnDragEvent(this._owner, e, 1 / this.Resources.DisplayMetrics.Density);
+        }
+
         internal XForma.View Owner
         {
             get

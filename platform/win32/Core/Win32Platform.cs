@@ -229,6 +229,16 @@ namespace XForma.Win32
             });
         }
 
+        public bool UsesSystemDragGesture => false;
+
+        public void StartDrag(
+            View source,
+            DataPackage data,
+            Point position)
+        {
+            this._host.RunDrag(data);
+        }
+
         public void Exit()
         {
             PInvoke.PostQuitMessage(0);

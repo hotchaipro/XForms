@@ -7,7 +7,7 @@ using XForma.Platform;
 
 namespace XForma
 {
-    public abstract class View : Element, INotifyPropertyChanged
+    public abstract partial class View : Element, INotifyPropertyChanged
     {
         private bool _isVisible = true;
         private bool _isHitTestVisible = true;
@@ -1647,6 +1647,11 @@ namespace XForma
         internal bool RouteLayerKeyDown(
             KeyEventArgs e)
         {
+            if (DragDropSession.HandleKey(this._focusedLightweight ?? this, e))
+            {
+                return true;
+            }
+
             if ((e.Key == Key.Tab) && ((e.KeyModifiers & ~KeyModifiers.Shift) == KeyModifiers.None)
                 && (this._focusedLightweight ?? this).MoveFocus(isForward: !e.KeyModifiers.HasFlag(KeyModifiers.Shift)))
             {
@@ -4064,6 +4069,11 @@ namespace XForma
             KeyEventArgs e)
         {
             SetFocusRingVisible(true);
+
+            if (DragDropSession.HandleKey(this, e))
+            {
+                return true;
+            }
 
             for (var view = this; null != view; view = view.KeyboardParent)
             {

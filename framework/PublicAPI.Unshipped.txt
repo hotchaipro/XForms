@@ -235,3 +235,44 @@ XForma.Primitives.WebViewNavigatedEventArgs
 XForma.Primitives.WebViewNavigatedEventArgs.IsSuccess.get -> bool
 XForma.Primitives.WebViewNavigatedEventArgs.Uri.get -> System.Uri
 
+XForma.DataPackage
+XForma.DataPackage.DataPackage() -> void
+XForma.DataPackage.Files.get -> System.Collections.Generic.IReadOnlyList<XForma.DroppedFile>
+XForma.DataPackage.Files.set -> void
+XForma.DataPackage.LocalData.get -> object
+XForma.DataPackage.LocalData.set -> void
+XForma.DataPackage.Text.get -> string
+XForma.DataPackage.Text.set -> void
+XForma.DataPackage.Uri.get -> System.Uri
+XForma.DataPackage.Uri.set -> void
+XForma.DragEventArgs
+XForma.DragEventArgs.AcceptedOperation.get -> XForma.DragOperation
+XForma.DragEventArgs.AcceptedOperation.set -> void
+XForma.DragEventArgs.Data.get -> XForma.DataPackage
+XForma.DragEventArgs.IsFromThisApp.get -> bool
+XForma.DragEventArgs.Position.get -> XForma.Point
+XForma.DragOperation
+XForma.DragOperation.Copy = 1 -> XForma.DragOperation
+XForma.DragOperation.Move = 2 -> XForma.DragOperation
+XForma.DragOperation.None = 0 -> XForma.DragOperation
+XForma.DragStartingEventArgs
+XForma.DragStartingEventArgs.Cancel.get -> bool
+XForma.DragStartingEventArgs.Cancel.set -> void
+XForma.DragStartingEventArgs.Data.get -> XForma.DataPackage
+XForma.DragStartingEventArgs.DragStartingEventArgs() -> void
+XForma.DropCompletedEventArgs
+XForma.DropCompletedEventArgs.Operation.get -> XForma.DragOperation
+XForma.DroppedFile
+XForma.DroppedFile.DroppedFile() -> void
+abstract XForma.DroppedFile.Name.get -> string
+abstract XForma.DroppedFile.OpenReadAsync() -> System.Threading.Tasks.Task<System.IO.Stream>
+XForma.View.AllowDrop.get -> bool
+XForma.View.AllowDrop.set -> void
+XForma.View.CanDrag.get -> bool
+XForma.View.CanDrag.set -> void
+XForma.View.DragEnter -> System.EventHandler<XForma.DragEventArgs>
+XForma.View.DragLeave -> System.EventHandler<XForma.DragEventArgs>
+XForma.View.DragOver -> System.EventHandler<XForma.DragEventArgs>
+XForma.View.DragStarting -> System.EventHandler<XForma.DragStartingEventArgs>
+XForma.View.Drop -> System.EventHandler<XForma.DragEventArgs>
+XForma.View.DropCompleted -> System.EventHandler<XForma.DropCompletedEventArgs>

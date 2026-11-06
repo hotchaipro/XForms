@@ -81,6 +81,140 @@ namespace XForma.Web
 
         #region Renderers
 
+        // ── Drag and drop ──────────────────────────────────────────────────
+
+        private (View View, Point Point) DragHit(
+            int id,
+            float x,
+            float y)
+        {
+            if (!this._renderers.TryGetValue(id, out var renderer) || !(renderer.Element is View view))
+            {
+                return (null, default);
+            }
+
+            var point = new Point(x, y);
+            var deepest = LayerHost.For(view).HitTestPointerOver(point);
+            var offset = (deepest == view) ? default : LayerHost.For(deepest).OffsetInLayer;
+            return (deepest, new Point(x - offset.X, y - offset.Y));
+        }
+
+        public bool CanDragAt(
+            int id,
+            float x,
+            float y)
+        {
+            var (view, _) = this.DragHit(id, x, y);
+            return (null != view) && (ApplicationHost.Current?.CanBeginDrag(view) ?? false);
+        }
+
+        public string OnDragStart(
+            int id,
+            float x,
+            float y)
+        {
+            var (view, _) = this.DragHit(id, x, y);
+            DataPackage data = null;
+            Run(() =>
+            {
+                data = (null != view) ? ApplicationHost.Current?.BeginDrag(view) : null;
+            });
+            if (null == data)
+            {
+                return null;
+            }
+
+            var size = LayerHost.For(view).Size;
+            return string.Join('\0', data.Text ?? string.Empty, data.Uri?.AbsoluteUri ?? string.Empty, size.Width.ToString(System.Globalization.CultureInfo.InvariantCulture), size.Height.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        }
+
+        public int OnDragOver(
+            int id,
+            float x,
+            float y)
+        {
+            var (view, point) = this.DragHit(id, x, y);
+            var operation = DragOperation.None;
+            Run(() =>
+            {
+                operation = ApplicationHost.Current?.UpdateDrag(view, point, null) ?? DragOperation.None;
+            });
+            return (int)operation;
+        }
+
+        public void OnDragLeave()
+        {
+            Run(() => ApplicationHost.Current?.ExitDrag());
+        }
+
+        public int OnDrop(
+            int id,
+            float x,
+            float y,
+            string text,
+            string uri,
+            string fileNames)
+        {
+            var (view, point) = this.DragHit(id, x, y);
+            var package = new DataPackage() { Text = string.IsNullOrEmpty(text) ? null : text };
+            if (!string.IsNullOrEmpty(uri) && System.Uri.TryCreate(uri, UriKind.Absolute, out var parsed))
+            {
+                package.Uri = parsed;
+            }
+
+            if (!string.IsNullOrEmpty(fileNames))
+            {
+                var parts = fileNames.Split('\n');
+                int token = int.Parse(parts[0], System.Globalization.CultureInfo.InvariantCulture);
+                var files = new List<DroppedFile>();
+                for (int i = 1; i < parts.Length; i += 1)
+                {
+                    files.Add(new BrowserFile(parts[i], token, i - 1));
+                }
+
+                package.Files = files;
+            }
+
+            var operation = DragOperation.None;
+            Run(() =>
+            {
+                operation = ApplicationHost.Current?.DropDrag(view, point, package) ?? DragOperation.None;
+            });
+            return (int)operation;
+        }
+
+        public void OnDragEnd(
+            int operation)
+        {
+            Run(() => ApplicationHost.Current?.EndDrag((DragOperation)operation));
+        }
+
+        private sealed class BrowserFile : DroppedFile
+        {
+            private readonly int _token;
+            private readonly int _index;
+
+            public BrowserFile(
+                string name,
+                int token,
+                int index)
+            {
+                this.Name = name;
+                this._token = token;
+                this._index = index;
+            }
+
+            public override string Name
+            {
+                get;
+            }
+
+            public override async Task<System.IO.Stream> OpenReadAsync()
+            {
+                return new System.IO.MemoryStream(Convert.FromBase64String(await Js.ReadDroppedFile(this._token, this._index)));
+            }
+        }
+
         public void OnElementLoaded(
             int id)
         {

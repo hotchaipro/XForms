@@ -236,6 +236,16 @@ namespace XForma.iOS.Renderers
         }
 
         // iOS doesn't let an app close itself
+        // A long press, which iOS recognizes (see IosDragDrop)
+        public bool UsesSystemDragGesture => true;
+
+        public void StartDrag(
+            View source,
+            DataPackage data,
+            Point position)
+        {
+        }
+
         public void Exit()
         {
         }
@@ -301,6 +311,7 @@ namespace XForma.iOS.Renderers
             var frameRenderer = (FrameRenderer)frame.Renderer;
 
             this._nativeApplicationDelegate.SetRootViewController(frameRenderer.ViewController);
+            IosDragDrop.Install(frameRenderer.ViewController.View);
             this.UpdateStatusBar();
         }
 

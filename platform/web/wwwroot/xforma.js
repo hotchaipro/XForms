@@ -73,6 +73,15 @@ export async function init() {
     });
     root.addEventListener('wheel', onWheel, { passive: false });
     root.addEventListener('contextmenu', onContextMenu);
+    root.addEventListener('dragstart', onDragStart);
+    root.addEventListener('dragover', onDragOver);
+    root.addEventListener('dragleave', (e) => {
+        if (!e.relatedTarget || !root.contains(e.relatedTarget)) {
+            exports.OnDragLeave();
+        }
+    });
+    root.addEventListener('drop', onDrop);
+    root.addEventListener('dragend', onDragEnd);
 }
 
 // Elements
@@ -484,7 +493,107 @@ function modifiers(e) {
     return (e.shiftKey ? 1 : 0) | (e.ctrlKey ? 2 : 0) | (e.altKey ? 4 : 0) | (e.metaKey ? 8 : 0);
 }
 
+// Drag and drop: the browser recognizes the gesture when the element pressed is
+// draggable, so the root is, while a press is on a view that can be dragged
+
+function viewAt(e, target) {
+    const ids = xids(target);
+    if (ids.length === 0) {
+        return null;
+    }
+    const [x, y] = local(ids[0], e);
+    return { id: ids[0], x, y };
+}
+
+let dragImage = null;
+
+function onDragStart(e) {
+    const hit = viewAt(e, document.elementFromPoint(e.clientX, e.clientY) ?? e.target);
+    const description = hit ? exports.OnDragStart(hit.id, hit.x, hit.y) : null;
+    if (!description) {
+        root.draggable = false;
+        e.preventDefault();
+        return;
+    }
+
+    const [text, uri, width, height] = description.split('\0');
+    e.dataTransfer.setData('text/plain', text || uri);
+    if (uri) {
+        e.dataTransfer.setData('text/uri-list', uri);
+    }
+    e.dataTransfer.effectAllowed = 'copyMove';
+
+    // A plain box the size of the view, not the whole page
+    dragImage = document.createElement('div');
+    dragImage.style.cssText = `position:fixed;left:-10000px;top:0;width:${width}px;height:${height}px;background:rgba(128,128,128,.4)`;
+    document.body.appendChild(dragImage);
+    e.dataTransfer.setDragImage(dragImage, hit.x, hit.y);
+    localDrag = true;
+}
+
+let localDrag = false;
+
+const dropEffects = ['none', 'copy', 'move'];
+
+function onDragOver(e) {
+    const hit = viewAt(e, e.target);
+    const operation = hit ? exports.OnDragOver(hit.id, hit.x, hit.y) : 0;
+    if (operation > 0) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = dropEffects[operation];
+    }
+}
+
+// Files dropped, until the page goes: a drop's token and their place in it
+const droppedFiles = new Map();
+let nextDropToken = 1;
+
+function onDrop(e) {
+    e.preventDefault();
+    const hit = viewAt(e, e.target);
+    if (!hit) {
+        return;
+    }
+
+    let names = '';
+    const files = Array.from(e.dataTransfer.files ?? []);
+    if (files.length > 0) {
+        const token = nextDropToken++;
+        droppedFiles.set(token, files);
+        names = [token, ...files.map((f) => f.name)].join('\n');
+    }
+
+    const text = localDrag ? '' : e.dataTransfer.getData('text/plain');
+    const uri = localDrag ? '' : e.dataTransfer.getData('text/uri-list');
+    dropResult = exports.OnDrop(hit.id, hit.x, hit.y, text, uri, names);
+}
+
+let dropResult = 0;
+
+function onDragEnd(e) {
+    root.draggable = false;
+    dragImage?.remove();
+    dragImage = null;
+    localDrag = false;
+    const operation = dropResult || dropEffects.indexOf(e.dataTransfer.dropEffect);
+    dropResult = 0;
+    exports.OnDragEnd(Math.max(0, operation));
+}
+
+export async function readDroppedFile(token, index) {
+    const bytes = new Uint8Array(await droppedFiles.get(token)[index].arrayBuffer());
+    let binary = '';
+    for (let i = 0; i < bytes.length; i += 0x8000) {
+        binary += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+    }
+    return btoa(binary);
+}
+
 function onPointerDown(e) {
+    for (const id of xids(e.target).slice(0, 1)) {
+        const [x, y] = local(id, e);
+        root.draggable = exports.CanDragAt(id, x, y);
+    }
     // Only the main button presses (the right one asks for a context menu)
     if (e.pointerType === 'mouse' && e.button !== 0) {
         return;

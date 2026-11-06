@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using XForma.Platform;
 
 namespace XForma.Android.Renderers
@@ -232,6 +232,17 @@ namespace XForma.Android.Renderers
             EventArgs e)
         {
             this._applicationHost.Resume();
+        }
+
+        public bool UsesSystemDragGesture => false;
+
+        public void StartDrag(
+            View source,
+            DataPackage data,
+            Point position)
+        {
+            float density = FrameRenderer.RootNativeFrame.Resources.DisplayMetrics.Density;
+            AndroidDragDrop.Start(FrameRenderer.RootNativeFrame, source, data, position, density);
         }
 
         public void Exit()

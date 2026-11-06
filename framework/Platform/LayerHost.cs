@@ -260,6 +260,17 @@ namespace XForma.Platform
         /// hovering pointer is over: a lightweight view drawn into this one, or
         /// this view.
         /// </summary>
+        /// <summary>
+        /// The view's size.
+        /// </summary>
+        public Size Size
+        {
+            get
+            {
+                return this._view.FrameSize;
+            }
+        }
+
         public View HitTestPointerOver(
             Point point)
         {

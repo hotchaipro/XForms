@@ -252,6 +252,11 @@ namespace XForma.Win32
                 return false;
             }
 
+            if ((this._focused?.Element is View dragView) && (ApplicationHost.Current?.HandleDragKey(dragView, new KeyEventArgs(key, modifiers)) ?? false))
+            {
+                return true;
+            }
+
             // A native text entry handles its own keys (except Tab and Escape),
             // but a single-line one offers the keys it has no use for (Up,
             // Down, Page Up, Page Down and Escape) to its ancestors first, for

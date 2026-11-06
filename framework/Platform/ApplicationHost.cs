@@ -230,6 +230,79 @@ namespace XForma.Platform
             }
         }
 
+        // ── Drag and drop ──────────────────────────────────────────────────
+
+        /// <summary>
+        /// Whether a drag could start in the view.
+        /// </summary>
+        public bool CanBeginDrag(
+            View view)
+        {
+            return DragDropSession.CanBegin(view);
+        }
+
+        /// <summary>
+        /// A drag is starting in the view: asks what's dragged, or null for no
+        /// drag.
+        /// </summary>
+        public DataPackage BeginDrag(
+            View view)
+        {
+            return DragDropSession.Begin(view);
+        }
+
+        /// <summary>
+        /// A drag moved over the deepest view under it (or null), at a point in
+        /// its coordinates, with the data from another app, if that's where it
+        /// came from. Returns what a drop there would do.
+        /// </summary>
+        public DragOperation UpdateDrag(
+            View deepest,
+            Point point,
+            DataPackage external)
+        {
+            return DragDropSession.Update(deepest, point, external);
+        }
+
+        /// <summary>
+        /// A drag left the window.
+        /// </summary>
+        public void ExitDrag()
+        {
+            DragDropSession.Exit();
+        }
+
+        /// <summary>
+        /// A drag dropped. Returns what the drop did.
+        /// </summary>
+        public DragOperation DropDrag(
+            View deepest,
+            Point point,
+            DataPackage external)
+        {
+            return DragDropSession.Drop(deepest, point, external);
+        }
+
+        /// <summary>
+        /// A key for a drag from the keyboard, on a platform that sends keys to
+        /// views itself: returns whether it was used.
+        /// </summary>
+        public bool HandleDragKey(
+            View focused,
+            KeyEventArgs e)
+        {
+            return DragDropSession.HandleKey(focused, e);
+        }
+
+        /// <summary>
+        /// A drag from this app ended, having done this.
+        /// </summary>
+        public void EndDrag(
+            DragOperation operation)
+        {
+            DragDropSession.End(operation);
+        }
+
         // ── Hover ──────────────────────────────────────────────────────────
 
         /// <summary>

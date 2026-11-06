@@ -244,6 +244,47 @@ namespace XForma.Web
         }
 
         [JSExport]
+        internal static bool CanDragAt(int id, float x, float y)
+        {
+            return WebHost.Current?.CanDragAt(id, x, y) ?? false;
+        }
+
+        // The drag's text, address and size ("text\0uri\0width\0height"), or null
+        [JSExport]
+        internal static string OnDragStart(int id, float x, float y)
+        {
+            return WebHost.Current?.OnDragStart(id, x, y);
+        }
+
+        [JSExport]
+        internal static int OnDragOver(int id, float x, float y)
+        {
+            return WebHost.Current?.OnDragOver(id, x, y) ?? 0;
+        }
+
+        [JSExport]
+        internal static void OnDragLeave()
+        {
+            WebHost.Current?.OnDragLeave();
+        }
+
+        [JSExport]
+        internal static int OnDrop(int id, float x, float y, string text, string uri, string fileNames)
+        {
+            return WebHost.Current?.OnDrop(id, x, y, text, uri, fileNames) ?? 0;
+        }
+
+        [JSExport]
+        internal static void OnDragEnd(int operation)
+        {
+            WebHost.Current?.OnDragEnd(operation);
+        }
+
+        [JSImport("readDroppedFile", Module)]
+        [return: JSMarshalAs<JSType.Promise<JSType.String>>]
+        public static partial Task<string> ReadDroppedFile(int token, int index);
+
+        [JSExport]
         internal static void OnElementLoaded(int id)
         {
             WebHost.Current?.OnElementLoaded(id);

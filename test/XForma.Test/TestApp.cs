@@ -121,6 +121,7 @@ namespace XForma.Test
             routes.Add("/safe-area-list", _ => new SafeAreaListPage());
             routes.Add("/forms", _ => new FormsPage());
             routes.Add("/webview", _ => new WebViewPage());
+            routes.Add("/dragdrop", _ => new DragDropPage());
             routes.Add("/feedback", _ => new FeedbackPage());
             routes.Add("/structure", _ => new StructurePage());
             routes.Add("/drawing", _ => new DrawingPage());

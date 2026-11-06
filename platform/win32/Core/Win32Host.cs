@@ -342,11 +342,13 @@ namespace XForma.Win32
             // RichEdit with DirectWrite rendering
             PInvoke.LoadLibrary("Msftedit.dll");
 
-            // Mouse, touch and pen all arrive as pointer messages
-            PInvoke.EnableMouseInPointer(true);
+            // NOTE: Touch and pen arrive as pointer messages, and the mouse as
+            // mouse messages, not through EnableMouseInPointer: OLE's drag loop
+            // follows the mouse by mouse messages, and doesn't see pointer ones
 
             RegisterWindowClass();
             this.CreateWindow(title, HWND.Null);
+            Win32DragDrop.Register(this);
         }
 
         private static void RegisterWindowClass()
@@ -785,6 +787,80 @@ namespace XForma.Win32
             return true;
         }
 
+        // The mouse's one pointer
+        private const uint MousePointerId = 1;
+        private bool _isTrackingMouseLeave;
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct TRACKMOUSEEVENT
+        {
+            public uint Size;
+            public uint Flags;
+            public HWND Window;
+            public uint HoverTime;
+        }
+
+        [DllImport("user32.dll", EntryPoint = "TrackMouseEvent")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool TrackMouse(TRACKMOUSEEVENT* tracking);
+
+        private bool OnMouseMessage(
+            uint msg,
+            WPARAM wParam,
+            LPARAM lParam)
+        {
+            var point = this.PointFromLParam(lParam);
+            const nuint LeftButton = 0x0001; // MK_LBUTTON
+
+            switch (msg)
+            {
+                case PInvoke.WM_LBUTTONDOWN:
+                case PInvoke.WM_LBUTTONDBLCLK:
+                    this._pointers.Down(MousePointerId, point, false, PointerDeviceType.Mouse);
+
+                    // Keep receiving mouse moves outside the window
+                    PInvoke.SetCapture(this._hwnd);
+                    return true;
+
+                case PInvoke.WM_MOUSEMOVE:
+                    if (!this._isTrackingMouseLeave)
+                    {
+                        const uint TME_LEAVE = 0x0002;
+                        var tracking = new TRACKMOUSEEVENT() { Size = (uint)sizeof(TRACKMOUSEEVENT), Flags = TME_LEAVE, Window = this._hwnd };
+                        this._isTrackingMouseLeave = TrackMouse(&tracking);
+                    }
+
+                    if (((wParam.Value & LeftButton) != 0) && this._pointers.IsActive)
+                    {
+                        this._pointers.Move(MousePointerId, point);
+                    }
+                    else
+                    {
+                        this.UpdatePointerOver(MousePointerId, PointerDeviceType.Mouse, point);
+                    }
+
+                    return true;
+
+                case PInvoke.WM_LBUTTONUP:
+                    this._pointers.Up(MousePointerId, point);
+                    this.UpdatePointerOver(MousePointerId, PointerDeviceType.Mouse, point);
+                    PInvoke.ReleaseCapture();
+                    return true;
+
+                case PInvoke.WM_RBUTTONUP:
+                    // The right button asks for the context menu of the view under it
+                    this.RequestContext(point);
+                    return true;
+
+                case 0x02A3: // WM_MOUSELEAVE
+                    this._isTrackingMouseLeave = false;
+                    ApplicationHost.Current?.PointerOver(null, new PointerEventArgs((int)MousePointerId, PointerDeviceType.Mouse, default, PointerInputState.Moved, false, KeyModifiers.None));
+                    return true;
+            }
+
+            return false;
+        }
+
         private bool OnPointerMessage(
             uint msg,
             WPARAM wParam)
@@ -810,23 +886,6 @@ namespace XForma.Win32
             var deviceType = (pointerType == POINTER_INPUT_TYPE.PT_TOUCH) ? PointerDeviceType.Touch
                 : (pointerType == POINTER_INPUT_TYPE.PT_PEN) ? PointerDeviceType.Pen
                 : PointerDeviceType.Mouse;
-
-            // A mouse's other buttons don't press: the right one asks for the
-            // context menu of the view under it when it's released
-            const uint FirstButton = 0x0010;  // POINTER_MESSAGE_FLAG_FIRSTBUTTON
-            const uint SecondButton = 0x0020; // POINTER_MESSAGE_FLAG_SECONDBUTTON
-            if ((deviceType == PointerDeviceType.Mouse) && (msg == PInvoke.WM_POINTERDOWN) && ((flags & FirstButton) == 0))
-            {
-                this._isRightButtonPressed = (flags & SecondButton) != 0;
-                return true;
-            }
-
-            if ((deviceType == PointerDeviceType.Mouse) && (msg == PInvoke.WM_POINTERUP) && this._isRightButtonPressed)
-            {
-                this._isRightButtonPressed = false;
-                this.RequestContext(point);
-                return true;
-            }
 
             switch (msg)
             {
@@ -866,8 +925,6 @@ namespace XForma.Win32
             return false;
         }
 
-        private bool _isRightButtonPressed;
-
         // A right-click: a context request for the view under it (outside an
         // open popup, the popup closes, as for any click)
         private void RequestContext(
@@ -887,6 +944,31 @@ namespace XForma.Win32
         }
 
         // A mouse or pen hovers over the deepest view under it
+        /// <summary>
+        /// The deepest view under a point in the window, and the point in its
+        /// coordinates.
+        /// </summary>
+        public (View View, Point Point) ViewAt(
+            Point point)
+        {
+            this.HitTest(point, out var hit);
+            var origin = hit?.AbsoluteOrigin() ?? default;
+            return (hit?.Element as View, new Point(point.X - origin.X, point.Y - origin.Y));
+        }
+
+        /// <summary>
+        /// Runs a drag from this window. The press it started from ended inside
+        /// OLE's loop, so views are told it's canceled.
+        /// </summary>
+        public void RunDrag(
+            DataPackage data)
+        {
+            PInvoke.ReleaseCapture();
+            var operation = Win32DragDrop.Run(data);
+            this._pointers.Cancel();
+            ApplicationHost.Current?.EndDrag(operation);
+        }
+
         private void UpdatePointerOver(
             uint pointerId,
             PointerDeviceType deviceType,
@@ -1037,6 +1119,26 @@ namespace XForma.Win32
 
                     case PInvoke.WM_POINTERCAPTURECHANGED:
                         host._pointers.Cancel();
+                        break;
+
+                    case PInvoke.WM_LBUTTONDOWN:
+                    case PInvoke.WM_LBUTTONDBLCLK:
+                    case PInvoke.WM_LBUTTONUP:
+                    case PInvoke.WM_RBUTTONUP:
+                    case PInvoke.WM_MOUSEMOVE:
+                    case 0x02A3: // WM_MOUSELEAVE
+                        if (host.OnMouseMessage(msg, wParam, lParam))
+                        {
+                            return (LRESULT)0;
+                        }
+                        break;
+
+                    case PInvoke.WM_CAPTURECHANGED:
+                        // Another window took the mouse in the middle of a press
+                        if (lParam.Value != (nint)hwnd.Value)
+                        {
+                            host._pointers.Cancel();
+                        }
                         break;
 
                     case PInvoke.WM_POINTERWHEEL:

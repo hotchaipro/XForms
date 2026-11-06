@@ -22,6 +22,20 @@ namespace XForma.Platform
         void Exit();
 
         /// <summary>
+        /// Whether the platform decides when a drag starts, by itself, and asks
+        /// through <see cref="ApplicationHost.BeginDrag"/> (iOS, the browser).
+        /// Otherwise a pressed view's gesture recognizer starts it.
+        /// </summary>
+        bool UsesSystemDragGesture { get; }
+
+        /// <summary>
+        /// Starts the platform's drag of the data, from a view, at a point in its
+        /// coordinates. The platform calls <see cref="ApplicationHost.EndDrag"/>
+        /// when it ends.
+        /// </summary>
+        void StartDrag(View source, DataPackage data, Point position);
+
+        /// <summary>
         /// Styles the platform's own parts (title bar, system bars) for the
         /// application's theme.
         /// </summary>
