@@ -37,6 +37,7 @@ namespace XForma.Test
             }
 
             TestApp.RecreateHost = () => AndroidApplication.Current?.Activity?.Recreate();
+            WebViewPage.CreateNativeSample = () => new global::Android.Widget.TextView(this) { Text = "A native Android view" };
             XFormaApp.Run(this, bundle, new TestApp(), new BasicTheme());
         }
 

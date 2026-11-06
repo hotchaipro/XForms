@@ -1,2 +1,2 @@
-XForma.Android.AndroidToolkitServices
-static XForma.Android.AndroidToolkitServices.Register() -> void
+static XForma.Toolkit.AndroidToolkitServices.Register(System.Func<Android.App.Activity> activity = null) -> void
+XForma.Toolkit.AndroidToolkitServices

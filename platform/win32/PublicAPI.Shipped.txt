@@ -1,4 +1,4 @@
-XForma.Win32.Win32Application
-XForma.Win32.Win32Application.MainWindowHandle.get -> nint
 static XForma.Win32.Win32Application.Current.get -> XForma.Win32.Win32Application
 static XForma.Win32.Win32Application.Run(string title, XForma.Application application) -> void
+XForma.Win32.Win32Application
+XForma.Win32.Win32Application.MainWindowHandle.get -> nint

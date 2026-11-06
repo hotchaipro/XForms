@@ -1,4 +1,5 @@
 <Solution>
+  <Project Path="testing/XForma.Testing.csproj" />
   <Project Path="templates/XForma.Templates.csproj" />
   <Folder Name="/framework/">
     <Project Path="framework/XForma.Framework.csproj" />

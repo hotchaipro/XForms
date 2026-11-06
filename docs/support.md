@@ -46,6 +46,12 @@ are handled.
   owner-drawn views on some platforms, so an XForma popup can't cover one
   there. See [architecture.md](architecture.md).
 
+- A `PanGestureRecognizer`'s translation is measured in its view's coordinates, so
+  a view that moves itself as it's panned gets a shrinking distance. Put the
+  recognizer on a view that stays put, such as the moving view's parent.
+- On Windows, a drag from the app shows the system's cursor, without a picture of
+  what's dragged. The other platforms show a plain box the size of the view.
+
 ## Versions and breaking changes
 
 XForma follows [semantic versioning](https://semver.org). From 1.0 on,

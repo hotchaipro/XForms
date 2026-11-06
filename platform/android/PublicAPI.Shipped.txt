@@ -1,3 +1,4 @@
+static XForma.Android.AndroidApplication.Current.get -> XForma.Android.AndroidApplication
+static XForma.Android.AndroidApplication.Run(Android.App.Activity activity, Android.OS.Bundle savedInstanceState, XForma.Application application) -> XForma.Android.AndroidApplication
 XForma.Android.AndroidApplication
 XForma.Android.AndroidApplication.Activity.get -> Android.App.Activity
-static XForma.Android.AndroidApplication.Current.get -> XForma.Android.AndroidApplication

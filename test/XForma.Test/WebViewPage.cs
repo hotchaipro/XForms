@@ -9,6 +9,9 @@ namespace XForma.Test
     // address, with what it reports
     public class WebViewPage : Page
     {
+        // Each platform's own view, from its entry point: a NativeViewHost's sample
+        public static Func<object> CreateNativeSample;
+
         protected override View Build()
         {
             var status = new TextBlock() { Text = "Loading", Name = "status" };
@@ -36,6 +39,11 @@ namespace XForma.Test
 
             var layout = new DockPanel();
             layout.Children.Add(bar, Dock.Top);
+            if (null != CreateNativeSample)
+            {
+                layout.Children.Add(new NativeViewHost(CreateNativeSample) { Height = 40 }, Dock.Top);
+            }
+
             layout.Children.Add(webView, Dock.CenterOverlay);
             return layout;
         }

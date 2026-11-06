@@ -103,3 +103,7 @@ children are walked without allocating.
   display lists, which aren't bitmaps).
 - **Not yet measured:** frame time while animating many views, which needs
   the Animator, and Win32 frame time while scrolling.
+
+## Web download and startup
+
+The test app, published for release (November 2026): 4.8 MB of Brotli-compressed files in _framework (15.6 MB uncompressed). First content in about 2 to 5 seconds, from a local server, in Edge 156, Firefox 159 and WebKit 27.2.

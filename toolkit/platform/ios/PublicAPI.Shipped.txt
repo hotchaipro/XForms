@@ -1,2 +1,2 @@
-XForma.iOS.IosToolkitServices
-static XForma.iOS.IosToolkitServices.Register() -> void
+static XForma.Toolkit.IosToolkitServices.Register(System.Func<UIKit.UIViewController> presenter = null) -> void
+XForma.Toolkit.IosToolkitServices

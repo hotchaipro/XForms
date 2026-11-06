@@ -1,7 +1,6 @@
 using System;
-using System.Reflection;
 using XForma.Layouts;
-using XForma.Platform;
+using XForma.Testing;
 using Xunit;
 
 // The tests share Application.Current and other process-wide state
@@ -9,79 +8,6 @@ using Xunit;
 
 namespace XForma.Tests
 {
-    /// <summary>
-    /// A platform that shows nothing, but lays out as a real one does: a native
-    /// container measures and arranges its view's content.
-    /// </summary>
-    public class LayoutPlatform : DispatchProxy
-    {
-        internal IApplicationRenderer Application;
-
-        protected override object Invoke(
-            MethodInfo targetMethod,
-            object[] args)
-        {
-            switch (targetMethod.Name)
-            {
-                case "CreateApplicationRenderer":
-                    return this.Application;
-
-                case "CreateContainerRenderer":
-                    var renderer = Create<IContainerRenderer, ContainerRenderer>();
-                    ((ContainerRenderer)(object)renderer).View = (View)args[0];
-                    return renderer;
-            }
-
-            return Default(targetMethod);
-        }
-
-        internal static object Default(
-            MethodInfo method)
-        {
-            return method.ReturnType.IsValueType && (method.ReturnType != typeof(void))
-                ? Activator.CreateInstance(method.ReturnType)
-                : null;
-        }
-    }
-
-    public class ContainerRenderer : DispatchProxy
-    {
-        internal View View;
-
-        protected override object Invoke(
-            MethodInfo targetMethod,
-            object[] args)
-        {
-            switch (targetMethod.Name)
-            {
-                case "get_Element":
-                    return this.View;
-
-                case "get_IsVisible":
-                    return true;
-
-                case "MeasureNative":
-                    return this.View.MeasureContent((Size)args[0]);
-
-                case "ArrangeNative":
-                    this.View.LayoutContent(((Rect)args[0]).Size);
-                    return null;
-            }
-
-            return LayoutPlatform.Default(targetMethod);
-        }
-    }
-
-    public class ApplicationRendererStub : DispatchProxy
-    {
-        protected override object Invoke(
-            MethodInfo targetMethod,
-            object[] args)
-        {
-            return (targetMethod.Name == "get_SystemTextScale") ? 1.0f : LayoutPlatform.Default(targetMethod);
-        }
-    }
-
     // How each panel measures and places its children
     public class LayoutTests
     {
@@ -108,9 +34,7 @@ namespace XForma.Tests
 
         public LayoutTests()
         {
-            var platform = DispatchProxy.Create<IPlatform, LayoutPlatform>();
-            ((LayoutPlatform)(object)platform).Application = DispatchProxy.Create<IApplicationRenderer, ApplicationRendererStub>();
-            new TestApp().Start(platform, null);
+            TestHost.Start(new TestApp());
         }
 
         private static void LayOut(
@@ -118,8 +42,7 @@ namespace XForma.Tests
             float width,
             float height)
         {
-            root.Measure(new Size(width, height));
-            root.Arrange(new Rect(0, 0, width, height));
+            TestHost.LayOut(root, width, height);
         }
 
         private static void AssertAt(
@@ -327,6 +250,18 @@ namespace XForma.Tests
             LayOut(panel, 200, 200);
 
             Assert.Equal(150, child.FrameOrigin.X);
+        }
+
+        [Fact]
+        public void TestHostFindsAViewByName()
+        {
+            var named = new Box(10, 10) { Name = "save" };
+            var panel = new StackPanel();
+            panel.Children.Add(new Box(10, 10));
+            panel.Children.Add(named);
+
+            Assert.Same(named, TestHost.Find<Box>(panel, "save"));
+            Assert.Throws<InvalidOperationException>(() => TestHost.Find<Box>(panel, "missing"));
         }
     }
 }

@@ -6,6 +6,12 @@ namespace XForma.Test.Win32
 {
     public static class Program
     {
+        [System.Runtime.InteropServices.DllImport("user32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
+        private static extern nint CreateWindowExW(uint exStyle, string className, string windowName, uint style, int x, int y, int width, int height, nint parent, nint menu, nint instance, nint parameter);
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern nint GetDesktopWindow();
+
         [STAThread]
         public static void Main()
         {
@@ -26,6 +32,8 @@ namespace XForma.Test.Win32
             {
                 AppContext.SetSwitch("XForma.DisableLightweightViews", true);
             }
+
+            WebViewPage.CreateNativeSample = () => CreateWindowExW(0, "STATIC", "A native Win32 window", 0x40000000, 0, 0, 100, 30, GetDesktopWindow(), 0, 0, 0);
 
             XFormaApp.Run("XForma Test (Win32)", new TestApp(), new BasicTheme());
         }

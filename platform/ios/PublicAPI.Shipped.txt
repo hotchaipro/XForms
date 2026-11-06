@@ -1,6 +1,10 @@
+static XForma.iOS.IosApplication.Current.get -> XForma.iOS.IosApplication
+static XForma.iOS.IosApplication.RegisterBackgroundRefresh() -> void
+static XForma.iOS.IosApplication.Run(string[] args, XForma.Application application) -> void
+static XForma.iOS.IosApplication.Run(UIKit.UIWindowScene windowScene, UIKit.UISceneConnectionOptions connectionOptions, XForma.Application application) -> XForma.iOS.IosApplication
 XForma.iOS.IosApplication
+XForma.iOS.IosApplication.CreateStateRestorationActivity() -> Foundation.NSUserActivity
+XForma.iOS.IosApplication.OpenUrl(Foundation.NSUrl url) -> void
 XForma.iOS.IosApplication.RootViewController.get -> UIKit.UIViewController
 XForma.iOS.IosApplication.Window.get -> UIKit.UIWindow
 XForma.iOS.IosApplication.WindowScene.get -> UIKit.UIWindowScene
-static XForma.iOS.IosApplication.Current.get -> XForma.iOS.IosApplication
-static XForma.iOS.IosApplication.Run(string[] args, XForma.Application application) -> void

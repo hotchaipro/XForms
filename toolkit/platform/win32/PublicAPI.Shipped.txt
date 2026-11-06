@@ -1,2 +1,2 @@
-XForma.Win32.Win32ToolkitServices
-static XForma.Win32.Win32ToolkitServices.Register() -> void
+static XForma.Toolkit.Win32ToolkitServices.Register(System.Func<nint> ownerWindow = null) -> void
+XForma.Toolkit.Win32ToolkitServices

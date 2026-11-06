@@ -19,6 +19,9 @@ namespace XForma.Test.Web
             HotReloadLog.Simulate();
         }
 
+        [JSImport("globalThis.document.createElement")]
+        private static partial JSObject CreateElement(string tag);
+
         public static async Task Main()
         {
             // ?page=lists picks another page, as XFORMA_TEST_PAGE does on Win32
@@ -26,6 +29,13 @@ namespace XForma.Test.Web
             var query = HttpUtility.ParseQueryString(location.GetPropertyAsString("search") ?? string.Empty);
             TestApp.StartPage = query["page"];
             TestApp.ThemeModeSwitches = query["themes"];
+
+            WebViewPage.CreateNativeSample = () =>
+            {
+                var element = CreateElement("div");
+                element.SetProperty("textContent", "A native element");
+                return element;
+            };
 
             await XFormaApp.RunAsync("XForma Test (Web)", new TestApp(), new BasicTheme());
         }

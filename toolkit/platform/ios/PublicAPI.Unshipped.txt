@@ -1,4 +1,0 @@
-XForma.Toolkit.IosToolkitServices
-static XForma.Toolkit.IosToolkitServices.Register(System.Func<UIKit.UIViewController> presenter = null) -> void
-*REMOVED*XForma.iOS.IosToolkitServices
-*REMOVED*static XForma.iOS.IosToolkitServices.Register() -> void

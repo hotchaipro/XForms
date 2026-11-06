@@ -14,6 +14,7 @@ namespace XForma.Test.iOS
             TestApp.StartPage = System.Environment.GetEnvironmentVariable("XFORMA_TEST_PAGE");
             TestApp.ThemeModeSwitches = System.Environment.GetEnvironmentVariable("XFORMA_THEME_SWITCHES");
 
+            WebViewPage.CreateNativeSample = () => new UIKit.UILabel() { Text = "A native UIKit view" };
             XFormaApp.Run(args, new TestApp(), new BasicTheme());
         }
     }

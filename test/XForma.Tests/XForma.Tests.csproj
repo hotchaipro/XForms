@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\framework\XForma.Framework.csproj" />
+    <ProjectReference Include="..\..\testing\XForma.Testing.csproj" />
     <ProjectReference Include="..\..\xforma\XForma.csproj" />
     <ProjectReference Include="..\..\themes\basic\XForma.Themes.Basic.csproj" />
     <ProjectReference Include="..\..\analyzers\XForma.Analyzers.csproj" />

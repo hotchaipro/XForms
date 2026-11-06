@@ -1,4 +1,0 @@
-XForma.iOS.IosApplication.CreateStateRestorationActivity() -> Foundation.NSUserActivity
-XForma.iOS.IosApplication.OpenUrl(Foundation.NSUrl url) -> void
-static XForma.iOS.IosApplication.Run(UIKit.UIWindowScene windowScene, UIKit.UISceneConnectionOptions connectionOptions, XForma.Application application) -> XForma.iOS.IosApplication
-static XForma.iOS.IosApplication.RegisterBackgroundRefresh() -> void

@@ -1,0 +1,53 @@
+override XForma.Themes.Basic.BasicColors.Equals(object obj) -> bool
+override XForma.Themes.Basic.BasicColors.GetHashCode() -> int
+override XForma.Themes.Basic.BasicColors.ToString() -> string
+override XForma.Themes.Basic.BasicTheme.Apply(XForma.Theme theme) -> XForma.Theme
+override XForma.Themes.Basic.BasicTheme.CreateColors(XForma.ThemeMode mode, XForma.Color accentColor) -> XForma.ColorScheme
+override XForma.Themes.Basic.ButtonStyle.Equals(object obj) -> bool
+override XForma.Themes.Basic.ButtonStyle.GetHashCode() -> int
+override XForma.Themes.Basic.ButtonStyle.ToString() -> string
+static XForma.Themes.Basic.BasicColors.operator !=(XForma.Themes.Basic.BasicColors left, XForma.Themes.Basic.BasicColors right) -> bool
+static XForma.Themes.Basic.BasicColors.operator ==(XForma.Themes.Basic.BasicColors left, XForma.Themes.Basic.BasicColors right) -> bool
+static XForma.Themes.Basic.ButtonStyle.operator !=(XForma.Themes.Basic.ButtonStyle left, XForma.Themes.Basic.ButtonStyle right) -> bool
+static XForma.Themes.Basic.ButtonStyle.operator ==(XForma.Themes.Basic.ButtonStyle left, XForma.Themes.Basic.ButtonStyle right) -> bool
+XForma.Themes.Basic.BasicColors
+XForma.Themes.Basic.BasicColors.<Clone>$() -> XForma.Themes.Basic.BasicColors
+XForma.Themes.Basic.BasicColors.BasicColors() -> void
+XForma.Themes.Basic.BasicColors.Equals(XForma.Themes.Basic.BasicColors other) -> bool
+XForma.Themes.Basic.BasicColors.FloatingPressedBackground.get -> XForma.Color
+XForma.Themes.Basic.BasicColors.FloatingPressedBackground.init -> void
+XForma.Themes.Basic.BasicColors.FloatingPressedForeground.get -> XForma.Color
+XForma.Themes.Basic.BasicColors.FloatingPressedForeground.init -> void
+XForma.Themes.Basic.BasicColors.Glow.get -> XForma.Color
+XForma.Themes.Basic.BasicColors.Glow.init -> void
+XForma.Themes.Basic.BasicColors.OnCommand.get -> XForma.Color
+XForma.Themes.Basic.BasicColors.OnCommand.init -> void
+XForma.Themes.Basic.BasicColors.OnPressed.get -> XForma.Color
+XForma.Themes.Basic.BasicColors.OnPressed.init -> void
+XForma.Themes.Basic.BasicColors.OnSuccess.get -> XForma.Color
+XForma.Themes.Basic.BasicColors.OnSuccess.init -> void
+XForma.Themes.Basic.BasicColors.OnWarning.get -> XForma.Color
+XForma.Themes.Basic.BasicColors.OnWarning.init -> void
+XForma.Themes.Basic.BasicColors.Shadow.get -> XForma.Color
+XForma.Themes.Basic.BasicColors.Shadow.init -> void
+XForma.Themes.Basic.BasicColors.SubtleFloatingBackground.get -> XForma.Color?
+XForma.Themes.Basic.BasicColors.SubtleFloatingBackground.init -> void
+XForma.Themes.Basic.BasicColors.Success.get -> XForma.Color
+XForma.Themes.Basic.BasicColors.Success.init -> void
+XForma.Themes.Basic.BasicColors.Warning.get -> XForma.Color
+XForma.Themes.Basic.BasicColors.Warning.init -> void
+XForma.Themes.Basic.BasicTheme
+XForma.Themes.Basic.BasicTheme.BasicTheme() -> void
+XForma.Themes.Basic.ButtonStyle
+XForma.Themes.Basic.ButtonStyle.<Clone>$() -> XForma.Themes.Basic.ButtonStyle
+XForma.Themes.Basic.ButtonStyle.Background.get -> XForma.Color?
+XForma.Themes.Basic.ButtonStyle.Background.init -> void
+XForma.Themes.Basic.ButtonStyle.ButtonStyle() -> void
+XForma.Themes.Basic.ButtonStyle.CornerRadius.get -> float?
+XForma.Themes.Basic.ButtonStyle.CornerRadius.init -> void
+XForma.Themes.Basic.ButtonStyle.Equals(XForma.Themes.Basic.ButtonStyle other) -> bool
+XForma.Themes.Basic.ButtonStyle.Foreground.get -> XForma.Color?
+XForma.Themes.Basic.ButtonStyle.Foreground.init -> void
+XForma.Themes.Basic.ButtonStyle.Over(XForma.Themes.Basic.ButtonStyle other) -> XForma.Themes.Basic.ButtonStyle
+XForma.Themes.Basic.ButtonStyle.TextStyle.get -> XForma.Controls.TextStyle
+XForma.Themes.Basic.ButtonStyle.TextStyle.init -> void
