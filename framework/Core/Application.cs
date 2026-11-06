@@ -689,7 +689,10 @@ namespace XForma
             InvalidateVisuals(this._rootFrame);
             foreach (var window in this.Windows)
             {
-                InvalidateVisuals(window.Frame);
+                if (null != window.Frame)
+                {
+                    InvalidateVisuals(window.Frame);
+                }
             }
 
             foreach (var popup in this._openPopups)
