@@ -9,7 +9,6 @@
     <RootNamespace>XForma.Web</RootNamespace>
     <AssemblyName>XForma.Framework.Web</AssemblyName>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Nullable>disable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
   </PropertyGroup>
 
