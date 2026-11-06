@@ -3,6 +3,9 @@ using XForma.Platform;
 
 namespace XForma.Primitives
 {
+    /// <summary>
+    /// Shows an image, with the platform's own image view.
+    /// </summary>
     public class Image : View
     {
         protected override AccessibilityRole DefaultAccessibilityRole

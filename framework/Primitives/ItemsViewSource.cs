@@ -4,6 +4,9 @@ using System.Collections.Specialized;
 
 namespace XForma.Primitives
 {
+    /// <summary>
+    /// The items of a list, with how to make and bind a view for each.
+    /// </summary>
     public abstract class ItemsViewSource : IEnumerable, INotifyCollectionChanged
     {
         public event NotifyCollectionChangedEventHandler? CollectionChanged;

@@ -2,6 +2,9 @@
 
 namespace XForma
 {
+    /// <summary>
+    /// Where text sits in its space.
+    /// </summary>
     public enum TextAlignment
     {
         Start = 0,

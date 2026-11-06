@@ -6,6 +6,9 @@ using XForma.Primitives;
 
 namespace XForma.Controls
 {
+    /// <summary>
+    /// A command bar's commands: primary on one side, secondary on the other.
+    /// </summary>
     public class CommandBarCommandCollection
     {
         private List<UICommand> _primaryCommands;
@@ -34,6 +37,9 @@ namespace XForma.Controls
         }
     }
 
+    /// <summary>
+    /// A bar of command buttons.
+    /// </summary>
     public class CommandBar : ContentControl
     {
         private DockPanel _buttonsLayout;

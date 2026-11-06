@@ -7,6 +7,9 @@ using XForma.Primitives;
 
 namespace XForma.Controls
 {
+    /// <summary>
+    /// A control was checked or unchecked.
+    /// </summary>
     public class ToggledEventArgs : EventArgs
     {
         public ToggledEventArgs(

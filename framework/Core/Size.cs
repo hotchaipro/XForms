@@ -2,6 +2,9 @@ using System;
 
 namespace XForma
 {
+    /// <summary>
+    /// A width and a height, in device-independent units.
+    /// </summary>
     public struct Size
     {
         private readonly float _width, _height;

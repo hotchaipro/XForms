@@ -26,7 +26,8 @@ has a comment saying so, and renaming one would lose users' data.
   VoiceOver and TalkBack say, and screen readers on the web.
 - Before committing a framework change, run `dotnet test test/XForma.Tests`; for a change that could
   show, `test/visual/Check-Screens.ps1` too. CI is postponed.
-- `docs/api` is generated: run `python docs/generate-api-reference.py` after a build.
+- `docs/api` is generated: run `python docs/generate-api-reference.py` after a build. The C# in
+  the docs is compiled by `python docs/check-snippets.py`: run it after changing either.
 
 ## Layout
 

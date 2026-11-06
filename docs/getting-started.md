@@ -51,13 +51,19 @@ dotnet build MyApp/MyApp.Android -t:Run
 dotnet build MyApp/MyApp.iOS -t:Run
 ```
 
+While you work, `dotnet watch` applies your edits to the running app:
+
+```bash
+dotnet watch --project MyApp/MyApp.Win32
+```
+
 ## How an app is put together
 
 ### The app and its pages
 
 An app derives from `Application` and maps paths to pages:
 
-```csharp
+```csharp no-compile
 public sealed class App : Application
 {
     protected override void OnConfigureRoutes(Routes routes)
@@ -69,7 +75,7 @@ public sealed class App : Application
 }
 ```
 
-`Application.NavigateToAsync("/settings")` opens a page, and the platform's Back
+`Application.NavigateAsync("/settings")` opens a page, and the platform's Back
 goes back. On the web, the path is the page's address.
 
 ### Views
@@ -100,7 +106,7 @@ property follows it.
 Controls have no look of their own: a theme package draws them. Pass one to
 `XFormaApp.Run`. Derive from `BasicTheme` to adapt it, or write your own.
 
-```csharp
+```csharp no-compile
 XFormaApp.Run("MyApp", new App(), new BasicTheme());
 ```
 
@@ -117,7 +123,7 @@ Call `Application.ReportException` at the top of an `async void` method.
 
 ## Where to go next
 
+- [The guides](README.md), a topic at a time.
 - [API reference](api/README.md).
 - [What's supported](support.md), and what 1.0 leaves out.
-- [Architecture](architecture.md), for how it works underneath.
 - The test app in `test/XForma.Test`, which uses every control.

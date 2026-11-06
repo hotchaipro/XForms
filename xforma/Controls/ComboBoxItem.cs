@@ -83,6 +83,9 @@ namespace XForma.Controls
         }
     }
 
+    /// <summary>
+    /// An item in a <see cref="ComboBox"/>.
+    /// </summary>
     public class ComboBoxItem : INotifyPropertyChanged
     {
         private string? _text;

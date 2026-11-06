@@ -8,6 +8,9 @@ using XForma.Primitives;
 
 namespace XForma.Controls
 {
+    /// <summary>
+    /// A floating button that opens other buttons around it.
+    /// </summary>
     public class FlyoutButton : LightDismissControl
     {
         public event EventHandler? Expanding;

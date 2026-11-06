@@ -2,6 +2,9 @@
 
 namespace XForma
 {
+    /// <summary>
+    /// Where an <see cref="Primitives.Image"/> gets its picture.
+    /// </summary>
     public abstract class ImageSource
     {
         internal ImageSource()
@@ -21,6 +24,9 @@ namespace XForma
         }
     }
 
+    /// <summary>
+    /// An <see cref="ImageSource"/> showing an image file.
+    /// </summary>
     public sealed class FileImageSource : ImageSource
     {
         public FileImageSource(
@@ -40,6 +46,9 @@ namespace XForma
         }
     }
 
+    /// <summary>
+    /// An <see cref="ImageSource"/> showing a <see cref="Bitmap"/>.
+    /// </summary>
     public sealed class BitmapImageSource : ImageSource
     {
         public BitmapImageSource(

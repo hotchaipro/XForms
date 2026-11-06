@@ -6,6 +6,9 @@ using XForma.Primitives;
 
 namespace XForma.Controls
 {
+    /// <summary>
+    /// How the user closed a <see cref="MessageBox"/>.
+    /// </summary>
     public enum MessageBoxResult
     {
         Cancel = 0,

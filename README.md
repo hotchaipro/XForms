@@ -138,6 +138,9 @@ What 1.0 leaves out is listed in [docs/support.md](docs/support.md).
 
 ## Documentation
 
+**[Start here](docs/README.md):** getting started, guides for each topic and the API
+reference.
+
 - [Architecture](docs/architecture.md): the layers, and how layout, drawing,
   input, popups, lists and accessibility work.
 - [Comparisons](docs/comparisons.md): XForma compared with Uno Platform,

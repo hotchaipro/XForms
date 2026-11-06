@@ -2,6 +2,9 @@ using System;
 
 namespace XForma
 {
+    /// <summary>
+    /// A rectangle, in device-independent units.
+    /// </summary>
     public struct Rect
     {
         private float _x, _y, _width, _height;

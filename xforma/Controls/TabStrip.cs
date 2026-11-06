@@ -7,6 +7,9 @@ using XForma.Primitives;
 
 namespace XForma.Controls
 {
+    /// <summary>
+    /// The selected tab changed.
+    /// </summary>
     public class TabSelectionChangedEventArgs : EventArgs
     {
         public TabSelectionChangedEventArgs(

@@ -51,6 +51,8 @@ An auto-suggest box's suggestions, in a list below it: a click chooses one. Its 
 
 ## AutoSuggestBoxQuerySubmittedEventArgs
 
+The user submitted an `AutoSuggestBox`'s text.
+
 | Member | |
 |---|---|
 | `AutoSuggestBoxQuerySubmittedEventArgs(string queryText, string chosenSuggestion) -> void` |  |
@@ -59,12 +61,16 @@ An auto-suggest box's suggestions, in a list below it: a click chooses one. Its 
 
 ## AutoSuggestBoxSuggestionChosenEventArgs
 
+The user chose one of an `AutoSuggestBox`'s suggestions.
+
 | Member | |
 |---|---|
 | `AutoSuggestBoxSuggestionChosenEventArgs(string selectedItem) -> void` |  |
 | `SelectedItem.get -> string` |  |
 
 ## AutoSuggestBoxTextChangedEventArgs
+
+An `AutoSuggestBox`'s text changed.
 
 | Member | |
 |---|---|
@@ -304,6 +310,8 @@ A field showing the selected item; clicking it opens a list of the items below i
 
 ## ComboBoxItem
 
+An item in a `ComboBox`.
+
 | Member | |
 |---|---|
 | `ComboBoxItem() -> void` |  |
@@ -341,6 +349,8 @@ A combo box's list of items, in its popup: picks the row under a click; Up and D
 
 ## CommandBar
 
+A bar of command buttons.
+
 | Member | |
 |---|---|
 | `CommandBar() -> void` |  |
@@ -366,6 +376,8 @@ A `CommandBar`'s button: an icon and a label, showing while its command can run.
 | `Text.set -> void` |  |
 
 ## CommandBarCommandCollection
+
+A command bar's commands: primary on one side, secondary on the other.
 
 | Member | |
 |---|---|
@@ -519,6 +531,8 @@ A `DaysOfWeekPicker`'s button for one day. Its theme's template draws it.
 | `Text.set -> void` |  |
 
 ## DaysOfWeekPicker
+
+Chooses days of the week.
 
 | Member | |
 |---|---|
@@ -697,6 +711,8 @@ A popup with its content in a frame (a `PopupFrame`, which its theme's template 
 
 ## FlyoutButton
 
+A floating button that opens other buttons around it.
+
 | Member | |
 |---|---|
 | `AddButton(XForma.Controls.FloatingButton button) -> void` |  |
@@ -756,6 +772,8 @@ Content that opens a URI when tapped. Its theme's template gives it its feedback
 | `NavigationUri.set -> void` |  |
 
 ## IMenuItemContainer
+
+What holds menu items.
 
 | Member | |
 |---|---|
@@ -867,6 +885,8 @@ How a theme lays out an `InfoBar`: an icon, then the title, message and action, 
 | `operator ==(XForma.Controls.InfoBarStyle left, XForma.Controls.InfoBarStyle right) -> bool` |  |
 
 ## ItemClickEventArgs
+
+An item in a list was clicked.
 
 | Member | |
 |---|---|
@@ -1105,6 +1125,8 @@ A menu flyout's items: a click or a tap chooses one; with keyboard focus, Up and
 
 ## MenuItem
 
+An item in a menu: its text, icon and command.
+
 | Member | |
 |---|---|
 | `Click -> System.EventHandler` | Raised when the item is chosen (before its command runs). |
@@ -1123,6 +1145,8 @@ A menu flyout's items: a click or a tap chooses one; with keyboard focus, Up and
 
 ## MenuItemCollection
 
+A menu's items.
+
 | Member | |
 |---|---|
 | `Add(XForma.Controls.MenuItem menuItem) -> void` |  |
@@ -1137,6 +1161,8 @@ A flyout asking the user to confirm something, with OK and Cancel.
 | `ShowAsync(string message, string title) -> System.Threading.Tasks.Task<XForma.Controls.MessageBoxResult>` |  |
 
 ## MessageBoxResult
+
+How the user closed a `MessageBox`.
 
 | Member | |
 |---|---|
@@ -1644,6 +1670,8 @@ One of a `RadioButtons` group's buttons, for one of its items. Its theme's templ
 
 ## RadioButtonItem
 
+One choice in a `RadioButtons` group.
+
 | Member | |
 |---|---|
 | `Icon.get -> XForma.Bitmap` |  |
@@ -1656,6 +1684,8 @@ One of a `RadioButtons` group's buttons, for one of its items. Its theme's templ
 | `Value.set -> void` |  |
 
 ## RadioButtonItemCollection
+
+A `RadioButtons` group's choices.
 
 | Member | |
 |---|---|
@@ -1682,6 +1712,8 @@ How a theme lays out a `RadioButtons` group.
 | `operator ==(XForma.Controls.RadioButtonStyle left, XForma.Controls.RadioButtonStyle right) -> bool` |  |
 
 ## RadioButtons
+
+A group of choices, of which one is selected.
 
 | Member | |
 |---|---|
@@ -1759,6 +1791,8 @@ A command that runs a delegate, optionally only when another delegate says it ca
 | `RelayCommand(System.Action<object> execute, System.Func<object, bool> canExecute = null) -> void` |  |
 
 ## SelectionChangedEventArgs
+
+What's selected changed.
 
 | Member | |
 |---|---|
@@ -1862,6 +1896,8 @@ How a theme lays out a `Slider`: its header, then the track across the middle of
 
 ## SwipeCommandCollection
 
+What swiping a row does: primary commands one way, secondary the other.
+
 | Member | |
 |---|---|
 | `IsFlickEnabled.get -> bool` | Whether a quick, short swipe runs its command as a full one does: false by default. A side that requires a long swipe never does. |
@@ -1875,6 +1911,8 @@ How a theme lays out a `Slider`: its header, then the track across the middle of
 | `SwipeCommandCollection() -> void` |  |
 
 ## TabSelectionChangedEventArgs
+
+The selected tab changed.
 
 | Member | |
 |---|---|
@@ -2281,6 +2319,8 @@ How a theme lays out a `ToggleSwitch`: its header, then a track at the start of 
 
 ## ToggledEventArgs
 
+A control was checked or unchecked.
+
 | Member | |
 |---|---|
 | `ToggledEventArgs(bool value) -> void` |  |
@@ -2424,6 +2464,8 @@ A theme's type scale.
 
 ## UICommand
 
+A command with its text and icon, for buttons and menus.
+
 | Member | |
 |---|---|
 | `AccentColor.get -> XForma.Color` |  |
@@ -2442,6 +2484,8 @@ A theme's type scale.
 | `UICommand() -> void` |  |
 
 ## UriNavigationCommand
+
+A command that opens a URI.
 
 | Member | |
 |---|---|

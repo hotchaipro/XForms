@@ -8,6 +8,9 @@ using XForma.Primitives;
 
 namespace XForma.Controls
 {
+    /// <summary>
+    /// What swiping a row does: primary commands one way, secondary the other.
+    /// </summary>
     public class SwipeCommandCollection
     {
         private List<UICommand> _primaryCommands;

@@ -7,6 +7,9 @@ namespace XForma
 {
 
 
+    /// <summary>
+    /// A screen of the app. Override <see cref="Build"/> to return its views.
+    /// </summary>
     public class Page : View
     {
         private View? _content;

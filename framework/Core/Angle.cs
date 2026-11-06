@@ -2,6 +2,9 @@ using System;
 
 namespace XForma
 {
+    /// <summary>
+    /// An angle, in degrees or radians.
+    /// </summary>
     public struct Angle
     {
         public static readonly Angle Zero = new Angle(0f);

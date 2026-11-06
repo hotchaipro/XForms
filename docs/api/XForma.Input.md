@@ -2,6 +2,8 @@
 
 ## HoldingEventArgs
 
+A press held on a view.
+
 | Member | |
 |---|---|
 | `HoldingEventArgs(XForma.Point position, XForma.Input.HoldingState state) -> void` |  |
@@ -9,6 +11,8 @@
 | `Position.get -> XForma.Point` |  |
 
 ## HoldingState
+
+How far a hold has got.
 
 | Member | |
 |---|---|
@@ -18,6 +22,8 @@
 
 ## IPanGestureDelegate
 
+What a control implements to follow a `PanGestureRecognizer`.
+
 | Member | |
 |---|---|
 | `OnPanCanceled() -> void` |  |
@@ -26,6 +32,8 @@
 | `OnPanStarted() -> void` |  |
 
 ## IPinchGestureDelegate
+
+What a control implements to follow a `PinchGestureRecognizer`.
 
 | Member | |
 |---|---|

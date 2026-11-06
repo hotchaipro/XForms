@@ -7,6 +7,9 @@ using XForma.Primitives;
 
 namespace XForma.Controls
 {
+    /// <summary>
+    /// Chooses days of the week.
+    /// </summary>
     public class DaysOfWeekPicker : ContentControl
     {
         private StyledValue<float> _height = new StyledValue<float>(Dimension.Auto);

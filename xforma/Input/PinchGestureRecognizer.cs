@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace XForma.Input
 {
+    /// <summary>
+    /// What a control implements to follow a <see cref="PinchGestureRecognizer"/>.
+    /// </summary>
     public interface IPinchGestureDelegate : IGestureRecognizerDelegate
     {
         void OnPinchStarted();

@@ -5,6 +5,9 @@ using XForma.Primitives;
 
 namespace XForma.Controls
 {
+    /// <summary>
+    /// A command that opens a URI.
+    /// </summary>
     public class UriNavigationCommand : ICommand
     {
         public UriNavigationCommand()

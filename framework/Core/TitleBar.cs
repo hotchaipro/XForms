@@ -2,6 +2,9 @@
 
 namespace XForma
 {
+    /// <summary>
+    /// The main window's title bar, on the platforms that have one.
+    /// </summary>
     public class TitleBar
     {
         private Application _application;

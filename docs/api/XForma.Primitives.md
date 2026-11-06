@@ -2,6 +2,8 @@
 
 ## Image
 
+Shows an image, with the platform's own image view.
+
 | Member | |
 |---|---|
 | `DefaultAccessibilityRole.get -> XForma.AccessibilityRole` |  |
@@ -65,6 +67,8 @@ A scrolling, virtualizing view of items: the platform realizes a container (an `
 
 ## ItemsViewSource
 
+The items of a list, with how to make and bind a view for each.
+
 | Member | |
 |---|---|
 | `CollectionChanged -> System.Collections.Specialized.NotifyCollectionChangedEventHandler` |  |
@@ -88,6 +92,8 @@ Whether scrolling a `ScrollViewer` hides the soft keyboard.
 | `OnDrag = 1 -> XForma.Primitives.KeyboardDismissMode` | Dragging the content ends text entry, hiding the keyboard. |
 
 ## KeyboardOptions
+
+What a text box offers while typing: the kind of keyboard, suggestions, capitalization.
 
 | Member | |
 |---|---|
@@ -163,6 +169,8 @@ A piece of a `TextBlock`'s text with its own style. Unset values keep the text b
 
 ## ScrollViewer
 
+Scrolls one view, with the platform's own scrolling.
+
 | Member | |
 |---|---|
 | `Content.get -> XForma.View` |  |
@@ -180,6 +188,8 @@ A piece of a `TextBlock`'s text with its own style. Unset values keep the text b
 | `VerticalOffset.get -> float` | How far the content is scrolled down. |
 
 ## TextBlock
+
+Shows text, with the platform's own text rendering.
 
 | Member | |
 |---|---|
@@ -216,6 +226,8 @@ A piece of a `TextBlock`'s text with its own style. Unset values keep the text b
 | `VerticalTextAlignment.set -> void` |  |
 
 ## TextBox
+
+Text entry: the platform's own, so selection, spell checking, input methods and autofill behave as in its own apps.
 
 | Member | |
 |---|---|

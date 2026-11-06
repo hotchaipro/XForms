@@ -4,6 +4,9 @@ using XForma.Platform;
 
 namespace XForma
 {
+    /// <summary>
+    /// The base of everything in the view tree: a theme, attached properties and a platform renderer.
+    /// </summary>
     public abstract class Element
     {
         public interface IAttachedProperty

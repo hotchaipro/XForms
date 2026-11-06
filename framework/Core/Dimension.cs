@@ -2,6 +2,9 @@ using System;
 
 namespace XForma
 {
+    /// <summary>
+    /// Values for a view's size, such as <see cref="Auto"/> to fit its content.
+    /// </summary>
     public struct Dimension
     {
         // TODO: Consider using float.PositiveInfinity instead of float.NaN since the == operator does not return true for float.NaN == float.NaN

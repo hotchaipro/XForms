@@ -5,6 +5,9 @@ using XForma.Primitives;
 
 namespace XForma.Controls
 {
+    /// <summary>
+    /// A group of choices, of which one is selected.
+    /// </summary>
     public class RadioButtons : ContentControl
     {
         private StyledValue<float> _height = new StyledValue<float>(Dimension.Auto);

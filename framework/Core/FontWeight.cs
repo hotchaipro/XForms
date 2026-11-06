@@ -2,6 +2,9 @@
 
 namespace XForma
 {
+    /// <summary>
+    /// How heavy text is.
+    /// </summary>
     public enum FontWeight
     {
         // See https://www.w3.org/TR/css-fonts-3/#propdef-font-weight

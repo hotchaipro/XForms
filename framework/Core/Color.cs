@@ -3,6 +3,9 @@ using System.Globalization;
 
 namespace XForma
 {
+    /// <summary>
+    /// A color, with 8 bits each of alpha, red, green and blue.
+    /// </summary>
     public struct Color
     {
         private Color(

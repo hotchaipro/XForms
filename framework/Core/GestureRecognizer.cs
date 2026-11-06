@@ -31,6 +31,9 @@ namespace XForma
         Failed,
     }
 
+    /// <summary>
+    /// What a control implements to hear when a touch begins and ends on its gesture recognizer.
+    /// </summary>
     public interface IGestureRecognizerDelegate
     {
         void OnTouchBegan();

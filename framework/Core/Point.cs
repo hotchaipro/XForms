@@ -3,6 +3,9 @@ using System.Globalization;
 
 namespace XForma
 {
+    /// <summary>
+    /// A position, in device-independent units.
+    /// </summary>
     public struct Point
     {
         public static readonly Point Zero = new Point(0, 0);

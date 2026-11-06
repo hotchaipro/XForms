@@ -3,6 +3,9 @@ using XForma.Platform;
 
 namespace XForma.Primitives
 {
+    /// <summary>
+    /// What a text box offers while typing: the kind of keyboard, suggestions, capitalization.
+    /// </summary>
     [Flags]
     public enum KeyboardOptions
     {
@@ -12,6 +15,9 @@ namespace XForma.Primitives
         All = SpellCheck | Suggestions,
     }
 
+    /// <summary>
+    /// Text entry: the platform's own, so selection, spell checking, input methods and autofill behave as in its own apps.
+    /// </summary>
     public class TextBox : View, ITextBoxDelegate
     {
         protected override AccessibilityRole DefaultAccessibilityRole

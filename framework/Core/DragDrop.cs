@@ -159,6 +159,9 @@ namespace XForma
         }
     }
 
+    /// <summary>
+    /// Something on screen: it measures, arranges and draws itself, and takes input.
+    /// </summary>
     public partial class View
     {
         private bool _canDrag;

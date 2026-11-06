@@ -2,6 +2,9 @@
 
 namespace XForma
 {
+    /// <summary>
+    /// Which end of an animation an easing applies to.
+    /// </summary>
     public enum EasingMode
     {
         EaseIn,
@@ -72,6 +75,9 @@ namespace XForma
         }
     }
 
+    /// <summary>
+    /// An easing that follows a cubic curve.
+    /// </summary>
     public class CubicEase : EasingFunction
     {
         public CubicEase(

@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Compiles the C# in the docs; docs/check-snippets.py fills it in -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <Nullable>annotations</Nullable>
+    <NoWarn>$(NoWarn);CS0219;CS0168;CS1998;CS8632;CA1416;CS4014</NoWarn>
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="$(SnippetsFolder)\*.cs" Condition="'$(SnippetsFolder)' != ''" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\framework\XForma.Framework.csproj" />
+    <ProjectReference Include="..\..\xforma\XForma.csproj" />
+    <ProjectReference Include="..\..\toolkit\XForma.Toolkit.csproj" />
+    <ProjectReference Include="..\..\themes\basic\XForma.Themes.Basic.csproj" />
+    <ProjectReference Include="..\..\testing\XForma.Testing.csproj" />
+  </ItemGroup>
+
+</Project>

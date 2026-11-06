@@ -7,6 +7,9 @@ using XForma.Primitives;
 
 namespace XForma.Controls
 {
+    /// <summary>
+    /// A <see cref="RadioButtons"/> group's choices.
+    /// </summary>
     public sealed class RadioButtonItemCollection : IEnumerable<RadioButtonItem>
     {
         private RadioButtons _radioButtonGroup;
@@ -46,6 +49,9 @@ namespace XForma.Controls
         }
     }
 
+    /// <summary>
+    /// One choice in a <see cref="RadioButtons"/> group.
+    /// </summary>
     public class RadioButtonItem : INotifyPropertyChanged
     {
         private Bitmap? _icon;

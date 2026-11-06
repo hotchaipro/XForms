@@ -35,6 +35,9 @@ namespace XForma.Input
         }
     }
 
+    /// <summary>
+    /// How far a hold has got.
+    /// </summary>
     public enum HoldingState
     {
         /// <summary>
@@ -53,6 +56,9 @@ namespace XForma.Input
         Canceled,
     }
 
+    /// <summary>
+    /// A press held on a view.
+    /// </summary>
     public sealed class HoldingEventArgs : EventArgs
     {
         public HoldingEventArgs(

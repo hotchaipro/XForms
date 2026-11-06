@@ -6,6 +6,9 @@ using XForma.Platform;
 
 namespace XForma
 {
+    /// <summary>
+    /// The app: its pages, its theme and its life. Derive from it, list the pages in <see cref="OnConfigureRoutes"/>, and start it with <c>XFormaApp.Run</c>.
+    /// </summary>
     public abstract class Application
     {
         private static Application? _CurrentApplication;

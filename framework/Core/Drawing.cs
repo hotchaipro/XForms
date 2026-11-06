@@ -15,6 +15,9 @@ namespace XForma
         }
     }
 
+    /// <summary>
+    /// A brush that fills with one color.
+    /// </summary>
     public sealed class SolidColorBrush : Brush
     {
         public SolidColorBrush(
@@ -29,6 +32,9 @@ namespace XForma
         }
     }
 
+    /// <summary>
+    /// A color at a position along a gradient.
+    /// </summary>
     public readonly struct GradientStop
     {
         public GradientStop(
@@ -120,6 +126,9 @@ namespace XForma
         }
     }
 
+    /// <summary>
+    /// What a segment of a path geometry is.
+    /// </summary>
     public enum PathSegmentKind
     {
         MoveTo,

@@ -4,6 +4,9 @@ using XForma.Platform;
 
 namespace XForma.Primitives
 {
+    /// <summary>
+    /// Scrolls one view, with the platform's own scrolling.
+    /// </summary>
     public class ScrollViewer : View
     {
         internal override bool ScrollsContent

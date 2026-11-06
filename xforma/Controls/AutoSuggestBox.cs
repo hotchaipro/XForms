@@ -25,6 +25,9 @@ namespace XForma.Controls
         SuggestionChosen,
     }
 
+    /// <summary>
+    /// An <see cref="AutoSuggestBox"/>'s text changed.
+    /// </summary>
     public sealed class AutoSuggestBoxTextChangedEventArgs : EventArgs
     {
         public AutoSuggestBoxTextChangedEventArgs(
@@ -39,6 +42,9 @@ namespace XForma.Controls
         }
     }
 
+    /// <summary>
+    /// The user chose one of an <see cref="AutoSuggestBox"/>'s suggestions.
+    /// </summary>
     public sealed class AutoSuggestBoxSuggestionChosenEventArgs : EventArgs
     {
         public AutoSuggestBoxSuggestionChosenEventArgs(
@@ -53,6 +59,9 @@ namespace XForma.Controls
         }
     }
 
+    /// <summary>
+    /// The user submitted an <see cref="AutoSuggestBox"/>'s text.
+    /// </summary>
     public sealed class AutoSuggestBoxQuerySubmittedEventArgs : EventArgs
     {
         public AutoSuggestBoxQuerySubmittedEventArgs(

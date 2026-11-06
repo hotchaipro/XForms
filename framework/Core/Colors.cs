@@ -2,6 +2,9 @@
 
 namespace XForma
 {
+    /// <summary>
+    /// Named colors. In views, prefer the theme's roles, which work in every theme mode.
+    /// </summary>
     public static class Colors
     {
         public static readonly Color Transparent = Color.FromArgb(0x00000000);

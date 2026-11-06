@@ -2,6 +2,9 @@ using System;
 
 namespace XForma.Input
 {
+    /// <summary>
+    /// What a control implements to follow a <see cref="PanGestureRecognizer"/>.
+    /// </summary>
     public interface IPanGestureDelegate : IGestureRecognizerDelegate
     {
         void OnPanStarted();

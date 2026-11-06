@@ -5,6 +5,9 @@ using XForma.Platform;
 
 namespace XForma
 {
+    /// <summary>
+    /// An image to draw or show, loaded from a file or from pixels.
+    /// </summary>
     public class Bitmap : Element
     {
         public Bitmap(

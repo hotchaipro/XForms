@@ -2,6 +2,9 @@ using System;
 
 namespace XForma
 {
+    /// <summary>
+    /// A point on a view that a transform works around.
+    /// </summary>
     public struct Origin
     {
         public static Origin TopLeft = new Origin(0, 0);

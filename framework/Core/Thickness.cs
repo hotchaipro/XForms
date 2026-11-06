@@ -2,6 +2,9 @@ using System;
 
 namespace XForma
 {
+    /// <summary>
+    /// A distance on each of four sides, for margins and padding.
+    /// </summary>
     public struct Thickness
     {
         public static readonly Thickness Zero = new Thickness(0, 0, 0, 0);

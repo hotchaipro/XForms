@@ -5,6 +5,9 @@ using XForma.Primitives;
 
 namespace XForma.Controls
 {
+    /// <summary>
+    /// A command with its text and icon, for buttons and menus.
+    /// </summary>
     public class UICommand : ICommand
     {
         public ICommand? Command

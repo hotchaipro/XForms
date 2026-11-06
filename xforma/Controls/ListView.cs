@@ -20,6 +20,9 @@ namespace XForma.Controls
         Multiple,
     }
 
+    /// <summary>
+    /// An item in a list was clicked.
+    /// </summary>
     public class ItemClickEventArgs : EventArgs
     {
         public ItemClickEventArgs(
@@ -47,6 +50,9 @@ namespace XForma.Controls
         }
     }
 
+    /// <summary>
+    /// What's selected changed.
+    /// </summary>
     public class SelectionChangedEventArgs : EventArgs
     {
         private static readonly object[] None = Array.Empty<object>();

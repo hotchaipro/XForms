@@ -2,6 +2,9 @@ using System;
 
 namespace XForma
 {
+    /// <summary>
+    /// What a pointer just did.
+    /// </summary>
     public enum PointerInputState
     {
         Began = 0,
@@ -10,6 +13,9 @@ namespace XForma
         Canceled,
     }
 
+    /// <summary>
+    /// What a pointer is: touch, a mouse or a pen.
+    /// </summary>
     public enum PointerDeviceType
     {
         Touch = 0,
@@ -17,6 +23,9 @@ namespace XForma
         Pen,
     }
 
+    /// <summary>
+    /// The modifier keys held during input.
+    /// </summary>
     [Flags]
     public enum KeyModifiers
     {

@@ -34,6 +34,9 @@ namespace XForma.Primitives
         public bool Strikethrough { get; init; }
     }
 
+    /// <summary>
+    /// Shows text, with the platform's own text rendering.
+    /// </summary>
     public class TextBlock : View
     {
         internal override bool IsLightweightType

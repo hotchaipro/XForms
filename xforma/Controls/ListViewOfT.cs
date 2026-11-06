@@ -90,6 +90,9 @@ namespace XForma.Controls
     /// };
     /// </code>
     /// </example>
+    /// <summary>
+    /// A list of items, which creates only the rows on screen and reuses them.
+    /// </summary>
     public class ListView<T> : ListView
     {
         private IReadOnlyList<T>? _itemsSource;

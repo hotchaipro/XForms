@@ -69,6 +69,8 @@ What a view is to assistive technology such as a screen reader. Each platform ma
 
 ## Angle
 
+An angle, in degrees or radians.
+
 | Member | |
 |---|---|
 | `Angle() -> void` |  |
@@ -166,6 +168,8 @@ A view's render properties: translation, scale, rotation, opacity and clip, arou
 
 ## Application
 
+The app: its pages, its theme and its life. Derive from it, list the pages in `OnConfigureRoutes`, and start it with `XFormaApp.Run`.
+
 | Member | |
 |---|---|
 | `AccentColor.get -> XForma.Color?` | The app's accent color, or null (the default) for the system's (or, without one, `DefaultAccentColor`). |
@@ -252,6 +256,8 @@ Keeps a view property up to date with a value from a source, such as a view mode
 
 ## Bitmap
 
+An image to draw or show, loaded from a file or from pixels.
+
 | Member | |
 |---|---|
 | `Bitmap(XForma.ImageSource source) -> void` |  |
@@ -259,6 +265,8 @@ Keeps a view property up to date with a value from a source, such as a view mode
 | `Source.get -> XForma.ImageSource` |  |
 
 ## BitmapImageSource
+
+An `ImageSource` showing a `Bitmap`.
 
 | Member | |
 |---|---|
@@ -270,6 +278,8 @@ Keeps a view property up to date with a value from a source, such as a view mode
 What fills a shape. Brushes are immutable, so they can be shared and cached.
 
 ## Color
+
+A color, with 8 bits each of alpha, red, green and blue.
 
 | Member | |
 |---|---|
@@ -340,6 +350,8 @@ A theme's colors, by role. Most come in pairs: a color, and the color of text an
 | `operator ==(XForma.ColorScheme left, XForma.ColorScheme right) -> bool` |  |
 
 ## Colors
+
+Named colors. In views, prefer the theme's roles, which work in every theme mode.
 
 | Member | |
 |---|---|
@@ -502,6 +514,8 @@ The user asked for a view's context menu: with a right-click, a long press, or t
 
 ## CubicEase
 
+An easing that follows a cubic curve.
+
 | Member | |
 |---|---|
 | `CubicEase(XForma.EasingMode easingMode) -> void` |  |
@@ -524,6 +538,8 @@ What's being dragged. Text and a URI go to other apps too; `LocalData` stays in 
 | `Uri.set -> void` |  |
 
 ## Dimension
+
+Values for a view's size, such as `Auto` to fit its content.
 
 | Member | |
 |---|---|
@@ -688,6 +704,8 @@ The shape of an animation's progress over time. Platforms sample it to play the 
 
 ## EasingMode
 
+Which end of an animation an easing applies to.
+
 | Member | |
 |---|---|
 | `EaseIn = 0 -> XForma.EasingMode` |  |
@@ -695,6 +713,8 @@ The shape of an animation's progress over time. Platforms sample it to play the 
 | `EaseOut = 1 -> XForma.EasingMode` |  |
 
 ## Element
+
+The base of everything in the view tree: a theme, attached properties and a platform renderer.
 
 | Member | |
 |---|---|
@@ -706,6 +726,8 @@ The shape of an animation's progress over time. Platforms sample it to play the 
 | `OnThemeChanged(XForma.Theme theme) -> void` | Called with the element's effective theme once it's attached (every constructor has run, and its native object exists), and whenever that theme changes. Never called from a constructor. |
 
 ## FileImageSource
+
+An `ImageSource` showing an image file.
 
 | Member | |
 |---|---|
@@ -733,12 +755,16 @@ Generic font families, as in CSS: each platform uses a matching system font, so 
 
 ## FontStyle
 
+Whether text is upright or italic.
+
 | Member | |
 |---|---|
 | `Italic = 1 -> XForma.FontStyle` |  |
 | `Normal = 0 -> XForma.FontStyle` |  |
 
 ## FontWeight
+
+How heavy text is.
 
 | Member | |
 |---|---|
@@ -809,6 +835,8 @@ Where a gesture recognizer is in following the pointer on its view.
 
 ## GradientStop
 
+A color at a position along a gradient.
+
 | Member | |
 |---|---|
 | `Color.get -> XForma.Color` |  |
@@ -849,6 +877,8 @@ One animator's native layer: a platform's compositor layer, or a view whose rend
 
 ## IGestureRecognizerDelegate
 
+What a control implements to hear when a touch begins and ends on its gesture recognizer.
+
 | Member | |
 |---|---|
 | `OnTouchBegan() -> void` |  |
@@ -868,6 +898,8 @@ The bindable properties of `Image`, such as `Image.SourceProperty`, for `ViewBin
 | `get_TintProperty() -> XForma.ViewProperty<XForma.Primitives.Image, XForma.Color>` |  |
 
 ## ImageSource
+
+Where an `Image` gets its picture.
 
 | Member | |
 |---|---|
@@ -964,6 +996,8 @@ A key pressed or released while a view (or one of its descendants) has keyboard 
 
 ## KeyModifiers
 
+The modifier keys held during input.
+
 | Member | |
 |---|---|
 | `Alt = 4 -> XForma.KeyModifiers` |  |
@@ -1007,12 +1041,16 @@ How much a message from the framework matters.
 
 ## NavigationEventArgs
 
+A page being navigated to or from.
+
 | Member | |
 |---|---|
 | `NavigationEventArgs(XForma.NavigationMode navigationMode) -> void` |  |
 | `NavigationMode.get -> XForma.NavigationMode` | Whether the navigation went forward to a page or back to it. |
 
 ## NavigationMode
+
+Whether navigation goes forward, back or replaces the page.
 
 | Member | |
 |---|---|
@@ -1029,6 +1067,8 @@ The direction a panel stacks or wraps its children in, or a list lays its items 
 | `Vertical = 1 -> XForma.Orientation` |  |
 
 ## Origin
+
+A point on a view that a transform works around.
 
 | Member | |
 |---|---|
@@ -1051,6 +1091,8 @@ The direction a panel stacks or wraps its children in, or a list lays its items 
 | `operator ==(XForma.Origin a, XForma.Origin b) -> bool` |  |
 
 ## Page
+
+A screen of the app. Override `Build` to return its views.
 
 | Member | |
 |---|---|
@@ -1155,6 +1197,8 @@ A segment of a path: the end point, and the control points of a curve.
 
 ## PathSegmentKind
 
+What a segment of a path geometry is.
+
 | Member | |
 |---|---|
 | `Close = 4 -> XForma.PathSegmentKind` |  |
@@ -1164,6 +1208,8 @@ A segment of a path: the end point, and the control points of a curve.
 | `QuadraticTo = 2 -> XForma.PathSegmentKind` |  |
 
 ## Point
+
+A position, in device-independent units.
 
 | Member | |
 |---|---|
@@ -1191,6 +1237,8 @@ A segment of a path: the end point, and the control points of a curve.
 | `operator ==(XForma.Point a, XForma.Point b) -> bool` |  |
 
 ## PointerDeviceType
+
+What a pointer is: touch, a mouse or a pen.
 
 | Member | |
 |---|---|
@@ -1220,6 +1268,8 @@ A pointer (touch, mouse or pen) pressing, moving, releasing or turning a wheel o
 
 ## PointerInputState
 
+What a pointer just did.
+
 | Member | |
 |---|---|
 | `Began = 0 -> XForma.PointerInputState` |  |
@@ -1228,6 +1278,8 @@ A pointer (touch, mouse or pen) pressing, moving, releasing or turning a wheel o
 | `Moved = 1 -> XForma.PointerInputState` |  |
 
 ## Rect
+
+A rectangle, in device-independent units.
 
 | Member | |
 |---|---|
@@ -1333,6 +1385,8 @@ The shape that casts a `Shadow`: the view's bounds, or the ellipse (a circle, fo
 
 ## Size
 
+A width and a height, in device-independent units.
+
 | Member | |
 |---|---|
 | `Empty -> XForma.Size` |  |
@@ -1347,6 +1401,8 @@ The shape that casts a `Shadow`: the view's bounds, or the ellipse (a circle, fo
 | `operator ==(XForma.Size a, XForma.Size b) -> bool` |  |
 
 ## SolidColorBrush
+
+A brush that fills with one color.
 
 | Member | |
 |---|---|
@@ -1367,6 +1423,8 @@ A spring: it overshoots and settles, oscillating the given number of times (as W
 | `Springiness.set -> void` | How quickly the oscillation dies away: larger is stiffer. |
 
 ## TextAlignment
+
+Where text sits in its space.
 
 | Member | |
 |---|---|
@@ -1522,6 +1580,8 @@ Whether the UI is light, dark or high contrast. The system reports its mode; an 
 
 ## Thickness
 
+A distance on each of four sides, for margins and padding.
+
 | Member | |
 |---|---|
 | `Bottom -> float` |  |
@@ -1543,6 +1603,8 @@ Whether the UI is light, dark or high contrast. The system reports its mode; an 
 
 ## TitleBar
 
+The main window's title bar, on the platforms that have one.
+
 | Member | |
 |---|---|
 | `AccentColor.get -> XForma.Color?` |  |
@@ -1563,6 +1625,8 @@ Where a view sits vertically in the space its parent gives it.
 | `Top = 0 -> XForma.VerticalAlignment` |  |
 
 ## View
+
+Something on screen: it measures, arranges and draws itself, and takes input.
 
 | Member | |
 |---|---|

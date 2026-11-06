@@ -8,11 +8,17 @@ using XForma.Primitives;
 
 namespace XForma.Controls
 {
+    /// <summary>
+    /// What holds menu items.
+    /// </summary>
     public interface IMenuItemContainer
     {
         void Add(MenuItem menuItem);
     }
 
+    /// <summary>
+    /// A menu's items.
+    /// </summary>
     public sealed class MenuItemCollection : IEnumerable<MenuItem>
     {
         private IMenuItemContainer _itemContainer;
@@ -52,6 +58,9 @@ namespace XForma.Controls
         }
     }
 
+    /// <summary>
+    /// An item in a menu: its text, icon and command.
+    /// </summary>
     public class MenuItem : INotifyPropertyChanged
     {
         private ICommand? _command;
